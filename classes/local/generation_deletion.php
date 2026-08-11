@@ -75,11 +75,6 @@ class generation_deletion {
         // The user id is deliberately NOT cleared here. This is an ordinary deletion, not a data
         // subject request, and the entries have to stay reachable in that user's own GDPR export.
         // Anonymising is what the privacy provider does, on request, and it is a different thing.
-        //
-        // The diagnostic payload is not redacted here either: it is exactly what somebody
-        // investigating a failed generation needs, and deleting the generation is often the last
-        // step of that investigation rather than the end of it. It goes when its retention period
-        // ends - see diagnostic_log_retention.
         $DB->set_field_select(
             'local_artqtml_log',
             'originalgenerationid',

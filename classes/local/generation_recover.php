@@ -54,8 +54,6 @@ class generation_recover {
             $fresh->draftcategoryid = null;
         }
         $DB->delete_records('local_artqtml_questions', ['generationid' => $generationid]);
-        // Glob-040: keep the token-budget log row, mark it rolled back so it leaves the next run's UI.
-        token_budget::mark_rolled_back($generationid);
         $DB->set_field('local_artqtml_generations', 'pendingdata', null, ['id' => $generationid]);
         $DB->set_field('local_artqtml_generations', 'countdiscrepancy', null, ['id' => $generationid]);
         $transaction->allow_commit();

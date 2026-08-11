@@ -186,96 +186,6 @@ function local_artqtml_render_model_buttons(string $provider): string {
 }
 
 /**
- * Render the license warning/blocked banner shown on every admin tab and the list page
- * (Lic-008: "minden fülön figyelmeztető sáv jelenik meg").
- *
- * Returns an empty string when the license is valid and not nearing its expiry/usage
- * threshold, so callers can skip rendering anything at all in that case.
- *
- * @return string
- */
-function local_artqtml_license_warning_banner(): string {
-    $status = \local_artqtml\local\license_checker::status();
-
-    // Security: unlike every other blocking state, tampered's message is deliberately generic -
-    // never the modified/missing file names/paths - plus an opaque error code an admin can quote
-    // to the vendor. See license_checker::integrity_error_code()'s docblock.
-    if ($status['state'] === 'tampered') {
-        return html_writer::div(
-            get_string('licensetampered_generic', 'local_artqtml') . ' ' .
-            get_string('licensetampered_errorcode', 'local_artqtml', $status['errorcode'] ?? ''),
-            'alert alert-danger'
-        );
-    }
-
-    if (in_array($status['state'], \local_artqtml\local\license_checker::BLOCKING_STATES, true)) {
-        return html_writer::div(
-            get_string('licensewarningblocked_' . $status['state'], 'local_artqtml'),
-            'alert alert-danger'
-        );
-    }
-
-    if (empty($status['warning'])) {
-        return '';
-    }
-
-    if (isset($status['expiresat'])) {
-        // Glob-042 / Lic-025 (2026-08-07): every UI date uses the plugin datetimeformat
-        // (ÉÉÉÉ.HH.NN óó:pp), including the licence expiry warning - no Moodle locale short-date
-        // exception.
-        $message = get_string(
-            'licensewarningexpiring',
-            'local_artqtml',
-            userdate((int) $status['expiresat'], get_string('datetimeformat', 'local_artqtml'))
-        );
-    } else if (isset($status['usedpct'])) {
-        $message = get_string('licensewarningquestionlimit', 'local_artqtml', $status['usedpct']);
-    } else {
-        $message = get_string('licensewarninggeneric', 'local_artqtml');
-    }
-
-    return html_writer::div($message, 'alert alert-warning');
-}
-
-/**
- * Render a yellow token-budget warning banner (Admin-033), shown on every admin tab - the same
- * "shown everywhere, not just the Token management page" treatment as the license banner.
- *
- * Returns a warning as soon as either provider's usage for the current billing cycle reaches the
- * configured warning percentage (tokenbudgetwarningpct) of its budget. Only ever shown to users
- * who can act on it (local/artqtml:configure); returns '' for everyone else, for a provider with
- * an unlimited (0) budget, and whenever no provider is over the threshold.
- *
- * @return string
- */
-function local_artqtml_token_warning_banner(): string {
-    if (!has_capability('local/artqtml:configure', context_system::instance())) {
-        return '';
-    }
-
-    $warningpct = (int) (get_config('local_artqtml', 'tokenbudgetwarningpct') ?: 80);
-
-    $messages = [];
-    $stringkeys = ['claude' => 'tokenwarningbannergenerator', 'gemini' => 'tokenwarningbannervalidator'];
-    foreach ($stringkeys as $provider => $stringkey) {
-        $budget = \local_artqtml\local\token_budget::budget($provider);
-        if ($budget <= 0) {
-            continue; // Unlimited budget - nothing to warn about.
-        }
-        $pct = (int) round((\local_artqtml\local\token_budget::used($provider) / $budget) * 100);
-        if ($pct >= $warningpct) {
-            $messages[] = get_string($stringkey, 'local_artqtml', min(100, $pct));
-        }
-    }
-
-    if (empty($messages)) {
-        return '';
-    }
-
-    return html_writer::div(implode(' ', $messages), 'alert alert-warning');
-}
-
-/**
  * Render a yellow "you're viewing someone else's generation" banner (Glob-031): local/artqtml
  * is a site-wide, not per-owner-locked tool - any user with local/artqtml:use can open and act
  * on any generation, but should always be told clearly whose it is when it isn't their own.
@@ -302,9 +212,8 @@ function local_artqtml_owner_warning_banner(stdClass $generation): string {
 }
 
 /**
- * Render a red "draft course not configured" banner (Jov-023) - shown on every admin tab, same
- * pattern as {@see local_artqtml_license_warning_banner()}, since new generations are blocked
- * site-wide (upload.php/generate.php) for as long as this is true.
+ * Render a red "draft course not configured" banner (Jov-023) - shown on every admin tab,
+ * since new generations are blocked site-wide (upload.php/generate.php) for as long as this is true.
  *
  * @return string empty string if the draft course is configured and exists
  */
@@ -351,9 +260,7 @@ function local_artqtml_setting_backup_notice(): string {
 /**
  * Glob-036/Admin-065: the model blocking warning bar, shown on every plugin surface.
  *
- * Mirrors the licence banner's treatment - the specification asks for "a licenszblokkoláshoz
- * hasonló figyelmeztető sáv". Returns '' when neither provider is blocked, so callers can render it
- * unconditionally.
+ * Returns '' when neither provider is blocked, so callers can render it unconditionally.
  *
  * @return string
  */

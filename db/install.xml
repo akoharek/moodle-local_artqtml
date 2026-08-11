@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/artqtml/db" VERSION="20260804" COMMENT="XMLDB file for Moodle local/artqtml"
+<XMLDB PATH="local/artqtml/db" VERSION="20260811" COMMENT="XMLDB file for Moodle local/artqtml Light"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -20,7 +20,6 @@
         <FIELD NAME="processingtoken" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" COMMENT="Random token set by an atomic UPDATE to claim this generation for processing; NULL means unclaimed (C-02: prevents two concurrent task runs processing the same generation)"/>
         <FIELD NAME="pendingdata" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="M-15: JSON holding the raw Claude questions and, once validated, the Gemini evaluations - held here (not in local_artqtml_questions) between the generating/validating/saving stages, so nothing is written to local_artqtml_questions until the saving stage commits it all in one transaction. Cleared once saving succeeds."/>
         <FIELD NAME="countdiscrepancy" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="M-08: JSON list of {type, requested, received} for any question type where Claude's actual output didn't match the requested count, null if none"/>
-        <FIELD NAME="diagnostics" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="BL-34: 1 if this generation records the full AI request and response payloads into local_artqtml_log. Off by default and settable only by a user with local/artqtml:configure - the payloads are large, and a teacher turning it on for every generation would grow the log without anyone deciding to."/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
@@ -75,7 +74,7 @@
     <TABLE NAME="local_artqtml_log" COMMENT="Event log entries for AI quiz question generations (technical annex ch.7/8)">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="generationid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The generation this log entry relates to; NULL for entries not tied to a generation (e.g. license integrity violations) and for entries whose generation has since been deleted - see originalgenerationid"/>
+        <FIELD NAME="generationid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The generation this log entry relates to; NULL for entries not tied to a generation and for entries whose generation has since been deleted - see originalgenerationid"/>
         <FIELD NAME="originalgenerationid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Historical id of a generation that has been deleted. While the generation exists its id is in generationid and this is NULL; deletion moves the id here and sets generationid to NULL. Glob-040 keeps the log entry itself, and this is what keeps it traceable without leaving generationid pointing at a row that is gone. Deliberately not a foreign key: the row it names no longer exists."/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="User who initiated the action that produced this event"/>
         <FIELD NAME="event" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Event identifier, e.g. generation_started, ai_call_made, ai_call_failed"/>
@@ -101,27 +100,6 @@
         <INDEX NAME="event" UNIQUE="false" FIELDS="event"/>
         <INDEX NAME="originalgenerationid" UNIQUE="false" FIELDS="originalgenerationid"/>
       </INDEXES>
-    </TABLE>
-    <TABLE NAME="local_artqtml_license" COMMENT="Singleton row holding the currently uploaded license state (functional spec ch.10)">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="edition" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="perpetual, annual or question_limit; null if no license has ever been uploaded"/>
-        <FIELD NAME="issuedto" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Institution name from the license file, display only (Lic-003)"/>
-        <FIELD NAME="issuedtourl" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Institution URL from the license file, display only (Lic-003)"/>
-        <FIELD NAME="issuedat" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="issued_at date from the license file, as a unix timestamp"/>
-        <FIELD NAME="expiresat" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="expires_at date from the license file (annual edition only), as a unix timestamp"/>
-        <FIELD NAME="activatedat" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Day this license file was uploaded/activated (Lic-005), display only"/>
-        <FIELD NAME="questionlimit" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="question_limit edition only: max AI-validated questions allowed"/>
-        <FIELD NAME="questionsvalidated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Lifetime counter of AI-validated questions (Lic-011); survives license re-upload and generation deletion"/>
-        <FIELD NAME="licensejson" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Raw decoded JSON content of the uploaded .lic file, re-verified on every status check"/>
-        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="none" SEQUENCE="false" COMMENT="Cached state as of the last check: none, valid, invalid, expired, exhausted (Lic-014)"/>
-        <FIELD NAME="lastcheckedtime" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Time of the last scheduled-task license check (Lic-014)"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
     </TABLE>
     <TABLE NAME="local_artqtml_modelcheck" COMMENT="Diagnostic log of scheduled and manual model checks (Admin-061/063). Documented, stable public interface: administrators read it with Configurable Reports, so renaming or dropping a column is a breaking change.">
       <FIELDS>

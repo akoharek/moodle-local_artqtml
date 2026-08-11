@@ -75,7 +75,7 @@ class current_question {
      * stored copy at the call site, so an unmapped key degrades to the old behaviour rather than to
      * a blank.
      *
-     * @param string $typecode IH/FE/FT/SR/EH/RV
+     * @param string $typecode IH/FE/SR
      * @param \question_definition $question
      * @return array
      */
@@ -92,13 +92,10 @@ class current_question {
                 break;
 
             case 'FE':
-            case 'FT':
                 $options = [];
                 foreach (self::answers_of($question) as $answer) {
                     $options[] = [
                         'text'    => self::plain($answer->answer),
-                        // A partially-credited option in an FT question is still a correct one;
-                        // "not wrong" is what the badge means here, so any positive fraction counts.
                         'correct' => (float) $answer->fraction > 0,
                         // BL-29: Moodle keeps the per-option explanation in the answer's feedback.
                         'explanation' => self::plain($answer->feedback ?? ''),
@@ -115,16 +112,6 @@ class current_question {
                     $items[] = ['text' => self::plain($answer->answer)];
                 }
                 $data['items'] = $items;
-                break;
-
-            case 'RV':
-                $answers = self::answers_of($question);
-                $first = reset($answers);
-                $data['answer'] = $first ? self::plain($first->answer) : '';
-                break;
-
-            case 'EH':
-                $data['graderinfo'] = self::plain($question->graderinfo ?? '');
                 break;
         }
 

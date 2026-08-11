@@ -133,16 +133,6 @@ final class capability_separation_test extends \advanced_testcase {
         $this->assertStringContainsString("require_capability('local/artqtml:configure'", $modelaction);
         $this->assertStringNotContainsString("require_capability('local/artqtml:use'", $modelaction);
 
-        foreach (['license.php'] as $name) {
-            $source = file_get_contents($root . '/' . $name);
-            $this->assertStringContainsString('admin_externalpage_setup(', $source, "$name");
-            $this->assertStringNotContainsString(
-                "require_capability('local/artqtml:use'",
-                $source,
-                "$name must not be a generation (:use) entry point"
-            );
-        }
-
         $settings = file_get_contents($root . '/settings.php');
         $this->assertStringContainsString("'local/artqtml:configure'", $settings);
         $this->assertMatchesRegularExpression(

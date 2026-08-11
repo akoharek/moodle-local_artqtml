@@ -85,9 +85,7 @@ class generate_questions_task {
             // into the log - it is the teacher's material, and a log is exactly where it should
             // not accumulate.
             //
-            // Deliberately NOT a monthly token-budget check. That is a different limit with a
-            // different owner (token_budget), and the scheduled task's budget behaviour is
-            // unchanged by this.
+            // Deliberately NOT a monthly token-budget check — that feature is removed in Light.
             $sourcetext = (string) $generation->sourcetext;
             if (source_text_limit::is_exceeded($sourcetext)) {
                 $usage = source_text_limit::usage($sourcetext);
@@ -360,11 +358,9 @@ class generate_questions_task {
 
         $row = $settings['matrix'][$code] ?? null;
         if (is_array($row) && $row !== []) {
-            foreach (['scale' => ['easy', 'medium', 'hard'], 'bloom' => ['remember', 'understand', 'apply']] as $mode => $levels) {
-                foreach ($levels as $level) {
-                    if (array_key_exists($level, $row)) {
-                        $one['difficulty'][$mode][$level] = (int) $row[$level];
-                    }
+            foreach (['easy', 'medium', 'hard'] as $level) {
+                if (array_key_exists($level, $row)) {
+                    $one['difficulty']['scale'][$level] = (int) $row[$level];
                 }
             }
         }
@@ -426,10 +422,6 @@ class generate_questions_task {
             $result = $this->http_with_backoff(function () use ($request, $timeout) {
                 return \local_artqtml\local\ai_request::send($request, $timeout);
             }, (int) $generation->id, 'generate', 'claude', $userid);
-
-            // BL-34: before any branch below can swallow it, because the body of a call that went
-            // wrong is the one worth having.
-            $this->log_diagnostics($generation, 'generate', $request, $result, $jsonattempt);
 
             if ($result['curlerror'] !== '' || $result['httpcode'] !== 200) {
                 // BL-35: a timeout or an HTTP error is a transport failure - momentary, and worth
@@ -580,123 +572,27 @@ class generate_questions_task {
         ], $userid);
     }
 
-    /**
-     * Wrap the teacher's source text as an explicitly untrusted, structured user message.
-     *
-     * Until 2026-08-04 the raw source text WAS the user message. That is what makes a prompt
-     * injection cheap: prose in, prose out, and a sentence in the middle of a teacher's uploaded
-     * document reads to the model exactly like an instruction from us. JSON does not make the
-     * model obey - nothing does, reliably - but it removes the ambiguity about where the material
-     * starts and ends. A `</source_text>`, a stray brace or a fabricated delimiter inside the
-     * document cannot terminate a JSON string field; it is escaped and stays inside it.
-     *
-     * `content_type` is a fixed label, not derived from anything the user supplies, and the
-     * immutable guard in {@see \local_artqtml\local\ai_request::harden_system_prompt()} names
-     * that label's meaning on the system side.
-     *
-     * The text itself is passed through unchanged - no HTML escaping (it is not being rendered)
-     * and no base64 (the model has to read it). Invalid UTF-8 is substituted rather than allowed
-     * to make json_encode() return false, because a generation failing on a stray byte would be a
-     * worse regression than a replacement character in one word.
-     *
-     * Since 2026-08-04 it also carries `teacher_preferences` - the free-text difficulty
-     * description and any per-type instruction the teacher wrote. Those two used to be substituted
-     * into the system prompt, where they were indistinguishable from the administrator's own
-     * instructions. Passing the security filter did not change that: the filter judges whether
-     * text looks hostile, not what role it speaks in, and a preference that reads as an ordinary
-     * sentence still carried system authority.
-     *
-     * Only whitelisted shapes reach the payload: the difficulty mode is one of three known values,
-     * the instruction keys are question_types::CODES, and every other key of the settings array is
-     * left out.
-     *
-     * @param \stdClass $generation the generation row, carrying sourcetext
-     * @param array $settings decoded settings JSON for this generation
-     * @return string a JSON object as the user message
-     */
     protected function build_user_content(\stdClass $generation, array $settings): string {
-        // NO SECURITY RE-CHECK HERE, by decision - see Felt-037 and dontesek.md (2026-08-05). The
-        // containment is the JSON envelope below, not a filter.
-        $mode = (string) ($settings['difficulty']['mode'] ?? 'scale');
-        if (!in_array($mode, ['scale', 'bloom', 'freetext'], true)) {
-            $mode = 'scale';
-        }
-
-        $difficulty = ['mode' => $mode, 'description' => null];
-        if ($mode === 'freetext') {
-            $difficulty['description'] = (string) ($settings['difficulty']['freetext']['description'] ?? '');
-        }
+        unset($settings);
 
         return (string) json_encode(
             [
-                'content_type'        => 'untrusted_generation_input',
-                'source_text'         => (string) $generation->sourcetext,
-                'teacher_preferences' => [
-                    'difficulty'        => $difficulty,
-                    'type_instructions' => $this->teacher_instruction_overrides($settings),
-                ],
+                'content_type' => 'untrusted_generation_input',
+                'source_text'  => (string) $generation->sourcetext,
             ],
             JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE
         );
     }
 
     /**
-     * The per-type instructions the teacher actually wrote, as opposed to the admin defaults.
-     *
-     * This distinction needs making, and it is not obvious from the stored data. The settings form
-     * PRE-FILLS each instruction box with the administrator's default for that type
-     * (`generate_form.php`, `setDefault()`), so a non-empty instruction in a generation's settings
-     * JSON does not mean the teacher typed anything - most of the time it is the admin default,
-     * submitted back unchanged. Treating all of them as teacher text would move the
-     * administrator's own instructions out of the system prompt, which is a behaviour change
-     * nobody asked for; treating none of them as teacher text would leave the defect in place.
-     *
-     * So an override is: submitted, non-empty, and different from what the admin default says now.
-     *
-     * On older generations this compares against the CURRENT admin default, which is the safe
-     * direction to be wrong in. If an administrator has since edited the default, a stored value
-     * that used to match no longer does, and it is treated as a teacher preference - i.e. it moves
-     * to the user message instead of the system prompt. The failure mode is a preference losing
-     * some authority, never user text gaining system authority.
-     *
-     * No schema change and no new column: the alternative was a migration to mark overrides
-     * explicitly, and the comparison above answers the same question without one.
-     *
-     * @param array $settings decoded settings JSON for this generation
-     * @return array<string, string> keyed by question type code, only where the teacher overrode
-     */
-    protected function teacher_instruction_overrides(array $settings): array {
-        $overrides = [];
-
-        foreach (question_types::CODES as $code) {
-            $submitted = trim((string) ($settings['types'][$code]['instruction'] ?? ''));
-            if ($submitted === '') {
-                continue;
-            }
-
-            $default = trim((string) (get_config('local_artqtml', 'instructiondefault_' . strtolower($code)) ?: ''));
-            if ($submitted === $default) {
-                continue;
-            }
-
-            $overrides[$code] = $submitted;
-        }
-
-        return $overrides;
-    }
-
-    /**
      * Build the Claude system prompt.
-     *
-     * Admin-066: every word of the result comes from admin settings. This method substitutes
-     * values and decides which optional sentences apply to this particular generation - it holds
-     * no prompt text of its own, and reads none from the lang packs.
      *
      * @param \stdClass $generation
      * @param array $settings decoded settings JSON
      * @return string
      */
     protected function build_prompt(\stdClass $generation, array $settings): string {
+        unset($generation);
         $template = (string) get_config('local_artqtml', 'generatorprompttemplate');
 
         $counts = [];
@@ -706,42 +602,24 @@ class generate_questions_task {
             }
         }
 
-        // Beal-018: one of the two applies, chosen by the teacher.
-        //
-        // A third option, "source text + internet", was removed on 2026-07-31. It could not do
-        // what it promised: web access is a tool the request has to carry, and no wording in a
-        // prompt substitutes for one. Generations created while it existed still carry
-        // 'internet' in their stored settings, and they map to the own-knowledge text - the
-        // closest of the two to what that teacher chose.
-        $knowledgesetting = [
-            'sourceonly'   => 'promptknowledgesourceonly',
-            'ownknowledge' => 'promptknowledgeownknowledge',
-            'internet'     => 'promptknowledgeownknowledge',
-        ][$settings['knowledgesource'] ?? 'sourceonly'] ?? 'promptknowledgesourceonly';
-        $knowledgesourcetext = (string) get_config('local_artqtml', $knowledgesetting);
+        // Light: knowledge source is always sourceonly.
+        $knowledgesourcetext = (string) get_config('local_artqtml', 'promptknowledgesourceonly');
 
         $typeinstructions = [];
         $rawcounts = $settings['counts'] ?? [];
 
-        // Always: do not name the source document in the stem ("szöveg szerint" / "according to
-        // the text"). Server-side strip + reject backs this up; the fragment is what stops the
-        // model writing the phrase in the first place.
         $nosourcemeta = trim((string) (get_config('local_artqtml', 'promptnosourcemetaref') ?: ''));
         if ($nosourcemeta !== '') {
             $typeinstructions[] = $nosourcemeta;
         }
 
-        // The FE/FT option count and SR item count cannot be enforced via the JSON schema (Claude
-        // Structured Outputs only allows minItems/maxItems values of 0 or 1), so they reach the
-        // model as prompt instructions instead.
-        if ((int) ($rawcounts['FE'] ?? 0) > 0 || (int) ($rawcounts['FT'] ?? 0) > 0) {
+        if ((int) ($rawcounts['FE'] ?? 0) > 0) {
             $typeinstructions[] = strtr((string) get_config('local_artqtml', 'promptoptioncount'), [
                 '{{OPTION_MIN}}' => (string) (int) (get_config('local_artqtml', 'fefminoptions') ?: 2),
                 '{{OPTION_MAX}}' => (string) (int) (get_config('local_artqtml', 'fefmaxoptions') ?: 5),
             ]);
         }
         if ((int) ($rawcounts['SR'] ?? 0) > 0) {
-            // M-26: a per-generation override (0 = "use the admin default") takes priority.
             $sritemcount = (int) ($settings['types']['SR']['sritemcount'] ?? 0);
             if ($sritemcount <= 0) {
                 $sritemcount = (int) (get_config('local_artqtml', 'sritemcount') ?: self::DEFAULT_SR_ITEM_COUNT);
@@ -750,23 +628,9 @@ class generate_questions_task {
                 '{{SR_ITEM_COUNT}}' => (string) $sritemcount,
             ]);
         }
-        // BL-32: short answer accepts one stored string, so its answer has to be one word - and
-        // that is a constraint on the QUESTION, not just on the answer. Sent whenever RV is asked
-        // for, at every difficulty level.
-        if ((int) ($rawcounts['RV'] ?? 0) > 0) {
-            $shortanswer = trim((string) (get_config('local_artqtml', 'promptshortanswer') ?: ''));
-            if ($shortanswer !== '') {
-                $typeinstructions[] = 'For RV questions: ' . $shortanswer;
-            }
-        }
 
-        // Admin-022 (extended): SR, EH and RV have no feedback fields in Moodle's own qtypes for
-        // question_importer to write into, so these admin-configured templates are surfaced to the
-        // model as prompt instructions instead of real question fields.
         $feedbacktemplatesettings = [
             'SR' => ['correct' => 'feedback_sr_correct', 'incorrect' => 'feedback_sr_incorrect'],
-            'EH' => ['correct' => 'feedback_eh_correct', 'incorrect' => 'feedback_eh_incorrect'],
-            'RV' => ['incorrect' => 'feedback_rv_incorrect'],
         ];
         foreach ($feedbacktemplatesettings as $code => $settingkeys) {
             if ((int) ($rawcounts[$code] ?? 0) <= 0) {
@@ -785,24 +649,12 @@ class generate_questions_task {
             }
         }
 
-        // BL-29: the per-answer explanation instruction, on exactly the same condition the schema
-        // uses. The two must agree: asking for an explanation the response schema cannot carry
-        // fails the call, and carrying a field nobody asked to fill wastes the tokens either way.
-        //
-        // Per type rather than once, because the switch is per type - a generation can ask for
-        // explanations on its multiple-choice questions and not on its True/False ones.
         foreach ($settings['types'] ?? [] as $code => $typesetting) {
             if ((int) ($rawcounts[$code] ?? 0) <= 0 || empty($typesetting['explanationenabled'])) {
                 continue;
             }
             $explanationfragment = trim((string) (get_config('local_artqtml', 'promptoptionexplanation') ?: ''));
 
-            // BL-29, second round: True/False needs an extra clause, not a different one. Measured
-            // on 2026-08-02 - with the general instruction alone the two explanations and the
-            // general feedback all restated the same fact, because two options over one claim
-            // leave nothing else to say. The extra clause asks for the student's misreading
-            // instead of the claim. Appended rather than substituted, so an admin editing the
-            // general instruction keeps affecting True/False too.
             if ($code === 'IH') {
                 $truefalseclause = trim(
                     (string) (get_config('local_artqtml', 'promptoptionexplanationtruefalse') ?: '')
@@ -817,40 +669,10 @@ class generate_questions_task {
             }
         }
 
-        // Admin-027: an admin-level default instruction per type always applies unless the teacher
-        // typed their own per-generation override - regardless of whether Admin-026's toggle even
-        // shows that field, so hiding it can never silently drop the admin's default.
-        //
-        // 2026-08-04: what changed here is WHOSE text ends up in this string. The admin default
-        // still goes in verbatim - it is the administrator's own prompt, which is what this system
-        // message is made of. The TEACHER's override no longer does. It used to be substituted
-        // straight in, one line below the administrator's, and at that point the two were
-        // indistinguishable to the model: a per-generation text box was writing system prompt.
-        //
-        // In its place the system prompt gets a trusted reference fragment saying that a teacher
-        // preference exists for this type and where to find it. The teacher's actual words travel
-        // in the structured user message - see build_user_content().
-        //
-        // The iteration is over question_types::CODES rather than over the submitted settings, so
-        // a key that is not a supported type cannot reach the prompt at all.
-        $teacheroverrides = $this->teacher_instruction_overrides($settings);
-
         foreach (question_types::CODES as $code) {
             if ((int) ($rawcounts[$code] ?? 0) <= 0) {
                 continue;
             }
-
-            if (array_key_exists($code, $teacheroverrides)) {
-                $reference = trim(strtr(
-                    (string) get_config('local_artqtml', 'promptteacherinstructionreference'),
-                    ['{{TYPE}}' => $code]
-                ));
-                if ($reference !== '') {
-                    $typeinstructions[] = $reference;
-                }
-                continue;
-            }
-
             $default = trim((string) (get_config('local_artqtml', 'instructiondefault_' . strtolower($code)) ?: ''));
             if ($default !== '') {
                 $typeinstructions[] = "$code: " . $default;
@@ -865,13 +687,6 @@ class generate_questions_task {
                 ? (string) get_config('local_artqtml', 'promptnegation')
                 : '',
             '{{TYPE_INSTRUCTIONS}}'    => implode("\n", $typeinstructions),
-            // BL-47: {{SEED}} was removed on 2026-08-03. It substituted an admin-set integer into
-            // the line "Seed: <n>", on the belief that it made generation reproducible. The Claude
-            // Messages API has no seed parameter, so the number was only ever text the model read
-            // and ignored - measured that day, 42 vs 77 on the same cell and the same source text
-            // returned two of six questions word-for-word identical and nothing new. Generations
-            // saved before this change still carry a 'seed' key in their settings JSON; it is
-            // simply no longer read.
         ];
 
         return strtr($template, $replacements);
@@ -884,19 +699,6 @@ class generate_questions_task {
      * @return string
      */
     protected function describe_difficulty(array $difficulty): string {
-        $mode = $difficulty['mode'] ?? 'scale';
-
-        // 2026-08-04: free-text mode used to be answered HERE, by returning the teacher's own
-        // description - which was then substituted into {{DIFFICULTY_MODE}}, so a per-generation
-        // text box wrote a paragraph of the system prompt. The branch is gone from this method
-        // rather than fixed in it: difficulty_prompt is the single source of what a generation's
-        // difficulty says, and leaving a second answer here is how the two drift apart. It now
-        // returns the admin-configured reference sentence for free-text mode, and the teacher's
-        // words travel in the user message instead - see build_user_content().
-        unset($mode);
-
-        // Admin-069 / Val-031: the definition lives in one place, because the validator has to
-        // judge against the same scale this prompt asks for. See local\difficulty_prompt.
         return \local_artqtml\local\difficulty_prompt::describe($difficulty);
     }
 }

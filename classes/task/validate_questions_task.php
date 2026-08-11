@@ -256,9 +256,6 @@ class validate_questions_task {
                 return \local_artqtml\local\ai_request::send($request, $timeout);
             }, (int) $generation->id, 'validate', 'gemini', $userid);
 
-            // BL-34: see generation_status_trait::log_diagnostics().
-            $this->log_diagnostics($generation, 'validate', $request, $result, $jsonattempt);
-
             if ($result['curlerror'] !== '' || $result['httpcode'] !== 200) {
                 $lasterror = $result['curlerror'] !== '' ? $result['curlerror'] : $this->extract_gemini_error($result['body']);
                 // Val-009: a failed attempt's tokens (there usually aren't any billable ones on
@@ -390,18 +387,10 @@ class validate_questions_task {
             '{{PROBLEM_CATEGORIES}}' => implode(', ', \local_artqtml\local\problem_category::VALUES),
         ]);
 
-        // Val-031: the level definitions the generator was given for THIS generation's mode, so the
-        // validator judges against the scale the question was written from rather than one of its
-        // own. In free-text mode there is no scale at all: difficulty_prompt returns the
-        // administrator's sentence pointing the model at the teacher's own wording, and neither
-        // that sentence nor the wording it refers to defines levels. There is nothing to check the
-        // label against, so the clause is left out rather than asking the model to measure against
-        // something that does not describe levels.
+        // Val-031: the level definitions the generator was given for THIS generation's scale.
         $definitions = \local_artqtml\local\difficulty_prompt::for_generation($generation);
-        $settings = json_decode((string) ($generation->settings ?? ''), true);
-        $mode = is_array($settings) ? ($settings['difficulty']['mode'] ?? 'scale') : 'scale';
 
-        $difficulty = ($mode === 'freetext' || trim($definitions) === '')
+        $difficulty = trim($definitions) === ''
             ? ''
             : strtr((string) get_config('local_artqtml', 'validationpromptdifficulty'), [
                 '{{DIFFICULTY_DEFINITIONS}}' => $definitions,
@@ -414,9 +403,6 @@ class validate_questions_task {
             '{{DIFFICULTY_INSTRUCTION}}' => $difficulty,
             '{{WORDING_INSTRUCTION}}'    => (string) get_config('local_artqtml', 'validationpromptwording'),
             '{{ITEMSOURCE_INSTRUCTION}}' => (string) get_config('local_artqtml', 'validationpromptitemsource'),
-            // BL-32: the counterpart of the generator's one-word rule. The generator is told; this
-            // is what notices when it was not followed.
-            '{{SHORTANSWER_INSTRUCTION}}' => (string) get_config('local_artqtml', 'validationpromptshortanswer'),
         ]);
     }
 

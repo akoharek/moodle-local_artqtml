@@ -25,7 +25,6 @@ require(__DIR__ . '/../../config.php');
 
 use local_artqtml\local\draft_bank;
 use local_artqtml\local\generation_status;
-use local_artqtml\local\token_budget;
 use local_artqtml\local\question_types;
 
 require_login();
@@ -154,7 +153,7 @@ $PAGE->set_heading(get_string('statusheading', 'local_artqtml'));
 $PAGE->requires->js_call_amd('local_artqtml/status', 'init');
 
 $questioncount = $DB->count_records('local_artqtml_questions', ['generationid' => $generationid]);
-$tokenwarningmessage = token_budget::warning_message($generationid);
+$tokenwarningmessage = '';
 
 $approveurl = new moodle_url('/local/artqtml/approve.php', ['generationid' => $generationid]);
 $backurl = new moodle_url('/local/artqtml/generate.php', ['id' => $generationid]);
@@ -166,13 +165,10 @@ echo local_artqtml_model_warning_banner();
 echo local_artqtml_owner_warning_banner($generation);
 echo html_writer::tag('p', format_string($generation->name));
 
-// Gen-018/019: rendered up front if already known, otherwise revealed live by amd/src/status.js
-// once the AJAX poll's tokenwarningmessage turns non-empty (e.g. the warning appears
-// mid-generation). Plain markup (not $OUTPUT->notification()) so amd/src/status.js can safely
-// overwrite just the message text without disturbing a dismiss-button/JS init.
+// Token-budget warning removed in ArtQTML Light; keep the region empty for status.js compatibility.
 echo html_writer::div(
     html_writer::div($tokenwarningmessage, 'alert alert-warning mb-0', ['data-region' => 'tokenwarning-text']),
-    $tokenwarningmessage !== '' ? 'mb-3' : 'mb-3 d-none',
+    'mb-3 d-none',
     ['data-region' => 'tokenwarning']
 );
 

@@ -36,7 +36,7 @@ use core_privacy\local\request\userlist;
  */
 final class provider_test extends \advanced_testcase {
     /**
-     * Create a generation owned by the given user, with a question and a diagnostics log row.
+     * Create a generation owned by the given user, with a question and a log row.
      *
      * @param int $userid
      * @param string $sourcetext

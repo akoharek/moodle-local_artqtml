@@ -107,7 +107,7 @@ class get_status extends external_api {
             'questioncount'           => $questioncount,
             'unvalidatedcount'        => $unvalidatedcount,
             'error'                   => $technicalerror,
-            'tokenwarningmessage'     => \local_artqtml\local\token_budget::warning_message($generation->id),
+            'tokenwarningmessage'     => '',
             'countdiscrepancymessage' => $countdiscrepancymessage,
             'failedpercent'           => $failedpercent,
             'generatingpercent'       => $generatingpercent,

@@ -104,9 +104,38 @@ if ($deleteid) {
     redirect($pageurl);
 }
 
-// Tömeges műveletek (Jov-013/014/015/016).
+// ArtQTML Light: single-question move (bulk move removed).
+$moveid = optional_param('movequestion', 0, PARAM_INT);
+if ($moveid) {
+    require_sesskey();
+    $categoryvalue = required_param('categoryvalue', PARAM_RAW);
+    if (!isset($categoryoptions[$categoryvalue])) {
+        \core\notification::error(get_string('errornocategory', 'local_artqtml'));
+        redirect($pageurl);
+    }
+    try {
+        $result = question_move_service::move_single($moveid, $generationid, $categoryvalue, $context);
+        draft_bank::delete_if_empty($generationid, (int) $generation->draftcategoryid);
+        if ($result['skipped'] > 0) {
+            \core\notification::success(get_string('movesuccesswithskipped', 'local_artqtml', (object) [
+                'moved'   => $result['moved'],
+                'skipped' => $result['skipped'],
+            ]));
+        } else if ($result['moved'] > 0) {
+            \core\notification::success(get_string('movesuccess', 'local_artqtml', $result['moved']));
+        } else {
+            \core\notification::error(get_string('errorbulkactionfailed', 'local_artqtml'));
+        }
+    } catch (\Throwable $e) {
+        debugging('local_artqtml single move failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
+        \core\notification::error(get_string('errorbulkactionfailed', 'local_artqtml'));
+    }
+    redirect($pageurl);
+}
+
+// Tömeges műveletek (Jov-013/015/016) — approve-all and bulk delete only (no bulk move).
 $bulkaction = optional_param('bulkaction', '', PARAM_ALPHA);
-if (in_array($bulkaction, ['move', 'allaccepted', 'delete'], true)) {
+if (in_array($bulkaction, ['allaccepted', 'delete'], true)) {
     require_sesskey();
 
     if ($bulkaction === 'delete') {
@@ -138,44 +167,6 @@ if (in_array($bulkaction, ['move', 'allaccepted', 'delete'], true)) {
         }
         redirect($pageurl);
     }
-
-    // Only $bulkaction === 'move' reaches here, and it needs a target bank.
-    $categoryvalue = required_param('categoryvalue', PARAM_RAW);
-    if (!isset($categoryoptions[$categoryvalue])) {
-        \core\notification::error(get_string('errornocategory', 'local_artqtml'));
-        redirect($pageurl);
-    }
-
-    $questionids = optional_param_array('questionids', [], PARAM_INT);
-    if (empty($questionids)) {
-        \core\notification::error(get_string('errornoselection', 'local_artqtml'));
-        redirect($pageurl);
-    }
-
-    try {
-        $result = question_move_service::move_selected($questionids, $generationid, $categoryvalue, $context);
-        // V20 #11: draft_bank::delete_if_empty() runs deliberately OUTSIDE move_selected()'s M-22
-        // transaction. The atomic unit that must never partially apply is the move itself (the
-        // Moodle question move + the movedout flag updates). Pruning the now-empty draft category
-        // is best-effort post-commit cleanup: it only makes sense once the move has committed (so
-        // the moved questions no longer count towards the category), and a failure to prune must
-        // never roll back a successful move - a leftover empty draft category is harmless and gets
-        // pruned by any later delete/move anyway.
-        draft_bank::delete_if_empty($generationid, (int) $generation->draftcategoryid);
-        if ($result['skipped'] > 0) {
-            \core\notification::success(get_string('movesuccesswithskipped', 'local_artqtml', (object) [
-                'moved'   => $result['moved'],
-                'skipped' => $result['skipped'],
-            ]));
-        } else {
-            \core\notification::success(get_string('movesuccess', 'local_artqtml', $result['moved']));
-        }
-    } catch (\Throwable $e) {
-        // V20 #3: log the full detail, show only a generic translated message.
-        debugging('local_artqtml bulk move failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
-        \core\notification::error(get_string('errorbulkactionfailed', 'local_artqtml'));
-    }
-    redirect($pageurl);
 }
 
 // Jov-011/012, Glob-005: sortable columns and pagination, matching the list page's pattern.

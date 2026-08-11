@@ -91,59 +91,6 @@ trait generation_status_trait {
     }
 
     /**
-     * BL-34 (Admin-070): store what a call actually sent and what came back, when this generation
-     * has diagnostics switched on.
-     *
-     * A no-op otherwise, and that is the whole design: the payloads are large, so they are kept
-     * only for a run somebody deliberately marked. Everything else about the call is already
-     * logged by {@see self::log_ai_call()} on every run - status, tokens, attempt number - and
-     * that stays as it is.
-     *
-     * What is worth keeping and what is not. The system prompt and the response schema are
-     * rebuildable from the generation's settings, so they are here for convenience. The **raw
-     * response body is not rebuildable**, and it is the one thing every unanswered question so far
-     * has needed: whether the model returned nothing, returned the wrong question type, or
-     * returned something the importer dropped cannot be told apart without it. The source text is
-     * deliberately left out - it is already on the generation row, and repeating it per call would
-     * multiply the largest field in the request by the number of attempts.
-     *
-     * The API key never appears: this records the payload and the body, never the headers.
-     *
-     * @param \stdClass $generation the generation being processed
-     * @param string $calltype 'generate' or 'validate'
-     * @param array $request the ai_request array, as sent (its 'headers' key is dropped)
-     * @param array $result the send() result: httpcode, body, curlerror
-     * @param int $jsonattempt which JSON-fallback attempt this was
-     * @return void
-     */
-    protected function log_diagnostics(
-        \stdClass $generation,
-        string $calltype,
-        array $request,
-        array $result,
-        int $jsonattempt
-    ): void {
-        if (empty($generation->diagnostics)) {
-            return;
-        }
-
-        $payload = $request['payload'] ?? [];
-
-        $this->log_event((int) $generation->id, 'diagnostics_call', [
-            'calltype'     => $calltype,
-            'jsonattempt'  => $jsonattempt,
-            'httpstatus'   => $result['httpcode'] ?? null,
-            'curlerror'    => $result['curlerror'] ?? '',
-            // The payload's shape differs per provider, and knowing that shape belongs to
-            // ai_request - the class that built it. Unpacking it here put a second copy of that
-            // knowledge in a file that has no other business with provider requests.
-            'systemprompt' => \local_artqtml\local\ai_request::system_from_payload($payload),
-            'schema'       => \local_artqtml\local\ai_request::schema_from_payload($payload),
-            'responsebody' => $result['body'] ?? null,
-        ], (int) $generation->userid);
-    }
-
-    /**
      * Record one AI API call attempt (technical annex 2.5/7.2) and trigger the matching
      * Moodle event (Glob-010).
      *
@@ -182,20 +129,6 @@ trait generation_status_trait {
         $record->timecreated = time();
 
         $DB->insert_record('local_artqtml_log', $record);
-
-        \local_artqtml\local\debug_logger::log(sprintf(
-            'generation #%d %s/%s call %s (attempt %d%s, HTTP %s): %s',
-            $generationid,
-            $calltype,
-            $provider,
-            $record->result,
-            $record->jsonattempt,
-            $record->isretry ? ', retry' : '',
-            $record->httpstatus ?? 'n/a',
-            $record->result === 'success'
-                ? sprintf('%d in / %d out tokens', $record->tokensinput ?? 0, $record->tokensoutput ?? 0)
-                : (string) $record->errormessage
-        ));
 
         $context = \context_system::instance();
         $eventdata = [

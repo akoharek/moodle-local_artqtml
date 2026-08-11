@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Scheduled task definitions for local_artqtml.
+ * Scheduled task definitions for local_artqtml Light.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -24,16 +24,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $tasks = [
-    [
-        // Lic-014: re-check and persist the license state once a day.
-        'classname' => 'local_artqtml\task\license_check_task',
-        'blocking'  => 0,
-        'minute'    => '30',
-        'hour'      => '3',
-        'day'       => '*',
-        'dayofweek' => '*',
-        'month'     => '*',
-    ],
     [
         // Admin-052: once a day. Deliberately not more often - each run makes a real (if tiny)
         // billable call per provider, and a withdrawn model is not a minute-to-minute risk.
@@ -53,20 +43,6 @@ $tasks = [
         'blocking'  => 0,
         'minute'    => '*/5',
         'hour'      => '*',
-        'day'       => '*',
-        'dayofweek' => '*',
-        'month'     => '*',
-    ],
-    [
-        // Removes the raw system prompt, response schema and provider response from diagnostic log
-        // entries once they are past their retention period. The log ROWS survive - Glob-040 keeps
-        // them deliberately - and so does every technical field on them; only the heavy payload
-        // goes. Daily is often enough for a period measured in days, and 03:45 keeps it clear of
-        // the 04:15 model check.
-        'classname' => 'local_artqtml\task\purge_expired_diagnostics',
-        'blocking'  => 0,
-        'minute'    => '45',
-        'hour'      => '3',
         'day'       => '*',
         'dayofweek' => '*',
         'month'     => '*',

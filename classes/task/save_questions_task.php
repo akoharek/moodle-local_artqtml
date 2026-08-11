@@ -196,7 +196,6 @@ class save_questions_task {
         $userid = (int) $generation->userid;
         $sequence = array_fill_keys(question_types::CODES, 0);
         $savedcount = 0;
-        $validatedcount = 0;
 
         foreach ($rawquestions as $pseudoid => $question) {
             if (!is_array($question)) {
@@ -264,21 +263,6 @@ class save_questions_task {
 
             $DB->insert_record('local_artqtml_questions', $record);
             $savedcount++;
-            if ($record->validationsuggestion !== \local_artqtml\local\validation_suggestion::NOT_EVALUATED) {
-                $validatedcount++;
-            }
-        }
-
-        // Cursor audit v3 #7: moved here (inside this stage's own transaction, only after every
-        // row above is actually written) from validate_questions_task.php, which used to
-        // increment this the moment Gemini returned results - well before, and regardless of
-        // whether, the save stage ever actually committed anything to local_artqtml_questions.
-        // Being inside the same $DB->start_delegated_transaction() as the inserts above (see
-        // process()) means a later failure that rolls that transaction back now rolls this
-        // increment back with it too, so a customer's quota is never spent on questions that
-        // never actually got saved.
-        if ($validatedcount > 0) {
-            \local_artqtml\local\license_checker::increment_validated($validatedcount);
         }
 
         return $savedcount;

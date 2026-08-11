@@ -66,14 +66,6 @@ $PAGE->set_heading(get_string('retrymissingtypes', 'local_artqtml'));
 if (!get_config('local_artqtml', 'enabled')) {
     redirect(new moodle_url('/local/artqtml/index.php'));
 }
-if (\local_artqtml\local\token_budget::is_exceeded('claude') || \local_artqtml\local\token_budget::is_exceeded('gemini')) {
-    \core\notification::error(get_string('errortokenbudgetexceeded', 'local_artqtml'));
-    redirect($statusurl);
-}
-if (\local_artqtml\local\license_checker::is_blocked()) {
-    \core\notification::error(get_string('errorlicenseblocked', 'local_artqtml'));
-    redirect($statusurl);
-}
 
 if ($generation->status !== generation_status::PARTIAL) {
     redirect($statusurl);

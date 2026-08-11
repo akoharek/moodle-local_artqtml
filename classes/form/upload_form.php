@@ -89,7 +89,7 @@ class upload_form extends \moodleform {
             // source file, and every path downstream (extraction, the combined hash, the size
             // limit) is written for one. Accepted_types is a browser convenience and is checked
             // again on the server in validation(), because a direct POST never sees it.
-            ['accepted_types' => ['.pdf', '.docx', '.txt'], 'maxbytes' => $maxbytes, 'maxfiles' => 1]
+            ['accepted_types' => ['.txt'], 'maxbytes' => $maxbytes, 'maxfiles' => 1]
         );
         $mform->addHelpButton('sourcefile', 'sourcefile', 'local_artqtml');
 

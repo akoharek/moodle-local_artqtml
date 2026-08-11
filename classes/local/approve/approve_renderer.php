@@ -312,6 +312,15 @@ class approve_renderer {
                 $actions[] = \html_writer::link($revokeurl, get_string('revokeapproval', 'local_artqtml'), [
                     'data-testid' => 'artqtml-approve-revoke-link',
                 ]);
+                // ArtQTML Light: single-question move (bulk move removed). Uses the shared
+                // category select in the form footer; the server validates categoryvalue.
+                $actions[] = \html_writer::tag('button', get_string('moveselected', 'local_artqtml'), [
+                    'type'        => 'submit',
+                    'name'        => 'movequestion',
+                    'value'       => $question->id,
+                    'class'       => 'btn btn-link p-0 align-baseline',
+                    'data-testid' => 'artqtml-approve-move-button',
+                ]);
             } else {
                 // Jov-031 calls this a gomb (button), and the field table (JOV-F020) types it as one,
                 // so it is a real submit button in the surrounding form rather than the state-changing
@@ -521,8 +530,8 @@ class approve_renderer {
     }
 
     /**
-     * The bulk action buttons: approve-all-accepted, the target-category select + move button
-     * (or a "no categories" notice), and the bulk-delete button (Jov-013/014/015).
+     * The bulk action buttons: approve-all-accepted, the target-category select for single-row
+     * move, and the bulk-delete button (Jov-013/015). ArtQTML Light: bulk move removed.
      *
      * @param \core_renderer $output the page output renderer (passed in rather than pulled from
      *      the global $OUTPUT, as this is a plain helper, not a plugin_renderer_base)
@@ -533,12 +542,8 @@ class approve_renderer {
     public static function bulk_action_buttons(\core_renderer $output, int $eligibleforapproval, array $categoryoptions): string {
         // Jov-045: "A célkérdésbank kategória választó vizuálisan a »Kijelöltek áthelyezése« és
         // »Kijelöltek törlése« gombokkal egy blokkban helyezkedik el; az »Összes elfogadható
-        // jóváhagyása« gomb ettől vizuálisan elkülönül, mivel ahhoz célkérdésbank megadása nem
-        // szükséges (Jov-032)". Two containers, separated by a rule - not one flat button row.
-        //
-        // "Összes elfogadható jóváhagyása" only sets the approval flag, so it needs no target bank
-        // and is not gated on $categoryoptions the way "Kijelöltek áthelyezése" is. Jov-044: it is
-        // disabled (not just inert) when nothing is eligible, and labelled with the eligible count.
+        // jóváhagyása« gomb ettől vizuálisan elkülönül". Two containers, separated by a rule.
+        // Light keeps the category select for per-row move; the bulk move button is gone.
         $approveallattrs = [
             'type'        => 'submit',
             'name'        => 'bulkaction',
@@ -549,7 +554,6 @@ class approve_renderer {
         if ($eligibleforapproval === 0) {
             $approveallattrs['disabled'] = 'disabled';
         }
-        // Glob-034: each bulk bar wraps onto more rows at narrow widths instead of overflowing.
         $html = \html_writer::start_div('artqtml-bulkactions artqtml-bulkapprove mb-3', [
             'data-testid' => 'artqtml-approve-bulk-approveblock',
         ]);
@@ -575,31 +579,16 @@ class approve_renderer {
                 ['class' => 'mr-2']
             );
             // Deliberately NOT required="required": the <select> lives in the same form as every
-            // other control on this page, so an HTML5 required attribute blocked "Összes elfogadható
-            // jóváhagyása" (which Jov-032 says needs no target bank), "Kijelöltek törlése" and the
-            // new per-row "Jóváhagyás" button from submitting at all until a category was picked.
-            // The move path validates the value server-side in approve.php (errornocategory).
+            // other control on this page. The move path validates the value server-side.
             $html .= \html_writer::select($categoryoptions, 'categoryvalue', '', ['' => 'choosedots'], [
                 'id'          => 'artqtml-categoryvalue',
                 'class'       => 'mr-2',
                 'data-testid' => 'artqtml-approve-category-select',
             ]);
             $html .= \html_writer::end_div();
-
-            // Jov-044: disabled until at least one row is selected; the selection script below is
-            // what re-enables it, so the server-rendered state (nothing selected) is disabled.
-            $html .= \html_writer::tag(
-                'button',
-                get_string('moveselected', 'local_artqtml'),
-                ['type' => 'submit', 'name' => 'bulkaction', 'value' => 'move', 'class' => 'btn btn-primary',
-                 'disabled' => 'disabled', 'data-selectionrequired' => '1',
-                 'data-testid' => 'artqtml-approve-move-button']
-            );
         }
 
-        // M-05: the confirmation must show how many questions are actually selected at click time (the
-        // selection changes client-side without a page reload), so the message is rendered with a
-        // sentinel placeholder here and substituted for the live checked-checkbox count in JS below.
+        // M-05: the confirmation must show how many questions are actually selected at click time.
         $html .= \html_writer::tag(
             'button',
             get_string('bulkdelete', 'local_artqtml'),
@@ -628,7 +617,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var selectable = function() {
         return document.querySelectorAll('.artqtml-rowselect:not(:disabled)');
     };
-    // Jov-044: 'Kijelöltek áthelyezése' and 'Kijelöltek törlése' are disabled while nothing is
+    // Jov-044: 'Kijelöltek törlése' is disabled while nothing is
     // selected. They render disabled server-side (nothing is selected on load), so this only ever
     // has to react to the selection changing.
     var syncBulkButtons = function() {
@@ -698,7 +687,7 @@ document.addEventListener('DOMContentLoaded', function() {
      * current_question::data_for(), falling back to the stored generation-time JSON only when the
      * question can no longer be loaded. The shape is unchanged, so this method did not have to.
      *
-     * @param string $typecode IH/FE/FT/SR/EH/RV
+     * @param string $typecode IH/FE/SR
      * @param array $questiondata question data in the stored JSON's shape
      * @return string
      */
@@ -730,7 +719,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 break;
 
             case 'FE':
-            case 'FT':
                 $items = [];
                 foreach ((array) ($questiondata['options'] ?? []) as $option) {
                     $text = s((string) ($option['text'] ?? ''));
@@ -765,22 +753,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     $items[] = \html_writer::tag('li', s((string) $text));
                 }
                 $parts[] = \html_writer::tag('ol', implode('', $items));
-                break;
-
-            case 'RV':
-                $parts[] = \html_writer::tag('p', \html_writer::tag(
-                    'strong',
-                    get_string('detailsanswer', 'local_artqtml')
-                ) . ' ' .
-                    s((string) ($questiondata['answer'] ?? '')));
-                break;
-
-            case 'EH':
-                $parts[] = \html_writer::tag('p', \html_writer::tag(
-                    'strong',
-                    get_string('detailsgraderinfo', 'local_artqtml')
-                ) . ' ' .
-                    s((string) ($questiondata['graderinfo'] ?? '')));
                 break;
         }
 

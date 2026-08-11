@@ -311,16 +311,17 @@ class provider implements
      * @return void
      */
     public static function delete_data_for_all_users_in_context(\context $context): void {
+        global $DB;
+
         if ($context->contextlevel != CONTEXT_SYSTEM) {
             return;
         }
 
         self::delete_generations([]);
 
-        // Only log entries attached to a generation are reached by delete_generations(). Entries
-        // that are not - a licence integrity violation, or one whose generation was deleted long
-        // ago - are caught here, so "delete everything in this context" means everything.
-        \local_artqtml\local\diagnostic_log_retention::redact_all();
+        // Orphan log rows (generation already gone) may still carry a userid; clear it.
+        // Light does not store full diagnostic payloads in log.data.
+        $DB->set_field_select('local_artqtml_log', 'userid', null, 'userid IS NOT NULL');
     }
 
     /**
@@ -370,8 +371,8 @@ class provider implements
      * THE LOG ENTRIES ARE NOT DELETED, they are anonymised - which is deliberate and is Glob-040:
      * a log entry outlives the generation it describes, because what it records is what the site
      * spent and what it asked for, and that has to remain auditable after the material is gone.
-     * The identifying part goes: the generation reference is moved to `originalgenerationid`, the
-     * user id and the stored payload are redacted, and only then is the generation itself removed.
+     * The identifying part goes: the generation reference is moved to `originalgenerationid`,
+     * and only then is the generation itself removed.
      *
      * @param array $conditions conditions passed to get_records() on local_artqtml_generations
      * @return void
@@ -392,19 +393,8 @@ class provider implements
             }
         }
 
-        // The log entries are ANONYMISED, not deleted - the line that deleted them was here until
-        // 2026-08-04, and it contradicted Glob-040 for the one case where the product had actually
-        // decided the entries should survive.
-        //
-        // The two obligations are not in conflict once they are separated. What GDPR requires
-        // removed is the link to the person and the raw content: the user id goes, the system
-        // prompt, schema and provider response go. What the product needs kept is the technical
-        // record that a call was made, what it cost and whether it worked - which, with no user id
-        // on it, is not personal data.
-        //
-        // Order matters. The id is preserved into originalgenerationid and the live reference
-        // cleared BEFORE the generation rows are deleted, or the entries would be left pointing at
-        // rows that no longer exist.
+        // Log entries are anonymised (not deleted): preserve id into originalgenerationid, clear
+        // the live generationid and userid, then delete generation/question rows.
         [$insql, $inparams] = $DB->get_in_or_equal($generationids, SQL_PARAMS_NAMED);
 
         $DB->execute(
@@ -413,9 +403,10 @@ class provider implements
               WHERE originalgenerationid IS NULL AND generationid $insql",
             $inparams
         );
-        \local_artqtml\local\diagnostic_log_retention::redact_for_generation_ids($generationids);
         $DB->execute(
-            "UPDATE {local_artqtml_log} SET generationid = NULL WHERE generationid $insql",
+            "UPDATE {local_artqtml_log}
+                SET generationid = NULL, userid = NULL
+              WHERE generationid $insql",
             $inparams
         );
 
@@ -440,10 +431,6 @@ class provider implements
         $DB->set_field('local_artqtml_questions', 'lasteditedat', null, ['lasteditedby' => $userid]);
         $DB->set_field('local_artqtml_questions', 'lasteditedby', null, ['lasteditedby' => $userid]);
         $DB->set_field('local_artqtml_questions', 'approvedby', null, ['approvedby' => $userid]);
-        // Nulling the user id alone was not enough: a diagnostics entry still held the full system
-        // prompt and the raw provider response, which can carry that user's own material. An
-        // anonymous row containing the text of somebody's document is not anonymous in any sense
-        // that matters. This nulls the id AND empties the payload, and keeps the row.
-        \local_artqtml\local\diagnostic_log_retention::redact_for_user($userid);
+        $DB->set_field('local_artqtml_log', 'userid', null, ['userid' => $userid]);
     }
 }

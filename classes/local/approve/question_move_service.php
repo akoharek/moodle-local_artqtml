@@ -15,9 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Moves already-approved draft questions into a real question bank (functional spec ch.7,
- * Jov-014) - split out of the approve.php controller. The Moodle question move and the movedout
- * flag update happen in one transaction (M-22); never renders anything.
+ * Moves an already-approved draft question into a real question bank (functional spec ch.7,
+ * Jov-014) - ArtQTML Light: single-question move only (bulk move removed).
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -28,51 +27,45 @@ namespace local_artqtml\local\approve;
 use local_artqtml\local\question_mover;
 
 /**
- * Bulk move of selected, approved questions into a chosen target category.
+ * Single-question move of an approved question into a chosen target category.
  */
 class question_move_service {
     /**
-     * Move the selected, already-approved questions into the given real bank category.
+     * Move one already-approved question into the given real bank category.
      *
-     * Only already-approved rows are moved - a selected-but-not-approved row is silently excluded
-     * (same pattern as delete/approve) but counted separately (M-23) so the caller can tell the
-     * user why the moved count differs from their selection.
-     *
-     * @param int[] $questionids the selected local_artqtml_questions ids
+     * @param int $questionid the local_artqtml_questions id
      * @param int $generationid
      * @param string $categoryvalue "categoryid,contextid" target
      * @param \context $context system context, for the events
-     * @return array{moved: int, skipped: int} moved: successfully moved; skipped: selected but
-     *      not yet approved (M-23)
+     * @return array{moved: int, skipped: int} moved: 0 or 1; skipped: 1 if selected but not approved
      */
-    public static function move_selected(
-        array $questionids,
+    public static function move_single(
+        int $questionid,
         int $generationid,
         string $categoryvalue,
         \context $context
     ): array {
         global $DB;
 
-        [$insql, $inparams] = $DB->get_in_or_equal($questionids, SQL_PARAMS_NAMED);
-        // Only already-approved questions may be moved - selecting a not-yet-approved row and
-        // clicking "move" silently excludes it rather than erroring (same pattern as delete/approve).
-        $rows = $DB->get_records_select(
+        $row = $DB->get_record_select(
             'local_artqtml_questions',
-            "generationid = :generationid AND id $insql AND movedout = 0 AND approved = 1",
-            array_merge(['generationid' => $generationid], $inparams)
+            'generationid = :generationid AND id = :id AND movedout = 0 AND approved = 1',
+            ['generationid' => $generationid, 'id' => $questionid]
         );
 
-        // M-23: count selected-but-not-approved rows separately so the notification tells the user
-        // why their selected count and the moved count differ, instead of silently moving fewer.
-        $skippedcount = $DB->count_records_select(
-            'local_artqtml_questions',
-            "generationid = :generationid AND id $insql AND movedout = 0 AND approved = 0",
-            array_merge(['generationid' => $generationid], $inparams)
-        );
+        if (!$row) {
+            $skipped = $DB->record_exists_select(
+                'local_artqtml_questions',
+                'generationid = :generationid AND id = :id AND movedout = 0 AND approved = 0',
+                ['generationid' => $generationid, 'id' => $questionid]
+            );
 
-        $moved = self::move_rows(array_values($rows), $categoryvalue, $context);
+            return ['moved' => 0, 'skipped' => $skipped ? 1 : 0];
+        }
 
-        return ['moved' => $moved, 'skipped' => $skippedcount];
+        $moved = self::move_rows([$row], $categoryvalue, $context);
+
+        return ['moved' => $moved, 'skipped' => 0];
     }
 
     /**

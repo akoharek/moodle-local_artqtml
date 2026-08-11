@@ -1,16 +1,16 @@
-ArtQTML plugin (local_artqtml)
+ArtQTML (local_artqtml) — Light / Moodle Marketplace edition
 
-2026 AR Tudásmenedzsment Kft. Minden jog fenntartva.
+Copyright (C) 2026 AR Tudásmenedzsment Kft.
 
-A beépülő minden módosítása az érvényes licencszerződés megszűnését eredményezi.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
---------------------------------------------------------------------------------
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-Ez a fájl része a licenc fájlintegritás-ellenőrzésének: a tartalma a kiadott
-licencbe aláírva bekerülő fájllistában szerepel, ezért a módosítása vagy törlése
-ugyanúgy sérült telepítésként jelenik meg a Licenc képernyőn, mint bármelyik
-forrásfájlé.
-
-A Moodle saját GPL-fejléce és @license sora a forrásfájlokban változatlanul
-megmarad. Az a Moodle licence, nem ezé a beépülőé; ez a fájl mondja meg, hogy
-maga a beépülő milyen feltételekkel használható.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.

@@ -83,20 +83,10 @@ class question_form_builder {
                 self::apply_truefalse($form, $data, $feedbackenabled);
                 break;
             case 'FE':
-                self::apply_multichoice($form, $data, true, $feedbackenabled);
-                break;
-            case 'FT':
-                self::apply_multichoice($form, $data, false, $feedbackenabled);
+                self::apply_multichoice($form, $data, $feedbackenabled);
                 break;
             case 'SR':
                 self::apply_ordering($form, $data);
-                break;
-            case 'RV':
-                self::apply_shortanswer($form, $data, $feedbackenabled);
-                break;
-            case 'EH':
-                $form->penalty = 0;
-                self::apply_essay($form, $data);
                 break;
         }
 
@@ -258,41 +248,24 @@ class question_form_builder {
     }
 
     /**
-     * Populate qtype_multichoice-specific form fields (technical annex 6.3).
+     * Populate qtype_multichoice-specific form fields for FE (single-answer) (technical annex 6.3).
      *
      * @param \stdClass $form
      * @param array $data expects 'options' => [['text' => ..., 'correct' => bool], ...]
-     * @param bool $single true for FE (single-answer), false for FT (multi-answer)
      * @param bool $feedbackenabled
      * @return void
      */
-    protected static function apply_multichoice(\stdClass $form, array $data, bool $single, bool $feedbackenabled): void {
+    protected static function apply_multichoice(\stdClass $form, array $data, bool $feedbackenabled): void {
         $options = $data['options'] ?? [];
-
-        $correctcount = 0;
-        foreach ($options as $option) {
-            if (!empty($option['correct'])) {
-                $correctcount++;
-            }
-        }
-        $correctcount = max($correctcount, 1);
 
         $answers = [];
         $fractions = [];
         $feedbacks = [];
         foreach ($options as $option) {
             $answers[] = ['text' => self::clean_ai_text($option['text'] ?? ''), 'format' => FORMAT_HTML, 'itemid' => 0];
-            $iscorrect = !empty($option['correct']);
-            if ($single) {
-                $fractions[] = $iscorrect ? 1.0 : 0.0;
-            } else {
-                $fractions[] = $iscorrect ? round(1.0 / $correctcount, 7) : 0.0;
-            }
-            // BL-29: Moodle's per-option feedback column, which every generation until 2026-08-02
-            // filled with an empty string. When the teacher asked for explanations, this is where
-            // the AI's sentence for THIS option goes - the one thing that tells a student why the
-            // answer they picked is wrong. Absent (switch off, or an older stored question), it
-            // stays empty and the behaviour is exactly what it was.
+            $fractions[] = !empty($option['correct']) ? 1.0 : 0.0;
+            // BL-29: Moodle's per-option feedback column. When the teacher asked for explanations,
+            // this is where the AI's sentence for THIS option goes.
             $feedbacks[] = [
                 'text'   => self::clean_ai_text($option['explanation'] ?? ''),
                 'format' => FORMAT_HTML,
@@ -300,24 +273,19 @@ class question_form_builder {
             ];
         }
 
-        $form->single = $single ? 1 : 0;
+        $form->single = 1;
         $form->shuffleanswers = 1;
         $form->answernumbering = 'abc';
         $form->showstandardinstruction = 0;
-        // FT (multi-answer) is the only type where "partially correct" is a real, distinct
-        // grading outcome (Admin-022) - FE (single-answer) has no such state, so it stays empty.
-        $partialfeedback = ($feedbackenabled && !$single)
-            ? (string) (get_config('local_artqtml', 'feedback_ft_partial') ?: '')
-            : '';
 
         $form->correctfeedback = [
-            'text'   => $feedbackenabled ? self::feedback_template($single ? 'FE' : 'FT', true) : '',
+            'text'   => $feedbackenabled ? self::feedback_template('FE', true) : '',
             'format' => FORMAT_HTML,
             'itemid' => 0,
         ];
-        $form->partiallycorrectfeedback = ['text' => $partialfeedback, 'format' => FORMAT_HTML, 'itemid' => 0];
+        $form->partiallycorrectfeedback = ['text' => '', 'format' => FORMAT_HTML, 'itemid' => 0];
         $form->incorrectfeedback = [
-            'text'   => $feedbackenabled ? self::feedback_template($single ? 'FE' : 'FT', false) : '',
+            'text'   => $feedbackenabled ? self::feedback_template('FE', false) : '',
             'format' => FORMAT_HTML,
             'itemid' => 0,
         ];
@@ -360,50 +328,6 @@ class question_form_builder {
         $form->correctfeedback = ['text' => '', 'format' => FORMAT_HTML, 'itemid' => 0];
         $form->partiallycorrectfeedback = ['text' => '', 'format' => FORMAT_HTML, 'itemid' => 0];
         $form->incorrectfeedback = ['text' => '', 'format' => FORMAT_HTML, 'itemid' => 0];
-    }
-
-    /**
-     * Populate qtype_shortanswer-specific form fields (technical annex 6.6).
-     *
-     * @param \stdClass $form
-     * @param array $data expects 'answer' => string (the single AI-provided correct answer)
-     * @param bool $feedbackenabled
-     * @return void
-     */
-    protected static function apply_shortanswer(\stdClass $form, array $data, bool $feedbackenabled): void {
-        $answer = self::clean_ai_text($data['answer'] ?? '');
-
-        $form->usecase = 0;
-        $form->answer = [$answer];
-        $form->fraction = [1.0];
-        $form->feedback = [[
-            'text'   => $feedbackenabled ? self::feedback_template('RV', true) : '',
-            'format' => FORMAT_HTML,
-            'itemid' => 0,
-        ]];
-    }
-
-    /**
-     * Populate qtype_essay-specific form fields (technical annex 6.5).
-     *
-     * @param \stdClass $form
-     * @param array $data expects 'graderinfo' => string
-     * @return void
-     */
-    protected static function apply_essay(\stdClass $form, array $data): void {
-        $form->responseformat = 'editor';
-        $form->responserequired = 1;
-        $form->responsefieldlines = 15;
-        $form->attachments = 0;
-        $form->attachmentsrequired = 0;
-        $form->maxbytes = 0;
-        $form->filetypeslist = '';
-        $form->graderinfo = [
-            'text'   => self::clean_ai_text($data['graderinfo'] ?? ''),
-            'format' => FORMAT_HTML,
-            'itemid' => 0,
-        ];
-        $form->responsetemplate = ['text' => '', 'format' => FORMAT_HTML, 'itemid' => 0];
     }
 
     /**

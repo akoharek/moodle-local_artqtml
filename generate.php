@@ -109,14 +109,9 @@ $indexurl = new moodle_url('/local/artqtml/index.php');
  * @return array
  */
 function local_artqtml_build_settings(stdClass $data): array {
-    $mode = (string) ($data->difficultymode ?? 'scale');
-    $levels = generate_form::MODE_LEVELS[$mode] ?? [];
+    $mode = 'scale';
+    $levels = generate_form::MODE_LEVELS[$mode];
 
-    // BL-35: the grid is the source now. 'matrix' holds the per-type, per-level counts the teacher
-    // actually entered; 'counts' and the generation-wide 'bloom'/'scale' totals are derived from
-    // it and kept because everything downstream reads them - question_schema::build(),
-    // build_prompt(), the save-time discrepancy check and every stored generation from before
-    // today. Deriving rather than storing twice is what stops the two drifting apart.
     $matrix = [];
     foreach (question_types::CODES as $code) {
         foreach ($levels as $level) {
@@ -124,7 +119,6 @@ function local_artqtml_build_settings(stdClass $data): array {
         }
     }
 
-    // Total for one level across every question type.
     $leveltotal = static function (array $matrix, string $level): int {
         $sum = 0;
         foreach ($matrix as $bytype) {
@@ -136,86 +130,36 @@ function local_artqtml_build_settings(stdClass $data): array {
 
     $settings = [
         'difficulty' => [
-            'mode'   => $mode,
-            'bloom'  => [
-                'remember'   => $leveltotal($matrix, 'remember'),
-                'understand' => $leveltotal($matrix, 'understand'),
-                'apply'      => $leveltotal($matrix, 'apply'),
-            ],
+            'mode'  => $mode,
             'scale' => [
                 'easy'   => $leveltotal($matrix, 'easy'),
                 'medium' => $leveltotal($matrix, 'medium'),
                 'hard'   => $leveltotal($matrix, 'hard'),
             ],
-            // BL-35: 'count' is no longer stored - the field it came from is gone (see
-            // generate_form). The description is what reaches the model; the per-type numbers are
-            // in 'counts' below. Generations saved before today keep their stored value; nothing
-            // reads it.
-            'freetext' => [
-                'description' => (string) ($data->freetextdescription ?? ''),
-            ],
         ],
         'matrix'            => $matrix,
         'counts'            => [],
-        'knowledgesource'   => (string) ($data->knowledgesource ?? 'sourceonly'),
+        'knowledgesource'   => 'sourceonly',
         'negationhighlight' => (bool) ($data->negationhighlight ?? false),
         'types'             => [],
     ];
 
     foreach (question_types::CODES as $code) {
-        // Free text has no levels, so its per-type count is the plain field; the two levelled
-        // modes sum their own row of the grid. In that second branch $levels is non-empty, so the
-        // loop above has filled $matrix[$code] for every code - no fallback is reachable here.
-        $settings['counts'][$code] = $levels === []
-            ? (int) ($data->{'count_' . $code} ?? 0)
-            : array_sum($matrix[$code]);
+        $settings['counts'][$code] = array_sum($matrix[$code]);
         $settings['types'][$code] = [
             'retryenabled'    => question_types::supports_retry($code) ? (bool) ($data->{'retry_' . $code} ?? false) : false,
             'retrypenalty'    => (int) ($data->{'retrypenalty_' . $code} ?? 33),
-            'instruction'     => (string) ($data->{'instruction_' . $code} ?? ''),
-            // Gen-022/025: independent per-type switches, replacing the old single
-            // generation-wide feedbackenabled and the retryenabled-tied hint behaviour.
-            // Cursor audit v3 #4/#5: hintenabled applies to all six types now, not just the four
-            // question_types::supports_hints() covers (that check only gates whether
-            // question_importer.php can attach a real Moodle "try again" hint - IH/EH still get
-            // AI-generated hint content stored for the review UI, per question_schema.php).
             'feedbackenabled' => (bool) ($data->{'feedback_' . $code} ?? false),
             'hintenabled'     => (bool) ($data->{'hint_' . $code} ?? false),
-            // BL-29: the field only exists on the three panels that can carry an explanation, so
-            // for the other three this reads false from the ?? and stays false. That is the
-            // intended result, not an accident of a missing field: the schema then never asks for
-            // an explanation the importer would have nowhere to put.
             'explanationenabled' => question_types::supports_option_explanation($code)
                 && (bool) ($data->{'explanation_' . $code} ?? false),
         ];
-        // M-26: 0 means "use the admin default" (see generate_questions_task::build_prompt()).
         if ($code === 'SR') {
             $settings['types'][$code]['sritemcount'] = (int) ($data->sritemcount ?? 0);
         }
     }
 
     return $settings;
-}
-
-/**
- * BL-34 (Admin-070): read the per-generation diagnostics flag off submitted form data.
- *
- * Not part of local_artqtml_build_settings() because this is not a prompt setting - it is a
- * column, and it is capability-gated. A user without local/artqtml:configure never sees the
- * field, so their submission carries no value for it and the stored flag must be left alone
- * rather than reset to 0: otherwise a teacher opening an admin-flagged draft and pressing Save
- * would silently turn the diagnostics off.
- *
- * @param stdClass $data submitted form data
- * @param stdClass $generation the generation as currently stored
- * @return int 0 or 1
- */
-function local_artqtml_diagnostics_flag(stdClass $data, stdClass $generation): int {
-    if (!has_capability('local/artqtml:configure', context_system::instance())) {
-        return (int) ($generation->diagnostics ?? 0);
-    }
-
-    return !empty($data->diagnostics) ? 1 : 0;
 }
 
 // Törlés és kilépés (Beal-025/026): POST + sesskey (no GET+sesskey URL).
@@ -261,7 +205,6 @@ if ($mform->is_cancelled()) {
             $DB->update_record('local_artqtml_generations', (object) [
                 'id'           => $generationid,
                 'settings'     => json_encode(local_artqtml_build_settings($rawdata)),
-                'diagnostics'  => local_artqtml_diagnostics_flag($rawdata, $current),
                 'timemodified' => time(),
             ]);
         });
@@ -280,15 +223,7 @@ if ($mform->is_cancelled()) {
         \core\notification::error(get_string('plugindisabled', 'local_artqtml'));
         redirect($indexurl);
     }
-    if (\local_artqtml\local\token_budget::is_exceeded('claude') || \local_artqtml\local\token_budget::is_exceeded('gemini')) {
-        \core\notification::error(get_string('errortokenbudgetexceeded', 'local_artqtml'));
-        redirect($indexurl);
-    }
-    if (\local_artqtml\local\license_checker::is_blocked()) {
-        \core\notification::error(get_string('errorlicenseblocked', 'local_artqtml'));
-        redirect($indexurl);
-    }
-    if (!\local_artqtml\local\draft_bank::is_configured()) {
+if (!\local_artqtml\local\draft_bank::is_configured()) {
         \core\notification::error(get_string('errordraftcoursenotconfigured', 'local_artqtml'));
         redirect($indexurl);
     }
@@ -369,7 +304,6 @@ if ($mform->is_cancelled()) {
                 $DB->update_record('local_artqtml_generations', (object) [
                     'id'           => $generationid,
                     'settings'     => json_encode($settings),
-                    'diagnostics'  => local_artqtml_diagnostics_flag($data, $current),
                     'timemodified' => time(),
                 ]);
 
@@ -402,7 +336,6 @@ if ($mform->is_cancelled()) {
                 'id'              => $generationid,
                 'userid'          => (int) $USER->id,
                 'settings'        => json_encode($settings),
-                'diagnostics'     => local_artqtml_diagnostics_flag($data, $current),
                 'draftcategoryid' => $draftcategoryid,
                 'status'          => \local_artqtml\local\generation_status::GENERATING,
                 'error'           => null,
@@ -449,9 +382,7 @@ if (!empty($generation->settings)) {
     $existing = json_decode($generation->settings, true);
     if (is_array($existing)) {
         $formdefaults = [
-            'difficultymode'      => $existing['difficulty']['mode'] ?? 'scale',
-            'freetextdescription' => $existing['difficulty']['freetext']['description'] ?? '',
-            'knowledgesource'     => $existing['knowledgesource'] ?? 'sourceonly',
+            'difficultymode'      => 'scale',
             'negationhighlight'   => !empty($existing['negationhighlight']),
         ];
         // BL-35: repopulate the grid. A generation saved before the grid existed has no 'matrix'
@@ -465,13 +396,8 @@ if (!empty($generation->settings)) {
         }
 
         foreach (question_types::CODES as $code) {
-            $formdefaults['count_' . $code] = $existing['counts'][$code] ?? 0;
             $formdefaults['retry_' . $code] = !empty($existing['types'][$code]['retryenabled']);
             $formdefaults['retrypenalty_' . $code] = $existing['types'][$code]['retrypenalty'] ?? 33;
-            $formdefaults['instruction_' . $code] = $existing['types'][$code]['instruction'] ?? '';
-            // Gen-022/025: independent per-type switches now, not one generation-wide setting.
-            // Cursor audit v3 #4/#5: hint_ now rendered/read for all six types - see the
-            // matching comment on local_artqtml_build_settings() above.
             $formdefaults['feedback_' . $code] = !empty($existing['types'][$code]['feedbackenabled']);
             $formdefaults['hint_' . $code] = !empty($existing['types'][$code]['hintenabled']);
             if (question_types::supports_option_explanation($code)) {
@@ -561,11 +487,6 @@ if ($candeleteown) {
     echo html_writer::end_tag('form');
 }
 
-// Beal-019/020/021: the token estimate is relative to the admin-configured monthly token budget
-// and its warning threshold, not a hardcoded count/percentage.
-$tokenbudget = (int) get_config('local_artqtml', 'generatortokenbudget');
-$tokenwarningpct = (int) (get_config('local_artqtml', 'tokenbudgetwarningpct') ?: 80);
-
 $amdabort = [
     'backconfirm' => get_string('backtoupload_confirm', 'local_artqtml'),
 ];
@@ -575,8 +496,6 @@ $PAGE->requires->js_call_amd('local_artqtml/generatesettings', 'init', [
         'step2total' => get_string('step2totallabel', 'local_artqtml'),
     ],
     $amdabort,
-    $tokenbudget,
-    $tokenwarningpct,
 ]);
 
 echo $OUTPUT->footer();

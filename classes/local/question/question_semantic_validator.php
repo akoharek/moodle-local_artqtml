@@ -34,7 +34,7 @@ class question_semantic_validator {
      * (already schema-validated) but semantically broken in a way that would silently create a
      * useless or unanswerable question.
      *
-     * @param string $typecode IH/FE/FT/SR/EH/RV
+     * @param string $typecode IH/FE/SR
      * @param array $data decoded per-type fields from the AI response
      * @param array $typesettings this type's generation settings - only SR's per-generation
      *      'sritemcount' override (M-26) is read, to enforce the exact item count (v20 #7)
@@ -63,18 +63,17 @@ class question_semantic_validator {
                 return null;
 
             case 'FE':
-            case 'FT':
                 $options = $data['options'] ?? [];
                 // V20 #6: reject an empty option array or any blank option text outright.
                 if (!is_array($options) || count($options) === 0) {
-                    return "multichoice ($typecode): no options";
+                    return 'multichoice (FE): no options';
                 }
                 foreach ($options as $option) {
                     if (trim((string) ($option['text'] ?? '')) === '') {
-                        return "multichoice ($typecode): blank option text";
+                        return 'multichoice (FE): blank option text';
                     }
                     if (source_meta_reference::contains((string) ($option['text'] ?? ''))) {
-                        return "multichoice ($typecode): option text contains source meta-reference";
+                        return 'multichoice (FE): option text contains source meta-reference';
                     }
                 }
 
@@ -84,19 +83,16 @@ class question_semantic_validator {
                         $correctcount++;
                     }
                 }
-                if ($typecode === 'FE' && $correctcount !== 1) {
+                if ($correctcount !== 1) {
                     return "multichoice (FE): expected exactly 1 correct option, got $correctcount";
                 }
-                if ($typecode === 'FT' && $correctcount < 2) {
-                    return "multichoiceset (FT): expected at least 2 correct options, got $correctcount";
-                }
 
-                // V20 #7: enforce the admin-configured FE/FT option-count range server-side.
+                // V20 #7: enforce the admin-configured FE option-count range server-side.
                 $min = (int) (get_config('local_artqtml', 'fefminoptions') ?: 2);
                 $max = (int) (get_config('local_artqtml', 'fefmaxoptions') ?: 5);
                 $count = count($options);
                 if ($count < $min || $count > $max) {
-                    return "multichoice ($typecode): $count options outside the configured range {$min}-{$max}";
+                    return "multichoice (FE): $count options outside the configured range {$min}-{$max}";
                 }
                 return null;
 
@@ -122,18 +118,6 @@ class question_semantic_validator {
                 if (count($items) !== $expected) {
                     return 'ordering (SR): expected exactly ' . $expected . ' items, got ' . count($items);
                 }
-                return null;
-
-            case 'RV':
-                // V20 #6: a short-answer question with no accepted answer is unanswerable.
-                if (trim((string) ($data['answer'] ?? '')) === '') {
-                    return 'shortanswer (RV): empty answer';
-                }
-                return null;
-
-            case 'EH':
-                // Essay: the non-blank question text checked above is the only hard requirement
-                // (graderinfo is optional marker guidance).
                 return null;
 
             default:

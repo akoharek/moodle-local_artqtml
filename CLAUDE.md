@@ -1,10 +1,15 @@
+> **ArtQTML Light (`local_artqtml`)** — Marketplace/GPL stripped edition.
+> Feature set: IH+FE+SR, paste+TXT, thin admin. No license/.lic, PDF/DOCX, Bloom, FT/EH/RV, bulk move, institutional prompts, token admin.
+> Docs: iCloud `moodle_dev_projektek/artqtmlight-munkadokumentumok/`.
+> Sibling Full product: `local_artqtm` / `moodle-local_artqtm`.
+
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project overview
 
-`local_artqtml` is a Moodle **local plugin** (frankenstyle component: `local_artqtml`) that generates quiz questions using AI:
+`local_artqtmll` is a Moodle **local plugin** (frankenstyle component: `local_artqtmll`) that generates quiz questions using AI:
 
 - **Claude API (Structured Outputs)** — generates question content in a defined schema.
 - **Gemini API** — validates/reviews generated questions before they're accepted.
@@ -17,7 +22,7 @@ Supported question types (must map to Moodle core/standard question type plugins
 - Short answer (`qtype_shortanswer`)
 - Essay (`qtype_essay`)
 
-The repository currently contains only tooling/config (`.agents/`, `.claude/`) — no plugin source code exists yet. When scaffolding the plugin, follow standard Moodle local plugin structure (`version.php`, `lib.php`, `settings.php`, `classes/` with PSR-4 autoloading, `db/access.php`, `db/services.php` if exposing web services, `lang/en/local_artqtml.php`).
+The repository currently contains only tooling/config (`.agents/`, `.claude/`) — no plugin source code exists yet. When scaffolding the plugin, follow standard Moodle local plugin structure (`version.php`, `lib.php`, `settings.php`, `classes/` with PSR-4 autoloading, `db/access.php`, `db/services.php` if exposing web services, `lang/en/local_artqtmll.php`).
 
 ## Reference documents
 

@@ -110,14 +110,13 @@ class missing_types {
         // The generation-wide per-level totals are derived from the grid in
         // local_artqtml_build_settings(); derived again here, from the same grid, so the stored
         // settings cannot describe a request the grid does not.
-        foreach (['bloom' => ['remember', 'understand', 'apply'], 'scale' => ['easy', 'medium', 'hard']] as $mode => $levels) {
-            foreach ($levels as $level) {
-                $sum = 0;
-                foreach ($matrix as $bytype) {
-                    $sum += (int) ($bytype[$level] ?? 0);
-                }
-                $settings['difficulty'][$mode][$level] = $sum;
+        // Light: Easy/Medium/Hard scale only (Bloom totals are Full-only).
+        foreach (['easy', 'medium', 'hard'] as $level) {
+            $sum = 0;
+            foreach ($matrix as $bytype) {
+                $sum += (int) ($bytype[$level] ?? 0);
             }
+            $settings['difficulty']['scale'][$level] = $sum;
         }
 
         return $settings;

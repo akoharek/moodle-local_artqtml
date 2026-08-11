@@ -128,7 +128,7 @@ class observer {
             'context'  => \context_system::instance(),
         ])->trigger();
 
-        if (in_array($row->typecode, ['FE', 'FT'], true)) {
+        if ($row->typecode === 'FE') {
             question_importer::recompute_multichoice_fractions($questionid);
         }
     }

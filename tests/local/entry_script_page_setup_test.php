@@ -71,9 +71,10 @@ final class entry_script_page_setup_test extends \advanced_testcase {
     public function test_entry_scripts_are_discovered(): void {
         $scripts = $this->entry_scripts();
 
-        $this->assertGreaterThanOrEqual(9, count($scripts), 'entry-script discovery found too few files');
+        $this->assertGreaterThanOrEqual(8, count($scripts), 'entry-script discovery found too few files');
         $this->assertArrayHasKey('delete.php', $scripts);
         $this->assertArrayHasKey('modelaction.php', $scripts);
+        $this->assertArrayNotHasKey('license.php', $scripts);
     }
 
     /**

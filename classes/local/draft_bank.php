@@ -55,9 +55,9 @@ class draft_bank {
 
     /**
      * Whether the admin-configured draft course (Jov-023) is actually usable right now - checked
-     * at the "start a new generation" checkpoints (upload.php, generate.php), same pattern as
-     * {@see license_checker::is_blocked()}. Callers must check this before ever calling
-     * {@see self::create()}/{@see self::get_root_category_id()}, which throw if it's false.
+     * at the "start a new generation" checkpoints (upload.php, generate.php). Callers must check
+     * this before ever calling {@see self::create()}/{@see self::get_root_category_id()}, which
+     * throw if it's false.
      *
      * @return bool
      */

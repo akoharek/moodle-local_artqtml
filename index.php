@@ -91,17 +91,7 @@ foreach ($stats as [$labelkey, $value]) {
 }
 echo html_writer::end_div();
 
-// Lic-009/010: blocked (missing/invalid/expired/exhausted) licenses disable starting new
-// generations, but already-started ones on the list below remain fully usable.
-//
-// Lic-025/026 (2026-08-07): the yellow expiry/quota warning must appear on the list page too -
-// teachers need to see it before anything is blocked. The banner helper returns '' when there is
-// nothing to say, danger markup when blocked, and warning markup for the soft thresholds; always
-// calling it is what puts the soft warning on this page (previously only is_blocked() opened the
-// gate, so warning state was silent here).
-$licenseblocked = \local_artqtml\local\license_checker::is_blocked();
-echo local_artqtml_license_warning_banner();
-echo local_artqtml_token_warning_banner();
+// ArtQTML Light: license and token-budget gates removed.
 
 // Admin-065/Glob-036: an unset or unusable model blocks new generations the same way, and for the
 // same reason - starting one would fail at the first API call.
@@ -114,7 +104,7 @@ if ($draftcourseblocked) {
 }
 
 if (has_capability('local/artqtml:use', $context)) {
-    if ($licenseblocked || $draftcourseblocked || $modelblocked) {
+    if ($draftcourseblocked || $modelblocked) {
         echo html_writer::div(
             html_writer::tag('button', get_string('newgeneration', 'local_artqtml'), [
                 'type' => 'button', 'class' => 'btn btn-primary', 'disabled' => 'disabled',

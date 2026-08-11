@@ -35,8 +35,7 @@
  *  - It is not a context-fit calculation. A request that passes this can still be too large for a
  *    model once the system prompt, the schema and the answer are added; that is what the 80%
  *    headroom is for, and it is a margin rather than a proof.
- *  - It is not connected to the monthly token budget ({@see token_budget}). That limits spending
- *    over a billing cycle; this limits one request's input.
+ *  - It is not connected to a monthly token budget (removed in ArtQTML Light).
  *  - It does not truncate. Silently shortening a teacher's material would produce questions about
  *    a document they did not upload, and nothing on screen would say so.
  *

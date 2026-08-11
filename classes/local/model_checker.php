@@ -249,7 +249,7 @@ class model_checker {
      * What stays the probe's own is the payload it carries, not how that payload is assembled:
      * Admin-059 forbids it advancing the question-count licence counter and Admin-060 forbids its
      * tokens being booked against the user budget, and both happen inside those tasks. So it does
-     * not call them, and nothing here touches license_checker or the token accounting. The schema
+     * not call them, and nothing here touches license or token accounting. The schema
      * is the smallest that still exercises structured output in both directions (Admin-060).
      *
      * @param string $provider
