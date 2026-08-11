@@ -129,33 +129,25 @@ final class setting_backup_test extends \advanced_testcase {
     }
 
     /**
-     * The helper exists so future migrations use it. This asserts the rule is documented where a
-     * migration author will see it, since the already-executed steps cannot be fixed retroactively.
+     * Light is a new plugin identity: upgrade.php carries no Full migration history.
+     *
+     * The setting_backup helper remains for any future Light step that rewrites a prompt template.
      */
-    public function test_upgrade_file_documents_the_backup_rule(): void {
+    public function test_upgrade_file_is_light_stub_without_full_history(): void {
         $upgrade = file_get_contents(__DIR__ . '/../../db/upgrade.php');
 
-        $this->assertStringContainsString(
-            'setting_backup',
-            $upgrade,
-            'db/upgrade.php should reference the backup helper so the next migration author uses it'
+        $this->assertStringContainsString('install.xml', $upgrade);
+        $this->assertStringContainsString('migration history', $upgrade);
+        $this->assertStringContainsString('new plugin identity', $upgrade);
+        $this->assertTrue(
+            class_exists(setting_backup::class),
+            'setting_backup must stay available for future Light prompt migrations'
         );
     }
 
     /**
-     * Glob-037 ENFORCEMENT (O-2): the tripwire that makes the rule real instead of documented.
-     *
-     * The concern the migration-backup cases exist for is "a migration that forgot to call the
-     * backup still shipped". A behavioural test cannot catch that on its own, so this inspects
-     * db/upgrade.php directly: it counts how many upgrade steps WRITE a prompt-template setting
-     * (set_config), and how many BACK ONE UP first (setting_backup::backup). The two
-     * grandfathered pre-rule steps (2026072501 and 2026072600) rewrote the template in place before
-     * the rule existed and cannot be repaired retroactively, so exactly two writes are allowed to
-     * have no matching backup. Every write beyond those two must be paired with a backup call.
-     *
-     * A future migration that changes a prompt template WITHOUT backing it up raises the write count
-     * without the backup count, and this fails, naming the counts - so the author sees Glob-037
-     * before the migration ships. (Proven to fail: see docs/migration_backup_report.md §5.)
+     * Glob-037 ENFORCEMENT for Light: every prompt-template write in upgrade.php must be paired
+     * with setting_backup::backup(). Light ships with zero such writes today.
      */
     public function test_future_template_migrations_must_back_up(): void {
         $upgrade = file_get_contents(__DIR__ . '/../../db/upgrade.php');
@@ -169,18 +161,12 @@ final class setting_backup_test extends \advanced_testcase {
             $upgrade
         );
 
-        // The two pre-rule steps (2026072501, 2026072600) are the only writes allowed without a
-        // backup; they predate the rule and cannot be fixed retroactively.
-        $grandfathered = 2;
-
         $this->assertSame(
-            $grandfathered,
+            0,
             $writes - $backups,
             "An upgrade step writes a prompt-template setting without a preceding "
             . "setting_backup::backup() call (Glob-037). Template set_config writes: $writes; "
-            . "backup calls: $backups; grandfathered pre-rule writes allowed without a backup: "
-            . "$grandfathered. Add the backup call before the write, or - only if this write is "
-            . "itself a legitimately-grandfathered pre-rule step - update the allowance here."
+            . "backup calls: $backups. Add the backup call before the write."
         );
     }
 }

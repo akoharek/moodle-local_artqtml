@@ -19,16 +19,7 @@ namespace local_artqtml\local;
 /**
  * The per-answer explanation (BL-29): the switch, the schema and where the text lands.
  *
- * What a student could not learn before this existed: why the option they picked was wrong. The
- * only AI-written explanation was `generalfeedback` - one per question, shown whatever they
- * answered - and Moodle's own per-option feedback column was filled with an empty string on every
- * generation.
- *
- * The assertions here are about the two things that have to stay in step. The schema field and the
- * prompt instruction are both conditional on the same switch, and if they ever disagree the failure
- * is expensive in one direction and silent in the other: asking for a field the schema forbids
- * fails the whole call, and declaring a field nobody asked for makes the model write an explanation
- * for every option of every question and bills for it.
+ * ArtQTML Light: IH and FE can store per-answer explanations; SR cannot. FT/RV/EH are removed.
  *
  * @package    local_artqtml
  * @category   test
@@ -54,10 +45,6 @@ final class option_explanation_test extends \advanced_testcase {
     /**
      * The branch of a built schema that describes one question, whatever the wrapper looks like.
      *
-     * A single requested type gets its object directly; more than one gets an anyOf. Only one type
-     * is ever asked for here, but reading it this way means the test does not break if that
-     * arrangement changes.
-     *
      * @param array $settings
      * @return array
      */
@@ -71,13 +58,11 @@ final class option_explanation_test extends \advanced_testcase {
      * With the switch off, nothing about an explanation reaches the schema.
      */
     public function test_the_option_has_no_explanation_field_when_the_switch_is_off(): void {
-        foreach (['FE', 'FT'] as $typecode) {
-            $branch = $this->question_branch($this->settings($typecode, false));
-            $option = $branch['properties']['options']['items'];
+        $branch = $this->question_branch($this->settings('FE', false));
+        $option = $branch['properties']['options']['items'];
 
-            $this->assertArrayNotHasKey('explanation', $option['properties'], $typecode);
-            $this->assertNotContains('explanation', $option['required'], $typecode);
-        }
+        $this->assertArrayNotHasKey('explanation', $option['properties']);
+        $this->assertNotContains('explanation', $option['required']);
     }
 
     /**
@@ -85,17 +70,15 @@ final class option_explanation_test extends \advanced_testcase {
      * optional one.
      */
     public function test_the_option_carries_a_required_explanation_when_the_switch_is_on(): void {
-        foreach (['FE', 'FT'] as $typecode) {
-            $branch = $this->question_branch($this->settings($typecode, true));
-            $option = $branch['properties']['options']['items'];
+        $branch = $this->question_branch($this->settings('FE', true));
+        $option = $branch['properties']['options']['items'];
 
-            $this->assertArrayHasKey('explanation', $option['properties'], $typecode);
-            $this->assertContains('explanation', $option['required'], $typecode);
-            $this->assertFalse(
-                $option['additionalProperties'],
-                'Anthropic rejects the whole request if any object omits this'
-            );
-        }
+        $this->assertArrayHasKey('explanation', $option['properties']);
+        $this->assertContains('explanation', $option['required']);
+        $this->assertFalse(
+            $option['additionalProperties'],
+            'Anthropic rejects the whole request if any object omits this'
+        );
     }
 
     /**
@@ -114,29 +97,18 @@ final class option_explanation_test extends \advanced_testcase {
     }
 
     /**
-     * The three types that have nowhere to put an explanation never get asked for one.
-     *
-     * This is not a policy choice: ordering keeps one combined feedback for the whole question, and
-     * short answer and essay have no options. A field generated for them would be discarded on
-     * import, so the cost would buy nothing.
+     * SR has nowhere to put a per-answer explanation and must never be asked for one.
      */
-    public function test_the_types_with_nowhere_to_store_it_never_ask_for_it(): void {
-        foreach (['SR', 'RV', 'EH'] as $typecode) {
-            $this->assertFalse(
-                question_types::supports_option_explanation($typecode),
-                "$typecode has no Moodle field for a per-answer explanation"
-            );
+    public function test_ordering_never_asks_for_an_explanation(): void {
+        $this->assertFalse(question_types::supports_option_explanation('SR'));
 
-            // Even if a stored setting claims otherwise - an older row, or a hand-edited one - the
-            // schema must not grow a field the importer would throw away.
-            $branch = $this->question_branch($this->settings($typecode, true));
-            $flattened = json_encode($branch);
-            $this->assertStringNotContainsString('explanation', $flattened, $typecode);
-        }
+        $branch = $this->question_branch($this->settings('SR', true));
+        $flattened = json_encode($branch);
+        $this->assertStringNotContainsString('explanation', $flattened);
     }
 
     /**
-     * And the three that do are exactly the three the form offers the switch on.
+     * The switch is offered for exactly the Light types that can store it.
      */
     public function test_the_switch_is_offered_for_exactly_the_types_that_can_store_it(): void {
         $supported = array_values(array_filter(
@@ -144,6 +116,7 @@ final class option_explanation_test extends \advanced_testcase {
             static fn(string $code): bool => question_types::supports_option_explanation($code)
         ));
 
-        $this->assertSame(['IH', 'FE', 'FT'], $supported);
+        $this->assertSame(['IH', 'FE'], $supported);
+        $this->assertCount(3, question_types::CODES);
     }
 }

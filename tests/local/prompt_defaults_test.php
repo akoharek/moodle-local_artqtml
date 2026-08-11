@@ -19,21 +19,7 @@ namespace local_artqtml\local;
 /**
  * The shipped prompt seed must stay in step with the code that substitutes into it (Admin-066).
  *
- * What changed, and why this replaces the old guard. Until 2026-07-31 the prompt was hidden -
- * encrypted in the database, base64 in the lang packs - and the test here asserted that the
- * settings page did not leak it. That protection is gone by decision: the whole prompt now lives
- * in admin settings, in plain text, and an administrator may edit or break it.
- *
- * The risk therefore moved. It is no longer disclosure; it is a placeholder going missing. The
- * template and the substitution list are two halves of one contract kept in two files, and nothing
- * fails loudly when they drift: a template missing a placeholder produces a perfectly valid prompt
- * that silently never carries that value. That is not hypothetical - it is exactly what was found
- * on the development machine that day, where a saved template had lost a line and nobody noticed,
- * because generation kept working.
- *
- * BL-47, 2026-08-03: the example that used to be given here was {{SEED}}, which has since been
- * removed outright - the value it carried never did anything, because the Claude Messages API has
- * no seed parameter. The contract this test guards is unchanged; only the illustration moved.
+ * ArtQTML Light: scale + sourceonly only; no ownknowledge / bloom / freetext / shortanswer seeds.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -44,42 +30,22 @@ final class prompt_defaults_test extends \advanced_testcase {
     private const EXPECTED_SETTINGS = [
         'generatorprompttemplate',
         'promptknowledgesourceonly',
-        'promptknowledgeownknowledge',
         'promptnegation',
         'promptoptioncount',
         'promptitemcount',
-        // BL-32: short answer stores one word, which is a constraint on the question too.
-        'promptshortanswer',
-        // Always-on: do not name the source document in the stem.
         'promptnosourcemetaref',
-        // Admin-069: what the difficulty levels mean. Before these existed the prompt carried the
-        // labels and nothing else, and the model invented its own scale - 72 of 181 measured
-        // questions did not match the level they were asked for.
         'promptdifficultyscale',
-        'promptdifficultybloom',
-        // 2026-08-04: the two sentences the system prompt uses INSTEAD of a teacher's own words.
-        // A free-text difficulty description and a per-type instruction used to be substituted
-        // into the system prompt, which gave a per-generation form field the administrator's
-        // authority. They now travel as untrusted preferences in the user message, and these two
-        // fragments are what the system prompt says about them.
-        'promptdifficultyfreetextreference',
-        'promptteacherinstructionreference',
         'promptfeedbackcorrect',
         'promptfeedbackincorrect',
-        // BL-29: what an explanation attached to one answer option should say, plus the extra
-        // clause True/False needs - two options over one claim leave nothing to say twice.
         'promptoptionexplanation',
         'promptoptionexplanationtruefalse',
         'validatorprompttemplate',
         'validationpromptsuggestion',
         'validationpromptcategory',
         'validationpromptlanguage',
-        // Val-031/032/033: the three checks the validator did not make - difficulty, wording, and
-        // whether an ordering item exists in the source text at all.
         'validationpromptdifficulty',
         'validationpromptwording',
         'validationpromptitemsource',
-        'validationpromptshortanswer',
         'promptjsoninvalid',
     ];
 
@@ -115,9 +81,6 @@ final class prompt_defaults_test extends \advanced_testcase {
 
     /**
      * The template carries every placeholder build_prompt() substitutes.
-     *
-     * A missing one costs nothing visible: the prompt is still valid, the generation still runs,
-     * and the value simply never reaches the model.
      */
     public function test_the_template_carries_every_placeholder(): void {
         $template = $this->defaults()['generatorprompttemplate'];
@@ -149,41 +112,15 @@ final class prompt_defaults_test extends \advanced_testcase {
         $this->assertStringContainsString('{{OPTION_MAX}}', $defaults['promptoptioncount']);
         $this->assertStringContainsString('{{SR_ITEM_COUNT}}', $defaults['promptitemcount']);
 
-        // Admin-069: the level definitions take the requested per-level counts by placeholder, so
-        // the sentence stays editable while the numbers stay the code's.
         foreach (['{{EASY}}', '{{MEDIUM}}', '{{HARD}}'] as $placeholder) {
             $this->assertStringContainsString($placeholder, $defaults['promptdifficultyscale']);
         }
-        foreach (['{{REMEMBER}}', '{{UNDERSTAND}}', '{{APPLY}}'] as $placeholder) {
-            $this->assertStringContainsString($placeholder, $defaults['promptdifficultybloom']);
-        }
 
-        // 2026-08-04: the reference fragments must carry {{TYPE}} and NOTHING that would let user
-        // text back into the system prompt. A placeholder like {{DESCRIPTION}} here would quietly
-        // undo the whole change - the sentence would go back to being a container for whatever the
-        // teacher typed, which is exactly what it replaced.
-        $this->assertStringContainsString('{{TYPE}}', $defaults['promptteacherinstructionreference']);
-
-        foreach (['promptdifficultyfreetextreference', 'promptteacherinstructionreference'] as $key) {
-            $this->assertNotSame('', trim($defaults[$key]));
-            foreach (['{{DESCRIPTION}}', '{{INSTRUCTION}}', '{{USER_TEXT}}', '{{FREETEXT}}'] as $forbidden) {
-                $this->assertStringNotContainsString(
-                    $forbidden,
-                    $defaults[$key],
-                    "the '$key' fragment carries $forbidden - a reference fragment must never be a "
-                        . 'container for user-authored text'
-                );
-            }
-        }
-
-        // Val-031/032/033: the validator template must actually carry the three new clauses,
-        // otherwise they are stored, editable, and never sent.
         foreach (
             [
                 '{{DIFFICULTY_INSTRUCTION}}',
                 '{{WORDING_INSTRUCTION}}',
                 '{{ITEMSOURCE_INSTRUCTION}}',
-                '{{SHORTANSWER_INSTRUCTION}}',
             ] as $placeholder
         ) {
             $this->assertStringContainsString(
@@ -202,10 +139,6 @@ final class prompt_defaults_test extends \advanced_testcase {
 
     /**
      * Gen-031: the template instructs the model about the language of the questions.
-     *
-     * Before the prompt became English-only, a Hungarian site sent a Hungarian prompt and the
-     * output language followed by accident. That accident is gone, so the instruction has to be
-     * present deliberately.
      */
     public function test_the_template_states_the_output_language_rule(): void {
         $this->assertStringContainsString(
@@ -219,9 +152,6 @@ final class prompt_defaults_test extends \advanced_testcase {
 
     /**
      * The always-on stem-wording fragment must name the banned HU/EN meta-references.
-     *
-     * Without these phrases in the shipped seed, an upgrade that only fills empty settings would
-     * leave existing sites with a fragment that never mentions what to avoid.
      */
     public function test_nosourcemetaref_fragment_names_banned_phrases(): void {
         $fragment = $this->defaults()['promptnosourcemetaref'];
@@ -275,9 +205,6 @@ final class prompt_defaults_test extends \advanced_testcase {
 
     /**
      * An edited setting is never overwritten, however different it has become.
-     *
-     * This is the guarantee an upgrade has to keep: a customer who tuned their prompt must not
-     * lose it to a routine version bump.
      */
     public function test_seeding_never_overwrites_an_edit(): void {
         $this->resetAfterTest();
@@ -304,12 +231,6 @@ final class prompt_defaults_test extends \advanced_testcase {
         $first = prompt_seed::apply();
         $second = prompt_seed::apply();
 
-        // Sorted, because the order apply() reports is simply the seed file's own key order, and
-        // nothing depends on it - prompt_seed writes each setting independently. What is worth
-        // asserting here is that the first run seeded every one of them. Membership itself is
-        // asserted in both directions by test_every_shipped_default_has_a_field, so pinning the
-        // order added no protection and broke on 2026-08-01 purely because Admin-069's two
-        // difficulty fragments were inserted into db/prompt_defaults.php.
         $seeded = $first['seeded'];
         $expected = self::EXPECTED_SETTINGS;
         sort($seeded);

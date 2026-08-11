@@ -112,19 +112,24 @@ final class current_question_test extends \advanced_testcase {
     }
 
     /**
-     * Short answer takes the first graded answer.
+     * Ordering (SR) reads the live sequence, not the generation-time items.
      */
-    public function test_shortanswer_reads_the_live_answer(): void {
+    public function test_ordering_reads_the_live_items(): void {
         $this->resetAfterTest();
 
         $generator = $this->getDataGenerator()->get_plugin_generator('core_question');
         $category = $generator->create_question_category();
-        $question = $generator->create_question('shortanswer', 'frogtoad', ['category' => $category->id]);
+        $question = $generator->create_question('ordering', 'moodle', ['category' => $category->id]);
 
-        $data = current_question::data_for($this->row((int) $question->id, 'RV', ['answer' => 'RÉGI VÁLASZ']));
+        $data = current_question::data_for($this->row(
+            (int) $question->id,
+            'SR',
+            ['items' => [['text' => 'RÉGI TÉTEL']]]
+        ));
 
-        $this->assertNotSame('RÉGI VÁLASZ', $data['answer']);
-        $this->assertNotSame('', $data['answer']);
+        $texts = array_column($data['items'] ?? [], 'text');
+        $this->assertNotContains('RÉGI TÉTEL', $texts);
+        $this->assertNotEmpty($texts);
     }
 
     /**

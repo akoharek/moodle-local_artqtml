@@ -309,6 +309,7 @@ $string['orderingnumberingtype_none'] = 'Nincs számozás';
 $string['pageheading'] = 'ArtQTML';
 $string['pageintro'] = 'Generálj kérdéseket AI segítségével, majd tekintsd át és helyezd át őket a Moodle kérdésbankba.';
 $string['plugindisabled'] = 'A ArtQTML jelenleg le van tiltva az adminisztrátor által.';
+$string['plugindesc'] = 'Kvízkérdések generálása Claude-dal, ellenőrzés Gemini-vel, majd átnézés és jóváhagyás a kérdésbankba. Light kiadás: beillesztett vagy TXT forrás; igaz/hamis, egy helyes válasz, sorrendezés.';
 $string['pluginname'] = 'ArtQTML';
 $string['privacy:metadata'] = 'A ArtQTML plugin a generálásokon, a generált kérdéseken és a kezdeményező felhasználóhoz kötött naplóbejegyzéseken túl nem tárol személyes adatot. A forrásszöveg feldolgozás céljából elküldésre kerül a Claude és Gemini szolgáltatásoknak.';
 $string['privacy:metadata:externalpurpose'] = 'A kérdések generálása és validálása céljából a feltöltött forrásszöveg elküldésre kerül ennek a külső AI szolgáltatásnak.';

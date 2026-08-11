@@ -96,26 +96,36 @@ final class retry_penalty_test extends \advanced_testcase {
     }
 
     /**
-     * Not one of T-07's four cases, but the third penalty branch: an essay is manually graded, so
-     * its penalty is forced to 0 regardless of the retry switch.
+     * Light: FE uses the same retry-driven penalty as IH (essay/EH removed).
      */
-    public function test_essay_penalty_is_zero_regardless_of_retry(): void {
-        $this->assertEqualsWithDelta(0.0, $this->penalty_for('EH', ['retryenabled' => 1]), 1e-9);
+    public function test_fe_retry_on_default_is_33_percent(): void {
+        $this->assertEqualsWithDelta(
+            0.33,
+            $this->penalty_for('FE', ['retryenabled' => 1], [
+                'questiontext' => 'Q?',
+                'options'      => [
+                    ['text' => 'a', 'correct' => true],
+                    ['text' => 'b', 'correct' => false],
+                ],
+            ]),
+            1e-9
+        );
     }
 
     /**
      * Build a question form the way the importer does and return the penalty it would store.
      *
-     * @param string $typecode e.g. 'IH' (true/false) or 'EH' (essay)
+     * @param string $typecode e.g. 'IH' (true/false) or 'FE' (multichoice)
      * @param array $typesettings the per-type generation settings (retryenabled, retrypenalty, hintenabled)
+     * @param array|null $data optional question payload (defaults to a true/false stem)
      * @return float
      */
-    private function penalty_for(string $typecode, array $typesettings): float {
+    private function penalty_for(string $typecode, array $typesettings, ?array $data = null): float {
         $this->resetAfterTest();
         $category = (object) ['id' => 1, 'contextid' => \context_system::instance()->id];
         $form = question_form_builder::build(
             $typecode,
-            ['questiontext' => 'Q', 'correctanswer' => 1],
+            $data ?? ['questiontext' => 'Q', 'correctanswer' => 1],
             $category,
             'C-' . $typecode . '-0001',
             $typesettings,

@@ -16,9 +16,11 @@
 
 namespace local_artqtml\local\question;
 
+use local_artqtml\local\question_types;
+
 /**
  * Unit tests for M-07 semantic validation of AI-generated question data (technical annex ch.6,
- * v20 #6/#7 - server-side FE/FT/SR enforcement).
+ * v20 #6/#7 - server-side FE/SR enforcement). ArtQTML Light: IH/FE/SR only.
  *
  * @package    local_artqtml
  * @category   test
@@ -30,7 +32,7 @@ final class question_semantic_validator_test extends \advanced_testcase {
      * Every supported type rejects a blank question stem (v20 #6).
      */
     public function test_blank_questiontext_rejected_for_every_type(): void {
-        foreach (['IH', 'FE', 'FT', 'SR', 'RV', 'EH'] as $type) {
+        foreach (question_types::CODES as $type) {
             $this->assertNotNull(
                 question_semantic_validator::validate($type, ['questiontext' => '   ']),
                 "$type should reject a blank questiontext"
@@ -59,19 +61,16 @@ final class question_semantic_validator_test extends \advanced_testcase {
 
         $base = ['questiontext' => 'Q?'];
 
-        // Zero correct -> rejected.
         $this->assertNotNull(question_semantic_validator::validate('FE', $base + ['options' => [
             ['text' => 'a', 'correct' => false],
             ['text' => 'b', 'correct' => false],
         ]]));
 
-        // Two correct -> rejected.
         $this->assertNotNull(question_semantic_validator::validate('FE', $base + ['options' => [
             ['text' => 'a', 'correct' => true],
             ['text' => 'b', 'correct' => true],
         ]]));
 
-        // Exactly one correct -> valid.
         $this->assertNull(question_semantic_validator::validate('FE', $base + ['options' => [
             ['text' => 'a', 'correct' => true],
             ['text' => 'b', 'correct' => false],
@@ -79,7 +78,7 @@ final class question_semantic_validator_test extends \advanced_testcase {
     }
 
     /**
-     * v20 #7: the admin-configured FE/FT option-count range is enforced server-side.
+     * v20 #7: the admin-configured FE option-count range is enforced server-side.
      */
     public function test_fe_option_count_range_enforced(): void {
         $this->resetAfterTest();
@@ -90,7 +89,6 @@ final class question_semantic_validator_test extends \advanced_testcase {
             ['text' => 'a', 'correct' => true],
             ['text' => 'b', 'correct' => false],
         ]];
-        // Two options is below the configured minimum of three.
         $this->assertNotNull(question_semantic_validator::validate('FE', $twooptions));
 
         $threeoptions = ['questiontext' => 'Q?', 'options' => [
@@ -102,31 +100,14 @@ final class question_semantic_validator_test extends \advanced_testcase {
     }
 
     /**
-     * FT (multi choice) needs at least two correct options and rejects blank option text.
+     * Removed Full types (FT/RV/EH) are rejected as unsupported.
      */
-    public function test_ft_requires_at_least_two_correct_and_no_blank(): void {
-        $this->resetAfterTest();
-        set_config('fefminoptions', 2, 'local_artqtml');
-        set_config('fefmaxoptions', 5, 'local_artqtml');
-
-        // Only one correct -> rejected.
-        $this->assertNotNull(question_semantic_validator::validate('FT', ['questiontext' => 'Q?', 'options' => [
-            ['text' => 'a', 'correct' => true],
-            ['text' => 'b', 'correct' => false],
-        ]]));
-
-        // Blank option text -> rejected.
-        $this->assertNotNull(question_semantic_validator::validate('FT', ['questiontext' => 'Q?', 'options' => [
-            ['text' => 'a', 'correct' => true],
-            ['text' => '', 'correct' => true],
-        ]]));
-
-        // Two correct, all non-blank -> valid.
-        $this->assertNull(question_semantic_validator::validate('FT', ['questiontext' => 'Q?', 'options' => [
-            ['text' => 'a', 'correct' => true],
-            ['text' => 'b', 'correct' => true],
-            ['text' => 'c', 'correct' => false],
-        ]]));
+    public function test_removed_full_types_are_unsupported(): void {
+        foreach (['FT', 'RV', 'EH'] as $type) {
+            $reason = question_semantic_validator::validate($type, ['questiontext' => 'Q?']);
+            $this->assertNotNull($reason, $type);
+            $this->assertStringContainsString('unsupported type code', $reason);
+        }
     }
 
     /**
@@ -139,14 +120,11 @@ final class question_semantic_validator_test extends \advanced_testcase {
 
         $threeitems = ['questiontext' => 'Order these', 'items' => ['a', 'b', 'c']];
 
-        // Three items, admin default is four -> rejected.
         $this->assertNotNull(question_semantic_validator::validate('SR', $threeitems));
 
-        // Four items matches the admin default -> valid.
         $fouritems = ['questiontext' => 'Order these', 'items' => ['a', 'b', 'c', 'd']];
         $this->assertNull(question_semantic_validator::validate('SR', $fouritems));
 
-        // The per-generation override (M-26) of three makes the three-item set valid instead.
         $this->assertNull(question_semantic_validator::validate('SR', $threeitems, ['sritemcount' => 3]));
     }
 
@@ -159,21 +137,6 @@ final class question_semantic_validator_test extends \advanced_testcase {
 
         $this->assertNotNull(question_semantic_validator::validate('SR', ['questiontext' => 'Q', 'items' => ['only one']]));
         $this->assertNotNull(question_semantic_validator::validate('SR', ['questiontext' => 'Q', 'items' => ['a', '  ']]));
-    }
-
-    /**
-     * RV (short answer) is unanswerable with no accepted answer.
-     */
-    public function test_rv_requires_answer(): void {
-        $this->assertNotNull(question_semantic_validator::validate('RV', ['questiontext' => 'Q?', 'answer' => '']));
-        $this->assertNull(question_semantic_validator::validate('RV', ['questiontext' => 'Q?', 'answer' => 'Paris']));
-    }
-
-    /**
-     * EH (essay) needs only a non-blank stem.
-     */
-    public function test_eh_valid_with_stem(): void {
-        $this->assertNull(question_semantic_validator::validate('EH', ['questiontext' => 'Discuss...']));
     }
 
     /**
@@ -192,8 +155,9 @@ final class question_semantic_validator_test extends \advanced_testcase {
         set_config('fefmaxoptions', 5, 'local_artqtml');
         set_config('sritemcount', 2, 'local_artqtml');
 
-        $reason = question_semantic_validator::validate('EH', [
-            'questiontext' => 'Melyik növénycsaládot említi a szöveg szerint?',
+        $reason = question_semantic_validator::validate('IH', [
+            'questiontext'  => 'Melyik növénycsaládot említi a szöveg szerint?',
+            'correctanswer' => true,
         ]);
         $this->assertNotNull($reason);
         $this->assertStringContainsString('source meta-reference', $reason);
@@ -203,8 +167,6 @@ final class question_semantic_validator_test extends \advanced_testcase {
             'correctanswer' => true,
         ]));
 
-        // Leading clause alone would be stripped by the cleaner first; an option that still
-        // carries the phrase after cleaning must fail here.
         $this->assertNotNull(question_semantic_validator::validate('FE', [
             'questiontext' => 'Melyik a helyes?',
             'options'      => [
@@ -218,8 +180,9 @@ final class question_semantic_validator_test extends \advanced_testcase {
             'items'        => ['Első', 'Based on the passage: második'],
         ]));
 
-        $this->assertNull(question_semantic_validator::validate('EH', [
-            'questiontext' => 'Melyik növénycsaládba tartozik az alma?',
+        $this->assertNull(question_semantic_validator::validate('IH', [
+            'questiontext'  => 'Melyik növénycsaládba tartozik az alma?',
+            'correctanswer' => true,
         ]));
     }
 }

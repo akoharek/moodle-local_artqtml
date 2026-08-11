@@ -50,7 +50,7 @@ final class schema_wellformedness_test extends \advanced_testcase {
      * @return array<string, array>
      */
     protected function all_request_schemas(): array {
-        $alltypes = ['IH', 'FE', 'FT', 'SR', 'EH', 'RV'];
+        $alltypes = question_types::CODES;
 
         $hintsandfeedbackoff = ['types' => []];
         $hintsandfeedbackon = ['types' => []];

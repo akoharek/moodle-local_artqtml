@@ -72,7 +72,7 @@ final class partial_reason_test extends \advanced_testcase {
     public function test_content_failure_is_named(): void {
         $this->resetAfterTest();
 
-        $id = $this->make_generation(['SR' => 12, 'RV' => 3]);
+        $id = $this->make_generation(['SR' => 12, 'FE' => 3]);
         $this->log_event($id, 'type_generation_failed', [
             'typecode' => 'SR',
             'kind'     => 'content',
@@ -92,14 +92,14 @@ final class partial_reason_test extends \advanced_testcase {
     public function test_rejects_are_counted_without_raw_reason(): void {
         $this->resetAfterTest();
 
-        $id = $this->make_generation(['FT' => 6]);
+        $id = $this->make_generation(['FE' => 6]);
         $this->log_event($id, 'question_rejected', [
-            'typecode' => 'FT',
-            'reason'   => 'multichoiceset (FT): expected at least 2 correct options, got 1',
+            'typecode' => 'FE',
+            'reason'   => 'multichoice (FE): expected exactly 1 correct option, got 0',
         ]);
         $this->log_event($id, 'question_rejected', [
-            'typecode' => 'FT',
-            'reason'   => 'multichoiceset (FT): expected at least 2 correct options, got 1',
+            'typecode' => 'FE',
+            'reason'   => 'multichoice (FE): expected exactly 1 correct option, got 0',
         ]);
 
         $messages = partial_reason::messages($id);
@@ -115,21 +115,21 @@ final class partial_reason_test extends \advanced_testcase {
     public function test_failure_outranks_rejects_for_the_same_type(): void {
         $this->resetAfterTest();
 
-        $id = $this->make_generation(['RV' => 3]);
+        $id = $this->make_generation(['FE' => 3]);
         $this->log_event($id, 'type_generation_failed', [
-            'typecode' => 'RV',
+            'typecode' => 'FE',
             'kind'     => 'transport',
             'message'  => 'HTTP 503',
         ]);
         $this->log_event($id, 'question_rejected', [
-            'typecode' => 'RV',
-            'reason'   => 'shortanswer (RV): empty answer',
+            'typecode' => 'FE',
+            'reason'   => 'multichoice (FE): blank option text',
         ]);
 
         $messages = partial_reason::messages($id);
         $this->assertCount(1, $messages);
         $this->assertSame(
-            get_string('generationpartialreasontransport', 'local_artqtml', question_types::label('RV')),
+            get_string('generationpartialreasontransport', 'local_artqtml', question_types::label('FE')),
             $messages[0]
         );
     }
@@ -166,7 +166,7 @@ final class partial_reason_test extends \advanced_testcase {
     public function test_no_logs_means_no_reason(): void {
         $this->resetAfterTest();
 
-        $id = $this->make_generation(['EH' => 4]);
+        $id = $this->make_generation(['IH' => 4]);
         $this->assertSame([], partial_reason::messages($id));
         $this->assertSame('', partial_reason::render($id));
     }

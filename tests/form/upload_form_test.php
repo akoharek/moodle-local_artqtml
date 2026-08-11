@@ -126,6 +126,26 @@ final class upload_form_test extends \advanced_testcase {
     }
 
     /**
+     * ArtQTML Light: the filepicker accepts TXT only (no PDF/DOCX).
+     */
+    public function test_source_filepicker_accepts_txt_only(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $form = new upload_form(null, ['maxbytes' => 1048576, 'editid' => 0]);
+        $formreflection = new \ReflectionProperty(\moodleform::class, '_form');
+        $formreflection->setAccessible(true);
+        $mform = $formreflection->getValue($form);
+        $element = $mform->getElement('sourcefile');
+
+        $optionsreflection = new \ReflectionProperty(\MoodleQuickForm_filepicker::class, '_options');
+        $optionsreflection->setAccessible(true);
+        $options = $optionsreflection->getValue($element);
+
+        $this->assertSame(['.txt'], $options['accepted_types']);
+    }
+
+    /**
      * A source text over the limit is refused, at the field the user has to shorten.
      *
      * Before 2026-08-04 nothing on the server compared this text to anything: the upload page's

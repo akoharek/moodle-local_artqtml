@@ -76,21 +76,21 @@ final class generation_progress_test extends \advanced_testcase {
             return json_encode(['generating' => ['done' => $done, 'total' => $total, 'current' => $current]]);
         };
 
-        // Four types: 25 at the start, then a step per finished type, 45 at the end.
-        $this->assertSame(25, generation_progress::generating_percent($progress(0, 4, 'IH')));
-        $this->assertSame(30, generation_progress::generating_percent($progress(1, 4, 'FE')));
-        $this->assertSame(35, generation_progress::generating_percent($progress(2, 4, 'SR')));
-        $this->assertSame(45, generation_progress::generating_percent($progress(4, 4, 'EH')));
+        // Light's three types: 25 at the start, then a step per finished type, 45 at the end.
+        $this->assertSame(25, generation_progress::generating_percent($progress(0, 3, 'IH')));
+        $this->assertSame(32, generation_progress::generating_percent($progress(1, 3, 'FE')));
+        $this->assertSame(38, generation_progress::generating_percent($progress(2, 3, 'SR')));
+        $this->assertSame(45, generation_progress::generating_percent($progress(3, 3, 'SR')));
 
         // A single type never leaves the two ends.
         $this->assertSame(25, generation_progress::generating_percent($progress(0, 1, 'IH')));
         $this->assertSame(45, generation_progress::generating_percent($progress(1, 1, 'IH')));
 
         // The label names the type in flight, and the bar never runs past the stage it belongs to.
-        $this->assertSame('FE', generation_progress::generating_type($progress(1, 4, 'FE')));
+        $this->assertSame('FE', generation_progress::generating_type($progress(1, 3, 'FE')));
         $this->assertLessThanOrEqual(
             generation_progress::STAGES[generation_status::VALIDATING]['percent'],
-            generation_progress::generating_percent($progress(9, 4, 'RV')),
+            generation_progress::generating_percent($progress(9, 3, 'IH')),
             'a miscounted loop must not push the bar past the validating mark'
         );
     }
