@@ -75,13 +75,14 @@ class question_bank_list {
     ): void {
         global $DB;
 
-        // Every generation's temporary draft bank lives under this shared category, in the
-        // admin-configured draft course's own context (Jov-023) - none of them, nor the shared
-        // category itself, are ever valid move targets, regardless of which generation's approval
-        // page is asking. If no draft course is configured there is nothing to exclude.
-        $draftrootid = 0;
+        // Jov-023: the admin-configured draft course exists only to hold unreviewed AI drafts.
+        // Nothing in that course's question bank is a valid move target — not Light's own
+        // artqtml_draft_* tree, and not leftover sibling roots from Full / earlier installs
+        // (aiquizgen_draft_*, artqtm_draft_*) that share the same course. Skipping the whole
+        // context is stronger than filtering one root's children, which previously leaked
+        // hundreds of legacy draft categories into the approve-page dropdown.
         if (draft_bank::is_configured() && $context->id === draft_bank::get_draft_context_id()) {
-            $draftrootid = draft_bank::get_root_category_id();
+            return;
         }
 
         $categories = $DB->get_records('question_categories', ['contextid' => $context->id], 'sortorder, name');
@@ -95,9 +96,6 @@ class question_bank_list {
             // it here let a question be "successfully" moved into a category the native question
             // bank UI never actually browses into, making it look like it vanished.
             if ((int) $category->parent === 0) {
-                continue;
-            }
-            if ($draftrootid > 0 && ((int) $category->id === $draftrootid || (int) $category->parent === $draftrootid)) {
                 continue;
             }
             $key = $category->id . ',' . $category->contextid;
