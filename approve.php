@@ -156,17 +156,16 @@ if (in_array($bulkaction, ['allaccepted', 'delete'], true)) {
         redirect($pageurl);
     }
 
-    if ($bulkaction === 'allaccepted') {
-        try {
-            $count = question_approval_service::approve_accepted_bulk($generationid, (int) $USER->id, $context);
-            \core\notification::success(get_string('bulkapprovesuccess', 'local_artqtml', $count));
-        } catch (\Throwable $e) {
-            // V20 #3: log the full detail, show only a generic translated message.
-            debugging('local_artqtml bulk approve failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
-            \core\notification::error(get_string('errorbulkactionfailed', 'local_artqtml'));
-        }
-        redirect($pageurl);
+    // Remaining allowed bulk action: approve all accepted.
+    try {
+        $count = question_approval_service::approve_accepted_bulk($generationid, (int) $USER->id, $context);
+        \core\notification::success(get_string('bulkapprovesuccess', 'local_artqtml', $count));
+    } catch (\Throwable $e) {
+        // V20 #3: log the full detail, show only a generic translated message.
+        debugging('local_artqtml bulk approve failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
+        \core\notification::error(get_string('errorbulkactionfailed', 'local_artqtml'));
     }
+    redirect($pageurl);
 }
 
 // Jov-011/012, Glob-005: sortable columns and pagination, matching the list page's pattern.

@@ -279,7 +279,7 @@ if ($mform->is_cancelled()) {
     // what protects the thing BL-51 was about - the SAME generation started twice.
     $blocking = \local_artqtml\local\generation_lock::run(
         $generationid,
-        function () use ($DB, $generationid, $data, $settings) {
+        function () use ($DB, $generationid, $settings) {
             global $USER;
 
             $current = $DB->get_record('local_artqtml_generations', ['id' => $generationid], '*', MUST_EXIST);
