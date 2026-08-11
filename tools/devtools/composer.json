@@ -1,0 +1,21 @@
+{
+    "name": "artqtml/devtools",
+    "description": "A local_artqtml fejlesztői ellenőrző eszközei. Külön projekt, hogy ne a Moodle sajat composer.json-jaban lakjanak (BL-21). Nem szallitodik a pluginnal.",
+    "type": "project",
+    "license": "GPL-3.0-or-later",
+    "require": {
+        "phpstan/phpstan": "2.2.5",
+        "spaze/phpstan-disallowed-calls": "4.14.0",
+        "squizlabs/php_codesniffer": "3.13.5",
+        "moodlehq/moodle-cs": "v3.7.0",
+        "phpmd/phpmd": "2.15.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        },
+        "audit": {
+            "block-insecure": false
+        }
+    }
+}

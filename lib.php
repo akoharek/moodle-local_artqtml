@@ -1,0 +1,376 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Library functions and callbacks for local_artqtml.
+ *
+ * @package    local_artqtml
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+/**
+ * Add a link to the ArtQTML into the primary/global navigation.
+ *
+ * The plugin is site-wide (Glob-022/023), not tied to any course, so the link is
+ * added to the root of the navigation tree rather than a course settings block.
+ *
+ * @param global_navigation $navigation the global navigation tree
+ * @return void
+ */
+function local_artqtml_extend_navigation(global_navigation $navigation) {
+    if (!get_config('local_artqtml', 'enabled')) {
+        return;
+    }
+
+    $context = context_system::instance();
+    if (!has_capability('local/artqtml:use', $context)) {
+        return;
+    }
+
+    $url = new moodle_url('/local/artqtml/index.php');
+    $node = navigation_node::create(
+        get_string('navigationlink', 'local_artqtml'),
+        $url,
+        navigation_node::TYPE_CUSTOM,
+        null,
+        'local_artqtml',
+        new pix_icon('i/settings', '')
+    );
+
+    $navigation->add_node($node);
+}
+
+/**
+ * Map a generation status to a Bootstrap badge CSS class.
+ *
+ * Thin wrapper kept for the existing call sites; the map itself lives with the status values in
+ * {@see \local_artqtml\local\generation_status} so the six-value set has one home (List-018).
+ *
+ * @param string $status one of \local_artqtml\local\generation_status::VALUES
+ * @return string badge CSS class
+ */
+function local_artqtml_status_badge_class(string $status): string {
+    return \local_artqtml\local\generation_status::badge_class($status);
+}
+
+/**
+ * Map a question validationsuggestion to a Bootstrap badge CSS class (Jov-007).
+ *
+ * Thin wrapper kept for the existing call sites; the map itself lives with the suggestion values
+ * in {@see \local_artqtml\local\validation_suggestion} so the set has one home (Val-017).
+ *
+ * @param string $status one of \local_artqtml\local\validation_suggestion::DISPLAY, or 'edited'
+ * @return string badge CSS class
+ */
+function local_artqtml_validation_badge_class(string $status): string {
+    return \local_artqtml\local\validation_suggestion::badge_class($status);
+}
+
+/**
+ * Render the "Test connection" button + status + model select markup for one provider
+ * (Admin-011/012/017/018), used by settings.php's Generator/Validator LLM tabs.
+ *
+ * Deliberately kept out of settings.php: Moodle can include a plugin's settings.php more
+ * than once per request while building/caching the admin tree, which would fatal-error on
+ * a plain top-level function redeclaration. lib.php is loaded via include_once through the
+ * component callback mechanism, so it does not have that problem.
+ *
+ * @param string $provider 'claude' or 'gemini'
+ * @return string
+ */
+function local_artqtml_render_test_button(string $provider): string {
+    global $PAGE;
+
+    $PAGE->requires->js(new moodle_url('/local/artqtml/js/admintest.js'));
+
+    // Cursor audit v3 #10: admintest.js is a plain (non-AMD) script, so core/str's async
+    // fetch isn't available to it - data_for_js() is the equivalent mechanism for that style of
+    // script, injecting these once as a plain JS object literal instead of hardcoding English
+    // text in the .js file. Guarded since this function runs once per provider (claude/gemini)
+    // on the same page - only the first call needs to emit it.
+    static $stringsemitted = false;
+    if (!$stringsemitted) {
+        $PAGE->requires->data_for_js('M.artqtml_admintest', [
+            'testing'      => get_string('admintesttesting', 'local_artqtml'),
+            'errorunknown' => get_string('errorajaxunknown', 'local_artqtml'),
+        ]);
+        $stringsemitted = true;
+    }
+
+    $buttonid = 'artqtml-test-' . $provider;
+    $statusid = 'artqtml-teststatus-' . $provider;
+
+    $html = html_writer::tag('button', get_string('testconnectionbutton', 'local_artqtml'), [
+        'type' => 'button', 'id' => $buttonid, 'class' => 'btn btn-secondary',
+        'data-testid' => 'artqtml-admin-connectiontest-' . $provider,
+    ]);
+    $html .= html_writer::tag('span', '', ['id' => $statusid, 'class' => 'ml-2']);
+    // Admin-048: no second model control here. This button used to render its own <select> of
+    // fetched models next to the model text field, so the tab carried two model controls at once -
+    // exactly the duplicate the field table's negative assertion targets. The model field is now
+    // itself the select (setting_modelselect), fed from the cached list.
+    $html .= html_writer::script(
+        'document.addEventListener("DOMContentLoaded", function() {' .
+        'if (window.ArtqtmlAdminTest) {' .
+        'window.ArtqtmlAdminTest.init(' . json_encode($provider) . ', ' . json_encode($buttonid) . ', ' .
+        json_encode($statusid) . ');' .
+        '}});'
+    );
+
+    return $html;
+}
+
+/**
+ * Render the model-list actions for one LLM tab: "Refresh models" (Admin-046).
+ *
+ * Plain links with a sesskey rather than AJAX: the actions change server state and the page must
+ * re-render from the refreshed cache anyway, so a round trip is the honest mechanism and needs no
+ * JavaScript to be testable.
+ *
+ * @param string $provider one of \local_artqtml\local\model_list::PROVIDERS
+ * @return string
+ */
+function local_artqtml_render_model_buttons(string $provider): string {
+    $refreshurl = new moodle_url('/local/artqtml/modelaction.php', [
+        'provider' => $provider,
+        'action'   => 'refresh',
+        'sesskey'  => sesskey(),
+    ]);
+
+    $html = html_writer::link($refreshurl, get_string('refreshmodels', 'local_artqtml'), [
+        'class' => 'btn btn-secondary',
+        'data-testid' => 'artqtml-admin-refreshmodels-' . $provider,
+    ]);
+
+    // Admin-054: run the same check the scheduled task runs, immediately. Success clears the
+    // blocking state, failure sets it - and this and the scheduled task are the only writers.
+    $checkurl = new moodle_url('/local/artqtml/modelaction.php', [
+        'provider' => $provider,
+        'action'   => 'check',
+        'sesskey'  => sesskey(),
+    ]);
+    $html .= html_writer::link($checkurl, get_string('runmodelcheck', 'local_artqtml'), [
+        'class' => 'btn btn-secondary ml-2',
+        'data-testid' => 'artqtml-admin-runmodelcheck-' . $provider,
+    ]);
+
+    // Admin-045: say how old the cached list is, so "the dropdown looks wrong" has an obvious
+    // first thing to check.
+    $cached = \local_artqtml\local\model_list::get_cached($provider);
+    if ($cached !== null) {
+        $html .= html_writer::span(
+            get_string(
+                'modellistfetched',
+                'local_artqtml',
+                userdate((int) $cached['fetchedat'], get_string('datetimeformat', 'local_artqtml'))
+            ),
+            'ml-2 text-muted small',
+            ['data-testid' => 'artqtml-admin-modellistage-' . $provider]
+        );
+    }
+
+    return html_writer::div($html, 'artqtml-modelactions');
+}
+
+/**
+ * Render the license warning/blocked banner shown on every admin tab and the list page
+ * (Lic-008: "minden fülön figyelmeztető sáv jelenik meg").
+ *
+ * Returns an empty string when the license is valid and not nearing its expiry/usage
+ * threshold, so callers can skip rendering anything at all in that case.
+ *
+ * @return string
+ */
+function local_artqtml_license_warning_banner(): string {
+    $status = \local_artqtml\local\license_checker::status();
+
+    // Security: unlike every other blocking state, tampered's message is deliberately generic -
+    // never the modified/missing file names/paths - plus an opaque error code an admin can quote
+    // to the vendor. See license_checker::integrity_error_code()'s docblock.
+    if ($status['state'] === 'tampered') {
+        return html_writer::div(
+            get_string('licensetampered_generic', 'local_artqtml') . ' ' .
+            get_string('licensetampered_errorcode', 'local_artqtml', $status['errorcode'] ?? ''),
+            'alert alert-danger'
+        );
+    }
+
+    if (in_array($status['state'], \local_artqtml\local\license_checker::BLOCKING_STATES, true)) {
+        return html_writer::div(
+            get_string('licensewarningblocked_' . $status['state'], 'local_artqtml'),
+            'alert alert-danger'
+        );
+    }
+
+    if (empty($status['warning'])) {
+        return '';
+    }
+
+    if (isset($status['expiresat'])) {
+        // Glob-042 / Lic-025 (2026-08-07): every UI date uses the plugin datetimeformat
+        // (ÉÉÉÉ.HH.NN óó:pp), including the licence expiry warning - no Moodle locale short-date
+        // exception.
+        $message = get_string(
+            'licensewarningexpiring',
+            'local_artqtml',
+            userdate((int) $status['expiresat'], get_string('datetimeformat', 'local_artqtml'))
+        );
+    } else if (isset($status['usedpct'])) {
+        $message = get_string('licensewarningquestionlimit', 'local_artqtml', $status['usedpct']);
+    } else {
+        $message = get_string('licensewarninggeneric', 'local_artqtml');
+    }
+
+    return html_writer::div($message, 'alert alert-warning');
+}
+
+/**
+ * Render a yellow token-budget warning banner (Admin-033), shown on every admin tab - the same
+ * "shown everywhere, not just the Token management page" treatment as the license banner.
+ *
+ * Returns a warning as soon as either provider's usage for the current billing cycle reaches the
+ * configured warning percentage (tokenbudgetwarningpct) of its budget. Only ever shown to users
+ * who can act on it (local/artqtml:configure); returns '' for everyone else, for a provider with
+ * an unlimited (0) budget, and whenever no provider is over the threshold.
+ *
+ * @return string
+ */
+function local_artqtml_token_warning_banner(): string {
+    if (!has_capability('local/artqtml:configure', context_system::instance())) {
+        return '';
+    }
+
+    $warningpct = (int) (get_config('local_artqtml', 'tokenbudgetwarningpct') ?: 80);
+
+    $messages = [];
+    $stringkeys = ['claude' => 'tokenwarningbannergenerator', 'gemini' => 'tokenwarningbannervalidator'];
+    foreach ($stringkeys as $provider => $stringkey) {
+        $budget = \local_artqtml\local\token_budget::budget($provider);
+        if ($budget <= 0) {
+            continue; // Unlimited budget - nothing to warn about.
+        }
+        $pct = (int) round((\local_artqtml\local\token_budget::used($provider) / $budget) * 100);
+        if ($pct >= $warningpct) {
+            $messages[] = get_string($stringkey, 'local_artqtml', min(100, $pct));
+        }
+    }
+
+    if (empty($messages)) {
+        return '';
+    }
+
+    return html_writer::div(implode(' ', $messages), 'alert alert-warning');
+}
+
+/**
+ * Render a yellow "you're viewing someone else's generation" banner (Glob-031): local/artqtml
+ * is a site-wide, not per-owner-locked tool - any user with local/artqtml:use can open and act
+ * on any generation, but should always be told clearly whose it is when it isn't their own.
+ *
+ * @param stdClass $generation the local_artqtml_generations record being viewed
+ * @return string empty string if the current user is the generation's own owner
+ */
+function local_artqtml_owner_warning_banner(stdClass $generation): string {
+    global $USER;
+
+    if ($generation->userid == $USER->id) {
+        return '';
+    }
+
+    $owner = core_user::get_user($generation->userid);
+    if (!$owner) {
+        return '';
+    }
+
+    return html_writer::div(
+        get_string('crossuserwarning', 'local_artqtml', fullname($owner)),
+        'alert alert-warning'
+    );
+}
+
+/**
+ * Render a red "draft course not configured" banner (Jov-023) - shown on every admin tab, same
+ * pattern as {@see local_artqtml_license_warning_banner()}, since new generations are blocked
+ * site-wide (upload.php/generate.php) for as long as this is true.
+ *
+ * @return string empty string if the draft course is configured and exists
+ */
+function local_artqtml_draftcourse_warning_banner(): string {
+    if (\local_artqtml\local\draft_bank::is_configured()) {
+        return '';
+    }
+
+    return html_writer::div(get_string('draftcoursewarningbanner', 'local_artqtml'), 'alert alert-danger');
+}
+
+/**
+ * Glob-038: after an upgrade backed up an admin-editable setting, tell the administrator which
+ * setting changed and where the previous value is.
+ *
+ * Shown once - reading it clears the pending notices - and only to users who could act on it.
+ *
+ * @return string HTML, or '' when there is nothing pending
+ */
+function local_artqtml_setting_backup_notice(): string {
+    if (!has_capability('local/artqtml:configure', context_system::instance())) {
+        return '';
+    }
+
+    $messages = \local_artqtml\local\setting_backup::notice_messages();
+    if (empty($messages)) {
+        return '';
+    }
+
+    \local_artqtml\local\setting_backup::clear_notices();
+
+    $items = '';
+    foreach ($messages as $message) {
+        $items .= html_writer::tag('li', s($message));
+    }
+
+    return html_writer::div(
+        html_writer::tag('ul', $items, ['class' => 'mb-0']),
+        'alert alert-info',
+        ['data-testid' => 'artqtml-settingbackup-notice']
+    );
+}
+
+/**
+ * Glob-036/Admin-065: the model blocking warning bar, shown on every plugin surface.
+ *
+ * Mirrors the licence banner's treatment - the specification asks for "a licenszblokkoláshoz
+ * hasonló figyelmeztető sáv". Returns '' when neither provider is blocked, so callers can render it
+ * unconditionally.
+ *
+ * @return string
+ */
+function local_artqtml_model_warning_banner(): string {
+    $messages = \local_artqtml\local\model_blocking::messages();
+    if (empty($messages)) {
+        return '';
+    }
+
+    $items = '';
+    foreach ($messages as $message) {
+        $items .= html_writer::tag('li', s($message));
+    }
+
+    return html_writer::div(
+        html_writer::tag('ul', $items, ['class' => 'mb-0']),
+        'alert alert-danger',
+        ['data-testid' => 'artqtml-modelblocked-banner']
+    );
+}

@@ -1,0 +1,188 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Scheduled task that drives the AI generation/validation pipeline in the background
+ * (functional spec ch.5/6): runs every 5 minutes by default via cron, and can also be run
+ * on demand - `admin/cli/scheduled_task.php --execute='\local_artqtml\task\process_pending_generations'`
+ * - which is the supported way to get near-instant processing during manual testing instead of
+ * waiting for the next scheduled tick.
+ *
+ * @package    local_artqtml
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+namespace local_artqtml\task;
+
+/**
+ * Finds every generation currently waiting on an AI call and runs it through to completion.
+ */
+class process_pending_generations extends \core\task\scheduled_task {
+    /**
+     * Task name shown in the admin scheduled task list.
+     *
+     * @return string
+     */
+    public function get_name() {
+        return get_string('task_process_pending_generations', 'local_artqtml');
+    }
+
+    /**
+     * Execute the task.
+     *
+     * @return void
+     */
+    public function execute() {
+        global $DB;
+
+        // C-02: only unclaimed rows are candidates - a row another concurrent run has already
+        // claimed (processingtoken set) is skipped here regardless of status. M-15: 'saving' is
+        // included too, since it's now a genuine third pipeline stage a generation can be left
+        // waiting in (e.g. after a crash between validating and saving on some previous tick).
+        // List-018: the in-progress status set comes from the single source of truth rather than
+        // being inlined into this SQL string.
+        [$statussql, $statusparams] = \local_artqtml\local\generation_status::in_progress_sql();
+        $pending = $DB->get_records_select(
+            'local_artqtml_generations',
+            $statussql . ' AND processingtoken IS NULL',
+            $statusparams,
+            'timecreated ASC'
+        );
+
+        // M-13: the default PHP/CLI time limit is nowhere near enough once this loop has to
+        // chain multiple generations' Claude+Gemini calls (each with up to 3 HTTP retry
+        // attempts with backoff) in a single tick - scale the limit to how much work is
+        // actually queued instead of leaving the process to be killed mid-generation.
+        //
+        // V-04: this used to use the technical annex's suggested formula verbatim,
+        // (API timeout x 3) + 30. That formula sizes exactly ONE exhausted HTTP retry cycle,
+        // but a single generation runs several of them: process_one() below drives the Claude
+        // stage and then the Gemini stage in the same tick, and each stage wraps its HTTP
+        // backoff in a JSON-fallback loop of up to MAX_JSON_ATTEMPTS (annex 2.3/2.4 make the
+        // two counters explicitly independent). At the default 60 s timeout the annex formula
+        // yields 210 s against a worst case above 1100 s, so the budget was roughly a fifth of
+        // what it claimed to guarantee.
+        //
+        // Derived from the constants the retry loops actually use, so it cannot drift from them.
+        $apitimeout = (int) (get_config('local_artqtml', 'apitimeout') ?: 60);
+        $httpcycle = (generate_questions_task::MAX_HTTP_ATTEMPTS * $apitimeout)
+            + generate_questions_task::MAX_BACKOFF_SECONDS;
+        $pertaskbudget = (int) ceil(
+            ($httpcycle * generate_questions_task::MAX_JSON_ATTEMPTS)   // Claude stage.
+            + ($httpcycle * validate_questions_task::MAX_JSON_ATTEMPTS) // Gemini stage.
+            + 30                                                        // Annex's fixed headroom.
+        );
+        set_time_limit($pertaskbudget * max(1, count($pending)));
+
+        foreach ($pending as $generation) {
+            $claimed = $this->claim((int) $generation->id);
+            if ($claimed === null) {
+                // Lost the race to another concurrent run (e.g. overlapping cron tick or a
+                // manually triggered admin/cli/scheduled_task.php run) - skip it.
+                continue;
+            }
+
+            $generationid = (int) $generation->id;
+
+            // C-01: a plain try/finally only protects against catchable Throwables - a true PHP
+            // fatal partway through process_one() (max_execution_time exceeded, memory
+            // exhaustion) terminates the script without ever running the finally block, which
+            // would leave processingtoken set forever and permanently block that generation from
+            // ever being claimed again. register_shutdown_function() is the one mechanism PHP
+            // guarantees still runs even after such a fatal, so it is the actual safety net here;
+            // the $released guard just stops the normal-completion path from releasing twice.
+            $released = false;
+            $release = function () use (&$released, $generationid): void {
+                if (!$released) {
+                    $released = true;
+                    $this->release($generationid);
+                }
+            };
+            register_shutdown_function($release);
+
+            try {
+                $this->process_one($claimed);
+            } finally {
+                $release();
+            }
+        }
+    }
+
+    /**
+     * Atomically claim a generation for processing by this run: only succeeds if the row is
+     * still unclaimed (processingtoken IS NULL) at the moment the UPDATE executes, so two
+     * concurrent runs racing on the same row can never both win (C-02).
+     *
+     * @param int $generationid
+     * @return \stdClass|null the freshly claimed record, or null if another run claimed it first
+     */
+    protected function claim(int $generationid): ?\stdClass {
+        global $DB;
+
+        $token = random_string(32);
+
+        $DB->execute(
+            "UPDATE {local_artqtml_generations} SET processingtoken = ? WHERE id = ? AND processingtoken IS NULL",
+            [$token, $generationid]
+        );
+
+        // Only the run whose UPDATE actually matched (WHERE processingtoken IS NULL) leaves the
+        // row carrying its own token - a concurrent run's UPDATE affects zero rows once this one
+        // has committed, so re-selecting by our own token is how we tell whether we won.
+        return $DB->get_record('local_artqtml_generations', ['id' => $generationid, 'processingtoken' => $token]) ?: null;
+    }
+
+    /**
+     * Release a generation's processing claim once this run is done with it (whatever the
+     * outcome), so a future tick can claim it again if it somehow needs another pass.
+     *
+     * @param int $generationid
+     * @return void
+     */
+    protected function release(int $generationid): void {
+        global $DB;
+
+        $DB->set_field('local_artqtml_generations', 'processingtoken', null, ['id' => $generationid]);
+    }
+
+    /**
+     * Run one generation through whichever pipeline stage(s) it is still waiting on - the Claude
+     * call if it's "generating", then the Gemini call if that leaves it "validating", then the
+     * transactional write if that leaves it "saving" (M-15) - all chained within this same tick,
+     * matching the previous synchronous behaviour's UX: a single run of this task takes a
+     * generation all the way to completed/failed rather than needing further ticks.
+     *
+     * @param \stdClass $generation
+     * @return void
+     */
+    protected function process_one(\stdClass $generation): void {
+        global $DB;
+
+        if ($generation->status === \local_artqtml\local\generation_status::GENERATING) {
+            (new generate_questions_task())->process($generation);
+            $generation = $DB->get_record('local_artqtml_generations', ['id' => $generation->id]);
+        }
+
+        if ($generation && $generation->status === \local_artqtml\local\generation_status::VALIDATING) {
+            (new validate_questions_task())->process($generation);
+            $generation = $DB->get_record('local_artqtml_generations', ['id' => $generation->id]);
+        }
+
+        if ($generation && $generation->status === \local_artqtml\local\generation_status::SAVING) {
+            (new save_questions_task())->process($generation);
+        }
+    }
+}

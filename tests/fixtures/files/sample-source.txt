@@ -1,0 +1,14 @@
+Photosynthesis and the Carbon Cycle
+
+Photosynthesis is the process by which green plants, algae and some bacteria convert
+light energy into chemical energy stored in glucose. It takes place mainly in the
+chloroplasts, using the pigment chlorophyll to absorb sunlight. The overall reaction
+combines carbon dioxide and water to produce glucose and oxygen.
+
+The light-dependent reactions occur in the thylakoid membranes and produce ATP and
+NADPH. The light-independent reactions, also called the Calvin cycle, take place in
+the stroma and use ATP and NADPH to fix carbon dioxide into sugars.
+
+Photosynthesis is central to the carbon cycle: it removes carbon dioxide from the
+atmosphere, while respiration and combustion return it. This balance is essential for
+regulating Earth's climate and sustaining life.

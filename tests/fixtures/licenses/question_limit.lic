@@ -1,0 +1,9 @@
+{
+    "edition": "question_limit",
+    "issued_to": "Test University",
+    "issued_to_url": "http://localhost",
+    "issued_at": "2026-01-01",
+    "expires_at": null,
+    "question_limit": 100,
+    "signature": "H8Iw1BrksQvfUSpa+CYlbmjFux/NUGsbpgX23ljsSDUvky8xlT7r4yivmFamVov/ghC3PBufKnwUSQz3zHd2sGUPSCbbuXpiNU1id79Q51ILo8b1kJpp+fg1ytiioJpTMvU+TCmy4HMIImLYj5y+2hfo7xwZohJSsRqiwa0oMqMSbBRyIyPaKgFZuD9mhxfzy+FHganzWmryZvxyDhMgC23lc4BDZFCSoggmAX+9MlzIJY14X5GnAI+eqB5+ruSztUiluXxYotMY+2WRnSqcX7ZfUWWKClejb2YNccuhQ8lxbApBgbr4xY7Ial9pQoyu4Lgqbt/dnZ0vcv95KGFWRg=="
+}

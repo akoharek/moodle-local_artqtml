@@ -1,0 +1,200 @@
+/*
+ * local_artqtml - screen-width behaviour (Glob-034, Glob-035).
+ *
+ * Glob-034: "A plugin minden képernyője a rendelkezésre álló képernyőszélességhez igazodik: a
+ * tartalomnak belső vízszintes görgetés nélkül el kell férnie. Egyetlen elem - különösen táblázat -
+ * sem csordulhat túl a tartalomkonténeren, és egyetlen oszlop vagy vezérlő sem válhat levágás miatt
+ * elérhetetlenné."
+ *
+ * Glob-035: "A táblázatok a szűkülő szélességhez alkalmazkodnak (oszlopok tördelése, összecsukása
+ * vagy a Moodle natív reszponzív táblázatkezelése), nem vízszintes görgetősávval; a műveleti oszlop
+ * minden szélességen elérhető marad."
+ *
+ * The column collapsing itself is done with Boost's own Bootstrap display utilities
+ * (d-none / d-lg-table-cell) applied from PHP via html_table::$colclasses, so this file only holds
+ * what a utility class cannot express. Deliberately NO overflow-x: auto anywhere - a horizontal
+ * scrollbar is the symptom Glob-035 excludes, not a fix for it.
+ */
+
+/* Nothing the plugin renders may be wider than the content column it sits in. */
+.path-local-artqtml .artqtml-page,
+.path-local-artqtml .artqtml-table {
+    max-width: 100%;
+}
+
+/*
+ * Cells wrap instead of pushing the table wider.
+ */
+.artqtml-table {
+    table-layout: auto;
+    width: 100%;
+}
+
+/*
+ * BL-12: nothing in these tables breaks inside a word. D-1 established this for headers, and the
+ * cells kept overflow-wrap: anywhere for a while longer, on the argument that an unbroken string
+ * (a question code, a pasted URL) would otherwise set a minimum width the table could not go
+ * below. The cost was visible on the approval page: "True/False" rendered as "True/F alse" and
+ * "PWT1-IH-0001" as "PWT1-IH- 0001". Ordinary words are what these columns hold, so the cost was
+ * paid on every row to protect an occasional one.
+ *
+ * overflow-wrap: break-word keeps the protection without the cost. It still breaks a genuinely
+ * oversized single word rather than letting it overflow, but - unlike anywhere and its legacy
+ * equivalent word-break: break-word - it does not reduce the element's min-content contribution,
+ * so it never breaks a word that would have fitted on a line of its own.
+ *
+ * The narrow-width guarantee (Glob-034/035, tests/responsive.spec.ts) is unaffected: below lg and
+ * xl the wide columns collapse into the name cell via Boost's display utilities, so the widths
+ * where overflow was ever a risk are the widths where few columns remain.
+ */
+.artqtml-table th,
+.artqtml-table td {
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: normal;
+}
+
+/*
+ * The actions column must stay reachable at every width (Glob-035), so it is never collapsed and
+ * never clipped. Its controls wrap onto as many lines as they need rather than forcing the table
+ * to overflow - this is the column that was previously cut off entirely on the approval page.
+ */
+.artqtml-table .artqtml-col-actions {
+    white-space: normal;
+    min-width: 5.5rem;
+}
+
+.artqtml-table .artqtml-col-actions .artqtml-rowactions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.5rem;
+}
+
+/* The checkbox column should not claim wrappable width it does not need. */
+.artqtml-table .artqtml-col-select {
+    width: 1.5rem;
+    white-space: nowrap;
+}
+
+/*
+ * The secondary line that carries the collapsed columns' values on narrow screens, so collapsing
+ * a column hides the cell, never the information (Glob-034: nothing becomes unreachable).
+ * Hidden at >= lg, where the real columns are shown instead.
+ */
+.artqtml-table .artqtml-collapsed-meta {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.85em;
+    line-height: 1.4;
+}
+
+.artqtml-table .artqtml-collapsed-meta > span::after {
+    content: " · ";
+}
+
+.artqtml-table .artqtml-collapsed-meta > span:last-child::after {
+    content: "";
+}
+
+/* Filter bars and button rows wrap rather than overflow at narrow widths. */
+.artqtml-filterbar,
+.artqtml-bulkactions,
+.artqtml-buttonrow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    max-width: 100%;
+}
+
+.artqtml-filterbar > *,
+.artqtml-bulkactions > * {
+    max-width: 100%;
+}
+
+/*
+ * Jov-045: the target-bank selector belongs in one block with "Kijelöltek áthelyezése" and
+ * "Kijelöltek törlése"; "Összes elfogadható jóváhagyása" must be visually separate from it,
+ * because approving needs no target bank (Jov-032). A rule between the two blocks is what makes
+ * that separation visible - the two are otherwise a single undifferentiated row of buttons.
+ */
+.artqtml-bulkmove {
+    align-items: center;
+    padding-top: 0.75rem;
+    border-top: 1px solid #dee2e6;
+}
+
+/*
+ * The target-bank <select> is sized by its widest <option> - that is, by whichever question-bank
+ * categories happen to exist. That is global data, not layout, and it made the approve page's
+ * visual baseline depend on which other specs had run before it: the functional approve specs
+ * move questions into banks, so the dropdown was 316px wide after a baseline-only run and 337px
+ * after a full one, shifting "Kijelöltek athelyezese" sideways. With selective spec running the
+ * preceding set now varies per push, so one committed reference could never match every run.
+ *
+ * A fixed width removes the data dependency. max-width keeps Glob-034/035 intact - the control
+ * shrinks on narrow viewports rather than overflowing - and min-width: 0 stops the flex item's
+ * default min-width: auto from blocking that shrink.
+ */
+.path-local-artqtml .artqtml-bulkcategory {
+    max-width: 100%;
+}
+
+.path-local-artqtml .artqtml-bulkcategory select {
+    width: 22rem;
+    min-width: 0;
+    max-width: 100%;
+}
+
+/*
+ * Long unbroken strings elsewhere on the plugin's pages (source-text previews, API error
+ * messages, licence identifiers, question codes) wrap instead of widening their container.
+ */
+.path-local-artqtml .artqtml-wrap,
+.path-local-artqtml .artqtml-validationsummary,
+.path-local-artqtml .alert {
+    overflow-wrap: anywhere;
+    max-width: 100%;
+}
+
+/*
+ * The plugin's own admin settings pages (Site administration -> Plugins -> Local plugins -> AI
+ * question generator). These are Moodle admin pages, so they carry .path-admin, not
+ * .path-local-artqtml - the page id is the reliable anchor, and keeps these rules off every
+ * other plugin's settings. Moodle renders some setting widgets (notably the password-unmask API
+ * key field) with a fixed size attribute that overflows a narrow viewport.
+ */
+body[id^="page-admin-setting-local_artqtml"] .form-item input,
+body[id^="page-admin-setting-local_artqtml"] .form-item select,
+body[id^="page-admin-setting-local_artqtml"] .form-item textarea,
+body[id^="page-admin-setting-local_artqtml"] .form-item .form-defaultinfo,
+body[id^="page-admin-setting-local_artqtml"] .form-item .form-text {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+}
+
+/*
+ * The API-key rows use admin_setting_configpasswordunmask, whose masked value is an unbroken run
+ * of bullet characters in an inline <a>/<span>. Being a single "word" it establishes a minimum
+ * width (~730px) that overflows the whole page below about 900px wide - the block container has to
+ * be told those runs may break, since a width limit on an inline box would have no effect.
+ */
+body[id^="page-admin-setting-local_artqtml"] .form-setting,
+body[id^="page-admin-setting-local_artqtml"] .form-password {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+}
+
+/* Progress bars and their wrappers are fluid, never a fixed pixel width. */
+.path-local-artqtml .progress {
+    max-width: 100%;
+}
+
+/*
+ * S-4: the stage label used to be written INSIDE the bar, so at an early stage (25%) the bar was
+ * narrower than its own label and Bootstrap's overflow: hidden clipped the text away - content
+ * made unreachable by clipping, which Glob-034 forbids. That was worked around here with
+ * overflow: visible and white-space: nowrap. Gen-004 actually requires the text below the bar
+ * ("szöveges visszajelzés is megjelenik a progress bar alatt"), and status.php now renders it
+ * there, so the workaround is gone and the bar keeps Bootstrap's own clipping behaviour.
+ */

@@ -1,0 +1,33 @@
+---
+description: Moodle PHPCS — // comments must start with a capital letter (CI fails on warnings)
+globs: "**/*.php"
+alwaysApply: true
+---
+
+# Moodle PHPCS: inline comment capitalization
+
+This recurs often in ArtQTML. Moodle coding style requires **new** `//` comments to start with an **uppercase** letter. In this plugin, PHPCS **warnings fail CI** (`phpcs.xml` has no `ignore_warnings_on_exit`).
+
+## Do
+
+```php
+// The moodleform::$_form property is protected; assert against the definition.
+// Seed the same file install and upgrade use.
+```
+
+## Do not
+
+```php
+// moodleform::$_form is protected; ...
+// must stay out of the schema enum ...
+```
+
+## Rules of thumb
+
+1. If the `//` line starts a **new** comment (not a wrap of the previous line), the first word must be capitalized.
+2. Do not start a new comment with a lowercase class/method/variable name — rephrase: *"The `foo` method …"* / *"Call `bar()` …"*.
+3. Mid-paragraph continuation lines may stay lowercase (they continue the sentence above).
+4. GPL file-header boilerplate is exempt (standard Moodle header).
+5. After writing PHP, prefer phrasing comments so a fresh `//` never begins with `[a-z]`.
+
+When fixing CI: search for the reported file:line and capitalize or rephrase that comment — do not weaken the PHPCS gate.

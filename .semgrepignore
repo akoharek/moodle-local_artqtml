@@ -1,0 +1,7 @@
+# Keep production PHP in scope; skip noise from tests, local tooling, and deps.
+tests/
+tools/
+node_modules/
+amd/build/
+vendor/
+*.min.js

@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<ruleset name="local_artqtml">
+    <description>
+        Coding standard for local_artqtml: the Moodle standard, applied to the shipped plugin
+        code. The standalone dev/QA-only tools/ scripts are excluded - they run without a Moodle
+        bootstrap (plain PHP CLI) and are excluded from the deployed zip, so Moodle's file
+        boilerplate / @package / MOODLE_INTERNAL rules deliberately don't apply to them.
+    </description>
+
+    <rule ref="moodle">
+        <!-- BL-10, 2026-08-06. The per-file @copyright line was removed from all 163 source files:
+             the copyright position is stated once, in COPYRIGHT.txt, which is covered by the licence
+             file-integrity manifest - a claim repeated in 163 places is a claim that drifts in 163
+             places.
+             ~
+             Only the @copyright half of the sniff is switched off. The @license checks stay on, and
+             so does moodle.Files.BoilerplateComment: Moodle's own GPL header block and the @license
+             line are Moodle's, not ours, and they stay exactly as the standard wants them.
+             ~
+             What this costs, recorded rather than argued away: the gate no longer notices if a new
+             file arrives without a file docblock @copyright tag. That is precisely the state we
+             want every file to be in now, so the check has nothing left to protect. -->
+        <exclude name="moodle.Commenting.FileExpectedTags.CopyrightTagMissing"/>
+    </rule>
+
+    <!-- Only PHP sources. -->
+    <arg name="extensions" value="php"/>
+
+    <!-- BL-15, closed 2026-08-02: the gate now blocks on warnings as well as errors.
+         ~
+         It did not, until today. `ignore_warnings_on_exit="1"` stood here, matching Moodle core and
+         moodle-plugin-ci convention, and the tightening was deferred because there were warnings to
+         clear first and clearing them on a moving tree is work that has to be redone.
+         ~
+         The deferral outlived its reason. The gates ran nine times on 2026-08-02 and the last run
+         reported 0 errors and 0 warnings - so there was nothing left to clear, and the line was
+         removed at no cost.
+         ~
+         What it buys, from the same day: twice, a warning was the only thing standing between a
+         correct-looking file and a failing test. Both times phpcs said the new language keys were
+         out of C-sort order, exited 0 because they were warnings, and `lang_parity_test` then failed
+         in PHPUnit a minute later - a slower, less specific report of the same fact. A warning here
+         is a defect that has not been given its right name yet. -->
+    <!-- (no ignore_warnings_on_exit: warnings fail the build) -->
+
+    <!-- Dev-only, not shipped, intentionally non-Moodle-standard. -->
+    <exclude-pattern>*/tools/*</exclude-pattern>
+    <exclude-pattern>*/node_modules/*</exclude-pattern>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+</ruleset>

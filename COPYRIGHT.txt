@@ -1,0 +1,16 @@
+ArtQTML plugin (local_artqtml)
+
+2026 AR Tudásmenedzsment Kft. Minden jog fenntartva.
+
+A beépülő minden módosítása az érvényes licencszerződés megszűnését eredményezi.
+
+--------------------------------------------------------------------------------
+
+Ez a fájl része a licenc fájlintegritás-ellenőrzésének: a tartalma a kiadott
+licencbe aláírva bekerülő fájllistában szerepel, ezért a módosítása vagy törlése
+ugyanúgy sérült telepítésként jelenik meg a Licenc képernyőn, mint bármelyik
+forrásfájlé.
+
+A Moodle saját GPL-fejléce és @license sora a forrásfájlokban változatlanul
+megmarad. Az a Moodle licence, nem ezé a beépülőé; ez a fájl mondja meg, hogy
+maga a beépülő milyen feltételekkel használható.

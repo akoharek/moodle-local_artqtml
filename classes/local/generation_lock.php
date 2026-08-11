@@ -1,0 +1,106 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Serialises the read-decide-write sequences that act on one generation.
+ *
+ * WHAT IT IS FOR, in one sentence: three screens and the start button all read a generation's row,
+ * decide from what they read whether they may write, and then write - and between the decision and
+ * the write another request can change the very thing the decision was made on.
+ *
+ * WHY A TRANSACTION IS NOT ENOUGH, because that was the first answer and it was wrong.
+ * `$DB->start_delegated_transaction()` gives atomicity, not isolation of a row: it issues no
+ * `SELECT ... FOR UPDATE`, so a second request reads the same row happily while the first is
+ * between its read and its write. Making the read locking would mean database-specific SQL across
+ * every engine Moodle supports.
+ *
+ * WHAT THE PARTIAL UPDATE ALREADY FIXED, so this is not asked to do it twice. Until 2026-08-05
+ * these paths wrote back the whole record they had read, so the source page's save also rewrote
+ * `status` and the settings page's save also rewrote the source text (BL-51, first half). Each path
+ * now writes only its own columns. That removed the damage the columns did to *each other*; it
+ * cannot remove the damage a path does to its own column, which is what this class is for:
+ *
+ *  - a source text replaced from an older tab while the generation is already being read by the
+ *    model - the questions come from the old text, the screen shows the new one, and nothing says
+ *    they are not the same thing;
+ *  - two people pressing "Start generation" in the same instant - both pass the status check, both
+ *    set `generating`, both clear the question rows, and the run is paid for twice.
+ *
+ * THESE LOCKS MUST NEVER BE NESTED, and the reason was measured rather than assumed. The protection
+ * is between requests, not within one: `lock_config::get_lock_factory()` returns a NEW factory
+ * object on every call, the fail-fast guard against a stacked lock is that object's own list, and
+ * on MySQL/MariaDB `GET_LOCK` is re-entrant within a single database connection. A call site that
+ * ran inside another one's locked section would therefore take the same lock a second time and
+ * carry on as if it held it alone. None of the four call sites nests today; this paragraph is why
+ * none of them may be made to.
+ *
+ * A PER-OWNER KEYING WAS BUILT AND THEN REMOVED on 2026-08-06, and it is recorded here so that
+ * nobody derives it a second time from the same starting point. BL-57 limits an owner to one
+ * running generation, and the check that enforces it spans generations - so a per-owner key was
+ * added to hold it under two Start presses in the same instant. ANDRAS DECIDED that simultaneous
+ * button presses are not a design concern for this product: the limit is there for the everyday
+ * case. The start path is therefore back to the per-generation key this class has always had, and
+ * with it the BL-51 protection it was there for in the first place - the SAME generation started
+ * twice, which would otherwise create two draft categories and pay for the run twice.
+ *
+ * THE TIMEOUT IS SHORT ON PURPOSE. These are user-facing page submits, not background work: a
+ * teacher waiting on a lock is a teacher watching a spinner. Five seconds is far longer than the
+ * millisecond-scale window this closes, and short enough that a stuck lock fails visibly instead of
+ * hanging the page.
+ *
+ * @package    local_artqtml
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+namespace local_artqtml\local;
+
+/**
+ * A per-generation lock around read-decide-write.
+ */
+class generation_lock {
+    /** @var string the lock factory's type, shared by every caller. */
+    public const LOCK_TYPE = 'local_artqtml_generation';
+
+    /** @var int seconds a page submit will wait for the lock before giving up. */
+    public const TIMEOUT = 5;
+
+    /**
+     * Run a callback with this generation locked.
+     *
+     * The lock is released in a `finally`, so it survives the callback throwing - which matters,
+     * because the callback's whole job is to throw when the status turns out to be wrong.
+     *
+     * @param int $generationid the generation to lock
+     * @param callable $callback the read-decide-write sequence
+     * @return mixed whatever the callback returns
+     * @throws \moodle_exception if the lock cannot be obtained within the timeout
+     */
+    public static function run(int $generationid, callable $callback) {
+        $factory = \core\lock\lock_config::get_lock_factory(self::LOCK_TYPE);
+        $lock = $factory->get_lock((string) $generationid, self::TIMEOUT);
+
+        if ($lock === false) {
+            // The message is the teacher's, not the developer's: what happened, and what to do.
+            throw new \moodle_exception('errorgenerationbusy', 'local_artqtml');
+        }
+
+        try {
+            return $callback();
+        } finally {
+            $lock->release();
+        }
+    }
+}

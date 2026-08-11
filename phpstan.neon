@@ -1,0 +1,47 @@
+includes:
+    # spaze/phpstan-disallowed-calls — PHPStan "security" layer (dangerous / execution /
+    # insecure call bans). NOT full taint analysis. Paths relative to this config file;
+    # requires composer install in tools/devtools (see tools/TOOLCHAIN.md).
+    - tools/devtools/vendor/spaze/phpstan-disallowed-calls/extension.neon
+    - tools/devtools/vendor/spaze/phpstan-disallowed-calls/disallowed-dangerous-calls.neon
+    - tools/devtools/vendor/spaze/phpstan-disallowed-calls/disallowed-execution-calls.neon
+    - tools/devtools/vendor/spaze/phpstan-disallowed-calls/disallowed-insecure-calls.neon
+
+parameters:
+    level: 5
+    paths:
+        - .
+    bootstrapFiles:
+        - phpstan-bootstrap.php
+    excludePaths:
+        - tests/*
+        - tools/*
+        - node_modules/*
+        - phpstan-bootstrap.php
+    ignoreErrors:
+        # Moodle superglobals brought in via `global $CFG;` etc. are not seen by PHPStan.
+        -
+            message: '#^Variable \$(CFG|DB|OUTPUT|PAGE|USER|SITE|SESSION|ADMIN|hassiteconfig|plugin) might not be defined\.$#'
+            identifier: variable.undefined
+        # Non-crypto content fingerprints for duplicate detection (Felt-021). Stored in
+        # sourcetexthash / sourcefilehash; changing algorithm would invalidate existing rows.
+        # Not a password/secret hash — spaze insecure-calls flags sha1() anyway.
+        -
+            message: '#Calling sha1\(\) is forbidden#'
+            path: classes/local/duplicate_detector.php
+        # XMLDB constructors/methods are documented as string but accept int/bool/null in practice.
+        -
+            message: '#Parameter \#\d+ .* of (class xmldb_(key|index|field)|method xmldb_table::add_index\(\)) (constructor )?expects#'
+            identifier: argument.type
+            path: db/upgrade.php
+        # Known/accepted: admin_setting_* $defaultsetting is typed string but int is valid at
+        # runtime (Moodle casts it) - 11 settings across settings.php.
+        -
+            message: '#Parameter \#4 \$defaultsetting of class .+ constructor expects string, int given\.#'
+            identifier: argument.type
+            path: settings.php
+        # Known/accepted: html_writer::checkbox() $value typed string but an int is fine here.
+        -
+            message: '#Parameter \#2 \$value of static method core\\output\\html_writer::checkbox\(\) expects string, int given\.#'
+            identifier: argument.type
+            path: classes/local/approve/approve_renderer.php

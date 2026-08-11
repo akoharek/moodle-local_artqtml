@@ -1,0 +1,55 @@
+# Miért van ez a fájl (BL-21)
+#
+# A kérdés, ami létrehozta: "ha az eszközökből új verzió jön, honnan tudjuk meg? A bukott CI-ből?
+# Nem késő az?" — De, késő. Egy piros build a legrosszabb módja megtudni, hogy létezik egy új
+# verzió: utólag érkezik, munka közben szakít félbe, és nem hagy időt eldönteni, kell-e egyáltalán.
+#
+# A megoldás két lépés, és ez a fájl a második:
+#
+#   1. Rögzítés — a CI ne "legfrissebbet" húzzon, hanem megnevezett verziót (ci.yml,
+#      PHPSTAN_VERSION). Ettől egy új kiadás magától NEM csinál semmit.
+#   2. Értesítés — ez a fájl. A Dependabot pull requestet nyit, amikor egy rögzített verzióhoz új
+#      kiadás jön, a változásnaplóval együtt. Mi döntjük el, mikor fogadjuk be.
+#
+# A kettő külön-külön rossz: csak rögzítés → csendben lemaradunk; csak értesítés → marad a
+# meglepetés. Együtt viszont az újdonságot soha nem egy bukott futás közli.
+
+version: 2
+updates:
+
+  # A GitHub Actions verziói. A #97 futás két figyelmeztetést adott: az actions/cache@v4 az elavult
+  # Node.js 20-at célozza, és a futtató kényszerből Node.js 24-en indítja. Erről is a CI szólt,
+  # utólag - pontosan az a minta, amit ez a fájl megszüntet. Kapcsolódik a BL-05b-hez.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+    labels:
+      - dependencies
+      - ci
+
+  # Az npm oldali fejlesztői eszközök (a Moodle grunt/AMD építéshez). Havonta nézzük, hogy ne
+  # induljanak el alattunk.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "deps"
+    labels:
+      - dependencies
+
+# Amit a Dependabot NEM tud figyelni, és ezért kézzel követendő:
+#
+# - A PHPStan phar. Nem csomagkezelőn keresztül jön, hanem a GitHub kiadási oldaláról, curl-lel
+#   (ci.yml). A Dependabot ezt nem látja. A verzió a ci.yml PHPSTAN_VERSION értékében és a helyi
+#   eszközkészletben áll - a kettőnek egyeznie kell, lásd tools/TOOLCHAIN.md.
+# - A moodle-plugin-ci. A ci.yml `^4` megkötéssel telepíti, ami futásidőben oldódik fel, tehát
+#   magától mozoghat. Ez tudatosan maradt így: a phpcs szabálykönyve a Moodle sajátja, és ritkán
+#   változik, a `^4` viszont a Moodle 4.5-höz igazodó ágat tartja. Ha ez is elkezd meglepetést
+#   okozni, ugyanaz a lépés kell rá: pontos verzió + értesítés.

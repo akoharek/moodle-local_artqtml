@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "skills": {
+    "moodle-accessibility": {
+      "source": "SaadRahman01/claude-moodle-dev",
+      "sourceType": "github",
+      "skillPath": "skills/moodle-accessibility/SKILL.md",
+      "computedHash": "5e529baf5dd273fba5d0459279083463947aceac330e75f13efa1d1f383ef5aa"
+    },
+    "moodle-amd-javascript": {
+      "source": "SaadRahman01/claude-moodle-dev",
+      "sourceType": "github",
+      "skillPath": "skills/moodle-amd-javascript/SKILL.md",
+      "computedHash": "9c0145a75ce20ca60694abb1d24fe26121a4f7f0b651011580baa54c6efb90ed"
+    },
+    "moodle-behat-testing": {
+      "source": "SaadRahman01/claude-moodle-dev",
+      "sourceType": "github",
+      "skillPath": "skills/moodle-behat-testing/SKILL.md",
+      "computedHash": "a9131799633a66db4a4e4a4a9c918392284fccb89798acc1e551aa59f275b450"
+    },
+    "moodle-hooks-api": {
+      "source": "SaadRahman01/claude-moodle-dev",
+      "sourceType": "github",
+      "skillPath": "skills/moodle-hooks-api/SKILL.md",
+      "computedHash": "095b70b61e039ac104daa9b3f7602957ba73711cf85adfc054df65c0f3e60f17"
+    },
+    "moodle-mobile-app": {
+      "source": "SaadRahman01/claude-moodle-dev",
+      "sourceType": "github",
+      "skillPath": "skills/moodle-mobile-app/SKILL.md",
+      "computedHash": "518b9c2720fc9bf13c9667bacde70d335d538f8dabea4ef20469744d19fd4621"
+    },
+    "moodle-performance": {
+      "source": "SaadRahman01/claude-moodle-dev",
+      "sourceType": "github",
+      "skillPath": "skills/moodle-performance/SKILL.md",
+      "computedHash": "eab8a1ca5f323110b8d30166abb9a79ecc8562e3ee16c43f9964726067190a69"
+    },
+    "moodle-phpunit-testing": {
+      "source": "SaadRahman01/claude-moodle-dev",
+      "sourceType": "github",
+      "skillPath": "skills/moodle-phpunit-testing/SKILL.md",
+      "computedHash": "0e1ae9c604496b92fb4ceb473d94558ac9cc9d94a91d329b569e5ff199f120dc"
+    },
+    "moodle-plugin-development": {
+      "source": "SaadRahman01/claude-moodle-dev",
+      "sourceType": "github",
+      "skillPath": "skills/moodle-plugin-development/SKILL.md",
+      "computedHash": "5745c88537e90f5df25d791882b0fbdf5a07a18960e3689622a7d94c56eb81ae"
+    },
+    "moodle-privacy-gdpr": {
+      "source": "SaadRahman01/claude-moodle-dev",
+      "sourceType": "github",
+      "skillPath": "skills/moodle-privacy-gdpr/SKILL.md",
+      "computedHash": "262652b7efa34463e26182ba0530ef6c63e9301ee9b3aa5374a8502264863b1e"
+    },
+    "moodle-security-audit": {
+      "source": "SaadRahman01/claude-moodle-dev",
+      "sourceType": "github",
+      "skillPath": "skills/moodle-security-audit/SKILL.md",
+      "computedHash": "d5829413d6f7bea21bbf9e2c22a8309768a93e7f278a624a8b023b722dc8aa4d"
+    },
+    "moodle-theme-development": {
+      "source": "SaadRahman01/claude-moodle-dev",
+      "sourceType": "github",
+      "skillPath": "skills/moodle-theme-development/SKILL.md",
+      "computedHash": "9892b83ce105b160342a757e079a0fd9d995e14dc66f5e4d14735cb50c16ba17"
+    },
+    "moodle-upgrade-migration": {
+      "source": "SaadRahman01/claude-moodle-dev",
+      "sourceType": "github",
+      "skillPath": "skills/moodle-upgrade-migration/SKILL.md",
+      "computedHash": "751df52c6ed26124048bd94f6e596de437b1ed3e95a433686b2efa0ed908437f"
+    },
+    "moodle-web-services": {
+      "source": "SaadRahman01/claude-moodle-dev",
+      "sourceType": "github",
+      "skillPath": "skills/moodle-web-services/SKILL.md",
+      "computedHash": "6c5a0ffc11b0f0bf24dba70f82eb6b8fdaee2de21305908c8a4187bd22ff9e7e"
+    }
+  }
+}
