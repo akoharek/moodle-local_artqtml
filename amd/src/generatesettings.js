@@ -14,12 +14,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Live total for the question settings page (ArtQTML Light: IH/FE/SR, scale only).
+ * Live total and token estimate for ArtQTML Light question settings (IH/FE/SR, scale only).
  *
  * @module     local_artqtml/generatesettings
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-define(['jquery'], function($) {
+define(['jquery', 'core/str'], function($, Str) {
     'use strict';
 
     /** @var {string[]} Light type codes matching matrix_<code>_<level> fields. */
@@ -29,6 +29,9 @@ define(['jquery'], function($) {
     var MODE_LEVELS = {
         scale: ['easy', 'medium', 'hard']
     };
+
+    /** @var {string} sentinel-substituted "~__N__ tokens" template, replaced once Str resolves. */
+    var tokensTemplate = '~__N__';
 
     /**
      * Read an element's numeric value by its Moodle-generated id ("id_" + element name).
@@ -45,7 +48,21 @@ define(['jquery'], function($) {
     }
 
     /**
-     * Recompute the question total and the submit button's enabled state.
+     * Read an advcheckbox field's checked state by its Moodle-generated id.
+     *
+     * @param {string} elementname the mform element name, e.g. "feedback_IH"
+     * @return {boolean}
+     */
+    function fieldChecked(elementname) {
+        var el = document.getElementById('id_' + elementname);
+        if (!el || el.offsetParent === null) {
+            return false;
+        }
+        return !!el.checked;
+    }
+
+    /**
+     * Recompute the question total, submit enablement, and token estimate.
      *
      * @param {{step2total: string}} labels lang-string label for the live total region
      */
@@ -65,6 +82,23 @@ define(['jquery'], function($) {
         var submitbutton = document.getElementById('artqtml-submitbutton');
         if (submitbutton) {
             submitbutton.disabled = !(total > 0);
+        }
+
+        var tokenregion = document.getElementById('artqtml-tokenestimate');
+        if (tokenregion) {
+            // ~60 extra tokens per question when that type's feedback checkbox is on,
+            // on top of the flat 300-token baseline per question.
+            var estimate = 0;
+            TYPE_CODES.forEach(function(code) {
+                var count = 0;
+                MODE_LEVELS.scale.forEach(function(level) {
+                    count += fieldValue('matrix_' + code + '_' + level);
+                });
+                var perquestion = 300 + (fieldChecked('feedback_' + code) ? 60 : 0);
+                estimate += count * perquestion;
+            });
+            var estimatetext = tokensTemplate.replace('__N__', estimate);
+            tokenregion.innerHTML = '<div class="text-muted">' + estimatetext + '</div>';
         }
     }
 
@@ -102,7 +136,7 @@ define(['jquery'], function($) {
     }
 
     /**
-     * Wire up totals and the generate / back / abort buttons.
+     * Wire up totals, estimate, and the generate / back / abort buttons.
      *
      * @param {{step2total: string}} labels
      * @param {{backconfirm: string}} messages confirm() text for "Vissza"
@@ -115,6 +149,13 @@ define(['jquery'], function($) {
 
         $(document).on('input change', handler);
         update(labels);
+
+        Str.get_string('estimatedtokenslabel', 'local_artqtml', '__N__').then(function(str) {
+            tokensTemplate = str;
+            update(labels);
+        }).catch(function() {
+            // Keep the '~__N__' fallback if the string cannot be loaded.
+        });
 
         var submitbutton = document.getElementById('artqtml-submitbutton');
         if (submitbutton) {

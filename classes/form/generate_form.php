@@ -195,6 +195,9 @@ class generate_form extends \moodleform {
 
         $mform->addElement('header', 'actionsheader', get_string('actionsheading', 'local_artqtml'));
         $mform->setExpanded('actionsheader', true, true);
+
+        // Pre-start size estimate (matrix: keep). Informational only — no monthly budget bar in Light.
+        $mform->addElement('html', \html_writer::div('', '', ['id' => 'artqtml-tokenestimate']));
     }
 
     /**
