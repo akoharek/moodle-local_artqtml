@@ -29,9 +29,14 @@ final class question_bank_list_test extends \advanced_testcase {
      * including sibling legacy roots that are not under Light's own artqtml_draft_root.
      */
     public function test_options_exclude_entire_draft_course_context(): void {
-        global $DB;
+        global $CFG, $DB;
 
         $this->resetAfterTest();
+
+        // Clear the per-request draft-root cache left by earlier tests in this process.
+        $property = new \ReflectionProperty(draft_bank::class, 'rootcategoryid');
+        $property->setAccessible(true);
+        $property->setValue(null, null);
 
         $draftcourse = $this->getDataGenerator()->create_course(['fullname' => 'Draft Bank Course']);
         $realcourse = $this->getDataGenerator()->create_course(['fullname' => 'Real Target Course']);
@@ -44,8 +49,9 @@ final class question_bank_list_test extends \advanced_testcase {
         $draftcontext = \context_course::instance($draftcourse->id);
         $realcontext = \context_course::instance($realcourse->id);
 
+        require_once($CFG->libdir . '/questionlib.php');
+
         // Light's own draft root + a legacy sibling root (as Full / aiquizgen leave behind).
-        // Creating Light's root also ensures the draft course has Moodle's hidden top category.
         $lightroot = draft_bank::get_root_category_id();
         $lightdraft = draft_bank::create((object) [
             'id' => 99,
@@ -53,10 +59,8 @@ final class question_bank_list_test extends \advanced_testcase {
             'shortname' => 'LGD1',
         ]);
 
-        $topcategoryid = (int) $DB->get_field('question_categories', 'id', [
-            'contextid' => $draftcontext->id,
-            'parent' => 0,
-        ], MUST_EXIST);
+        $top = question_get_top_category($draftcontext->id, true);
+        $topcategoryid = (int) $top->id;
 
         $legacyroot = (object) [
             'name' => 'AI Quiz Generator',
