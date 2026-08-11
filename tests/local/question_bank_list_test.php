@@ -85,7 +85,9 @@ final class question_bank_list_test extends \advanced_testcase {
         ];
         $legacydraftid = (int) $DB->insert_record('question_categories', $legacydraft);
 
-        $realtarget = $this->getDataGenerator()->create_question_category([
+        /** @var \core_question_generator $questiongenerator */
+        $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
+        $realtarget = $questiongenerator->create_question_category([
             'contextid' => $realcontext->id,
             'name' => 'Course default',
         ]);
