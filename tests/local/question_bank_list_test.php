@@ -45,6 +45,7 @@ final class question_bank_list_test extends \advanced_testcase {
         $realcontext = \context_course::instance($realcourse->id);
 
         // Light's own draft root + a legacy sibling root (as Full / aiquizgen leave behind).
+        // Creating Light's root also ensures the draft course has Moodle's hidden top category.
         $lightroot = draft_bank::get_root_category_id();
         $lightdraft = draft_bank::create((object) [
             'id' => 99,
@@ -52,16 +53,18 @@ final class question_bank_list_test extends \advanced_testcase {
             'shortname' => 'LGD1',
         ]);
 
+        $topcategoryid = (int) $DB->get_field('question_categories', 'id', [
+            'contextid' => $draftcontext->id,
+            'parent' => 0,
+        ], MUST_EXIST);
+
         $legacyroot = (object) [
             'name' => 'AI Quiz Generator',
             'contextid' => $draftcontext->id,
             'info' => '',
             'infoformat' => FORMAT_HTML,
             'stamp' => make_unique_id_code(),
-            'parent' => $DB->get_field('question_categories', 'id', [
-                'contextid' => $draftcontext->id,
-                'parent' => 0,
-            ], MUST_EXIST),
+            'parent' => $topcategoryid,
             'sortorder' => 1,
             'idnumber' => 'aiquizgen_draft_root',
         ];
