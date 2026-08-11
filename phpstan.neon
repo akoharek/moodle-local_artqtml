@@ -29,11 +29,6 @@ parameters:
         -
             message: '#Calling sha1\(\) is forbidden#'
             path: classes/local/duplicate_detector.php
-        # XMLDB constructors/methods are documented as string but accept int/bool/null in practice.
-        -
-            message: '#Parameter \#\d+ .* of (class xmldb_(key|index|field)|method xmldb_table::add_index\(\)) (constructor )?expects#'
-            identifier: argument.type
-            path: db/upgrade.php
         # Known/accepted: admin_setting_* $defaultsetting is typed string but int is valid at
         # runtime (Moodle casts it) - 11 settings across settings.php.
         -
