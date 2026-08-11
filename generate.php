@@ -223,7 +223,7 @@ if ($mform->is_cancelled()) {
         \core\notification::error(get_string('plugindisabled', 'local_artqtml'));
         redirect($indexurl);
     }
-if (!\local_artqtml\local\draft_bank::is_configured()) {
+    if (!\local_artqtml\local\draft_bank::is_configured()) {
         \core\notification::error(get_string('errordraftcoursenotconfigured', 'local_artqtml'));
         redirect($indexurl);
     }

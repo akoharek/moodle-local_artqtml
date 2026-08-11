@@ -173,7 +173,7 @@ final class pipeline_security_filter_test extends \advanced_testcase {
 
         $generation = $this->make_generation(generation_status::GENERATING, $clean);
         $this->generate_stub()->process($generation);
-        // process() logs failures via debugging(); Moodle PHPUnit fails the test unless we expect it.
+        // Process() logs failures via debugging(); Moodle PHPUnit fails the test unless we expect it.
         $this->assertDebuggingCalled();
 
         $after = $DB->get_record('local_artqtml_generations', ['id' => $generation->id], '*', MUST_EXIST);

@@ -572,6 +572,13 @@ class generate_questions_task {
         ], $userid);
     }
 
+    /**
+     * Build the untrusted user message payload for Claude (source text only in Light).
+     *
+     * @param \stdClass $generation
+     * @param array $settings decoded settings JSON (unused in Light; kept for call-site parity)
+     * @return string JSON body for the user turn
+     */
     protected function build_user_content(\stdClass $generation, array $settings): string {
         unset($settings);
 
