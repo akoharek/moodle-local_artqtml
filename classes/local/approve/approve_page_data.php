@@ -25,6 +25,8 @@
 
 namespace local_artqtml\local\approve;
 
+use local_artqtml\local\draft_bank;
+
 /**
  * Supplies the approve page's display data.
  */
@@ -169,6 +171,80 @@ class approve_page_data {
      * @return string|null null if the question/category can't be resolved
      */
     public static function question_category_value(int $questionid): ?string {
+        $category = self::question_category_record($questionid);
+
+        return $category ? ($category->id . ',' . $category->contextid) : null;
+    }
+
+    /**
+     * Build URL params for Moodle's native question editor from an approve-row question.
+     *
+     * Moodle 4.5 accepts courseid; Moodle 5.1+ requires cmid (module question banks).
+     *
+     * @param int $questionbankid question.id
+     * @param \moodle_url $returnurl approve page return URL
+     * @return array<string,int|string>
+     */
+    public static function question_edit_url_params(int $questionbankid, \moodle_url $returnurl): array {
+        $params = [
+            'id' => $questionbankid,
+            'returnurl' => $returnurl->out_as_local_url(false),
+        ];
+        $categoryvalue = self::question_category_value($questionbankid);
+        if ($categoryvalue !== null) {
+            $params['category'] = $categoryvalue;
+        }
+
+        if (draft_bank::uses_module_question_banks()) {
+            $cmid = self::question_edit_cmid($questionbankid);
+            if ($cmid !== null) {
+                $params['cmid'] = $cmid;
+            }
+        } else {
+            // Finding #1: draft questions live in the draft course context on 4.5.
+            $params['courseid'] = draft_bank::get_draft_courseid() ?? SITEID;
+        }
+
+        return $params;
+    }
+
+    /**
+     * Resolve the mod_qbank (or other bank activity) cmid for editing a question on Moodle 5.1+.
+     *
+     * Prefers the question's current category module context (works after move); falls back to
+     * the configured draft course's system-type qbank.
+     *
+     * @param int $questionid
+     * @return int|null
+     */
+    public static function question_edit_cmid(int $questionid): ?int {
+        $category = self::question_category_record($questionid);
+        if ($category) {
+            $context = \context::instance_by_id((int) $category->contextid, IGNORE_MISSING);
+            if ($context && (int) $context->contextlevel === CONTEXT_MODULE) {
+                return (int) $context->instanceid;
+            }
+        }
+
+        $draftcontextid = draft_bank::get_draft_context_id();
+        if ($draftcontextid === null) {
+            return null;
+        }
+        $draftcontext = \context::instance_by_id($draftcontextid, IGNORE_MISSING);
+        if ($draftcontext && (int) $draftcontext->contextlevel === CONTEXT_MODULE) {
+            return (int) $draftcontext->instanceid;
+        }
+
+        return null;
+    }
+
+    /**
+     * Return the question category id and contextid for a question.
+     *
+     * @param int $questionid
+     * @return \stdClass|null {id, contextid}
+     */
+    protected static function question_category_record(int $questionid): ?\stdClass {
         global $DB;
 
         $category = $DB->get_record_sql(
@@ -180,6 +256,6 @@ class approve_page_data {
             ['questionid' => $questionid]
         );
 
-        return $category ? ($category->id . ',' . $category->contextid) : null;
+        return $category ?: null;
     }
 }
