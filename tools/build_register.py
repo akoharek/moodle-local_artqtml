@@ -24,7 +24,7 @@ A fejlécben szereplő darabszám GENERÁLT: a konverter megszámolja, nem átm�
 a szám kilenc szekcióból hétben elavult volt -- a v29-es állapotot hirdette, négy kiadáson át,
 mert egy kézzel karbantartott összeg némán romlik el.
 
-A követelménymező tartalmazhat zárójelet (`Admin-006 (Seed)`), ezért a Típus mindig az
+A követelménymező tartalmazhat zárójelet (pl. `Req-006 (Seed)`), ezért a Típus mindig az
 UTOLSÓ zárójeles csoport a szögletes zárójel előtt. Nem mohó illesztéssel ez az egy eset
 csendben elcsúszna.
 
