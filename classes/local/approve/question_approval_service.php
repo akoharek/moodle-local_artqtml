@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Helper.
+ *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -117,6 +119,8 @@ class question_approval_service {
     }
 
     /**
+     * approve accepted bulk.
+     *
      * @param int $generationid
      * @param int $userid the approving user
      * @param \context $context system context, for the events

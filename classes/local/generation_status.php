@@ -49,6 +49,8 @@ class generation_status {
     public const FAILED = 'failed';
 
     /**
+     * Helper.
+     *
      * @var string the pipeline finished, but delivered fewer questions than were asked for.
      */
     public const PARTIAL = 'partial';

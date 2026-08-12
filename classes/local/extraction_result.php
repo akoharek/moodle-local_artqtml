@@ -50,6 +50,8 @@ class extraction_result {
     public const REASON_RESOURCE_LIMIT = 'resourcelimit';
 
     /**
+     * Helper.
+     *
      * @var string the document was read successfully and holds no text this extractor can reach.
      */
     public const REASON_NO_TEXT = 'notext';

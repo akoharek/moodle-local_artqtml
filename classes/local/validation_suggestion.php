@@ -42,11 +42,15 @@ class validation_suggestion {
     public const REJECTED = 'rejected';
 
     /**
+     * Helper.
+     *
      * @var string the plugin's own "no verdict yet" marker (/ "Nem értékelt").
      */
     public const NOT_EVALUATED = 'not_evaluated';
 
     /**
+     * Helper.
+     *
      * @var string display-only marker for an edited question .
      *
      * Never stored in validationsuggestion; the approve page renders it in place of the AI verdict
@@ -84,6 +88,8 @@ class validation_suggestion {
     }
 
     /**
+     * label.
+     *
      * @param string $value one of {@see self::DISPLAY}, or self::EDITED
      * @return string
      */

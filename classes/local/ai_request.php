@@ -199,6 +199,8 @@ class ai_request {
     }
 
     /**
+     * Helper.
+     *
      * @var int[] HTTP status codes that mean "try again later", not "this will never work".
      *
      */

@@ -40,6 +40,8 @@ class model_list {
     public const CACHE_TTL = 86400;
 
     /**
+     * Helper.
+     *
      * @var string[] id fragments that mark a Gemini model as not a text model.
      *
      * Gemini's catalogue is one list for every modality, and `supportedGenerationMethods` does not
@@ -66,6 +68,8 @@ class model_list {
     ];
 
     /**
+     * Helper.
+     *
      * @var int page size requested from Anthropic.
      *
      * The endpoint defaults to 20 and caps at 1000. Raising the limit is not by itself enough -

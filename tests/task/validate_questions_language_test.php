@@ -125,6 +125,8 @@ final class validate_questions_language_test extends \advanced_testcase {
     }
 
     /**
+     * scale generation.
+     *
      * @return \stdClass
      */
     private function scale_generation(): \stdClass {

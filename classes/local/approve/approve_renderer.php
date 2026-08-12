@@ -432,6 +432,8 @@ class approve_renderer {
     }
 
     /**
+     * bulk action buttons.
+     *
      * @param \core_renderer $output the page output renderer (passed in rather than pulled from
      * The global $OUTPUT, as this is a plain helper, not a plugin_renderer_base)
      * @param int $eligibleforapproval count for the approve-all button label/disabled state

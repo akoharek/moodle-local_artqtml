@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Helper.
+ *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -28,6 +30,8 @@ use local_artqtml\local\draft_bank;
  */
 class question_deletion_service {
     /**
+     * delete single.
+     *
      * @param int $questionid local_artqtml_questions.id
      * @param int $generationid
      * @param \context $context system context, for the event

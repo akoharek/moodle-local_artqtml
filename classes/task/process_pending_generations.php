@@ -138,6 +138,8 @@ class process_pending_generations extends \core\task\scheduled_task {
     }
 
     /**
+     * process one.
+     *
      * @param \stdClass $generation
      * @return void
      */

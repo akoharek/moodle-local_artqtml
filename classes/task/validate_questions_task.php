@@ -149,6 +149,8 @@ class validate_questions_task {
     }
 
     /**
+     * build batches.
+     *
      * @param \stdClass $generation
      * @param \stdClass[] $questions pseudo-question records keyed by pseudo-id
      * @return array<int, \stdClass[]> list of batches
@@ -478,6 +480,8 @@ class validate_questions_task {
     }
 
     /**
+     * merge results.
+     *
      * @param array $evaluations the running map (pseudo-id => evaluation fields) to merge into
      * @param \stdClass[] $batch pseudo-question records keyed by pseudo-id
      * @param array $results list of evaluation arrays from the Gemini response

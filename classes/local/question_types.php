@@ -68,6 +68,8 @@ class question_types {
     }
 
     /**
+     * supports hints.
+     *
      * @param string $code one of self::CODES
      * @return bool
      */
@@ -91,6 +93,8 @@ class question_types {
     }
 
     /**
+     * format count discrepancy.
+     *
      * @param array $discrepancies list of ['type' => code, 'requested' => int, 'received' => int]
      * @return string empty string if $discrepancies is empty
      */

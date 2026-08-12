@@ -28,6 +28,8 @@ namespace local_artqtml\local;
  */
 class generation_list {
     /**
+     * Helper.
+     *
      * @var string default sort column - newest generation first ( v3 #8), not the
      * Previous status-based default. Status remains available as an explicit, user-chosen sort
      * (see the "status"/"statusorder" SORTABLE entries and STATUS_ORDER below) - only the
@@ -39,6 +41,8 @@ class generation_list {
     protected const DEFAULT_DIR = 'DESC';
 
     /**
+     * Helper.
+     *
      * @var array<string,int> status -> sort weight for the status column's ordering.
      *
      * The seven status values themselves come from

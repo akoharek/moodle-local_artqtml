@@ -71,6 +71,8 @@ class security_filter {
     }
 
     /**
+     * has sql injection.
+     *
      * @param string $text
      * @return bool true if suspicious content was found
      */

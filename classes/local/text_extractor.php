@@ -31,6 +31,8 @@ class text_extractor {
     public const SUPPORTED_EXTENSIONS = ['txt'];
 
     /**
+     * Helper.
+     *
      * @var int most bytes an uploaded file may be as it arrives (64 MiB).
      */
     protected const MAX_SOURCE_FILE_BYTES = 67108864;

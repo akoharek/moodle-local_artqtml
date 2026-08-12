@@ -110,6 +110,8 @@ final class validate_questions_problemcategory_test extends \advanced_testcase {
     }
 
     /**
+     * scale generation.
+     *
      * @return \stdClass
      */
     private function scale_generation(): \stdClass {

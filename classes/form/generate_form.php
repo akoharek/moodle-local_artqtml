@@ -36,6 +36,8 @@ require_once($CFG->libdir . '/formslib.php');
  */
 class generate_form extends \moodleform {
     /**
+     * Helper.
+     *
      * @var array<string, string[]> the three levels the scale mode offers, in display order.
      */
     public const MODE_LEVELS = [

@@ -33,6 +33,8 @@ namespace local_artqtml\task;
  */
 trait retry_trait {
     /**
+     * Helper.
+     *
      * @var int[] HTTP status codes considered retryable (Claude 429/500/504/529, Gemini 429/500/503/504).
      *
      * Shared with {@see \local_artqtml\local\ai_request::TRANSIENT_HTTP} so "provider busy"
@@ -44,6 +46,8 @@ trait retry_trait {
     public const MAX_HTTP_ATTEMPTS = 3;
 
     /**
+     * Helper.
+     *
      * @var float worst-case total backoff sleep across one exhausted HTTP retry cycle, in seconds.
      *
      * Annex 2.4: 2 s before attempt 2 and 4 s before attempt 3, each with up to 20% jitter, so
@@ -133,6 +137,8 @@ trait retry_trait {
     }
 
     /**
+     * is nonretryable client error.
+     *
      * @param int $httpcode
      * @return bool
      */

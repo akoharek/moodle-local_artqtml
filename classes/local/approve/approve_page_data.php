@@ -32,6 +32,8 @@ use local_artqtml\local\draft_bank;
  */
 class approve_page_data {
     /**
+     * sortable columns.
+     *
      * @return array<string,string>
      */
     public static function sortable_columns(): array {
@@ -59,6 +61,8 @@ class approve_page_data {
     }
 
     /**
+     * status counts.
+     *
      * @param int $generationid
      * @return array<string,int>
      */
@@ -83,6 +87,8 @@ class approve_page_data {
     }
 
     /**
+     * eligible for approval.
+     *
      * @param int $generationid
      * @return int
      */

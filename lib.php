@@ -2,17 +2,17 @@
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
-// It under the terms of the GNU General Public License as published by
-// The Free Software Foundation, either version 3 of the License, or
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
 // Moodle is distributed in the hope that it will be useful,
-// But WITHOUT ANY WARRANTY; without even the implied warranty of
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// Along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Library functions and callbacks for local_artqtml.
@@ -165,6 +165,8 @@ function local_artqtml_render_model_buttons(string $provider): string {
 }
 
 /**
+ * local artqtml owner warning banner.
+ *
  * @param stdClass $generation the local_artqtml_generations record being viewed
  * @return string empty string if the current user is the generation's own owner
  */
@@ -187,6 +189,8 @@ function local_artqtml_owner_warning_banner(stdClass $generation): string {
 }
 
 /**
+ * local artqtml draftcourse warning banner.
+ *
  * @return string empty string if the draft course is configured and exists
  */
 function local_artqtml_draftcourse_warning_banner(): string {

@@ -60,6 +60,8 @@ class problem_category {
     }
 
     /**
+     * label.
+     *
      * @param string $value one of {@see self::VALUES}
      * @return string
      */

@@ -28,6 +28,8 @@ namespace local_artqtml\local\question;
  */
 class question_semantic_validator {
     /**
+     * validate.
+     *
      * @param string $typecode IH/FE/SR
      * @param array $data decoded per-type fields from the AI response
      * @param array $typesettings this type's generation settings - only SR's per-generation

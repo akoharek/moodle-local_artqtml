@@ -140,6 +140,8 @@ class generate_questions_task {
     }
 
     /**
+     * store count discrepancy.
+     *
      * @param int $generationid
      * @param array $settings decoded settings JSON (requested counts)
      * @param array $questions raw question arrays as returned by Claude (before validation
@@ -182,6 +184,8 @@ class generate_questions_task {
     }
 
     /**
+     * rollback.
+     *
      * @param int $generationid
      * @param string $errormessage
      * @param int|null $userid
@@ -208,6 +212,8 @@ class generate_questions_task {
     }
 
     /**
+     * Helper.
+     *
      * @var string|null how the last call_claude() failed - 'transport' or 'content'.
      */
     protected $lastfailurekind = null;
@@ -456,6 +462,8 @@ class generate_questions_task {
     }
 
     /**
+     * store token limit warning.
+     *
      * @param int $generationid
      * @param int $requested
      * @param int $actual

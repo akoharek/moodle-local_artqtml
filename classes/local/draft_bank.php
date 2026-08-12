@@ -39,6 +39,8 @@ class draft_bank {
     protected static $rootcategoryid = null;
 
     /**
+     * is configured.
+     *
      * @return bool
      */
     public static function is_configured(): bool {
@@ -265,6 +267,8 @@ class draft_bank {
     }
 
     /**
+     * delete if empty.
+     *
      * @param int $generationid
      * @param int $categoryid
      * @return void

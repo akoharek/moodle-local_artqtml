@@ -84,6 +84,8 @@ class question_importer {
     }
 
     /**
+     * recompute multichoice fractions.
+     *
      * @param int $questionid the real question.id (local_artqtml_questions.questionbankid)
      * @return void
      */

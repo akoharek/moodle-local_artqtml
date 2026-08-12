@@ -99,6 +99,8 @@ class save_questions_task {
     }
 
     /**
+     * Helper.
+     *
      * @param \stdClass $generation
      * @param array $settings decoded settings JSON
      * @param array $rawquestions raw question arrays as returned by Claude, keyed by pseudo-id
@@ -106,6 +108,8 @@ class save_questions_task {
      * @return int number of questions actually saved
      */
     /**
+     * store save discrepancy.
+     *
      * @param \stdClass $generation the generation, already reloaded inside the save transaction
      * @param array $settings decoded settings, holding the requested per-type counts
      * @param int $userid

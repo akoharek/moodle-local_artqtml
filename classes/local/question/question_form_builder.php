@@ -139,6 +139,8 @@ class question_form_builder {
     }
 
     /**
+     * truncate feedback.
+     *
      * @param string $text
      * @param string $questioncode for the log entry, e.g. BIO1-IH-0001
      * @param int $generationid 0 to skip logging (no generation context available)
