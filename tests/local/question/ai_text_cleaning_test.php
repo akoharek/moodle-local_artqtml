@@ -85,8 +85,7 @@ final class ai_text_cleaning_test extends \advanced_testcase {
 
     /**
      * TEXT LOSS THIS GUARDS. Dropping <p> without putting anything in its place joins the last
-     * word of one paragraph to the first of the next - the same defect BL-48 fixed in the PDF
-     * reader ("A fenségeséssokoldalúgyümölcs").
+     * word of one paragraph to the first of the next ("Első bekezdésMásodik bekezdés").
      */
     public function test_paragraphs_do_not_run_together(): void {
         $cleaned = $this->cleaned_questiontext('<p>Első bekezdés</p><p>Második bekezdés</p>');

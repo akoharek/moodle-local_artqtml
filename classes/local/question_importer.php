@@ -42,7 +42,7 @@ class question_importer {
     /**
      * M-07: semantic validation of AI-generated question data, run before it is ever imported.
      *
-     * @param string $typecode IH/FE/FT/SR/EH/RV
+     * @param string $typecode IH/FE/SR
      * @param array $data decoded per-type fields from the AI response
      * @param array $typesettings this type's generation settings (only SR's sritemcount override
      *      is read - v20 #7); optional to preserve the existing two-argument callers
@@ -55,7 +55,7 @@ class question_importer {
     /**
      * Create a new question in the given category from AI-generated data.
      *
-     * @param string $typecode IH/FE/FT/SR/EH/RV
+     * @param string $typecode IH/FE/SR
      * @param array $data decoded per-type fields from the AI response (technical annex 3.3)
      * @param int $categoryid target question_categories.id (the generation's draft bank)
      * @param string $questioncode plugin-generated name, e.g. BIO1-IH-0001
@@ -85,7 +85,7 @@ class question_importer {
     }
 
     /**
-     * Recompute qtype_multichoice answer fraction percentages after a teacher edits an FE/FT
+     * Recompute qtype_multichoice answer fraction percentages after a teacher edits an FE
      * question in Moodle's native question editor (Jov-024).
      *
      * @param int $questionid the real question.id (local_artqtml_questions.questionbankid)

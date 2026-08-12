@@ -53,7 +53,7 @@ class generation_progress {
         generation_status::COMPLETED  => ['percent' => 100, 'color' => 'bg-success', 'striped' => false],
         // BL-35: the pipeline reached the end, so the bar is full - but not green. A run that
         // delivered less than was asked for is finished and is not a success, and those are two
-        // different facts; showing it as 100% green was how nine empty FT generations passed for
+        // different facts; showing it as 100% green was how nine empty generations passed for
         // completed ones.
         generation_status::PARTIAL    => ['percent' => 100, 'color' => 'bg-warning', 'striped' => false],
     ];

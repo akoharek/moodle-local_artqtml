@@ -39,7 +39,7 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="generationid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The generation this question belongs to"/>
         <FIELD NAME="questioncode" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" COMMENT="Plugin-generated code, e.g. BIO1-IH-0001 (spec 3.3.1)"/>
-        <FIELD NAME="typecode" TYPE="char" LENGTH="2" NOTNULL="true" SEQUENCE="false" COMMENT="IH/FE/FT/SR/EH/RV per functional spec"/>
+        <FIELD NAME="typecode" TYPE="char" LENGTH="2" NOTNULL="true" SEQUENCE="false" COMMENT="IH/FE/SR (ArtQTML Light type codes)"/>
         <FIELD NAME="questiontype" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="Moodle qtype: truefalse, multichoice, ordering, shortanswer, essay"/>
         <FIELD NAME="questiontext" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The generated question text"/>
         <FIELD NAME="difficultylabel" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Emlékezés/Megértés/Alkalmazás, Könnyű/Közepes/Nehéz, or empty for free-text mode"/>

@@ -217,7 +217,7 @@ if ($mform->is_cancelled()) {
 } else if ($data = $mform->get_data()) {
     // M-01: upload.php only checks these at the START of the "New generation" flow - a
     // generation saved as a draft (Beal-025/027) can sit for a long time before its owner comes
-    // back to actually start it here, so the license/token/enabled gate must be re-checked at
+    // back to actually start it here, so the enabled / draft-bank gate must be re-checked at
     // the point generation is actually kicked off, not assumed still valid from step 1.
     if (!get_config('local_artqtml', 'enabled')) {
         \core\notification::error(get_string('plugindisabled', 'local_artqtml'));

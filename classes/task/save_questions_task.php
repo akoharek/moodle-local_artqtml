@@ -79,7 +79,7 @@ class save_questions_task {
                 // BL-30/BL-35: the count that matters to the teacher is what ended up in the
                 // draft bank, and until now nothing compared it to what was asked for. M-08 does
                 // compare, but one stage earlier and against Claude's raw output - which is why
-                // nine FT generations that saved nothing at all recorded no discrepancy and were
+                // nine empty generations that saved nothing at all recorded no discrepancy and were
                 // shown as Completed with a full green bar: Claude had returned six questions
                 // every time, and all six were rejected here, after M-08 had already looked.
                 $shortfall = $this->store_save_discrepancy($generation, $settings, $userid);
@@ -128,7 +128,7 @@ class save_questions_task {
      * teacher get what they ordered?", and the two can differ by everything - a question can be
      * returned, validated, and then dropped by the semantic check on the way in
      * ({@see \local_artqtml\local\question\question_semantic_validator}), which is exactly
-     * what happened to every FT question the plugin ever generated before 2026-08-01.
+     * what happened when empty generations were still labelled Completed before 2026-08-01.
      *
      * Overwrites whatever M-08 stored rather than merging: this measurement supersedes it, and two
      * discrepancy lists on one row would be a question about which one to believe.

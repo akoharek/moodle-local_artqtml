@@ -504,7 +504,7 @@ class generate_questions_task {
                 // is for, and the retry tells the model its last answer was invalid. A response
                 // that parsed perfectly well and simply contains no questions is not: the model has
                 // answered, and asking again spends money to be told the same thing. That was the
-                // FT case, three attempts a run, nine runs (BL-30).
+                // empty-payload case, three attempts a run, nine runs (BL-30).
                 $this->lastfailurekind = $parsed === null ? 'transport' : 'content';
                 $lasterror = get_string('errorapiresponse', 'local_artqtml');
                 $this->log_ai_call($generation->id, 'generate', 'claude', [

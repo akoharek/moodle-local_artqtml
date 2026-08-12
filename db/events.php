@@ -38,7 +38,7 @@ defined('MOODLE_INTERNAL') || die();
 // from stale text, losing the previous edit.
 $observers = [
     [
-        // Jov-024: recompute FE/FT answer percentages after a teacher edits a draft question
+        // Jov-024: recompute FE answer percentages after a teacher edits a draft question
         // in Moodle's native question editor. This is the event that path really fires.
         'eventname' => '\core\event\question_created',
         'callback'  => '\local_artqtml\observer::question_saved',

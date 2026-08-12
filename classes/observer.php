@@ -33,7 +33,7 @@ class observer {
      * When a teacher saves edits to a still-in-draft AI question in the native question editor:
      * the stale Gemini result no longer describes the current content, so it is cleared and
      * flagged "edited", any prior approval is revoked (a question must be (re-)approved before
-     * it can be moved), the edit is logged, and - for FE/FT only - answer percentages are
+     * it can be moved), the edit is logged, and - for FE only - answer percentages are
      * recomputed (Jov-024).
      *
      * BL-28: called for BOTH core events, because a versioned save is a *creation*. See

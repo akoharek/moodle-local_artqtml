@@ -227,7 +227,7 @@ if ($generation->status === generation_status::PARTIAL) {
 
     // BL-30 leftover: countdiscrepancy only names the shortfall. The why is already in
     // local_artqtml_log (type_generation_failed / question_rejected / undershoot outcomes) -
-    // surface it here so the teacher is not left guessing why SR/RV came back empty.
+    // surface it here so the teacher is not left guessing why SR (or another type) came back empty.
     $partialreasons = \local_artqtml\local\partial_reason::render($generationid);
 
     echo html_writer::div(
