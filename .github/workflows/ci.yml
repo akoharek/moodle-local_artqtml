@@ -131,21 +131,23 @@ jobs:
       - name: AMD build is in step with its source
         working-directory: ${{ github.workspace }}/moodle
         run: |
-          PLUGIN_DIR=""
+          # Do not export as PLUGIN_DIR — moodle-plugin-ci reads that name and breaks
+          # phplint/phpcs with Failed to run realpath(...).
+          ARTQTM_PLUGIN_REL=""
           for cand in local/artqtml public/local/artqtml; do
             if [ -d "$cand" ]; then
-              PLUGIN_DIR="$cand"
+              ARTQTM_PLUGIN_REL="$cand"
               break
             fi
           done
-          if [ -z "$PLUGIN_DIR" ]; then
+          if [ -z "$ARTQTM_PLUGIN_REL" ]; then
             echo "::error::Plugin directory not found (tried local/artqtml and public/local/artqtml)."
             ls -la local 2>/dev/null || true
             ls -la public/local 2>/dev/null || true
             exit 1
           fi
-          echo "PLUGIN_DIR=$PLUGIN_DIR" >> "$GITHUB_ENV"
-          echo "Using plugin path: $PLUGIN_DIR"
+          echo "ARTQTM_PLUGIN_REL=$ARTQTM_PLUGIN_REL" >> "$GITHUB_ENV"
+          echo "Using plugin path: $ARTQTM_PLUGIN_REL"
 
           node_version="$(node --version)"
           echo "node: $node_version (Moodle .nvmrc: $(cat .nvmrc 2>/dev/null || echo 'missing'))"
@@ -155,11 +157,11 @@ jobs:
                     "The .nvmrc says $(cat .nvmrc 2>/dev/null || echo 'missing') - the toolchain install did not honour it."
                exit 1 ;;
           esac
-          npx grunt amd --root="$PLUGIN_DIR"
+          npx grunt amd --root="$ARTQTM_PLUGIN_REL"
           # Copy the freshly built files back over the checkout before comparing. Where
           # moodle-plugin-ci symlinked the plugin this is a no-op; where it copied, it is what makes
           # the comparison mean anything at all.
-          cp -R "$PLUGIN_DIR/amd/build/." "${{ github.workspace }}/plugin/amd/build/"
+          cp -R "$ARTQTM_PLUGIN_REL/amd/build/." "${{ github.workspace }}/plugin/amd/build/"
       - name: Fail if the committed AMD build is stale
         working-directory: ${{ github.workspace }}/plugin
         run: |
@@ -192,28 +194,28 @@ jobs:
         env:
           PHPSTAN_VERSION: 2.2.5
         run: |
-          PLUGIN_DIR="${PLUGIN_DIR:-}"
-          if [ -z "$PLUGIN_DIR" ]; then
+          ARTQTM_PLUGIN_REL="${ARTQTM_PLUGIN_REL:-}"
+          if [ -z "$ARTQTM_PLUGIN_REL" ]; then
             for cand in local/artqtml public/local/artqtml; do
               if [ -d "$cand" ]; then
-                PLUGIN_DIR="$cand"
+                ARTQTM_PLUGIN_REL="$cand"
                 break
               fi
             done
           fi
-          if [ -z "$PLUGIN_DIR" ] || [ ! -d "$PLUGIN_DIR" ]; then
+          if [ -z "$ARTQTM_PLUGIN_REL" ] || [ ! -d "$ARTQTM_PLUGIN_REL" ]; then
             echo "::error::Plugin directory not found for PHPStan."
             exit 1
           fi
           DEVTOOLS_BIN="${{ github.workspace }}/plugin/tools/devtools/vendor/bin/phpstan"
-          if [ ! -d "$PLUGIN_DIR/tools/devtools/vendor" ]; then
-            mkdir -p "$PLUGIN_DIR/tools/devtools"
+          if [ ! -d "$ARTQTM_PLUGIN_REL/tools/devtools/vendor" ]; then
+            mkdir -p "$ARTQTM_PLUGIN_REL/tools/devtools"
             cp -a "${{ github.workspace }}/plugin/tools/devtools/vendor" \
-              "$PLUGIN_DIR/tools/devtools/"
+              "$ARTQTM_PLUGIN_REL/tools/devtools/"
           fi
           php "$DEVTOOLS_BIN" --version
           php -d memory_limit=2G "$DEVTOOLS_BIN" analyse \
-            --configuration="$PLUGIN_DIR/phpstan.neon" --no-progress
+            --configuration="$ARTQTM_PLUGIN_REL/phpstan.neon" --no-progress
 
   # ---------------------------------------------------------------------------
   # PHPUnit: full Moodle install, then the plugin's test suite.
