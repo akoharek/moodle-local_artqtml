@@ -26,6 +26,14 @@ Install the ZIP so the folder is `moodle/local/artqtml/`. Then configure keys an
 
 GPLv3 or later. See `COPYING.txt` and `COPYRIGHT.txt`.
 
-## Tracker
+## Support / bug tracker
 
-https://github.com/akoharek/moodle-local_artqtml/issues
+Public issue tracker (bugs, feature requests, other code issues):
+
+**https://github.com/akoharek/moodle-local_artqtml/issues**
+
+Please use the issue templates (Bug report, Feature request, or Other / code issue). Do not post API keys or other secrets.
+
+> Magyarul: hibákat, funkciókéréseket és egyéb kódproblémákat a fenti nyilvános GitHub Issues oldalon várjuk (sablonok angolul).
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to report issues and propose changes.

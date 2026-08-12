@@ -1,0 +1,64 @@
+name: Bug report
+description: Something is broken or does not work as expected
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Please fill in the sections below so we can reproduce and fix it.
+        *(Hibajelentéshez használd ezt a sablont — angolul is rendben van.)*
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What went wrong in one or two sentences?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Exact steps someone else can follow.
+      placeholder: |
+        1. Go to …
+        2. Click …
+        3. See error …
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+      description: Include error messages or screenshots if useful. Do not paste API keys or secrets.
+    validations:
+      required: true
+  - type: input
+    id: moodle
+    attributes:
+      label: Moodle version
+      description: e.g. 4.5.1, 5.1, 5.2
+      placeholder: "5.1"
+    validations:
+      required: true
+  - type: input
+    id: plugin
+    attributes:
+      label: Plugin version / release
+      description: From Site administration → Plugins, or version.php ($plugin->release / version)
+      placeholder: "1.0.0 / 2026081100"
+    validations:
+      required: false
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment (optional)
+      description: PHP version, browser, theme, relevant third-party plugins
+    validations:
+      required: false
