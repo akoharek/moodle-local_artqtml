@@ -17,20 +17,20 @@
 namespace local_artqtml\local;
 
 /**
- * Unit tests for the content screens (Felt-017/018, Admin-028/029).
+ * Unit tests for the content screens.
  *
  * This file did not exist before 2026-08-04. The prompt-injection screen had no test at all,
- * which is how it could sit there with no baseline - an empty admin setting made it match
- * nothing, and nothing said so.
+ * Which is how it could sit there with no baseline - an empty admin setting made it match
+ * Nothing, and nothing said so.
  *
  * What is deliberately NOT tested here: whether the screen stops a determined jailbreak. It does
- * not, cannot, and does not claim to. These tests pin the behaviour it does promise - a mandatory
- * baseline that cannot be switched off, and immunity to the trivial obfuscations of a literal
- * phrase.
+ * Not, cannot, and does not claim to. These tests pin the behaviour it does promise - a mandatory
+ * Baseline that cannot be switched off, and immunity to the trivial obfuscations of a literal
+ * Phrase.
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\security_filter
  */
 final class security_filter_test extends \advanced_testcase {
@@ -38,8 +38,8 @@ final class security_filter_test extends \advanced_testcase {
      * With no setting saved at all - a fresh install - the baseline still catches the obvious case.
      *
      * This is the defect the whole change was made for: `get_config()` returns false for a setting
-     * that was never written, the old code turned that into an empty pattern list, and the screen
-     * became a no-op on exactly the sites that had never been configured.
+     * That was never written, the old code turned that into an empty pattern list, and the screen
+     * Became a no-op on exactly the sites that had never been configured.
      */
     public function test_baseline_works_with_no_configuration(): void {
         $this->resetAfterTest();
@@ -89,7 +89,7 @@ final class security_filter_test extends \advanced_testcase {
      * The obfuscations the old substring search could not survive.
      *
      * Each of these is the same literal phrase with something harmless inserted, and each one
-     * defeated `stripos()` outright.
+     * Defeated `stripos()` outright.
      *
      * @dataProvider obfuscation_provider
      * @param string $text the text to screen
@@ -128,7 +128,7 @@ final class security_filter_test extends \advanced_testcase {
      * NFKC folding, when the intl extension is present.
      *
      * Skipped rather than failed without intl, because the class is documented to work without it -
-     * every other normalisation step still runs.
+     * Every other normalisation step still runs.
      */
     public function test_fullwidth_characters_are_folded_when_intl_is_available(): void {
         $this->resetAfterTest();
@@ -147,8 +147,8 @@ final class security_filter_test extends \advanced_testcase {
      *
      * The screen blocks an upload outright, so a false positive costs a teacher their document.
      * These sentences deliberately contain the individual words of a baseline phrase without
-     * forming it - `compact` matching ignores word boundaries, and this is what stops that from
-     * turning into a false positive machine.
+     * Forming it - `compact` matching ignores word boundaries, and this is what stops that from
+     * Turning into a false positive machine.
      */
     public function test_ordinary_text_is_not_rejected(): void {
         $this->resetAfterTest();
@@ -172,7 +172,7 @@ final class security_filter_test extends \advanced_testcase {
      * Empty entries in the admin list are skipped rather than matching everything.
      *
      * An empty pattern would be found in every string, so a trailing comma would have blocked
-     * every upload on the site.
+     * Every upload on the site.
      */
     public function test_empty_admin_entries_are_ignored(): void {
         $this->resetAfterTest();
@@ -186,8 +186,8 @@ final class security_filter_test extends \advanced_testcase {
      * A realistic document is screened without a regex error or a timeout.
      *
      * Not a benchmark - the assertion is that it completes and returns a boolean. The reason it is
-     * here is that fuzzy matching was explicitly rejected for this method, and this is the size of
-     * input that rejection was about.
+     * Here is that fuzzy matching was explicitly rejected for this method, and this is the size of
+     * Input that rejection was about.
      */
     public function test_a_long_document_completes(): void {
         $this->resetAfterTest();
@@ -201,7 +201,7 @@ final class security_filter_test extends \advanced_testcase {
     }
 
     /**
-     * Invalid UTF-8 does not fatal.
+     * Invalid UT does not fatal.
      *
      * A teacher pasting from a badly encoded source must get a screening decision, not a crash.
      */
@@ -217,7 +217,7 @@ final class security_filter_test extends \advanced_testcase {
      * The SQL screen still behaves as it did, including its own baseline.
      *
      * It shares `split_list()` with the prompt screen now, so this is the regression guard for
-     * that change - not new behaviour.
+     * That change - not new behaviour.
      */
     public function test_sql_screen_is_unchanged(): void {
         global $CFG;
@@ -232,7 +232,7 @@ final class security_filter_test extends \advanced_testcase {
         $this->assertFalse(security_filter::has_sql_injection('The ' . $CFG->prefix . ' is a prefix, mentioned innocently.'));
 
         // The admin list replaces the default here - deliberately different from the prompt
-        // screen, and left that way because the SQL keyword set is site-specific by nature.
+        // Screen, and left that way because the SQL keyword set is site-specific by nature.
         set_config('sqlkeywords', "TRUNCATE\nGRANT", 'local_artqtml');
         $this->assertTrue(security_filter::has_sql_injection('TRUNCATE ' . $CFG->prefix . 'user'));
         $this->assertFalse(security_filter::has_sql_injection('DROP TABLE ' . $CFG->prefix . 'user'));
@@ -240,9 +240,6 @@ final class security_filter_test extends \advanced_testcase {
 
     /**
      * The settings page default and the enforced baseline are the same list.
-     *
-     * They used to be two hand-maintained copies, and they had already drifted: the field showed
-     * three phrases, one of which ('you are now') was not in the code at all.
      */
     public function test_settings_default_is_not_a_second_copy(): void {
         $patterns = security_filter::default_prompt_patterns();

@@ -17,11 +17,11 @@
 namespace local_artqtml\local;
 
 /**
- * Unit tests for uploaded-file text extraction (TXT only in ArtQTML Light).
+ * Unit tests for uploaded-file text extraction (TXT).
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\text_extractor
  */
 final class text_extractor_test extends \advanced_testcase {
@@ -46,7 +46,7 @@ final class text_extractor_test extends \advanced_testcase {
     }
 
     /**
-     * A UTF-8 text file (accented Hungarian characters) passes through unchanged.
+     * A UT text file (accented Hungarian characters) passes through unchanged.
      */
     public function test_extract_txt_utf8_passthrough(): void {
         $this->resetAfterTest();
@@ -60,7 +60,7 @@ final class text_extractor_test extends \advanced_testcase {
     }
 
     /**
-     * A legacy ISO-8859-2 (Latin-2) file is detected and converted to valid UTF-8.
+     * A legacy ISO-8859-2 (Latin-2) file is detected and converted to valid UT.
      */
     public function test_extract_txt_latin2_converted_to_utf8(): void {
         $this->resetAfterTest();
@@ -99,7 +99,7 @@ final class text_extractor_test extends \advanced_testcase {
     }
 
     /**
-     * TXT remains a supported upload extension in Light.
+     * TXT is a supported upload extension.
      */
     public function test_txt_is_supported(): void {
         $this->resetAfterTest();

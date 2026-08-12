@@ -18,27 +18,23 @@
  * Roll an in-flight generation back to a draft the teacher can reopen.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
 
 /**
  * Shared "back to Megkezdett" cleanup used by the status-page Abort button and by pipeline
- * gates that must refuse to call a provider without leaving the generation stuck in
- * generating/validating/failed.
+ * Gates that must refuse to call a provider without leaving the generation stuck in
+ * Generating/validating/failed.
  */
 class generation_recover {
     /**
      * Delete draft bank / question rows / pending pipeline junk and return the generation to
      * {@see generation_status::STARTED} so upload.php and generate.php are editable again.
      *
-     * Mirrors the Abort path in status.php (Gen-008/009/010). Optional $usermessage is stored on
-     * the generation's error field for the next page load to surface - keep it generic; never put
-     * security-filter match details here.
-     *
      * @param \stdClass $generation a local_artqtml_generations record (id required; other fields
-     *      refreshed from the DB inside this method)
+     * Refreshed from the DB inside this method)
      * @param string|null $usermessage teacher-facing message, or null to clear any previous error
      * @return \stdClass the updated generation record
      */

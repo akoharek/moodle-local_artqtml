@@ -15,11 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Post-edit DB normalisation of an existing FE question's answer weights (Jov-024) - not
- * question creation, split out of question_importer; called from classes/observer.php.
+ * Helper.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local\question;
@@ -29,14 +28,11 @@ namespace local_artqtml\local\question;
  */
 class multichoice_fraction_normalizer {
     /**
-     * Recompute qtype_multichoice answer fraction percentages after the teacher edits an FE
-     * question in Moodle's native question editor (Jov-024).
-     *
      * Moodle's own multichoice edit form leaves picking each answer's percentage entirely to
-     * the teacher; it does not renormalise automatically. This mirrors apply_multichoice()'s
-     * generation-time logic against the already-saved question_answers rows instead: any answer
-     * the teacher left with a positive fraction is treated as "correct" and given an even share
-     * of 100% (single correct = 100%, multiple correct split evenly); everything else is zeroed.
+     * The teacher; it does not renormalise automatically. This mirrors apply_multichoice()'s
+     * Generation-time logic against the already-saved question_answers rows instead: any answer
+     * The teacher left with a positive fraction is treated as "correct" and given an even share
+     * Of 100% (single correct = 100%, multiple correct split evenly); everything else is zeroed.
      *
      * @param int $questionid the real question.id (local_artqtml_questions.questionbankid)
      * @return void

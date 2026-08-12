@@ -17,19 +17,16 @@
 namespace local_artqtml\local;
 
 /**
- * Unit tests for the single-source structured-output request (Admin-053, Admin-060).
+ * Unit tests for the single-source structured-output request.
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\ai_request
  */
 final class ai_request_test extends \advanced_testcase {
     /**
      * The probe and the generator must send the same envelope, headers and parameter name.
-     *
-     * This is the regression the whole class exists for: the probe used to omit the beta header the
-     * generator sent, and read the resulting 400 as "the provider is broken".
      */
     public function test_probe_and_generator_build_the_same_shape(): void {
         $generator = ai_request::claude('claude-opus-4-8', 'key', 8192, 'system', 'source', [
@@ -43,11 +40,6 @@ final class ai_request_test extends \advanced_testcase {
         $this->assertSame($generator['headers'], $probe['headers']);
         $this->assertSame(array_keys($generator['payload']), array_keys($probe['payload']));
 
-        // The schemas may differ - the probe asks for one question where a generation asks for
-        // several - but nothing else about the request may. BL-44, 2026-08-03: the probe's schema
-        // is no longer a token {ok: boolean}; it now comes from question_schema::build() with a
-        // count of one, the same builder generation uses. That is what makes a passing probe mean
-        // "the plugin can read this model's questions" rather than "this model can emit JSON".
         $this->assertNotSame(
             $generator['payload']['output_config']['format']['schema'],
             $probe['payload']['output_config']['format']['schema']
@@ -56,8 +48,8 @@ final class ai_request_test extends \advanced_testcase {
 
     /**
      * Anthropic deprecated output_format in favour of output_config.format. Measured across all
-     * eleven dropdown models: output_format without the beta header is a 400 on every one of them,
-     * and output_config.format without any header is a 200 on every one of them.
+     * Eleven dropdown models: output_format without the beta header is a 400 on every one of them,
+     * And output_config.format without any header is a 200 on every one of them.
      */
     public function test_claude_uses_output_config_and_no_beta_header(): void {
         $request = ai_request::claude('claude-opus-4-8', 'key', 128, 's', 'u', ['type' => 'object']);
@@ -112,8 +104,8 @@ final class ai_request_test extends \advanced_testcase {
 
     /**
      * Anthropic rejects the whole request if any object anywhere lacks additionalProperties:false,
-     * with a message that looks nothing like the mistake. The rule is applied in one place so that
-     * no caller can forget it - the probe's hand-written schema was the first that did.
+     * With a message that looks nothing like the mistake. The rule is applied in one place so that
+     * No caller can forget it - the probe's hand-written schema was the first that did.
      */
     public function test_claude_schema_reaches_every_nested_object(): void {
         $hardened = ai_request::claude_schema($this->nested_schema());
@@ -128,7 +120,7 @@ final class ai_request_test extends \advanced_testcase {
     /**
      * Gemini's rule is the opposite one, and a live 400 proves it: "Unknown name
      * 'additionalProperties' at 'generation_config.response_schema': Cannot find field."
-     * responseSchema is an OpenAPI subset, so hardening a schema for Gemini breaks it.
+     * ResponseSchema is an OpenAPI subset, so hardening a schema for Gemini breaks it.
      */
     public function test_gemini_schema_removes_what_claude_requires(): void {
         $stripped = ai_request::gemini_schema(ai_request::claude_schema($this->nested_schema()));
@@ -145,12 +137,12 @@ final class ai_request_test extends \advanced_testcase {
      *
      * 2026-08-03: every one of the 42 Gemini models came back `failure` in about 150 ms with
      * "Unknown name "const" at 'generation_config.response_schema...'", which excluded all of them
-     * from the validator's dropdown at once. No model was ever reached - the API rejected the
-     * request. question_schema::build() pins each question's type with `['const' => $typecode]`,
-     * and the OpenAPI subset expresses that as a single-entry `enum` instead.
+     * From the validator's dropdown at once. No model was ever reached - the API rejected the
+     * Request. question_schema::build() pins each question's type with `['const' => $typecode]`,
+     * And the OpenAPI subset expresses that as a single-entry `enum` instead.
      *
      * Asserted on the *production* schema rather than a fixture, because a fixture only proves the
-     * fixture: a `const` added to question_schema tomorrow has to fail this test, not a live sweep.
+     * Fixture: a `const` added to question_schema tomorrow has to fail this test, not a live sweep.
      */
     public function test_gemini_schema_leaves_no_const_in_the_production_schema(): void {
         $settings = ['counts' => [], 'types' => []];
@@ -167,8 +159,8 @@ final class ai_request_test extends \advanced_testcase {
         );
 
         // The meaning has to survive the conversion, not just the keyword disappear. Collected by
-        // value rather than asserted at a fixed index, so the test does not quietly depend on the
-        // order build() happens to emit its branches in.
+        // Value rather than asserted at a fixed index, so the test does not quietly depend on the
+        // Order build() happens to emit its branches in.
         $pinned = [];
         foreach ($converted['properties']['questions']['items']['anyOf'] as $branch) {
             $this->assertSame('string', $branch['properties']['type']['type']);
@@ -183,7 +175,7 @@ final class ai_request_test extends \advanced_testcase {
 
     /**
      * The walker reaches every node, so Claude's rule has to guard itself: additionalProperties on
-     * a string is a new way to fail a live call, and nothing else would catch it.
+     * A string is a new way to fail a live call, and nothing else would catch it.
      */
     public function test_claude_schema_does_not_touch_scalar_properties(): void {
         $hardened = ai_request::claude_schema([
@@ -197,7 +189,7 @@ final class ai_request_test extends \advanced_testcase {
 
     /**
      * The production schema already complies with Anthropic's rule, so applying it must change
-     * nothing - if it ever does, question_schema has grown an object that would fail the live call.
+     * Nothing - if it ever does, question_schema has grown an object that would fail the live call.
      */
     public function test_production_schema_is_already_compliant(): void {
         $settings = ['counts' => [], 'types' => []];
@@ -212,7 +204,7 @@ final class ai_request_test extends \advanced_testcase {
 
     /**
      * A hard rejection blocks; a deprecation notice on a successful call does not. Getting this
-     * backwards is what turned a self-inflicted 400 into a site-wide block.
+     * Backwards is what turned a self-inflicted 400 into a site-wide block.
      */
     public function test_classify_separates_deprecation_from_rejection(): void {
         $this->assertSame(ai_request::OUTCOME_OK, ai_request::classify(200, ['content' => []])['outcome']);
@@ -235,16 +227,16 @@ final class ai_request_test extends \advanced_testcase {
      * The rule this whole class enforces: exactly one place builds a provider request.
      *
      * A static scan, because the defect it guards against is a second construction path appearing
-     * somewhere else - which is invisible until the two drift. Six instances of that pattern have
-     * been found in this plugin; the probe was the first we introduced ourselves.
+     * Somewhere else - which is invisible until the two drift. Six instances of that pattern have
+     * Been found in this plugin; the probe was the first we introduced ourselves.
      */
     public function test_nothing_else_builds_a_provider_request(): void {
         $root = realpath(__DIR__ . '/../..');
         $allowed = [$root . '/classes/local/ai_request.php'];
 
         // Literals that only a hand-built generation/validation request would contain. The model
-        // list and connection test call the providers' /models endpoints, which is a different
-        // request with no schema and no beta header, so those are deliberately not covered here.
+        // List and connection test call the providers' /models endpoints, which is a different
+        // Request with no schema and no beta header, so those are deliberately not covered here.
         $markers = [
             'output_format',
             'output_config',
@@ -283,13 +275,7 @@ final class ai_request_test extends \advanced_testcase {
     }
 
     /**
-     * BL-44: a reasoning model puts its thinking first, and the answer after it.
-     *
-     * This is the 2026-08-03 defect, pinned. Claude Sonnet 5 and Opus 5 open the reply with a
-     * thinking block, so reading `content[0]` returned nothing and the plugin declared failure on
-     * nine calls that were HTTP 200 and carried six usable questions - one of them costing $0.228
-     * for zero questions. The old code was `$decoded['content'][0]['text']`, so the first case
-     * below is the one that used to fail.
+     * A reasoning model puts its thinking first, and the answer after it.
      */
     public function test_extract_text_survives_a_thinking_block(): void {
         $withthinking = [
@@ -320,17 +306,13 @@ final class ai_request_test extends \advanced_testcase {
         $this->assertSame('the answer', ai_request::extract_text(model_list::PROVIDER_GEMINI, $gemini));
 
         // An envelope carrying no text at all yields null rather than an empty string, so the
-        // caller can tell "nothing came back" from "the model returned an empty answer".
+        // Caller can tell "nothing came back" from "the model returned an empty answer".
         $this->assertNull(ai_request::extract_text(model_list::PROVIDER_CLAUDE, ['content' => []]));
         $this->assertNull(ai_request::extract_text(model_list::PROVIDER_CLAUDE, null));
     }
 
     /**
      * The truncation signal, which the two providers spell differently and nested differently.
-     *
-     * Val-022 / Val-014-016: this has to be readable without the text parsing first, because being
-     * cut off is usually what breaks the JSON. If it is only checked after a successful parse, the
-     * failure lands in the generic invalid-JSON retry and the real cause never reaches the log.
      */
     public function test_hit_token_limit_reads_both_providers(): void {
         $this->assertTrue(ai_request::hit_token_limit(
@@ -355,26 +337,26 @@ final class ai_request_test extends \advanced_testcase {
     }
 
     /**
-     * BL-44's real point: exactly one place knows where the answer sits in the envelope.
+     * 's real point: exactly one place knows where the answer sits in the envelope.
      *
      * The sibling of the request-building guard above, and it exists for a sharper reason. Until
      * 2026-08-03 this knowledge was written out three times - generation, validation, model check -
-     * and they agreed only by coincidence. They agreed on something wrong.
+     * And they agreed only by coincidence. They agreed on something wrong.
      *
      * The direction of the danger is what makes a static scan worth it: fix the model check alone
-     * and it will pass a model that generation then fails on, so the connection-test button would
-     * promise something untrue. A copy reappearing anywhere is invisible until exactly that
-     * happens, which is why this is checked in the source rather than left to review.
+     * And it will pass a model that generation then fails on, so the connection-test button would
+     * Promise something untrue. A copy reappearing anywhere is invisible until exactly that
+     * Happens, which is why this is checked in the source rather than left to review.
      */
     public function test_nothing_else_reads_the_response_envelope(): void {
         $root = realpath(__DIR__ . '/../..');
         $allowed = [$root . '/classes/local/ai_request.php'];
 
         // The envelope paths and the truncation signals, written as they appear in code. Anything
-        // reaching into the provider's reply by hand will contain one of them. The stop reason is
-        // in here because it was the second copy found: Claude spells it `stop_reason`/`max_tokens`
-        // at the top level, Gemini `finishReason`/`MAX_TOKENS` two levels down, and the two were
-        // compared by hand in two files - a difference of spelling is exactly what survives a copy.
+        // Reaching into the provider's reply by hand will contain one of them. The stop reason is
+        // In here because it was the second copy found: Claude spells it `stop_reason`/`max_tokens`
+        // At the top level, Gemini `finishReason`/`MAX_TOKENS` two levels down, and the two were
+        // Compared by hand in two files - a difference of spelling is exactly what survives a copy.
         $markers = [
             "['content'][0]",
             "['candidates'][0]",
@@ -416,10 +398,10 @@ final class ai_request_test extends \advanced_testcase {
      * Every request this class builds carries the security guard, on both providers.
      *
      * The guard is the one piece of prompt text an administrator cannot edit away, so the test
-     * that matters is not "does the constant exist" but "does it reach the payload on both sides".
+     * That matters is not "does the constant exist" but "does it reach the payload on both sides".
      * Claude and Gemini put the system instruction in different places, and the guard was added
-     * to each of them separately - which is exactly the shape of change that silently covers one
-     * provider and not the other.
+     * To each of them separately - which is exactly the shape of change that silently covers one
+     * Provider and not the other.
      */
     public function test_both_providers_carry_the_security_guard(): void {
         $schema = ['type' => 'object', 'properties' => ['ok' => ['type' => 'boolean']], 'required' => ['ok']];
@@ -447,8 +429,8 @@ final class ai_request_test extends \advanced_testcase {
      * The guard appears exactly once, however many times the prompt passes through.
      *
      * Idempotence is not decoration here: the same system prompt is built in one place and sent
-     * from three, and a guard that stacked would cost tokens on every call and tell the model the
-     * instruction is negotiable.
+     * From three, and a guard that stacked would cost tokens on every call and tell the model the
+     * Instruction is negotiable.
      */
     public function test_the_guard_is_applied_exactly_once(): void {
         $once = ai_request::harden_system_prompt('Base system prompt.');
@@ -481,8 +463,8 @@ final class ai_request_test extends \advanced_testcase {
      * Hardening does not disturb what the rest of the payload is for.
      *
      * The API key stays in the header and never appears in the body - the same assertion the
-     * privacy and diagnostics work relies on - and the schema still reaches its provider-specific
-     * field. Both are checked here because this change touched the payload builder.
+     * Privacy and diagnostics work relies on - and the schema still reaches its provider-specific
+     * Field. Both are checked here because this change touched the payload builder.
      */
     public function test_hardening_leaves_the_key_and_schema_alone(): void {
         $schema = ['type' => 'object', 'properties' => ['ok' => ['type' => 'boolean']], 'required' => ['ok']];

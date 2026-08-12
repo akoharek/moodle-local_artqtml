@@ -17,13 +17,13 @@
 namespace local_artqtml\local;
 
 /**
- * The per-answer explanation (BL-29): the switch, the schema and where the text lands.
+ * The per-answer explanation: the switch, the schema and where the text lands.
  *
- * ArtQTML Light: IH and FE can store per-answer explanations; SR cannot. FT/RV/EH are removed.
+ * IH and FE can store per-answer explanations; SR cannot.
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\question_schema
  * @covers     \local_artqtml\local\question_types::supports_option_explanation
  */
@@ -67,7 +67,7 @@ final class option_explanation_test extends \advanced_testcase {
 
     /**
      * With it on, the field is declared AND required - Structured Outputs will not fill an
-     * optional one.
+     * Optional one.
      */
     public function test_the_option_carries_a_required_explanation_when_the_switch_is_on(): void {
         $branch = $this->question_branch($this->settings('FE', true));
@@ -108,7 +108,7 @@ final class option_explanation_test extends \advanced_testcase {
     }
 
     /**
-     * The switch is offered for exactly the Light types that can store it.
+     * The switch is offered for exactly the types that can store it.
      */
     public function test_the_switch_is_offered_for_exactly_the_types_that_can_store_it(): void {
         $supported = array_values(array_filter(

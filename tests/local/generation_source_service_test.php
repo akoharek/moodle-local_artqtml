@@ -20,12 +20,12 @@ namespace local_artqtml\local;
  * Unit tests for the generation source write path.
  *
  * The test that matters most here is the stale one: a form opened on a draft and submitted after
- * the generation started running. That case is why the write moved out of upload.php in the first
- * place - as a function declared inside a controller it could not be called at all.
+ * The generation started running. That case is why the write moved out of upload.php in the first
+ * Place - as a function declared inside a controller it could not be called at all.
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\generation_source_service
  */
 final class generation_source_service_test extends \advanced_testcase {
@@ -103,8 +103,8 @@ final class generation_source_service_test extends \advanced_testcase {
      * Every non-draft status is refused, and NOTHING is written.
      *
      * The second half is the assertion that matters. A refusal that had already changed three
-     * fields before throwing would be worse than no refusal at all - the record would be
-     * half-rewritten with nothing on screen to say so.
+     * Fields before throwing would be worse than no refusal at all - the record would be
+     * Half-rewritten with nothing on screen to say so.
      *
      * @dataProvider non_draft_status_provider
      * @param string $status
@@ -154,13 +154,13 @@ final class generation_source_service_test extends \advanced_testcase {
      * The stale form: a draft that started running while the form was open.
      *
      * This is the sequence the fix exists for, and it needs no attacker - the tool is site-wide,
-     * so the second tab can belong to a different teacher. Modelled by changing the status between
+     * So the second tab can belong to a different teacher. Modelled by changing the status between
      * "the form was built" and "the form was submitted", which is exactly what a race does, minus
-     * the timing.
+     * The timing.
      *
      * Without the re-read inside save(), step 4 rewrites the source text of a generation Claude is
-     * reading at that moment - and which Gemini will read again afterwards to judge the questions
-     * against it.
+     * Reading at that moment - and which Gemini will read again afterwards to judge the questions
+     * Against it.
      */
     public function test_a_form_submitted_after_the_generation_started_writes_nothing(): void {
         global $DB;
@@ -193,8 +193,8 @@ final class generation_source_service_test extends \advanced_testcase {
      * The same for the duplicate-confirmation path.
      *
      * That path carries the generation id through the session, from one request to the next. The
-     * session remembers which generation was being edited; it cannot remember what state it is in
-     * now, and it must not be trusted to.
+     * Session remembers which generation was being edited; it cannot remember what state it is in
+     * Now, and it must not be trusted to.
      */
     public function test_a_stale_duplicate_confirmation_writes_nothing(): void {
         global $DB;
@@ -207,7 +207,6 @@ final class generation_source_service_test extends \advanced_testcase {
         // The pending data was prepared while the generation was a draft.
         $pending = ['name' => 'Confirmed', 'shortname' => 'CONF', 'sourcetext' => 'Confirmed text.'];
 
-        // It finished before the user pressed "continue".
         $DB->set_field('local_artqtml_generations', 'status', generation_status::COMPLETED, ['id' => $before->id]);
 
         try {
@@ -232,10 +231,6 @@ final class generation_source_service_test extends \advanced_testcase {
 
     /**
      * A colleague's draft is still editable - the refusal is about status, never about ownership.
-     *
-     * Glob-031, decided 2026-08-03 and unchanged by this work. Recorded as a test because "we
-     * blocked editing other people's generations" is the wrong lesson to take from this change,
-     * and the wrong lesson is the one somebody acts on later.
      */
     public function test_a_colleagues_draft_is_still_editable(): void {
         global $DB;

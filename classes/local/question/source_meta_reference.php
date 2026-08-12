@@ -18,7 +18,7 @@
  * Detects and strips unprofessional "according to the text / szöveg szerint" meta-references.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local\question;
@@ -27,17 +27,13 @@ namespace local_artqtml\local\question;
  * Quiz stems must not point at the source document ("szöveg szerint", "according to the text").
  *
  * The student already knows the material comes from the course. Naming the source in the stem
- * reads as AI scaffolding, not as a finished question. The generator prompt forbids it; this
- * class is the server-side half: strip a leading clause when that is safe, and tell the semantic
- * validator to reject anything that still carries the phrase.
+ * Reads as AI scaffolding, not as a finished question. The generator prompt forbids it; this
+ * Class is the server-side half: strip a leading clause when that is safe, and tell the semantic
+ * Validator to reject anything that still carries the phrase.
  */
 class source_meta_reference {
     /**
      * HU/EN phrases that mean "according to / based on the source document".
-     *
-     * Kept as literal multi-word needles (not single words like "szöveg") so a legitimate question
-     * about the word "text" is not rejected. Matching is case-insensitive over whitespace-collapsed
-     * UTF-8 text.
      */
     private const PHRASES = [
         // Hungarian.
@@ -88,7 +84,7 @@ class source_meta_reference {
      * Leading-clause patterns that can be removed without leaving a broken mid-sentence hole.
      *
      * Only the start of the stem/option is touched. Embedded phrases ("… a szöveg szerint?") stay
-     * for the validator to reject - stripping those would produce ungrammatical leftovers.
+     * For the validator to reject - stripping those would produce ungrammatical leftovers.
      */
     private const LEADING_PATTERNS = [
         // HU: "A szöveg szerint, …" / "Forrásszöveg alapján: …".
@@ -128,8 +124,8 @@ class source_meta_reference {
      * Strip a leading meta-reference clause when the stem opens with one.
      *
      * Idempotent: a second pass finds nothing to remove. Does not invent content - if stripping
-     * would leave an empty string, the original text is returned unchanged so the validator can
-     * still see and reject the phrase.
+     * Would leave an empty string, the original text is returned unchanged so the validator can
+     * Still see and reject the phrase.
      *
      * @param string $text
      * @return string

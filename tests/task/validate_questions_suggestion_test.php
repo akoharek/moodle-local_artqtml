@@ -19,22 +19,17 @@ namespace local_artqtml\task;
 use local_artqtml\local\validation_suggestion;
 
 /**
- * Unit tests for the validator's suggestion enum (Val-017/Val-018) as a single source of truth.
- *
- * F-1: the three values used to live in a code constant AND as English prose inside the
- * admin-editable prompt template, with nothing checking the two against each other - the same
- * two-source arrangement that let problem_category drift apart and cost nine days. These tests
- * are the check that makes reintroducing it fail the build.
+ * Unit tests for the validator's suggestion enum as a single source of truth.
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\validation_suggestion
  * @covers     \local_artqtml\task\validate_questions_task
  */
 final class validate_questions_suggestion_test extends \advanced_testcase {
     /**
-     * Val-017: exactly the three verdicts, in order, none empty, no duplicates.
+     * Exactly the three verdicts, in order, none empty, no duplicates.
      */
     public function test_enum_is_exactly_three_values(): void {
         $this->assertSame(
@@ -49,7 +44,7 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
         );
 
         // The not_evaluated value is the plugin's own marker, never one the validator may return, so it
-        // must stay out of the schema enum while still being displayable.
+        // Must stay out of the schema enum while still being displayable.
         $this->assertNotContains(validation_suggestion::NOT_EVALUATED, validation_suggestion::VALUES);
         $this->assertContains(validation_suggestion::NOT_EVALUATED, validation_suggestion::DISPLAY);
         $this->assertCount(4, validation_suggestion::DISPLAY);
@@ -57,7 +52,7 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
 
     /**
      * The response schema's suggestion enum IS the constant - not a copy of it - and the field
-     * stays required.
+     * Stays required.
      */
     public function test_schema_enum_matches_single_source_and_is_required(): void {
         $task = new validate_questions_task();
@@ -82,14 +77,12 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
 
     /**
      * The assembled prompt names exactly the three values, and the values come from code rather
-     * than from the (admin-editable) template - so editing the template cannot desynchronise them.
+     * Than from the (admin-editable) template - so editing the template cannot desynchronise them.
      */
     public function test_assembled_prompt_contains_exactly_the_three_values(): void {
         global $CFG;
 
         $this->resetAfterTest();
-        // Admin-066: an empty setting is now an empty prompt - there is no fallback to a shipped
-        // template. Seed the same file install and upgrade use.
         foreach (require($CFG->dirroot . '/local/artqtml/db/prompt_defaults.php') as $s => $v) {
             set_config($s, $v, 'local_artqtml');
         }
@@ -118,8 +111,8 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
         }
 
         // The shipped template carries a placeholder, never the values themselves. An admin may
-        // rewrite the sentence around {{SUGGESTION_VALUES}}; they cannot make the prompt name a
-        // value the schema would reject, because they never type the list.
+        // Rewrite the sentence around {{SUGGESTION_VALUES}}; they cannot make the prompt name a
+        // Value the schema would reject, because they never type the list.
         global $CFG;
         $shipped = require($CFG->dirroot . '/local/artqtml/db/prompt_defaults.php');
         $this->assertStringContainsString('{{SUGGESTION_VALUES}}', $shipped['validationpromptsuggestion']);
@@ -134,14 +127,7 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
 
     /**
      * An admin who rewrites the template around the placeholder still gets all three values, and
-     * never types one of them.
-     *
-     * This test used to assert that the values survived *any* template, because the code appended
-     * the clause after it. Since 2026-07-31 the whole prompt is editable (Admin-066/067), so a
-     * template without {{SUGGESTION_INSTRUCTION}} has no clause - the accepted cost of a readable
-     * prompt. What survives, and is the guarantee worth pinning, is that the values themselves are
-     * still code-owned: the administrator writes the sentence, the placeholder brings the list, and
-     * nothing an administrator types can name a value the schema would reject.
+     * Never types one of them.
      */
     public function test_values_survive_an_admin_template_override(): void {
         global $CFG;
@@ -173,7 +159,7 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
     }
 
     /**
-     * Val-017: every displayable value has a lang label; the raw key never reaches the UI.
+     * Every displayable value has a lang label; the raw key never reaches the UI.
      */
     public function test_every_value_has_a_lang_label(): void {
         $this->resetAfterTest();
@@ -187,9 +173,6 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
 
         $this->assertSame('Accepted', validation_suggestion::label(validation_suggestion::ACCEPTED));
 
-        // Val-017's Hungarian labels are asserted against the shipped lang file rather than via
-        // force_current_language('hu'): the CI/PHPUnit install carries only the English pack, so
-        // get_string() would silently fall back to English and assert nothing.
         $hu = [];
         require(__DIR__ . '/../../lang/hu/local_artqtml.php');
         $hu = $string;
@@ -201,7 +184,7 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
     }
 
     /**
-     * normalise() keeps the three and falls back for anything else.
+     * Normalise() keeps the three and falls back for anything else.
      */
     public function test_normalise(): void {
         foreach (validation_suggestion::VALUES as $value) {
@@ -217,7 +200,7 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
     }
 
     /**
-     * F-1: no file outside the constant's own definition re-types the three-value list.
+     * No file outside the constant's own definition re-types the three-value list.
      */
     public function test_no_file_outside_the_constant_repeats_the_literal_list(): void {
         $root = realpath(__DIR__ . '/../..');
@@ -259,10 +242,7 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
     }
 
     /**
-     * A minimal generation for build_system_instruction(), which since Val-031 takes the record so
-     * it can substitute the difficulty definitions for THAT generation's mode. Scale mode, because
-     * that is what the shipped default is and what these assertions describe; free text would
-     * deliberately leave the difficulty clause empty.
+     * scale generation.
      *
      * @return \stdClass
      */

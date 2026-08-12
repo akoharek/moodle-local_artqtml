@@ -18,14 +18,11 @@
  * Library functions and callbacks for local_artqtml.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /**
  * Add a link to the ArtQTML into the primary/global navigation.
- *
- * The plugin is site-wide (Glob-022/023), not tied to any course, so the link is
- * added to the root of the navigation tree rather than a course settings block.
  *
  * @param global_navigation $navigation the global navigation tree
  * @return void
@@ -57,7 +54,7 @@ function local_artqtml_extend_navigation(global_navigation $navigation) {
  * Map a generation status to a Bootstrap badge CSS class.
  *
  * Thin wrapper kept for the existing call sites; the map itself lives with the status values in
- * {@see \local_artqtml\local\generation_status} so the six-value set has one home (List-018).
+ * {@see \local_artqtml\local\generation_status} so the six-value set has one home.
  *
  * @param string $status one of \local_artqtml\local\generation_status::VALUES
  * @return string badge CSS class
@@ -67,10 +64,7 @@ function local_artqtml_status_badge_class(string $status): string {
 }
 
 /**
- * Map a question validationsuggestion to a Bootstrap badge CSS class (Jov-007).
- *
- * Thin wrapper kept for the existing call sites; the map itself lives with the suggestion values
- * in {@see \local_artqtml\local\validation_suggestion} so the set has one home (Val-017).
+ * Map a question validationsuggestion to a Bootstrap badge CSS class.
  *
  * @param string $status one of \local_artqtml\local\validation_suggestion::DISPLAY, or 'edited'
  * @return string badge CSS class
@@ -80,13 +74,10 @@ function local_artqtml_validation_badge_class(string $status): string {
 }
 
 /**
- * Render the "Test connection" button + status + model select markup for one provider
- * (Admin-011/012/017/018), used by settings.php's Generator/Validator LLM tabs.
- *
  * Deliberately kept out of settings.php: Moodle can include a plugin's settings.php more
- * than once per request while building/caching the admin tree, which would fatal-error on
- * a plain top-level function redeclaration. lib.php is loaded via include_once through the
- * component callback mechanism, so it does not have that problem.
+ * Than once per request while building/caching the admin tree, which would fatal-error on
+ * A plain top-level function redeclaration. lib.php is loaded via include_once through the
+ * Component callback mechanism, so it does not have that problem.
  *
  * @param string $provider 'claude' or 'gemini'
  * @return string
@@ -96,11 +87,6 @@ function local_artqtml_render_test_button(string $provider): string {
 
     $PAGE->requires->js(new moodle_url('/local/artqtml/js/admintest.js'));
 
-    // Cursor audit v3 #10: admintest.js is a plain (non-AMD) script, so core/str's async
-    // fetch isn't available to it - data_for_js() is the equivalent mechanism for that style of
-    // script, injecting these once as a plain JS object literal instead of hardcoding English
-    // text in the .js file. Guarded since this function runs once per provider (claude/gemini)
-    // on the same page - only the first call needs to emit it.
     static $stringsemitted = false;
     if (!$stringsemitted) {
         $PAGE->requires->data_for_js('M.artqtml_admintest', [
@@ -118,10 +104,6 @@ function local_artqtml_render_test_button(string $provider): string {
         'data-testid' => 'artqtml-admin-connectiontest-' . $provider,
     ]);
     $html .= html_writer::tag('span', '', ['id' => $statusid, 'class' => 'ml-2']);
-    // Admin-048: no second model control here. This button used to render its own <select> of
-    // fetched models next to the model text field, so the tab carried two model controls at once -
-    // exactly the duplicate the field table's negative assertion targets. The model field is now
-    // itself the select (setting_modelselect), fed from the cached list.
     $html .= html_writer::script(
         'document.addEventListener("DOMContentLoaded", function() {' .
         'if (window.ArtqtmlAdminTest) {' .
@@ -134,10 +116,10 @@ function local_artqtml_render_test_button(string $provider): string {
 }
 
 /**
- * Render the model-list actions for one LLM tab: "Refresh models" (Admin-046).
+ * Render the model-list actions for one LLM tab: "Refresh models".
  *
  * Plain links with a sesskey rather than AJAX: the actions change server state and the page must
- * re-render from the refreshed cache anyway, so a round trip is the honest mechanism and needs no
+ * Re-render from the refreshed cache anyway, so a round trip is the honest mechanism and needs no
  * JavaScript to be testable.
  *
  * @param string $provider one of \local_artqtml\local\model_list::PROVIDERS
@@ -155,8 +137,6 @@ function local_artqtml_render_model_buttons(string $provider): string {
         'data-testid' => 'artqtml-admin-refreshmodels-' . $provider,
     ]);
 
-    // Admin-054: run the same check the scheduled task runs, immediately. Success clears the
-    // blocking state, failure sets it - and this and the scheduled task are the only writers.
     $checkurl = new moodle_url('/local/artqtml/modelaction.php', [
         'provider' => $provider,
         'action'   => 'check',
@@ -167,8 +147,7 @@ function local_artqtml_render_model_buttons(string $provider): string {
         'data-testid' => 'artqtml-admin-runmodelcheck-' . $provider,
     ]);
 
-    // Admin-045: say how old the cached list is, so "the dropdown looks wrong" has an obvious
-    // first thing to check.
+    // Say how old the cached list is, so "the dropdown looks wrong" has an obvious first thing to check.
     $cached = \local_artqtml\local\model_list::get_cached($provider);
     if ($cached !== null) {
         $html .= html_writer::span(
@@ -186,9 +165,7 @@ function local_artqtml_render_model_buttons(string $provider): string {
 }
 
 /**
- * Render a yellow "you're viewing someone else's generation" banner (Glob-031): local/artqtml
- * is a site-wide, not per-owner-locked tool - any user with local/artqtml:use can open and act
- * on any generation, but should always be told clearly whose it is when it isn't their own.
+ * local artqtml owner warning banner.
  *
  * @param stdClass $generation the local_artqtml_generations record being viewed
  * @return string empty string if the current user is the generation's own owner
@@ -212,8 +189,7 @@ function local_artqtml_owner_warning_banner(stdClass $generation): string {
 }
 
 /**
- * Render a red "draft course not configured" banner (Jov-023) - shown on every admin tab,
- * since new generations are blocked site-wide (upload.php/generate.php) for as long as this is true.
+ * local artqtml draftcourse warning banner.
  *
  * @return string empty string if the draft course is configured and exists
  */
@@ -226,9 +202,6 @@ function local_artqtml_draftcourse_warning_banner(): string {
 }
 
 /**
- * Glob-038: after an upgrade backed up an admin-editable setting, tell the administrator which
- * setting changed and where the previous value is.
- *
  * Shown once - reading it clears the pending notices - and only to users who could act on it.
  *
  * @return string HTML, or '' when there is nothing pending
@@ -258,7 +231,7 @@ function local_artqtml_setting_backup_notice(): string {
 }
 
 /**
- * Glob-036/Admin-065: the model blocking warning bar, shown on every plugin surface.
+ * The model blocking warning bar, shown on every plugin surface.
  *
  * Returns '' when neither provider is blocked, so callers can render it unconditionally.
  *

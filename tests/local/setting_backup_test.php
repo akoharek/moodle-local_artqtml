@@ -17,16 +17,16 @@
 namespace local_artqtml\local;
 
 /**
- * Unit tests for the migration setting backup (Glob-037, Glob-038).
+ * Unit tests for the migration setting backup.
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\setting_backup
  */
 final class setting_backup_test extends \advanced_testcase {
     /**
-     * Glob-037: the previous value is stored under <setting>_backup_<version> before the change.
+     * The previous value is stored under <setting>_backup_<version> before the change.
      */
     public function test_backup_stores_the_previous_value(): void {
         $this->resetAfterTest();
@@ -47,10 +47,10 @@ final class setting_backup_test extends \advanced_testcase {
      * Nothing set means nothing to lose - no backup key and no notice noise.
      *
      * Uses a setting with no shipped default on purpose: for one that HAS a default, get_config()
-     * returns that default even when the administrator never touched it, so the "no value" branch
-     * is unreachable through it. That is also the honest limitation of this helper - it cannot tell
-     * an untouched default from a deliberate choice, so it backs both up. Backing up a value that
-     * turns out to be the default is harmless; the reverse would not be.
+     * Returns that default even when the administrator never touched it, so the "no value" branch
+     * Is unreachable through it. That is also the honest limitation of this helper - it cannot tell
+     * An untouched default from a deliberate choice, so it backs both up. Backing up a value that
+     * Turns out to be the default is harmless; the reverse would not be.
      */
     public function test_no_backup_when_there_is_no_value(): void {
         $this->resetAfterTest();
@@ -65,7 +65,7 @@ final class setting_backup_test extends \advanced_testcase {
 
     /**
      * "A mentés nem íródik felül": a second backup at the same version keeps the first, which is
-     * the more original value, and takes a suffixed key instead.
+     * The more original value, and takes a suffixed key instead.
      */
     public function test_an_existing_backup_is_never_overwritten(): void {
         $this->resetAfterTest();
@@ -83,8 +83,7 @@ final class setting_backup_test extends \advanced_testcase {
     }
 
     /**
-     * Glob-037: an encrypted setting's backup is encrypted too - a backup must not downgrade a
-     * secret to plaintext.
+     * An encrypted setting's backup is encrypted too - a backup must not downgrade a secret to plaintext.
      */
     public function test_encrypted_setting_is_backed_up_encrypted(): void {
         $this->resetAfterTest();
@@ -101,7 +100,7 @@ final class setting_backup_test extends \advanced_testcase {
     }
 
     /**
-     * Glob-038: the administrator is told which setting changed and where the old value is.
+     * The administrator is told which setting changed and where the old value is.
      */
     public function test_notices_are_recorded_rendered_and_cleared(): void {
         $this->resetAfterTest();
@@ -118,7 +117,7 @@ final class setting_backup_test extends \advanced_testcase {
 
         $messages = setting_backup::notice_messages();
         $this->assertCount(2, $messages);
-        // The message names both the setting and the key, which is what Glob-038 requires.
+        // The message names both the setting and the key, which is what requires.
         $this->assertStringContainsString('validatorprompttemplate', $messages[0]);
         $this->assertStringContainsString('validatorprompttemplate_backup_2026072602', $messages[0]);
         $this->assertStringNotContainsString('[[', $messages[0], 'settingbackednotice is missing from the lang file');
@@ -129,26 +128,21 @@ final class setting_backup_test extends \advanced_testcase {
     }
 
     /**
-     * Light is a new plugin identity: upgrade.php carries no Full migration history.
+     * New plugin identity: upgrade.php carries no prior migration history.
      *
-     * The setting_backup helper remains for any future Light step that rewrites a prompt template.
+     * The setting_backup helper remains for any future step that rewrites a prompt template.
      */
-    public function test_upgrade_file_is_light_stub_without_full_history(): void {
+    public function test_upgrade_file_is_stub_without_prior_history(): void {
         $upgrade = file_get_contents(__DIR__ . '/../../db/upgrade.php');
 
-        $this->assertStringContainsString('install.xml', $upgrade);
+        $this->assertStringContainsString('new plugin identity', strtolower($upgrade));
         $this->assertStringContainsString('migration history', $upgrade);
-        $this->assertStringContainsString('new plugin identity', $upgrade);
         $this->assertTrue(
             class_exists(setting_backup::class),
-            'setting_backup must stay available for future Light prompt migrations'
+            'setting_backup must stay available for future prompt migrations'
         );
     }
 
-    /**
-     * Glob-037 ENFORCEMENT for Light: every prompt-template write in upgrade.php must be paired
-     * with setting_backup::backup(). Light ships with zero such writes today.
-     */
     public function test_future_template_migrations_must_back_up(): void {
         $upgrade = file_get_contents(__DIR__ . '/../../db/upgrade.php');
 
@@ -165,7 +159,7 @@ final class setting_backup_test extends \advanced_testcase {
             0,
             $writes - $backups,
             "An upgrade step writes a prompt-template setting without a preceding "
-            . "setting_backup::backup() call (Glob-037). Template set_config writes: $writes; "
+            . "setting_backup::backup call . Template set_config writes: $writes"
             . "backup calls: $backups. Add the backup call before the write."
         );
     }

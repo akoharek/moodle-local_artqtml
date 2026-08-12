@@ -1,28 +1,22 @@
 <?php
 /**
  * Standalone dev/QA tool: measures what a generation actually sends to the generator API, and
- * projects what the same generation would cost if it were split into one call per question type.
- *
- * Written for the "one prompt or one per type?" decision (BL-33). The argument for splitting is
- * that the schema becomes unambiguous and the type/difficulty pairing becomes exact; the argument
- * against is that the source text is re-sent with every call. Which wins depends on how much of a
- * request the source text actually is - a number nobody had, so this prints it instead of
- * estimating it.
+ * Projects what the same generation would cost if it were split into one call per question type.
  *
  * It measures through the plugin's own code (`generate_questions_task::build_prompt()` and
  * `question_schema::build()`), reached by reflection because both are protected. A second
- * implementation here would be a second source of truth, and the whole point is to measure what
- * really goes out.
+ * Implementation here would be a second source of truth, and the whole point is to measure what
+ * Really goes out.
  *
  * Token figures are the plugin's own rough estimate - characters / 4, the same divisor
- * validate_questions_task uses for batching. Treat them as proportions, not invoices.
+ * Validate_questions_task uses for batching. Treat them as proportions, not invoices.
  *
  * NOT part of the shipped plugin - `tools/` is excluded from the deployment zip, from phpcs and
- * from phpstan.
+ * From phpstan.
  *
  * Usage, from the Moodle root inside the webserver container:
- *   php local/artqtml/tools/prompt_size.php --generationid=1258
- *   php local/artqtml/tools/prompt_size.php --latest
+ * Php local/artqtml/tools/prompt_size.php --generationid=1258
+ * Php local/artqtml/tools/prompt_size.php --latest
  */
 
 define('CLI_SCRIPT', true);
@@ -65,7 +59,7 @@ if (!is_array($settings)) {
 
 /**
  * Call generate_questions_task::build_prompt() for a settings array. Protected on purpose; this is
- * a measuring tool, and measuring a copy would measure the copy.
+ * A measuring tool, and measuring a copy would measure the copy.
  *
  * @param \stdClass $generation
  * @param array $settings

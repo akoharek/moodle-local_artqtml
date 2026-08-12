@@ -14,9 +14,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Keeps the upload page's Continue button disabled until the Generation name, Shortname, and
- * Source text (or an uploaded file) are all filled in (Felt-025).
- *
  * Plain JS (no AMD/grunt build), matching this plugin's other JS files.
  *
  * @package    local_artqtml

@@ -15,21 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Migration backup for admin-editable settings (Glob-037, Glob-038).
- *
- * Glob-037: "Minden adatbázis-migráció, amely adminisztrátor által szerkeszthető beállítás értékét
- * módosítja, a módosítás előtt elmenti a korábbi értéket. Titkosítva tárolt beállítás esetén a
- * mentés is titkosítva történik."
+ * Migration backup for admin-editable settings.
  *
  * The reason this exists at all: the validator prompt template is the administrator's own work - an
- * evaluation instruction tuned to their subject area - and a plugin upgrade must not destroy it
- * irrecoverably. It has already happened twice (the problem_category migration and the SUGGESTIONS
- * one, upgrade step 2026072600), both of which rewrote the stored template in place with no backup.
+ * Evaluation instruction tuned to their subject area - and a plugin upgrade must not destroy it
+ * Irrecoverably. It has already happened twice (the problem_category migration and the SUGGESTIONS
+ * One, upgrade step 2026072600), both of which rewrote the stored template in place with no backup.
  * Those steps have already run and cannot be fixed retroactively; this rule binds every migration
- * written from here on.
+ * Written from here on.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -45,7 +41,7 @@ class setting_backup {
      * Back up a setting's current value before a migration changes it.
      *
      * Call this BEFORE writing the new value. Returns the key the previous value was stored under,
-     * or null if there was nothing to back up.
+     * Or null if there was nothing to back up.
      *
      * @param string $setting the plugin setting name, e.g. 'validatorprompttemplate'
      * @param int $version the plugin version of the migration doing the change
@@ -62,8 +58,8 @@ class setting_backup {
         $key = self::backup_key($setting, $version);
 
         // Spec, "A mentés nem íródik felül": if this key already exists (a re-run of the same upgrade
-        // step, or a restored database) the earlier backup is the more original value and wins. A
-        // suffixed key is used rather than clobbering it.
+        // Step, or a restored database) the earlier backup is the more original value and wins. A
+        // Suffixed key is used rather than clobbering it.
         if (get_config('local_artqtml', $key) !== false) {
             $suffix = 2;
             while (get_config('local_artqtml', $key . '_' . $suffix) !== false) {
@@ -75,12 +71,12 @@ class setting_backup {
         $store = $current;
         if ($encrypted) {
             // The original is stored encrypted, so the backup is too - a backup that downgrades a
-            // secret to plaintext would be worse than no backup.
+            // Secret to plaintext would be worse than no backup.
             try {
                 $store = \core\encryption::encrypt((string) $current);
             } catch (\Throwable $e) {
                 // Encryption unavailable: the original could not have been encrypted either, so
-                // the value is already plaintext and is stored as-is rather than lost.
+                // The value is already plaintext and is stored as-is rather than lost.
                 $store = $current;
             }
         }
@@ -103,7 +99,7 @@ class setting_backup {
     }
 
     /**
-     * Record that a setting was backed up, for the post-upgrade administrator notice (Glob-038).
+     * Record that a setting was backed up, for the post-upgrade administrator notice.
      *
      * @param string $setting
      * @param string $key
@@ -141,7 +137,7 @@ class setting_backup {
     }
 
     /**
-     * Glob-038: the notice text telling the administrator what changed and where the old value is.
+     * The notice text telling the administrator and where the old value is.
      *
      * @return string[] one rendered message per backed-up setting
      */

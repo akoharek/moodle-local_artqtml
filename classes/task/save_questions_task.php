@@ -15,17 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * M-15's third pipeline stage ("saving"): commits a generation's Claude-generated questions and
- * their Gemini validation results to local_artqtml_questions and the real Moodle question bank,
- * all in a single transaction, then marks the generation completed.
- *
  * Invoked from {@see process_pending_generations} once {@see generate_questions_task} and
  * {@see validate_questions_task} have both finished - see those classes for why the pipeline is
- * split this way (generating/validating hold everything in $generation->pendingdata; nothing
- * touches local_artqtml_questions or creates a real Moodle question until this stage runs).
+ * Split this way (generating/validating hold everything in $generation->pendingdata; nothing
+ * Touches local_artqtml_questions or creates a real Moodle question until this stage runs).
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\task;
@@ -66,8 +62,8 @@ class save_questions_task {
             $evaluations = is_array($pending['evaluations'] ?? null) ? $pending['evaluations'] : [];
 
             // The transaction is rolled back explicitly (and its exception rethrown) on any
-            // failure, so a partial batch of real questions/local_artqtml_questions rows is
-            // never left half-committed - the outer catch's cleanup then finds nothing to undo.
+            // Failure, so a partial batch of real questions/local_artqtml_questions rows is
+            // Never left half-committed - the outer catch's cleanup then finds nothing to undo.
             $savedcount = 0;
             $transaction = $DB->start_delegated_transaction();
             try {
@@ -76,12 +72,6 @@ class save_questions_task {
                 $generation = $DB->get_record('local_artqtml_generations', ['id' => $generationid]);
                 $generation->pendingdata = null;
 
-                // BL-30/BL-35: the count that matters to the teacher is what ended up in the
-                // draft bank, and until now nothing compared it to what was asked for. M-08 does
-                // compare, but one stage earlier and against Claude's raw output - which is why
-                // nine empty generations that saved nothing at all recorded no discrepancy and were
-                // shown as Completed with a full green bar: Claude had returned six questions
-                // every time, and all six were rejected here, after M-08 had already looked.
                 $shortfall = $this->store_save_discrepancy($generation, $settings, $userid);
 
                 $this->set_status(
@@ -109,9 +99,7 @@ class save_questions_task {
     }
 
     /**
-     * Create every accepted raw question as a real Moodle question in the generation's draft
-     * bank, and insert its local_artqtml_questions row already carrying its merged validation
-     * result - the combined write M-15 asks for, all within the caller's transaction.
+     * Helper.
      *
      * @param \stdClass $generation
      * @param array $settings decoded settings JSON
@@ -120,18 +108,7 @@ class save_questions_task {
      * @return int number of questions actually saved
      */
     /**
-     * Compare what actually reached the draft bank with what the teacher asked for, per question
-     * type, and record the difference on the generation (BL-30/BL-35).
-     *
-     * This is M-08's comparison, repeated at the only point where the answer is final. The
-     * generating stage's version asks "did Claude return what we ordered?"; this one asks "did the
-     * teacher get what they ordered?", and the two can differ by everything - a question can be
-     * returned, validated, and then dropped by the semantic check on the way in
-     * ({@see \local_artqtml\local\question\question_semantic_validator}), which is exactly
-     * what happened when empty generations were still labelled Completed before 2026-08-01.
-     *
-     * Overwrites whatever M-08 stored rather than merging: this measurement supersedes it, and two
-     * discrepancy lists on one row would be a question about which one to believe.
+     * store save discrepancy.
      *
      * @param \stdClass $generation the generation, already reloaded inside the save transaction
      * @param array $settings decoded settings, holding the requested per-type counts
@@ -170,8 +147,8 @@ class save_questions_task {
         $this->log_event($generation->id, 'save_count_discrepancy', ['discrepancies' => $discrepancies], $userid);
 
         // Only a shortfall makes a generation partly successful. More questions than requested is
-        // also a discrepancy worth showing - it happened once, 7 delivered against 6 asked for -
-        // but the teacher has lost nothing, so the run is complete.
+        // Also a discrepancy worth showing - it happened once, 7 delivered against 6 asked for -
+        // But the teacher has lost nothing, so the run is complete.
         foreach ($discrepancies as $entry) {
             if ($entry['received'] < $entry['requested']) {
                 return true;
@@ -206,15 +183,8 @@ class save_questions_task {
                 continue;
             }
 
-            // Gen-022/025: feedbackenabled/hintenabled are already per-type keys on
-            // $settings['types'][$typecode] (generate.php's settings builder) - no longer a
-            // single generation-wide flag to overlay here. Resolved before validation so the
-            // validator can enforce SR's per-generation exact item count (v20 #7).
             $typesettings = $settings['types'][$typecode] ?? [];
 
-            // M-07: reject AI output that is structurally valid JSON but semantically broken
-            // (e.g. a single-answer question with two "correct" options) before it ever becomes
-            // a real Moodle question - log it instead of silently importing something unusable.
             $rejectreason = question_importer::validate($typecode, $question, $typesettings);
             if ($rejectreason !== null) {
                 $this->log_event($generation->id, 'question_rejected', [
@@ -237,8 +207,6 @@ class save_questions_task {
                 (int) $generation->id
             );
 
-            // Val-013: a question with no matching Gemini evaluation (dropped mid-batch, or the
-            // generation was abandoned before validation reached it) is simply not_evaluated.
             $evaluation = $evaluations[$pseudoid] ?? null;
 
             $record = new \stdClass();
@@ -270,10 +238,10 @@ class save_questions_task {
 
     /**
      * Full rollback on unrecoverable failure: delete any real questions already committed (there
-     * won't be any - the transaction in {@see self::process()} rolls those back itself - this is
-     * defensive, matching the same cleanup {@see generate_questions_task::rollback()} and
+     * Won't be any - the transaction in {@see self::process()} rolls those back itself - this is
+     * Defensive, matching the same cleanup {@see generate_questions_task::rollback()} and
      * {@see validate_questions_task::process()}'s failure path use), delete the draft category,
-     * and return the generation to a retryable failed state.
+     * And return the generation to a retryable failed state.
      *
      * @param int $generationid
      * @param string $errormessage
@@ -296,10 +264,6 @@ class save_questions_task {
         $DB->delete_records('local_artqtml_questions', ['generationid' => $generationid]);
         $transaction->allow_commit();
 
-        // M-15: pendingdata (still holding both the questions and their evaluations at this
-        // stage) is deliberately left as-is - status.php uses its presence/shape to tell which
-        // stage a failed generation actually got to, for the progress bar's failed-percent. A
-        // full "retry" (status.php's own rollback helper) is what clears it for a clean restart.
         $this->set_status($generation, \local_artqtml\local\generation_status::FAILED, $errormessage);
         $this->log_event($generationid, 'error', ['message' => $errormessage], $userid ?? (int) $generation->userid);
     }

@@ -17,14 +17,14 @@
 namespace local_artqtml\task;
 
 /**
- * Unit tests for the Claude generation task's system-prompt building (technical annex 3.2) -
- * specifically that every {{PLACEHOLDER}} in the template is substituted.
+ * Unit tests for the Claude generation task's system-prompt building
+ * Specifically that every {{PLACEHOLDER}} in the template is substituted.
  *
- * ArtQTML Light: scale + sourceonly; user message is source text only (no teacher_preferences).
+ * Scale + sourceonly; user message is source text only.
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\task\generate_questions_task
  */
 final class generate_questions_task_test extends \advanced_testcase {
@@ -35,9 +35,6 @@ final class generate_questions_task_test extends \advanced_testcase {
      * @return string
      */
     protected function build_prompt(array $settings): string {
-        // Admin-066: the prompt lives in config, seeded from db/prompt_defaults.php by
-        // install/upgrade. A unit test gets no install step, so it seeds the same file - which is
-        // also what keeps this test honest about what a real site runs.
         global $CFG;
         foreach (require($CFG->dirroot . '/local/artqtml/db/prompt_defaults.php') as $setting => $text) {
             set_config($setting, $text, 'local_artqtml');
@@ -51,7 +48,7 @@ final class generate_questions_task_test extends \advanced_testcase {
 
     /**
      * Every placeholder is replaced (no {{...}} token survives) and the substituted values are
-     * present.
+     * Present.
      */
     public function test_build_prompt_replaces_all_placeholders(): void {
         $this->resetAfterTest();
@@ -70,7 +67,7 @@ final class generate_questions_task_test extends \advanced_testcase {
         $this->assertStringContainsString('(SR)', $prompt);
         $this->assertStringContainsString('szöveg szerint', $prompt);
         $this->assertStringContainsString('according to the text', $prompt);
-        // Light always uses the sourceonly knowledge fragment.
+        // Always uses the sourceonly knowledge fragment.
         $this->assertStringContainsString('Only use facts found in the source text', $prompt);
     }
 
@@ -112,7 +109,7 @@ final class generate_questions_task_test extends \advanced_testcase {
     }
 
     /**
-     * BL-29: the True/False explanation clause goes only to True/False, and only when asked for.
+     * The True/False explanation clause goes only to True/False, and only when asked for.
      */
     public function test_the_truefalse_explanation_clause_goes_only_to_truefalse(): void {
         $this->resetAfterTest();
@@ -177,7 +174,7 @@ final class generate_questions_task_test extends \advanced_testcase {
     }
 
     /**
-     * Invalid UTF-8 produces a message rather than a failed generation.
+     * Invalid UT produces a message rather than a failed generation.
      */
     public function test_invalid_utf8_does_not_break_the_user_message(): void {
         $this->resetAfterTest();
@@ -193,7 +190,7 @@ final class generate_questions_task_test extends \advanced_testcase {
     }
 
     /**
-     * Light: the user payload is only content_type + source_text (no teacher_preferences).
+     * The user payload is only content_type + source_text.
      */
     public function test_user_payload_has_no_teacher_preferences(): void {
         $this->resetAfterTest();
@@ -216,7 +213,7 @@ final class generate_questions_task_test extends \advanced_testcase {
     }
 
     /**
-     * Admin per-type defaults still reach the system prompt (Admin-027).
+     * Admin per-type defaults still reach the system prompt.
      */
     public function test_admin_instruction_defaults_reach_the_system_prompt(): void {
         $this->resetAfterTest();

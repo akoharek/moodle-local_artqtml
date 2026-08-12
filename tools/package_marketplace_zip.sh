@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build a Moodle Marketplace ZIP for ArtQTML Light: top-level folder artqtml/, lang/en only.
+# Build a Moodle Marketplace ZIP for ArtQTML: top-level folder artqtml/, lang/en only.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -23,6 +23,7 @@ rsync -a \
   --exclude '.cursor/' \
   --exclude '.agents/' \
   --exclude '.claude/' \
+  --exclude '.devtools/' \
   --exclude 'node_modules/' \
   --exclude 'screens/' \
   --exclude 'assets/' \
@@ -83,6 +84,7 @@ forbidden_prefixes = (
     "artqtml/tools/",
     "artqtml/.git/",
     "artqtml/CLAUDE.md",
+    "artqtml/BACKLOG.md",
     "artqtml/license.php",
 )
 for f in forbidden_prefixes:

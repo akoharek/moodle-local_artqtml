@@ -15,16 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Shared HTTP-level exponential backoff for Claude/Gemini adhoc tasks (technical annex 2.4).
+ * Shared HTTP-level exponential backoff for Claude/Gemini adhoc tasks.
  *
  * The HTTP-level retry (max 3 attempts: immediate, 2s, 4s + 0-20% jitter) and the JSON-fallback
- * retry (max 2 attempts, independent counter, tokens excluded from the monthly budget) are
- * deliberately separate mechanisms per the technical annex (2.3/2.4) - this trait only
- * implements the former. Callers loop the JSON-fallback themselves around a call to
+ * Retry (max 2 attempts, independent counter) are separate mechanisms — this trait only
+ * Implements the former. Callers loop the JSON-fallback themselves around a call to
  * {@see self::http_with_backoff()}.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\task;
@@ -34,34 +33,31 @@ namespace local_artqtml\task;
  */
 trait retry_trait {
     /**
+     * Helper.
+     *
      * @var int[] HTTP status codes considered retryable (Claude 429/500/504/529, Gemini 429/500/503/504).
      *
-     * Defined in ai_request rather than here as of 2026-08-03: the model check needs the same
-     * judgement - "the provider is busy" must not be recorded as "this model cannot be used" - and
-     * a second copy of this list is exactly the kind of duplicate that drifts apart unnoticed.
+     * Shared with {@see \local_artqtml\local\ai_request::TRANSIENT_HTTP} so "provider busy"
+     * Is not recorded as "this model cannot be used".
      */
     protected const RETRYABLE_HTTP = \local_artqtml\local\ai_request::TRANSIENT_HTTP;
 
-    /** @var int maximum HTTP-level attempts (technical annex 2.4). */
+    /** @var int maximum HTTP-level attempts. */
     public const MAX_HTTP_ATTEMPTS = 3;
 
     /**
+     * Helper.
+     *
      * @var float worst-case total backoff sleep across one exhausted HTTP retry cycle, in seconds.
      *
      * Annex 2.4: 2 s before attempt 2 and 4 s before attempt 3, each with up to 20% jitter, so
      * 2 x 1.2 + 4 x 1.2. Public so process_pending_generations can size its time limit from the
-     * same numbers {@see self::backoff_sleep()} actually sleeps for, rather than a copy.
+     * Same numbers {@see self::backoff_sleep()} actually sleeps for, rather than a copy.
      */
     public const MAX_BACKOFF_SECONDS = 7.2;
 
     /**
      * Run an HTTP request callable with exponential backoff on retryable status codes.
-     *
-     * M-12: every intermediate retryable failure (429/500/503/504/529 or a curl-level error) is
-     * logged to local_artqtml_log before sleeping/retrying, not just whichever attempt
-     * ultimately succeeds or exhausts the retry budget - relies on the consuming class also
-     * using {@see generation_status_trait} for log_ai_call(), same as call_claude()/call_gemini()
-     * already assume for their own final-result logging.
      *
      * @param callable $requestfn () => array{httpcode:int, body:string, curlerror:string}
      * @param int $generationid
@@ -105,7 +101,7 @@ trait retry_trait {
 
     /**
      * Extract the technical error.message from a Claude/Gemini error response body - both
-     * providers use the same {"error": {"message": "..."}} shape.
+     * Providers use the same {"error": {"message": "..."}} shape.
      *
      * @param string $body
      * @return string
@@ -119,7 +115,7 @@ trait retry_trait {
      * Sleep for the backoff duration before HTTP retry attempt $attempt + 1.
      *
      * Attempt 1 -> immediate (no sleep), attempt 2 -> ~2s, attempt 3 -> ~4s, each with
-     * 0-20% jitter (technical annex 2.4 table).
+     * 0-20% jitter ( table).
      *
      * @param int $attempt the attempt number that just failed (1-based)
      * @return void
@@ -141,10 +137,7 @@ trait retry_trait {
     }
 
     /**
-     * M-11: a 4xx client error (bad request, auth, not found, payload too large, ...) other than
-     * 429 (rate limit, which IS retryable) means the request itself is wrong and will fail
-     * identically on every retry - callers must fail immediately rather than looping through the
-     * JSON-fallback attempts as if this were a transient/formatting problem.
+     * is nonretryable client error.
      *
      * @param int $httpcode
      * @return bool

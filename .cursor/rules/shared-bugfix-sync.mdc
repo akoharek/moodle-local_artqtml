@@ -1,0 +1,10 @@
+---
+description: Port shared ArtQTML bugfixes to related maintainer variants in the same decision round
+alwaysApply: true
+---
+
+# Shared bugfix sync across related ArtQTML codebases
+
+When fixing a bug on a **shared behavior / shared code path** in this plugin, also port the same fix in the same decision round to any related private ArtQTML codebase the maintainer tracks.
+
+Do **not** copy product-specific features across variants — only shared bugfixes and shared behavior.

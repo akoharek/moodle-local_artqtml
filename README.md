@@ -1,16 +1,14 @@
-# ArtQTML (local_artqtml) — Light
+# ArtQTML (local_artqtml)
 
 Moodle local plugin that generates quiz questions with **Claude**, validates them with **Gemini**, then lets teachers review and approve into the question bank.
 
-This is the **Light** Marketplace edition (GPLv3+):
+Scope (GPLv3+):
 
 - Source: paste/type or **`.txt`** upload
 - Types: true/false (IH), single-choice (FE), ordering (SR — requires `qtype_ordering`)
 - Difficulty: easy / medium / hard
 - Review: edit, approve, delete, **single-question** move to the bank
-- Admin: API keys (BYOK), models, connection test, draft course, thin type defaults
-
-Not included (separate Full product): PDF/DOCX, FT/EH/RV types, Bloom, free-text instruction, own-knowledge mode, bulk move, institutional prompt editing, token admin UI, `.lic` entitlement.
+- Admin: API keys (BYOK — Claude + Gemini), models, connection test, draft course, thin type defaults
 
 ## Requirements
 
@@ -57,5 +55,3 @@ Please use the issue templates (Bug report, Feature request, or Other / code iss
 > Magyarul: hibákat, funkciókéréseket és egyéb kódproblémákat a fenti nyilvános GitHub Issues oldalon várjuk (sablonok angolul).
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to report issues and propose changes.
-
-Maintainers: optional Teams/email alerts on issue events — see [SUPPORT.md](SUPPORT.md).

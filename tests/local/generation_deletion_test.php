@@ -17,24 +17,14 @@
 namespace local_artqtml\local;
 
 /**
- * Pins Glob-040 (V-06): deleting a generation must NOT delete its diagnostic log rows.
- *
- * This exercises the real production deletion path (generation_deletion::purge(), which delete.php
- * and generate.php's abort-delete both call), not a hand-rolled copy of the deletes - so if anyone
- * re-adds a local_artqtml_log delete to that path "for consistency" with the other two, this
- * fails. TC to register at the next register change (alongside TC-Gen-060): TC-Glob-067.
+ * Pins: deleting a generation must NOT delete its diagnostic log rows.
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\generation_deletion
  */
 final class generation_deletion_test extends \advanced_testcase {
-    /**
-     * Seed a generation with questions and log rows, delete it through the production path, and
-     * assert the generation and its questions are gone while its log rows remain (Glob-040) -
-     * carrying the deleted generation's id in originalgenerationid, with generationid cleared.
-     */
     public function test_deleting_a_generation_keeps_its_log_rows(): void {
         global $DB;
         $this->resetAfterTest();
@@ -43,7 +33,7 @@ final class generation_deletion_test extends \advanced_testcase {
         $now = time();
 
         // No draftcategoryid: a generation that failed before building a draft bank is a real state,
-        // and it keeps the test off question-bank setup - the point here is the log, not the bank.
+        // And it keeps the test off question-bank setup - the point here is the log, not the bank.
         $generationid = (int) $DB->insert_record('local_artqtml_generations', (object) [
             'userid'       => $userid,
             'name'         => 'Log retention test',
@@ -104,10 +94,6 @@ final class generation_deletion_test extends \advanced_testcase {
         $this->assertFalse($DB->record_exists('local_artqtml_generations', ['id' => $generationid]));
         // 2. Its question rows are gone.
         $this->assertEquals(0, $DB->count_records('local_artqtml_questions', ['generationid' => $generationid]));
-        // 3. Its log rows are still there (Glob-040) and since 2026-08-04 they no longer point at
-        // the row that has just been deleted. The id moved to originalgenerationid, which is what
-        // keeps them findable; generationid is NULL, which is what stops it asserting a
-        // relationship that is not there.
         $this->assertEquals(0, $DB->count_records('local_artqtml_log', ['generationid' => $generationid]));
         $this->assertEquals(2, $DB->count_records('local_artqtml_log', ['originalgenerationid' => $generationid]));
 
@@ -116,9 +102,9 @@ final class generation_deletion_test extends \advanced_testcase {
         $this->assertEquals(0, $DB->count_records('local_artqtml_log', ['originalgenerationid' => $othergenid]));
 
         // 4. The user id survives an ORDINARY deletion. This is not a data subject request, and
-        // the entries have to stay reachable in that user's own GDPR export - which is exactly what
-        // they were not, before the export stopped looking for them through the generations
-        // table.
+        // The entries have to stay reachable in that user's own GDPR export - which is exactly what
+        // They were not, before the export stopped looking for them through the generations
+        // Table.
         $this->assertEquals(
             0,
             $DB->count_records_select(
@@ -130,8 +116,8 @@ final class generation_deletion_test extends \advanced_testcase {
         );
 
         // 5. And the diagnostic payload is NOT redacted early. Deleting a generation is often the
-        // last step of investigating it, not the end of the investigation; the payload goes when
-        // its retention period ends.
+        // Last step of investigating it, not the end of the investigation; the payload goes when
+        // Its retention period ends.
         $remaining = $DB->get_records('local_artqtml_log', ['originalgenerationid' => $generationid]);
         foreach ($remaining as $entry) {
             $this->assertStringNotContainsString('payloadredacted', (string) $entry->data);

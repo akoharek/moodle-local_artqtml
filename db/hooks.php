@@ -18,15 +18,13 @@
  * Hooks API listener registrations for local_artqtml.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $callbacks = [
     [
-        // Jov-019/020: injects the read-only AI validation panel into the native question
-        // editor. Replaces the legacy before_standard_top_of_body_html() lib.php callback.
         'hook'     => \core\hook\output\before_standard_top_of_body_html_generation::class,
         'callback' => \local_artqtml\hook_callbacks::class . '::before_standard_top_of_body_html',
     ],

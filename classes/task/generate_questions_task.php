@@ -15,17 +15,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Calls the Claude API to generate quiz questions for a generation (functional spec ch.5,
- * technical annex ch.3).
+ * Calls the Claude API to generate quiz questions for a generation.
  *
  * Invoked from {@see process_pending_generations}, the scheduled task that actually runs the
  * AI pipeline in the background (every 5 minutes by default, or manually via
  * `admin/cli/scheduled_task.php --execute='\local_artqtml\task\process_pending_generations'`
  * - see that class). This is a plain processor, not itself an adhoc/scheduled task, so it can
- * be unit-tested and invoked directly without going through Moodle's task runner.
+ * Be unit-tested and invoked directly without going through Moodle's task runner.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\task;
@@ -46,7 +45,7 @@ class generate_questions_task {
     use generation_status_trait;
     use retry_trait;
 
-    /** @var int maximum JSON-fallback retry attempts, independent of the HTTP retry counter (2.3). */
+    /** @var int maximum JSON-fallback retry attempts, independent of the HTTP retry counter. */
     public const MAX_JSON_ATTEMPTS = 3; // 1 initial + 2 fallback retries.
 
     /** @var int fixed number of items generated for SR (ordering) questions, unless overridden. */
@@ -55,11 +54,7 @@ class generate_questions_task {
     /**
      * Run the Claude call for one generation. On success, leaves the generation in
      * "validating" status - it is the caller's (process_pending_generations') job to then hand
-     * it to {@see validate_questions_task::process()}, not this method's.
-     *
-     * M-15: this stage only calls Claude and stores its raw output - nothing is written to
-     * local_artqtml_questions (nor is any real Moodle question created) until the later saving
-     * stage, so a failure/abort here has nothing question-level to roll back yet.
+     * It to {@see validate_questions_task::process()}, not this method's.
      *
      * @param \stdClass $generation the local_artqtml_generations record to process
      * @return void
@@ -75,17 +70,6 @@ class generate_questions_task {
                 throw new \moodle_exception('errormissingsettings', 'local_artqtml');
             }
 
-            // 2026-08-04: the last gate before money is spent. generate.php checks the same thing,
-            // and this is not that check repeated for tidiness - it is the one that holds when the
-            // controller was bypassed: an old row, a direct database edit, or a generation queued
-            // before an administrator lowered the limit. Everything upstream can be skipped; this
-            // runs on the path every provider call goes through.
-            //
-            // What is logged is three numbers and nothing else. The source text itself never goes
-            // into the log - it is the teacher's material, and a log is exactly where it should
-            // not accumulate.
-            //
-            // Deliberately NOT a monthly token-budget check — that feature is removed in Light.
             $sourcetext = (string) $generation->sourcetext;
             if (source_text_limit::is_exceeded($sourcetext)) {
                 $usage = source_text_limit::usage($sourcetext);
@@ -98,10 +82,6 @@ class generate_questions_task {
                 throw new \moodle_exception('errorsourcetexttoolong', 'local_artqtml');
             }
 
-            // Finding #5: intentional defense-in-depth — re-run security_filter here even though
-            // upload.php already screened the text. Covers DB edits, admin pattern changes after
-            // save, and any path that queued a generation without the upload gate. On hit: do not
-            // call Claude; roll back to started (Megkezdett) so the teacher can reopen upload.
             if (
                 security_filter::has_sql_injection($sourcetext)
                 || security_filter::has_prompt_injection($sourcetext)
@@ -116,11 +96,11 @@ class generate_questions_task {
                 return;
             }
 
-            // BL-35: one call per question type, not one call for the generation.
+            // One call per question type, not one call for the generation.
             [$questions, $outcomes] = $this->call_claude_per_type($generation, $settings);
 
             // C-03: the calls above can take a long time - re-check the generation still exists
-            // and hasn't been aborted/deleted while they were in flight before saving results.
+            // And hasn't been aborted/deleted while they were in flight before saving results.
             $generation = $this->reload_if_active($generationid, \local_artqtml\local\generation_status::GENERATING);
             if ($generation === null) {
                 $this->log_event($generationid, 'processing_abandoned', [], $userid);
@@ -128,8 +108,8 @@ class generate_questions_task {
             }
 
             // Every type failed. There is nothing to validate and nothing to save, so this is a
-            // failure of the whole generation rather than a partial one - and the teacher gets the
-            // retry path that a failed generation has.
+            // Failure of the whole generation rather than a partial one - and the teacher gets the
+            // Retry path that a failed generation has.
             if ($questions === []) {
                 $messages = [];
                 foreach ($outcomes as $code => $outcome) {
@@ -143,7 +123,7 @@ class generate_questions_task {
                 );
             }
 
-            // M-08: compare Claude's actual per-type output against what was requested.
+            // Compare Claude's actual per-type output against what was requested.
             $this->store_count_discrepancy($generationid, $settings, $questions, $userid);
 
             $this->log_event($generationid, 'claude_call_completed', [
@@ -151,8 +131,6 @@ class generate_questions_task {
                 'outcomes'      => $outcomes,
             ], $userid);
 
-            // M-15: held here (not local_artqtml_questions) until the saving stage commits
-            // everything - generating/validating/saving are now genuinely separate stages.
             $generation->pendingdata = json_encode(['questions' => $questions]);
             $this->set_status($generation, \local_artqtml\local\generation_status::VALIDATING);
         } catch (\Throwable $e) {
@@ -162,15 +140,13 @@ class generate_questions_task {
     }
 
     /**
-     * Count Claude's actual per-type question output against the requested per-type counts and,
-     * if they differ for any type, store the discrepancy on the generation and log it (M-08).
-     * Generation still proceeds to validation normally regardless.
+     * store count discrepancy.
      *
      * @param int $generationid
      * @param array $settings decoded settings JSON (requested counts)
-     * @param array $questions raw question arrays as returned by Claude (before M-07 validation -
-     *      this is about what Claude actually produced, independent of whether it later turns
-     *      out to be semantically valid enough to import)
+     * @param array $questions raw question arrays as returned by Claude (before validation
+     * This is about what Claude actually produced, independent of whether it later turns
+     * Out to be semantically valid enough to import)
      * @param int $userid
      * @return void
      */
@@ -208,9 +184,7 @@ class generate_questions_task {
     }
 
     /**
-     * Full rollback on unrecoverable failure (Gen-010/Gen-017): delete any draft questions
-     * already created, delete the draft category, and return the generation to a retryable
-     * failed state.
+     * rollback.
      *
      * @param int $generationid
      * @param string $errormessage
@@ -233,37 +207,19 @@ class generate_questions_task {
         $DB->delete_records('local_artqtml_questions', ['generationid' => $generationid]);
         $transaction->allow_commit();
 
-        // M-15: pendingdata is deliberately left as-is (null at this stage, since it's only ever
-        // populated on the success path below) - status.php uses its presence/shape to tell
-        // which stage a failed generation actually got to, for the progress bar's failed-percent.
-        // A full "retry" (status.php's own rollback helper) is what clears it for a clean restart.
         $this->set_status($generation, \local_artqtml\local\generation_status::FAILED, $errormessage);
         $this->log_event($generationid, 'error', ['message' => $errormessage], $userid ?? (int) $generation->userid);
     }
 
     /**
-     * @var string|null how the last call_claude() failed - 'transport' or 'content'.
+     * Helper.
      *
-     * BL-35: the two are worth telling apart and the exception cannot. A transport failure is a
-     * timeout or a 5xx: momentary, and worth another go - on 2026-07-31 Gemini returned 503 three
-     * times under load and the retry loop absorbed it. A content failure is a valid HTTP 200
-     * carrying nothing usable, which is what a question type that cannot be produced looks like,
-     * and repeating it three times only spends money to be told the same thing.
+     * @var string|null how the last call_claude() failed - 'transport' or 'content'.
      */
     protected $lastfailurekind = null;
 
     /**
-     * Generate one question type at a time, and let the others through when one fails (BL-35).
-     *
-     * Why the split. The form used to take counts on two independent axes - so many per type, so
-     * many per difficulty level - and nothing joined them, so which type got the easy question was
-     * decided by the model. The grid now records the teacher's actual intent, and this is where it
-     * is honoured: each call asks for one type at one set of levels, and gets a response schema
-     * with one branch in it.
-     *
-     * The second reason is containment. Before this, one type failing lost the whole generation;
-     * on 2026-08-01 that meant nine generations delivering nothing because a single type could not
-     * be produced. Now the others survive, and the run ends "partly successful" (BL-30, BL-35).
+     * Generate one question type at a time, and let the others through when one fails.
      *
      * @param \stdClass $generation
      * @param array $settings the generation's decoded settings
@@ -286,11 +242,6 @@ class generate_questions_task {
         $total = count($requested);
         $done = 0;
 
-        // Progress within the generating stage. Nothing reads pendingdata until validating, so this
-        // is free to describe where the loop is - and without it a teacher watching six API calls
-        // sees one motionless bar for several minutes. Written before each call as well as after
-        // it: an API call takes a minute or more, and during that minute the teacher wants to know
-        // which type is in flight, not which one finished last.
         $writeprogress = function (int $done, string $current) use ($DB, $generation, $total, &$outcomes): void {
             $DB->set_field('local_artqtml_generations', 'pendingdata', json_encode([
                 'generating' => [
@@ -312,7 +263,7 @@ class generate_questions_task {
                 $outcomes[$code] = ['result' => 'ok', 'count' => count($typequestions)];
             } catch (\Throwable $e) {
                 // Deliberately not rethrown: the remaining types are still worth generating, and
-                // the teacher is told what is missing by the partly-successful outcome.
+                // The teacher is told what is missing by the partly-successful outcome.
                 $outcomes[$code] = [
                     'result'  => $this->lastfailurekind ?? 'transport',
                     'count'   => 0,
@@ -333,17 +284,17 @@ class generate_questions_task {
     }
 
     /**
-     * A copy of the generation's settings narrowed to one question type (BL-35).
+     * A copy of the generation's settings narrowed to one question type.
      *
      * Two things are narrowed, and the second is the point of the exercise. The counts keep only
-     * this type, so the response schema carries a single branch. The difficulty levels are taken
-     * from **this type's row of the grid**, so a call asking for two easy True/False questions says
-     * exactly that - rather than "six questions, two of them easy, three of them True/False" and
-     * leaving the model to pair them up.
+     * This type, so the response schema carries a single branch. The difficulty levels are taken
+     * From **this type's row of the grid**, so a call asking for two easy True/False questions says
+     * Exactly that - rather than "six questions, two of them easy, three of them True/False" and
+     * Leaving the model to pair them up.
      *
      * A generation saved before the grid existed has no 'matrix'. Its per-type levels were never
-     * recorded and cannot be invented, so the generation-wide levels are passed through unchanged:
-     * such a run behaves exactly as it did before, one type at a time.
+     * Recorded and cannot be invented, so the generation-wide levels are passed through unchanged:
+     * Such a run behaves exactly as it did before, one type at a time.
      *
      * @param array $settings the whole generation's settings
      * @param string $code one of question_types::CODES
@@ -373,7 +324,7 @@ class generate_questions_task {
      *
      * @param \stdClass $generation the generation record
      * @param array $settings decoded settings JSON
-     * @return array list of generated question arrays (raw, per technical annex 3.3)
+     * @return array list of generated question arrays (raw, per )
      */
     protected function call_claude(\stdClass $generation, array $settings): array {
         $apikey = \local_artqtml\local\api_key_store::get('claude');
@@ -393,23 +344,13 @@ class generate_questions_task {
 
         $lasterror = '';
         for ($jsonattempt = 1; $jsonattempt <= self::MAX_JSON_ATTEMPTS; $jsonattempt++) {
-            // Val-008: a JSON-fallback retry must actually tell the model its previous
-            // response was invalid, not just resend an identical request.
-            //
-            // THE RETRY NOTICE IS ADDED BEFORE THE REQUEST IS BUILT, NOT AFTER, and that ordering is
-            // the whole of BL-52's first half. The notice is admin-editable; the security guard is
-            // deliberately not. ai_request::claude() puts the guard at the end of the system prompt,
-            // so appending the notice to the finished request left an editable instruction AFTER the
-            // immutable one - the last word in the prompt, which is the position the guard exists to
-            // hold. Folding it in here means the request is rebuilt each attempt, which costs an
-            // array construction and nothing else (2026-08-05).
             $system = $basesystem;
             if ($jsonattempt > 1) {
                 $system .= "\n\n" . (string) get_config('local_artqtml', 'promptjsoninvalid');
             }
 
             // The endpoint, headers and envelope come from ai_request, which the model check's probe
-            // uses too - the probe building its own request is what produced a false site-wide block.
+            // Uses too - the probe building its own request is what produced a false site-wide block.
             $request = \local_artqtml\local\ai_request::claude(
                 (string) $model,
                 (string) $apikey,
@@ -424,13 +365,8 @@ class generate_questions_task {
             }, (int) $generation->id, 'generate', 'claude', $userid);
 
             if ($result['curlerror'] !== '' || $result['httpcode'] !== 200) {
-                // BL-35: a timeout or an HTTP error is a transport failure - momentary, and worth
-                // another attempt. The caller uses this to decide whether the type is finally
-                // failed or merely unlucky.
                 $this->lastfailurekind = 'transport';
                 $lasterror = $result['curlerror'] !== '' ? $result['curlerror'] : $this->extract_claude_error($result['body']);
-                // Val-009: a failed attempt's tokens (there usually aren't any billable ones on
-                // an HTTP-level failure anyway) never count toward the monthly budget.
                 $this->log_ai_call($generation->id, 'generate', 'claude', [
                     'httpstatus'   => $result['httpcode'],
                     'jsonattempt'  => $jsonattempt,
@@ -440,38 +376,20 @@ class generate_questions_task {
                 ], $userid);
                 if ($this->is_retryable_http((int) $result['httpcode']) || $result['httpcode'] === 0) {
                     // HTTP-level retries are already exhausted inside http_with_backoff();
-                    // a further JSON-attempt loop iteration would not help a pure HTTP failure.
+                    // A further JSON-attempt loop iteration would not help a pure HTTP failure.
                     break;
                 }
                 if ($this->is_nonretryable_client_error((int) $result['httpcode'])) {
-                    // M-11: a 4xx (other than 429) is a bad request, not a JSON-formatting
-                    // problem - retrying via the JSON-fallback loop would just resend the exact
-                    // same broken request up to MAX_JSON_ATTEMPTS times.
                     break;
                 }
                 continue;
             }
 
             $decoded = json_decode((string) $result['body'], true);
-            // BL-44: the envelope is read in one place now (ai_request::extract_text), because
-            // this line, its twin in validate_questions_task and the one in model_checker were
-            // three copies of the same provider knowledge with nothing keeping them in step.
             $text = ai_request::extract_text(model_list::PROVIDER_CLAUDE, $decoded);
             $parsed = is_string($text) ? json_decode($text, true) : null;
             $questions = (is_array($parsed) && is_array($parsed['questions'] ?? null)) ? $parsed['questions'] : [];
 
-            // BL-58: the formatting comes off HERE, at the parse step, not at the save step.
-            //
-            // This is the moment the model's answer first becomes data, and everything after it -
-            // the Gemini validation, the stored questiondata JSON, the approval screen, the
-            // question bank - reads what this line produces. BL-55 cleaned at the save stage
-            // instead, which left the validator judging text the teacher would never see: on
-            // 2026-08-06 a measured generation came back "Needs review" with a justification
-            // complaining about a blue background, next to a question that no longer had one.
-            // A complaint the teacher cannot act on is worse than none.
-            //
-            // Placed before every return below (the token-limit path returns early), so no exit
-            // from this method can carry raw model markup forward.
             $questions = array_map(
                 static function ($question) {
                     return is_array($question) ? ai_text_cleaner::clean_question($question) : $question;
@@ -479,10 +397,6 @@ class generate_questions_task {
                 $questions
             );
 
-            // Val-022: a truncated response must be detected independently of whether it still
-            // happens to parse as valid JSON - checking stop_reason only after a successful
-            // parse would miss the common case where truncation itself breaks the JSON, routing
-            // it into the generic invalid-JSON retry below instead.
             if (ai_request::hit_token_limit(model_list::PROVIDER_CLAUDE, $decoded)) {
                 $this->log_ai_call($generation->id, 'generate', 'claude', [
                     'httpstatus'   => 200,
@@ -493,18 +407,12 @@ class generate_questions_task {
                     'requestid'    => $decoded['id'] ?? null,
                     'result'       => 'success',
                 ], $userid);
-                // Val-016: the process is not blocked - whatever questions did parse are kept.
+                // The process is not blocked - whatever questions did parse are kept.
                 $this->store_token_limit_warning($generation->id, $requestedcount, count($questions), $userid);
                 return $questions;
             }
 
             if (empty($questions)) {
-                // BL-35: two very different failures used to share this branch and share its three
-                // retries. Unparseable JSON is worth retrying - that is what the JSON-fallback loop
-                // is for, and the retry tells the model its last answer was invalid. A response
-                // that parsed perfectly well and simply contains no questions is not: the model has
-                // answered, and asking again spends money to be told the same thing. That was the
-                // empty-payload case, three attempts a run, nine runs (BL-30).
                 $this->lastfailurekind = $parsed === null ? 'transport' : 'content';
                 $lasterror = get_string('errorapiresponse', 'local_artqtml');
                 $this->log_ai_call($generation->id, 'generate', 'claude', [
@@ -523,8 +431,7 @@ class generate_questions_task {
                 continue;
             }
 
-            // Val-009: only the attempt that actually produced a usable result counts toward
-            // the monthly token budget, regardless of whether it took more than one try.
+            // Log usage for the attempt that produced a usable result, regardless of whether it took more than one try.
             $this->log_ai_call($generation->id, 'generate', 'claude', [
                 'httpstatus'   => 200,
                 'tokensinput'  => $decoded['usage']['input_tokens'] ?? null,
@@ -555,8 +462,7 @@ class generate_questions_task {
     }
 
     /**
-     * Record a non-blocking token-limit warning on the generation (Gen-018/019, Val-022),
-     * including how many questions were requested vs. actually generated (TC-Val-024).
+     * store token limit warning.
      *
      * @param int $generationid
      * @param int $requested
@@ -573,10 +479,10 @@ class generate_questions_task {
     }
 
     /**
-     * Build the untrusted user message payload for Claude (source text only in Light).
+     * Build the untrusted user message payload for Claude (source text only).
      *
      * @param \stdClass $generation
-     * @param array $settings decoded settings JSON (unused in Light; kept for call-site parity)
+     * @param array $settings decoded settings JSON (unused; kept for call-site parity)
      * @return string JSON body for the user turn
      */
     protected function build_user_content(\stdClass $generation, array $settings): string {
@@ -609,7 +515,7 @@ class generate_questions_task {
             }
         }
 
-        // Light: knowledge source is always sourceonly.
+        // Knowledge source fragment is always the source-only template.
         $knowledgesourcetext = (string) get_config('local_artqtml', 'promptknowledgesourceonly');
 
         $typeinstructions = [];

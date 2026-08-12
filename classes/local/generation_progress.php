@@ -15,21 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The single source of truth for the status page's progress-bar presentation (Gen-001/Gen-004).
- *
- * S-3: status.php and amd/src/status.js used to map a generation status onto a percentage, a
- * colour and a striping flag independently of each other. They agreed (25/50/75/100), but nothing
- * checked that they did, so a change to either would have desynchronised the server-rendered first
- * paint from the AJAX-updated view - the same two-source shape as the problem_category outage,
- * only across the PHP/JS boundary instead of prompt/schema.
- *
- * The mapping now lives here. status.php reads it directly and also serialises it into a
- * data-progress-config attribute on the status root, which status.js parses instead of owning a
- * copy. S-2 folds the JS TERMINAL_STATUSES list into the same payload, so
- * {@see \local_artqtml\local\generation_status::TERMINAL} is likewise stated once.
+ * The single source of truth for the status page's progress-bar presentation.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -42,7 +31,7 @@ class generation_progress {
      * Presentation per generation status.
      *
      * 'failed' is deliberately absent: its percentage is not a property of the status but of how
-     * far the generation actually got, which only {@see self::failed_percent()} can work out.
+     * Far the generation actually got, which only {@see self::failed_percent()} can work out.
      *
      * @var array<string, array{percent: int, color: string, striped: bool}>
      */
@@ -51,10 +40,6 @@ class generation_progress {
         generation_status::VALIDATING => ['percent' => 50, 'color' => 'bg-primary', 'striped' => true],
         generation_status::SAVING     => ['percent' => 75, 'color' => 'bg-primary', 'striped' => true],
         generation_status::COMPLETED  => ['percent' => 100, 'color' => 'bg-success', 'striped' => false],
-        // BL-35: the pipeline reached the end, so the bar is full - but not green. A run that
-        // delivered less than was asked for is finished and is not a success, and those are two
-        // different facts; showing it as 100% green was how nine empty generations passed for
-        // completed ones.
         generation_status::PARTIAL    => ['percent' => 100, 'color' => 'bg-warning', 'striped' => false],
     ];
 
@@ -68,7 +53,7 @@ class generation_progress {
      * Every colour class the bar can carry, so a re-render can clear the previous one.
      *
      * Derived rather than re-listed, so adding a stage colour above cannot leave a stale class
-     * stuck on the element.
+     * Stuck on the element.
      *
      * @return string[]
      */
@@ -96,20 +81,19 @@ class generation_progress {
     }
 
     /**
-     * How far through the generating stage the per-type loop has got, as a bar percentage
-     * (BL-35).
+     * How far through the generating stage the per-type loop has got, as a bar percentage.
      *
      * The generating stage is N API calls now, one per requested question type, and a bar that
-     * sits at 25% through all of them tells the teacher nothing - six calls can take several
-     * minutes, and the only honest thing the old bar said was "still working". The loop writes its
-     * position into pendingdata before and after each type (nothing reads that column until
-     * validating, so it is free to), and this turns it into a percentage between the generating
-     * and validating marks: 25% before the first type finishes, 45% after the last. The pre-call
-     * write is what names the type currently in flight; without it the label would only ever be
-     * able to name the type that finished last.
+     * Sits at 25% through all of them tells the teacher nothing - six calls can take several
+     * Minutes, and the only honest thing the old bar said was "still working". The loop writes its
+     * Position into pendingdata before and after each type (nothing reads that column until
+     * Validating, so it is free to), and this turns it into a percentage between the generating
+     * And validating marks: 25% before the first type finishes, 45% after the last. The pre-call
+     * Write is what names the type currently in flight; without it the label would only ever be
+     * Able to name the type that finished last.
      *
      * Falls back to the plain stage percentage when there is nothing to read - an older generation
-     * mid-flight, or a single-type run that has not finished its one call.
+     * Mid-flight, or a single-type run that has not finished its one call.
      *
      * @param string|null $pendingdatajson the generation's raw pendingdata column
      * @return int
@@ -131,7 +115,7 @@ class generation_progress {
     }
 
     /**
-     * Which question type the generating loop is on, for the bar's label (BL-35).
+     * Which question type the generating loop is on, for the bar's label.
      *
      * @param string|null $pendingdatajson
      * @return string empty when there is nothing in flight, or the generation predates the loop
@@ -145,11 +129,6 @@ class generation_progress {
 
     /**
      * How far a failed generation actually got, as a bar percentage.
-     *
-     * M-15: nothing is written to local_artqtml_questions until the saving stage commits, so the
-     * question count says nothing about progress. The shape of pendingdata does: both keys means
-     * it reached saving, 'questions' alone means it failed validating, neither means it never got
-     * past generating.
      *
      * @param string|null $pendingdatajson the generation's raw pendingdata column
      * @return int
@@ -179,7 +158,7 @@ class generation_progress {
             'stages'       => self::STAGES,
             'failed'       => self::FAILED_STAGE,
             'colorClasses' => self::color_classes(),
-            // S-2: the JS used to carry its own two-value copy of this list.
+            // The JS used to carry its own two-value copy of this list.
             'terminal'     => generation_status::TERMINAL,
         ]);
     }

@@ -15,29 +15,27 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Admin settings for local_artqtml Light: general, generator LLM, validator LLM,
- * question-type defaults (IH/FE/SR), and security.
+ * Admin settings for local_artqtml: general, generator LLM, validator LLM,
+ * Question-type defaults (IH/FE/SR), and security.
  *
  * Moodle's admin_settingpage API does not support in-page tabs for a single settings form,
- * so tabs are sibling pages under one admin_category.
+ * So tabs are sibling pages under one admin_category.
  *
  * Institutional prompt templates live in code (db/prompt_defaults.php / prompt_seed) only —
- * they are not editable from this page.
+ * They are not editable from this page.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 // Moodle can include a plugin's settings.php more than once per request while building/
-// caching the admin tree. require_once is safe against that, and guarantees
-// local_artqtml_render_test_button() is defined before it's used below.
+// Caching the admin tree. require_once is safe against that, and guarantees
+// Local_artqtml_render_test_button() is defined before it's used below.
 require_once($CFG->dirroot . '/local/artqtml/lib.php');
 
-// Product decision 2026-08-10: settings are local/artqtml:configure territory only.
-// Register for site admins (hassiteconfig) and for users who hold :configure without
-// moodle/site:config - otherwise a configure-only manager would never see the panel.
+// Visible to site admins and users with local/artqtml:configure (without needing moodle/site:config).
 if ($hassiteconfig || has_capability('local/artqtml:configure', context_system::instance())) {
     $ADMIN->add('localplugins', new admin_category('local_artqtml_category', get_string('pluginname', 'local_artqtml')));
 
@@ -183,7 +181,7 @@ if ($hassiteconfig || has_capability('local/artqtml:configure', context_system::
     $ADMIN->add('local_artqtml_category', $validator);
 
     // ------------------------------------------------------------------
-    // Question-type defaults — Light: IH / FE / SR only.
+    // Question-type defaults — IH / FE / SR.
     $qtypes = new admin_settingpage(
         'local_artqtml_qtypes',
         get_string('tabqtypes', 'local_artqtml'),
@@ -260,8 +258,7 @@ if ($hassiteconfig || has_capability('local/artqtml:configure', context_system::
         1
     ));
 
-    // Local copies of qtype_ordering option sets (see Full plugin notes) — avoid loading the
-    // qtype class from settings.php.
+    // Local copies of qtype_ordering option sets — avoid loading the qtype class from settings.php.
     $qtypes->add(new admin_setting_configselect(
         'local_artqtml/orderinggradingtype',
         get_string('settingorderinggradingtype', 'local_artqtml'),

@@ -15,20 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Provider model list: fetch, normalise, filter and cache (Admin-044/045/046/047).
- *
- * Admin-044: "A Generátor és a Validátor LLM fülön a modellválasztó legördülő tartalma a
- * szolgáltatói API modell-lista végpontjából származik [...] A listát a plugin nem tartalmazhatja
- * beégetve". The two providers return different shapes, normalised here to one internal form:
- * { id, display_name, supports_structured_output }.
- *
- * Admin-045: the list is cached per provider for 24 hours, and the settings page is built from the
- * cache ALONE - it never makes a synchronous network call, because an admin page that blocks on a
- * provider being reachable is an admin page that cannot be used to fix a broken provider setting.
- * Only the "Refresh models" button and the scheduled model check ever fetch.
+ * Provider model list: fetch, normalise, filter and cache.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -46,28 +36,25 @@ class model_list {
     /** @var string[] both providers, in settings-tab order. */
     public const PROVIDERS = [self::PROVIDER_CLAUDE, self::PROVIDER_GEMINI];
 
-    /** @var int cache lifetime in seconds (Admin-045: 24 hours). */
+    /** @var int cache lifetime in seconds (: 24 hours). */
     public const CACHE_TTL = 86400;
 
     /**
+     * Helper.
+     *
      * @var string[] id fragments that mark a Gemini model as not a text model.
      *
      * Gemini's catalogue is one list for every modality, and `supportedGenerationMethods` does not
-     * separate them: a speech or image model answers `generateContent` exactly like a text model
-     * does, so the method check alone lets all of them through. Anthropic's list needs no
-     * equivalent because it publishes `capabilities.structured_outputs` per model.
+     * Separate them: a speech or image model answers `generateContent` exactly like a text model
+     * Does, so the method check alone lets all of them through. Anthropic's list needs no
+     * Equivalent because it publishes `capabilities.structured_outputs` per model.
      *
-     * Measured 2026-08-03: the account's catalogue was 42 models, of which **21 matched one of
-     * these** - music (lyria), images (nano-banana and every `-image`), speech (`-tts`), robotics,
-     * computer use, and the deep-research/antigravity agents that run for minutes per call. None
-     * of them can produce a quiz question, and probing them was the reason a sweep could not
-     * finish inside a web request.
      *
      * Matched as substrings against the bare model id, deliberately: Google's naming puts the
-     * modality in the id itself, and a new `gemini-4-flash-image` has to be excluded on the day it
-     * appears, without an edit here. The cost of that choice is that a text model whose name
-     * happens to contain one of these fragments would be excluded too - which is why the list is
-     * kept to modality words rather than anything that could occur incidentally.
+     * Modality in the id itself, and a new `gemini-4-flash-image` has to be excluded on the day it
+     * Appears, without an edit here. The cost of that choice is that a text model whose name
+     * Happens to contain one of these fragments would be excluded too - which is why the list is
+     * Kept to modality words rather than anything that could occur incidentally.
      */
     public const GEMINI_NON_TEXT_MARKERS = [
         'antigravity',
@@ -81,11 +68,13 @@ class model_list {
     ];
 
     /**
+     * Helper.
+     *
      * @var int page size requested from Anthropic.
      *
      * The endpoint defaults to 20 and caps at 1000. Raising the limit is not by itself enough -
-     * the annex is explicit that the list length is not guaranteed - so {@see self::fetch_claude()}
-     * follows the after_id cursor to the end regardless of this value.
+     * The annex is explicit that the list length is not guaranteed - so {@see self::fetch_claude()}
+     * Follows the after_id cursor to the end regardless of this value.
      */
     public const ANTHROPIC_PAGE_SIZE = 1000;
 
@@ -95,13 +84,10 @@ class model_list {
     /**
      * The cached model list for a provider, or null if nothing usable is cached.
      *
-     * This is the ONLY method the settings page may call. It never touches the network: a missing
-     * or expired cache returns null and the page says the list needs refreshing (Admin-045).
-     *
      * The returned shape is {models: list<array{id, display_name, supports_structured_output}>,
-     * fetchedat: int, error: string}. It is deliberately typed loosely: the value is json_decode'd
-     * from stored config, so it is only that shape if nothing corrupted it, and the runtime guards
-     * below - not the annotation - are what make a corrupt cache harmless on an admin page.
+     * Fetchedat: int, error: string}. It is deliberately typed loosely: the value is json_decode'd
+     * From stored config, so it is only that shape if nothing corrupted it, and the runtime guards
+     * Below - not the annotation - are what make a corrupt cache harmless on an admin page.
      *
      * @param string $provider one of self::PROVIDERS
      * @return array<string, mixed>|null
@@ -135,11 +121,11 @@ class model_list {
     /**
      * Fetch from the provider and replace the cache.
      *
-     * Only the "Refresh models" button (Admin-046) and the scheduled model check call this.
+     * Only the "Refresh models" button and the scheduled model check call this.
      *
      * On failure the previous cache content is deliberately left in place (annex, "Hibakezelés":
      * "Ha a lekérés meghiúsul, a korábbi gyorsítótár-tartalom marad érvényben"), so a transient
-     * provider outage does not empty the dropdown of an admin who is mid-configuration.
+     * Provider outage does not empty the dropdown of an admin who is mid-configuration.
      *
      * @param string $provider one of self::PROVIDERS
      * @return array{success: bool, models: array, error: string}
@@ -168,7 +154,7 @@ class model_list {
     }
 
     /**
-     * The models a dropdown may offer: cached, and structured-output capable only (Admin-047).
+     * The models a dropdown may offer: cached, and structured-output capable only.
      *
      * @param string $provider
      * @return array<string, string> model id => display label, ready for a select
@@ -179,11 +165,6 @@ class model_list {
             return [];
         }
 
-        // BL-44: a model this plugin version has proved it cannot read does not belong in the
-        // dropdown. Choosing it means every generation fails - and the API call is billed anyway,
-        // which is how the item was found: $0.228 for zero questions. Same shape as the Admin-047
-        // filter below, different reason: that one is about what the model supports, this one about
-        // what we have verified.
         $excluded = model_check_log::excluded_models($provider);
 
         $options = [];
@@ -191,11 +172,6 @@ class model_list {
             if (in_array((string) $model['id'], $excluded, true)) {
                 continue;
             }
-            // Only models that support structured output may reach the dropdown, because the plugin
-            // relies on structured output in both directions and a model without it could not be
-            // used at all. The requirement is Admin-047: "A legördülő kizárólag strukturált
-            // kimenetet támogató modelleket kínál fel. A plugin mindkét irányban strukturált
-            // kimenetet használ, ezért más modell nem választható".
             if (empty($model['supports_structured_output'])) {
                 continue;
             }
@@ -211,12 +187,6 @@ class model_list {
 
     /**
      * Whether a model id is present and selectable in the cached list.
-     *
-     * Used by the availability half of the model check, and by the settings page to decide whether
-     * a saved model needs the "currently unavailable" marker (Admin-049).
-     *
-     * Note this is NOT proof the model works: Admin-052 is explicit that the list endpoint has been
-     * observed still listing a model whose generation calls fail. Only the live probe proves that.
      *
      * @param string $provider
      * @param string $modelid
@@ -272,7 +242,7 @@ class model_list {
                     'id'           => $id,
                     'display_name' => (string) ($model['display_name'] ?? $id),
                     // The annex names capabilities.structured_outputs as the filter basis. Absent
-                    // means "not advertised", which is treated as unsupported rather than assumed.
+                    // Means "not advertised", which is treated as unsupported rather than assumed.
                     'supports_structured_output' => !empty($model['capabilities']['structured_outputs']),
                 ];
                 $afterid = $id;
@@ -290,7 +260,7 @@ class model_list {
      * Is this Gemini model id one of the non-text modalities?
      *
      * Public so the check is asserted directly rather than through a live API call - the filter it
-     * guards is the difference between a sweep that finishes and one that does not.
+     * Guards is the difference between a sweep that finishes and one that does not.
      *
      * @param string $id the bare model id, without the "models/" prefix
      * @return bool
@@ -344,7 +314,7 @@ class model_list {
 
             foreach ($data as $model) {
                 // Gemini prefixes ids with "models/"; the settings store the bare id, which is also
-                // what the generateContent URL is built from.
+                // What the generateContent URL is built from.
                 $id = preg_replace('#^models/#', '', (string) ($model['name'] ?? ''));
                 if ($id === '') {
                     continue;
@@ -357,7 +327,7 @@ class model_list {
                     'id'           => $id,
                     'display_name' => (string) ($model['displayName'] ?? $id),
                     // The annex filters Gemini "a támogatott generálási metódusok alapján".
-                    // generateContent is the method the plugin's structured-output calls use.
+                    // GenerateContent is the method the plugin's structured-output calls use.
                     'supports_structured_output' => in_array('generateContent', $methods, true),
                 ];
             }

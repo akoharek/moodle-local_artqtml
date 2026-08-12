@@ -20,22 +20,15 @@ use local_artqtml\local\validation_suggestion;
 use local_artqtml\local\problem_category;
 
 /**
- * Unit tests for the validator prompt's output-language clause (Val-030).
+ * Unit tests for the validator prompt's output-language clause.
  *
  * The justification Gemini returns is stored text, written once at validation time - it cannot
- * follow the interface language afterwards, so the language has to be settled in the prompt.
+ * Follow the interface language afterwards, so the language has to be settled in the prompt.
  * Neither shipped template stated one, which is why a Hungarian site got English justifications.
- *
- * **Two things changed on 2026-07-31.** The clause now asks for the *source text's* language rather
- * than the site's (Val-030), so a teacher never sees a question and its reasoning in two languages.
- * And it lives in its own admin setting rather than being appended by code: the whole prompt is
- * editable now (Admin-066/067), which means an administrator who deletes {{LANGUAGE_INSTRUCTION}}
- * from the template loses the clause. That is a deliberate trade for a prompt they can read, so the
- * test that used to pin "an edit cannot drop it" now pins the placeholder instead.
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\task\validate_questions_task
  */
 final class validate_questions_language_test extends \advanced_testcase {
@@ -56,7 +49,7 @@ final class validate_questions_language_test extends \advanced_testcase {
      * With the shipped default template, the assembled prompt states an output language.
      *
      * Compared against the lang string itself, not a re-typed sentence: the wording is allowed to
-     * change, its presence is not.
+     * Change, its presence is not.
      *
      * @return void
      */
@@ -77,12 +70,6 @@ final class validate_questions_language_test extends \advanced_testcase {
 
     /**
      * An administrator keeps the placeholder, and their own wording keeps the clause.
-     *
-     * This replaces a test that pinned the opposite - that a template edit could not drop the
-     * clause, because the code appended it. Since 2026-07-31 the whole prompt is editable
-     * (Admin-066/067) and the clause has its own field, so an edit that keeps
-     * {{LANGUAGE_INSTRUCTION}} keeps the clause, and one that removes it does not. The first half
-     * is what the product promises; the second is the accepted cost.
      *
      * @return void
      */
@@ -109,8 +96,8 @@ final class validate_questions_language_test extends \advanced_testcase {
 
     /**
      * Asking for a language is the instruction most likely to make a model localise the enum
-     * values and break the response schema, so the clause has to keep saying they are exempt -
-     * and the enum values themselves must still be listed in the prompt.
+     * Values and break the response schema, so the clause has to keep saying they are exempt -
+     * And the enum values themselves must still be listed in the prompt.
      *
      * @return void
      */
@@ -138,10 +125,7 @@ final class validate_questions_language_test extends \advanced_testcase {
     }
 
     /**
-     * A minimal generation for build_system_instruction(), which since Val-031 takes the record so
-     * it can substitute the difficulty definitions for THAT generation's mode. Scale mode, because
-     * that is what the shipped default is and what these assertions describe; free text would
-     * deliberately leave the difficulty clause empty.
+     * scale generation.
      *
      * @return \stdClass
      */

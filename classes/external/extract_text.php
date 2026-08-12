@@ -15,11 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * External function extracting text from a just-picked upload-page draft file (Felt-010/011),
- * so it can be loaded into the source text box for review before the user submits.
+ * Helper.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\external;
@@ -50,9 +49,9 @@ class extract_text extends external_api {
     /**
      * Extract text from the first file in the given draft area.
      *
-     * text_extractor::draft_files() only ever looks at the current $USER's own draft file area
+     * Text_extractor::draft_files() only ever looks at the current $USER's own draft file area
      * (context_user::instance($USER->id)), so a caller cannot use this to read another user's
-     * files by guessing item ids.
+     * Files by guessing item ids.
      *
      * @param int $draftitemid
      * @return array
@@ -71,9 +70,9 @@ class extract_text extends external_api {
             $report = text_extractor::extract_with_report($file);
 
             // The document was refused - an unreadable structure, an unsupported type, or a
-            // processing limit. The browser gets the reason code and a localised sentence, and
-            // nothing else: no partial text, no parser warning, and above all no part of the
-            // document itself, which has no business in a message that may also be logged.
+            // Processing limit. The browser gets the reason code and a localised sentence, and
+            // Nothing else: no partial text, no parser warning, and above all no part of the
+            // Document itself, which has no business in a message that may also be logged.
             if ($report['status'] === extraction_result::STATUS_REJECTED) {
                 return [
                     'text'    => '',
@@ -88,8 +87,8 @@ class extract_text extends external_api {
             }
 
             // Checked inside the loop, after each file, so a set of files that is collectively too
-            // large stops as soon as it is known to be - rather than being assembled in full first
-            // and then thrown away.
+            // Large stops as soon as it is known to be - rather than being assembled in full first
+            // And then thrown away.
             if (source_text_limit::is_exceeded($text)) {
                 return [
                     'text'    => '',
@@ -112,11 +111,11 @@ class extract_text extends external_api {
         return new external_single_structure([
             'text' => new external_value(PARAM_RAW, 'Extracted plain text, empty if extraction failed/produced nothing'),
             // Deliberately a normal result rather than an exception. A refused document is
-            // something the teacher can act on - split it up, re-save it, choose another file -
-            // and they need to be told which. An exception would surface as a
-            // generic failure with nothing useful in it. Empty text, never a truncated prefix:
-            // half a document silently loaded into the textarea would produce questions about
-            // material nobody chose.
+            // Something the teacher can act on - split it up, re-save it, choose another file -
+            // And they need to be told which. An exception would surface as a
+            // Generic failure with nothing useful in it. Empty text, never a truncated prefix:
+            // Half a document silently loaded into the textarea would produce questions about
+            // Material nobody chose.
             'success' => new external_value(PARAM_BOOL, 'False if the document was refused'),
             'reason' => new external_value(PARAM_ALPHANUMEXT, 'Technical reason code when success is false, otherwise empty'),
             'message' => new external_value(PARAM_TEXT, 'Localised explanation when success is false, otherwise empty'),

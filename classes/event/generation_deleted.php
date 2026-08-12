@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * generation_deleted event (technical annex 7.1, List-016).
+ * Generation_deleted event.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\event;
@@ -35,12 +35,6 @@ class generation_deleted extends \core\event\base {
     protected function init() {
         $this->data['crud'] = 'd';
         $this->data['edulevel'] = self::LEVEL_OTHER;
-        // The delete.php script triggers this with an objectid, and \core\event\base::validate_data()
-        // throws
-        // "objecttable must be specified in init() method if objectid present" without this - which
-        // made deleting a generation from the list page fail with a coding-error page after the
-        // delete had already committed. Every other event class in this directory that carries an
-        // objectid already declares its table; this one was the outlier (TC-List-075).
         $this->data['objecttable'] = 'local_artqtml_generations';
     }
 

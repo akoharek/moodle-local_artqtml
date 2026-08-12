@@ -16,10 +16,10 @@
 
 /**
  * Builds the Claude Structured Outputs JSON schema for generated questions
- * (technical annex 3.3). ArtQTML Light: IH/FE/SR only.
+ * . Supported types: IH/FE/SR.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -29,10 +29,10 @@ namespace local_artqtml\local;
  */
 class question_schema {
     /**
-     * Fields present on every question type regardless of settings (technical annex 3.3.1).
+     * Fields present on every question type regardless of settings.
      *
-     * hint1/hint2/generalfeedback are added per-type by {@see self::apply_hint_feedback()}
-     * only when actually enabled for that type in this generation's settings.
+     * Hint1/hint2/generalfeedback are added per-type by {@see self::apply_hint_feedback()}
+     * Only when actually enabled for that type in this generation's settings.
      *
      * @param string $typecode IH/FE/SR
      * @return array
@@ -49,13 +49,8 @@ class question_schema {
     /**
      * Build the full output_config.format.schema object sent to the Claude API (3.3.8).
      *
-     * The FE min/max answer-option count (Admin-025) and the SR fixed item count
-     * (Admin-036) are not expressible here: Claude Structured Outputs only allows
-     * minItems/maxItems values of 0 or 1. Those counts are instead communicated to the
-     * model via the prompt (see generate_questions_task::build_prompt()).
-     *
      * @param array $settings this generation's decoded settings (settings['types'][$typecode]
-     *      ['hintenabled'|'feedbackenabled'])
+     * ['hintenabled'|'feedbackenabled'])
      * @return array
      */
     public static function build(array $settings): array {
@@ -74,7 +69,7 @@ class question_schema {
         }
 
         // Settings with no counts at all keep the previous behaviour rather than producing a
-        // schema that permits nothing.
+        // Schema that permits nothing.
         if ($branches === []) {
             $branches = array_map(static fn(callable $builder): array => $builder(), array_values($builders));
         }
@@ -163,7 +158,7 @@ class question_schema {
     }
 
     /**
-     * Gen-023/024: two progressive hints.
+     * Two progressive hints.
      *
      * @return array
      */
@@ -184,7 +179,7 @@ class question_schema {
     }
 
     /**
-     * M-25: shown to the student regardless of which answer they picked.
+     * Shown to the student regardless of which answer they picked.
      *
      * @return array
      */
@@ -201,7 +196,7 @@ class question_schema {
     }
 
     /**
-     * The per-option explanation for a true/false question (BL-29).
+     * The per-option explanation for a true/false question.
      *
      * @return array
      */

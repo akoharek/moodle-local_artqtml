@@ -17,21 +17,17 @@
 namespace local_artqtml\local;
 
 /**
- * Unit tests for the shared status -> progress-bar mapping (S-3/S-2, Gen-001/Gen-004).
- *
- * The point of this class is that PHP and JS cannot disagree about the mapping. These tests fail
- * if they ever start to: the last two assertions scan amd/src/status.js for a re-introduced copy
- * of the stage table or the terminal-status list, which is what the pre-S-3 code had.
+ * Unit tests for the shared status -> progress-bar mapping.
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\generation_progress
  */
 final class generation_progress_test extends \advanced_testcase {
     /**
      * Every in-progress and completed status has a stage; the mapping is the 25/50/75/100 ladder
-     * the specification describes, and it covers exactly the statuses that can show a bar.
+     * The specification describes, and it covers exactly the statuses that can show a bar.
      */
     public function test_stage_table_matches_the_status_constant(): void {
         $this->assertSame(
@@ -45,13 +41,12 @@ final class generation_progress_test extends \advanced_testcase {
             array_keys(generation_progress::STAGES)
         );
 
-        // BL-35: partial is the second stage to reach 100 - the pipeline did finish - and the only
-        // one that is not green there.
+        // Partial is the second stage to reach 100 - the pipeline did finish - and the only one that is not green there.
         $this->assertSame([25, 50, 75, 100, 100], array_column(generation_progress::STAGES, 'percent'));
         $this->assertSame('bg-warning', generation_progress::STAGES[generation_status::PARTIAL]['color']);
 
         // Every key is a real status, and the two statuses without a fixed stage are the ones
-        // that genuinely have none: 'started' (nothing running yet) and 'failed' (percent derived).
+        // That genuinely have none: 'started' (nothing running yet) and 'failed' (percent derived).
         foreach (array_keys(generation_progress::STAGES) as $status) {
             $this->assertContains($status, generation_status::VALUES, "$status is not a real status");
         }
@@ -63,7 +58,7 @@ final class generation_progress_test extends \advanced_testcase {
     }
 
     /**
-     * BL-35 (Gen-036): the generating stage is subdivided by how many question types are done.
+     * The generating stage is subdivided by how many question types are done.
      */
     public function test_generating_percent_and_type_follow_the_loop(): void {
         // Nothing written yet (an older generation, or the first call still in flight).
@@ -76,7 +71,7 @@ final class generation_progress_test extends \advanced_testcase {
             return json_encode(['generating' => ['done' => $done, 'total' => $total, 'current' => $current]]);
         };
 
-        // Light's three types: 25 at the start, then a step per finished type, 45 at the end.
+        // Three types: 25 at the start, then a step per finished type, 45 at the end.
         $this->assertSame(25, generation_progress::generating_percent($progress(0, 3, 'IH')));
         $this->assertSame(32, generation_progress::generating_percent($progress(1, 3, 'FE')));
         $this->assertSame(38, generation_progress::generating_percent($progress(2, 3, 'SR')));
@@ -96,7 +91,7 @@ final class generation_progress_test extends \advanced_testcase {
     }
 
     /**
-     * for_status() resolves every status, including the two without a fixed stage.
+     * For_status() resolves every status, including the two without a fixed stage.
      */
     public function test_for_status_covers_every_status(): void {
         foreach (generation_status::VALUES as $status) {
@@ -114,7 +109,7 @@ final class generation_progress_test extends \advanced_testcase {
     }
 
     /**
-     * M-15: a failed generation's percentage comes from pendingdata's shape, not a question count.
+     * A failed generation's percentage comes from pendingdata's shape, not a question count.
      */
     public function test_failed_percent_reads_pendingdata_shape(): void {
         $this->assertSame(25, generation_progress::failed_percent(null));
@@ -128,8 +123,8 @@ final class generation_progress_test extends \advanced_testcase {
     }
 
     /**
-     * color_classes() covers every colour the bar can carry, so a re-render always clears the
-     * previous one - a colour present in a stage but missing here would stick on the element.
+     * Color_classes() covers every colour the bar can carry, so a re-render always clears the
+     * Previous one - a colour present in a stage but missing here would stick on the element.
      */
     public function test_color_classes_cover_every_stage(): void {
         $classes = generation_progress::color_classes();
@@ -144,7 +139,7 @@ final class generation_progress_test extends \advanced_testcase {
 
     /**
      * The payload handed to amd/src/status.js carries everything the JS needs, so it can own no
-     * copy of any of it.
+     * Copy of any of it.
      */
     public function test_config_json_carries_everything_the_js_needs(): void {
         $config = json_decode(generation_progress::config_json(), true);
@@ -152,7 +147,7 @@ final class generation_progress_test extends \advanced_testcase {
         $this->assertIsArray($config);
         $this->assertSame(array_keys(generation_progress::STAGES), array_keys($config['stages']));
         $this->assertSame(generation_progress::color_classes(), $config['colorClasses']);
-        // S-2: the terminal list is generation_status::TERMINAL, not a second copy.
+        // The terminal list is generation_status::TERMINAL, not a second copy.
         $this->assertSame(generation_status::TERMINAL, $config['terminal']);
         $this->assertSame(generation_progress::FAILED_STAGE['color'], $config['failed']['color']);
 
@@ -164,10 +159,7 @@ final class generation_progress_test extends \advanced_testcase {
     }
 
     /**
-     * S-3: amd/src/status.js must not re-acquire its own copy of the stage mapping.
-     *
-     * The pre-S-3 code held a STAGE_INFO object literal with the same four percentages. If any
-     * two of them reappear together in the module, the two sources have diverged again.
+     * Amd/src/status.js must not re-acquire its own copy of the stage mapping.
      */
     public function test_status_js_holds_no_copy_of_the_stage_mapping(): void {
         $js = file_get_contents(__DIR__ . '/../../amd/src/status.js');
@@ -188,7 +180,7 @@ final class generation_progress_test extends \advanced_testcase {
     }
 
     /**
-     * S-2: the terminal status list likewise appears only in the PHP constant.
+     * The terminal status list likewise appears only in the PHP constant.
      */
     public function test_status_js_holds_no_copy_of_the_terminal_statuses(): void {
         $js = file_get_contents(__DIR__ . '/../../amd/src/status.js');

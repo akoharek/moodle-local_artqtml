@@ -147,7 +147,7 @@ jobs:
           SMTP_FROM: ${{ secrets.SMTP_FROM }}
         run: |
           if [ -z "$SMTP_HOST" ] || [ -z "$SMTP_USER" ] || [ -z "$SMTP_PASSWORD" ] || [ -z "$SMTP_FROM" ]; then
-            echo "::warning::SMTP secrets incomplete (need SMTP_HOST, SMTP_USER, SMTP_PASSWORD, SMTP_FROM); skipping email. Teams-only works until SMTP is configured — see SUPPORT.md."
+            echo "::warning::SMTP secrets incomplete (need SMTP_HOST, SMTP_USER, SMTP_PASSWORD, SMTP_FROM); skipping email. Teams-only works until SMTP is configured."
             echo "skip=true" >> "$GITHUB_OUTPUT"
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"

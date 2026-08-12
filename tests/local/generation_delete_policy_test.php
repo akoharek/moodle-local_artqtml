@@ -19,12 +19,9 @@ namespace local_artqtml\local;
 /**
  * Unit tests for generation deletion authorisation.
  *
- * Product decision 2026-08-10: delete requires local/artqtml:use and ownership.
- * local/artqtml:configure never authorises deletion.
- *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\generation_delete_policy
  */
 final class generation_delete_policy_test extends \advanced_testcase {
@@ -44,7 +41,7 @@ final class generation_delete_policy_test extends \advanced_testcase {
      * Assign only the named ArtQTML capabilities to a user at system context.
      *
      * Uses a fresh role each time so :use and :configure can be granted independently - the
-     * manager archetype has both, which would blur the configure-only case.
+     * Manager archetype has both, which would blur the configure-only case.
      *
      * @param \stdClass $user
      * @param string[] $capabilities frankenstyle capability names
@@ -93,7 +90,7 @@ final class generation_delete_policy_test extends \advanced_testcase {
     }
 
     /**
-     * :configure alone never authorises deletion - even of the caller's own generation.
+     * Configure alone never authorises deletion - even of the caller's own generation.
      */
     public function test_configure_only_cannot_delete(): void {
         $owner = $this->getDataGenerator()->create_user();

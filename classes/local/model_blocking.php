@@ -15,23 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The model blocking state (Admin-055, Admin-065, Glob-036).
- *
- * Admin-055 is the load-bearing rule: "A blokkoló állapotot kizárólag a modellellenőrzés írja -
- * akár ütemezett, akár kézi futásról van szó. A normál generálási forgalom soha nem állítja be, még
- * HTTP 404 esetén sem." So exactly two callers may write here, both in model_checker; a 404 during
- * generation puts that generation into the error state (Admin-058) and touches nothing else.
- *
- * Two distinct blocked situations exist and Admin-065 requires the warning to tell them apart,
- * because they need different administrator actions:
- *
- *  - NOT CONFIGURED: no model is set at all. Since Admin-051 removed the factory defaults, this is
- *    the state of every fresh install, and the fix is to choose a model.
- *  - UNUSABLE: a model is set but the check found it withdrawn or the API structure changed. The
- *    fix is to choose a different model.
+ * The model blocking state.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -40,14 +27,14 @@ namespace local_artqtml\local;
  * Reads and writes the per-provider blocking state.
  */
 class model_blocking {
-    /** @var string no model is configured for this provider (Admin-065). */
+    /** @var string no model is configured for this provider . */
     public const REASON_NOT_CONFIGURED = 'notconfigured';
 
-    /** @var string a model is configured but the check found it unusable (Glob-036). */
+    /** @var string a model is configured but the check found it unusable . */
     public const REASON_UNUSABLE = 'unusable';
 
     /**
-     * Record that a provider's model check failed (Admin-055).
+     * Record that a provider's model check failed.
      *
      * @param string $provider
      * @param string $model the model that failed, for the message
@@ -66,7 +53,7 @@ class model_blocking {
     }
 
     /**
-     * Clear a provider's blocking state after a successful check (Admin-054/055).
+     * Clear a provider's blocking state after a successful check.
      *
      * @param string $provider
      * @return void
@@ -79,7 +66,7 @@ class model_blocking {
      * The blocking state for one provider, or null when it is not blocked.
      *
      * The "no model configured" case is derived rather than stored: it is a fact about the setting,
-     * so deriving it means it cannot go stale against the setting the way a stored copy would.
+     * So deriving it means it cannot go stale against the setting the way a stored copy would.
      *
      * @param string $provider
      * @return array{reason: string, model: string, checktype: string, errorcode: string, since: int}|null
@@ -87,8 +74,6 @@ class model_blocking {
     public static function state(string $provider): ?array {
         $model = (string) get_config('local_artqtml', $provider === model_list::PROVIDER_CLAUDE ? 'claudemodel' : 'geminimodel');
         if ($model === '') {
-            // Admin-065: an unset model is a blocking state in its own right, and since Admin-051
-            // removed the factory defaults this is what a fresh install looks like.
             return [
                 'reason'    => self::REASON_NOT_CONFIGURED,
                 'model'     => '',
@@ -124,7 +109,7 @@ class model_blocking {
     }
 
     /**
-     * The warning messages to show, one per blocked provider (Glob-036, Admin-065).
+     * The warning messages to show, one per blocked provider.
      *
      * @return string[]
      */
@@ -146,7 +131,7 @@ class model_blocking {
                 continue;
             }
 
-            // Admin-056/057: name the affected model and carry the traceable error code.
+            // Name the affected model and carry the traceable error code.
             $messages[] = get_string($key, 'local_artqtml', $state['errorcode']);
         }
 

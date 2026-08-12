@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Extracts plain text from an uploaded TXT file (ArtQTML Light: TXT only).
+ * Extracts plain text from an uploaded TXT file.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -31,13 +31,15 @@ class text_extractor {
     public const SUPPORTED_EXTENSIONS = ['txt'];
 
     /**
+     * Helper.
+     *
      * @var int most bytes an uploaded file may be as it arrives (64 MiB).
      */
     protected const MAX_SOURCE_FILE_BYTES = 67108864;
 
     /**
      * Fetch the real (non-directory) stored_file objects for a filepicker/filemanager
-     * element's draft item id.
+     * Element's draft item id.
      *
      * @param int $draftitemid the draft area item id (the raw value submitted by the element)
      * @return \stored_file[]
@@ -55,8 +57,8 @@ class text_extractor {
      * Whether this file is one the plugin will open at all.
      *
      * The filepicker's `accepted_types` is a convenience for the browser and nothing more - it is
-     * client-side, and a direct POST never sees it. This is the server's answer, and it checks the
-     * file's actual first bytes rather than trusting either the extension or the browser-supplied
+     * Client-side, and a direct POST never sees it. This is the server's answer, and it checks the
+     * File's actual first bytes rather than trusting either the extension or the browser-supplied
      * MIME type, which the client controls.
      *
      * @param \stored_file $file
@@ -71,8 +73,8 @@ class text_extractor {
         $prefix = self::read_prefix($file, 8);
 
         // TXT: refuse anything that announces itself as an executable or an archive. A plain text
-        // file has no signature of its own, so this is a deny-list of the shapes that clearly are
-        // not text, plus the NUL-density check inside the TXT reader.
+        // File has no signature of its own, so this is a deny-list of the shapes that clearly are
+        // Not text, plus the NUL-density check inside the TXT reader.
         foreach (["\x7fELF", "MZ", "PK\x03\x04", "%PDF-", "\x1f\x8b"] as $signature) {
             if (strncmp($prefix, $signature, strlen($signature)) === 0) {
                 return false;
@@ -140,7 +142,7 @@ class text_extractor {
     }
 
     /**
-     * Extract text from a plain-text file, converting to UTF-8 if needed.
+     * Extract text from a plain-text file, converting to UT if needed.
      *
      * @param \stored_file $file
      * @param array $metrics
@@ -155,8 +157,8 @@ class text_extractor {
         $metrics['expandedbytes'] = strlen($content);
 
         // A binary file renamed to .txt. Checked on a sample rather than the whole content: a
-        // genuine text file has no NUL bytes at all, so a handful in the first kilobytes is
-        // already conclusive.
+        // Genuine text file has no NUL bytes at all, so a handful in the first kilobytes is
+        // Already conclusive.
         $sample = substr($content, 0, 4096);
         if ($sample !== '' && substr_count($sample, "\0") > 0) {
             return extraction_result::rejected(extraction_result::REASON_INVALID_STRUCTURE, $metrics);

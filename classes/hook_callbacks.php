@@ -18,7 +18,7 @@
  * Hooks API listeners for local_artqtml (db/hooks.php).
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml;
@@ -31,11 +31,8 @@ use local_artqtml\local\validation_panel;
  */
 class hook_callbacks {
     /**
-     * Inject the read-only AI validation panel into Moodle's native question editor when the
-     * question being edited is one of ours (Jov-019/020).
-     *
      * Only ever adds HTML on /question/bank/editquestion/question.php for a question that has
-     * a matching local_artqtml_questions row - a cheap no-op everywhere else.
+     * A matching local_artqtml_questions row - a cheap no-op everywhere else.
      *
      * @param before_standard_top_of_body_html_generation $hook
      * @return void

@@ -17,36 +17,24 @@
 namespace local_artqtml\local;
 
 /**
- * Unit tests for the model-check diagnostic log (Admin-061/063).
- *
- * Admin-063 makes this table a documented, stable public interface that administrators query with
- * Configurable Reports, so the schema itself is under test here, not just the writer: the column
- * set is asserted verbatim, and the table is read back with a plain unquoted SELECT of the kind an
- * administrator would actually write.
+ * Unit tests for the model-check diagnostic log.
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\model_check_log
  */
 final class model_check_log_test extends \advanced_testcase {
     /**
-     * Admin-063: the column set is a public contract. If this assertion needs changing, the change
-     * is breaking and needs a documented version bump - it is not a free refactor.
-     *
-     * Changed once, on 2026-08-03 (BL-44, version 2026080303): `pluginversion` appended. Recorded
-     * here rather than only in the upgrade step, because this is where the next person will be
-     * standing when they wonder whether the change was deliberate.
-     *
      * It is an addition, which the table's own comment separates from the breaking kind - that
-     * comment names renaming and dropping. A report selecting named columns is unaffected; one
-     * selecting `*` gains a column at the end.
+     * Comment names renaming and dropping. A report selecting named columns is unaffected; one
+     * Selecting `*` gains a column at the end.
      *
      * Why the column had to exist: a structural check failure takes a model out of the dropdown,
-     * and that verdict has to be revocable by us. On the day this was added, two models failed the
-     * check in the morning and passed in the afternoon, because the defect was in how the plugin
-     * read the response. Scoping an exclusion to the plugin version that produced it means our own
-     * fix reopens them; without the column the exclusion would have outlived its own cause.
+     * And that verdict has to be revocable by us. On the day this was added, two models failed the
+     * Check in the morning and passed in the afternoon, because the defect was in how the plugin
+     * Read the response. Scoping an exclusion to the plugin version that produced it means our own
+     * Fix reopens them; without the column the exclusion would have outlived its own cause.
      */
     public function test_schema_matches_the_documented_interface(): void {
         global $DB;
@@ -72,9 +60,9 @@ final class model_check_log_test extends \advanced_testcase {
 
     /**
      * The table must be readable with a plain, unquoted, portable SELECT - which is the entire
-     * point of naming the column triggertype rather than the annex's `trigger`. TRIGGER is a
-     * reserved word; an unquoted reference to it is a syntax error in MariaDB and PostgreSQL, and
-     * a quoted one is not portable between them.
+     * Point of naming the column triggertype rather than the annex's `trigger`. TRIGGER is a
+     * Reserved word; an unquoted reference to it is a syntax error in MariaDB and PostgreSQL, and
+     * A quoted one is not portable between them.
      */
     public function test_every_column_is_selectable_unquoted(): void {
         global $DB;
@@ -90,10 +78,6 @@ final class model_check_log_test extends \advanced_testcase {
             model_check_log::TRIGGER_MANUAL
         );
 
-        // Every column by name, deliberately: a `SELECT *` would pass this test without proving
-        // anything about the new one. 2026-08-03 - `pluginversion` was added and this list was not
-        // updated with it at first, so the test kept passing while no longer covering the column it
-        // was written to protect.
         $rows = $DB->get_records_sql(
             'SELECT id, timecreated, provider, model, checktype, result, errorcode, errormessage,
                     duration, triggertype, pluginversion
@@ -105,15 +89,10 @@ final class model_check_log_test extends \advanced_testcase {
         $row = reset($rows);
         $this->assertSame('gemini', $row->provider);
         $this->assertSame(model_check_log::TRIGGER_MANUAL, $row->triggertype);
-        // BL-44: the verdict carries the plugin version it was made under, so our own fix can
-        // reopen a model our own defect excluded.
+        // The verdict carries the plugin version it was made under, so our own fix can reopen a model our own defect excluded.
         $this->assertGreaterThan(0, (int) $row->pluginversion);
     }
 
-    /**
-     * Admin-057: the four-digit part of the code is the log row id, so a code read off the warning
-     * bar leads back to the entry that produced it.
-     */
     public function test_failure_records_an_error_code_derived_from_the_row_id(): void {
         global $DB;
         $this->resetAfterTest();
@@ -162,7 +141,7 @@ final class model_check_log_test extends \advanced_testcase {
     }
 
     /**
-     * Admin-061: only a shortened detail is stored, never a raw provider response.
+     * Only a shortened detail is stored, never a raw provider response.
      */
     public function test_error_message_is_truncated(): void {
         global $DB;
@@ -186,10 +165,6 @@ final class model_check_log_test extends \advanced_testcase {
     /**
      * A busy provider is not a verdict about the model.
      *
-     * MEASURED 2026-08-03: `gemini-3.1-pro-preview-customtools` answered "This model is currently
-     * experiencing high demand. Spikes in demand are usually temporary" and the sweep struck it off
-     * the dropdown, where it would have stayed until the next version bump. Both halves are
-     * asserted - that the row is written, so the outage is visible, and that it does not exclude.
      */
     public function test_a_transient_failure_is_recorded_but_does_not_exclude(): void {
         $this->resetAfterTest();
@@ -227,7 +202,7 @@ final class model_check_log_test extends \advanced_testcase {
 
     /**
      * An outage must not erase the failure underneath it, which is what would let a genuinely
-     * broken model back into the dropdown on the next busy night.
+     * Broken model back into the dropdown on the next busy night.
      */
     public function test_a_transient_row_does_not_overwrite_an_earlier_verdict(): void {
         $this->resetAfterTest();
@@ -256,7 +231,7 @@ final class model_check_log_test extends \advanced_testcase {
     }
 
     /**
-     * latest_for_provider() returns the newest entry for that provider and ignores the other.
+     * Latest_for_provider() returns the newest entry for that provider and ignores the other.
      */
     public function test_latest_for_provider(): void {
         $this->resetAfterTest();
@@ -298,7 +273,7 @@ final class model_check_log_test extends \advanced_testcase {
     }
 
     /**
-     * Admin-062: no retention policy - nothing prunes the table.
+     * No retention policy - nothing prunes the table.
      */
     public function test_no_purge_mechanism_exists(): void {
         $root = realpath(__DIR__ . '/../..');
@@ -317,6 +292,6 @@ final class model_check_log_test extends \advanced_testcase {
             }
         }
 
-        $this->assertSame([], $offenders, 'Admin-062 forbids automatic purging of the diagnostic log');
+        $this->assertSame([], $offenders, 'forbids automatic purging of the diagnostic log');
     }
 }

@@ -17,28 +17,11 @@
 namespace local_artqtml\local\question;
 
 /**
- * Pins the retry penalty that question_form_builder writes onto the real Moodle question
- * (T-07, TC-Gen-061).
- *
- * Gen-030 (corrected): multiple attempts, hint display and the per-attempt deduction are three
- * INDEPENDENT switches. When retry is on, the deduction is configurable per question type, default
- * 33%. The teacher may change it later, per question, in Moodle's native editor. The old Gen-030
- * wording tied the 33% to hint generation, which was wrong - so the independence of the penalty
- * from the hint switch is the part most worth pinning here.
- *
- * On the 0.33 vs 0.3333333 question: they are two different intended defaults, not one value at two
- * precisions (see docs/retry_penalty_report.md).
- *  - retry ON, default -> 0.33: exactly 33%, the value Gen-030 documents and the one actually
- *    applied per failed attempt under "Interactive with multiple tries".
- *  - retry OFF -> 0.3333333: Moodle's OWN default penalty (\question/format.php,
- *    \question/type/edit_question_form.php, \question/type/questiontypebase.php all use it). When
- *    the plugin is not managing the penalty, it leaves the question at Moodle's native default,
- *    exactly as a hand-created question would be; a non-interactive behaviour never applies it.
- * The code is correct as written, so these are asserted as the contract, not copied blindly.
+ * Pins the retry penalty that question_form_builder writes onto the real Moodle question.
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\question\question_form_builder
  */
 final class retry_penalty_test extends \advanced_testcase {
@@ -65,17 +48,17 @@ final class retry_penalty_test extends \advanced_testcase {
 
     /**
      * Case 3 - retry off: Moodle's own default penalty reaches the bank (never applied without an
-     * interactive behaviour, but this is the field's stored value).
+     * Interactive behaviour, but this is the field's stored value).
      */
     public function test_retry_off_is_the_moodle_default(): void {
         $this->assertEqualsWithDelta(self::MOODLE_DEFAULT_PENALTY, $this->penalty_for('IH', []), 1e-9);
     }
 
     /**
-     * Case 4 - the penalty follows the RETRY switch, not the HINT switch (the corrected Gen-030).
+     * Case 4 - the penalty follows the RETRY switch, not the HINT switch (the corrected ).
      *
      * A hint with retry off must NOT pull in the retry-on penalty, and retry on with no hint must
-     * still apply it - proving the two switches are independent, which the old wording got wrong.
+     * Still apply it - proving the two switches are independent, which the old wording got wrong.
      */
     public function test_penalty_follows_retry_not_hint(): void {
         // Hint on, retry off -> the retry-off value, because the hint switch does not touch penalty.
@@ -96,7 +79,7 @@ final class retry_penalty_test extends \advanced_testcase {
     }
 
     /**
-     * Light: FE uses the same retry-driven penalty as IH (essay/EH removed).
+     * FE uses the same retry-driven penalty as IH.
      */
     public function test_fe_retry_on_default_is_33_percent(): void {
         $this->assertEqualsWithDelta(

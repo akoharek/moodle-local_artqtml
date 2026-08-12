@@ -18,10 +18,10 @@
  * Per-user AJAX rate limits for extract_text and get_status (security audit finding #7).
  *
  * Fixed 60-second windows (core_ai-style counter, shorter window). Limits leave headroom for
- * the status page's 3s poll (~20/min) plus a few tabs, while capping extract_text bursts.
+ * The status page's 3s poll (~20/min) plus a few tabs, while capping extract_text bursts.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;

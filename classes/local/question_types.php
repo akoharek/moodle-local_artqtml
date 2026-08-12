@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Single source of truth for the three supported question types (ArtQTML Light).
+ * Single source of truth for the three supported question types (IH/FE/SR).
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -56,9 +56,9 @@ class question_types {
     }
 
     /**
-     * Whether the "multiple attempts" toggle (Beal-014) applies to this type.
+     * Whether the "multiple attempts" toggle applies to this type.
      *
-     * IH only has two possible answers, so retries are not meaningful (Beal-014/Admin-023).
+     * IH only has two possible answers, so retries are not meaningful.
      *
      * @param string $code one of self::CODES
      * @return bool
@@ -68,8 +68,7 @@ class question_types {
     }
 
     /**
-     * Whether Moodle actually supports per-question hints (question_hints) for this type
-     * (M-24). Narrower than {@see self::supports_retry()}: Light keeps FE and SR only.
+     * supports hints.
      *
      * @param string $code one of self::CODES
      * @return bool
@@ -79,12 +78,12 @@ class question_types {
     }
 
     /**
-     * Whether a per-answer explanation can be stored for this type at all (BL-29).
+     * Whether a per-answer explanation can be stored for this type at all.
      *
      * - FE is qtype_multichoice, which keeps one feedback per answer.
      * - IH is qtype_truefalse, whose two answers have feedbacktrue and feedbackfalse.
      * - SR is qtype_ordering, which has combined feedback only - a sequence item has no
-     *   feedback field, so an explanation generated for one would have nowhere to go.
+     * Feedback field, so an explanation generated for one would have nowhere to go.
      *
      * @param string $code
      * @return bool
@@ -94,8 +93,7 @@ class question_types {
     }
 
     /**
-     * Render a stored count-discrepancy list (M-08) as a human-readable warning, e.g.
-     * "Requested: 3 True/False, 2 Multiple choice — Received: 5 True/False, 0 Multiple choice."
+     * format count discrepancy.
      *
      * @param array $discrepancies list of ['type' => code, 'requested' => int, 'received' => int]
      * @return string empty string if $discrepancies is empty

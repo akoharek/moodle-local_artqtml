@@ -21,7 +21,7 @@ namespace local_artqtml\local;
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\generation_list
  */
 final class generation_list_date_filter_test extends \advanced_testcase {
@@ -57,7 +57,7 @@ final class generation_list_date_filter_test extends \advanced_testcase {
     }
 
     /**
-     * build_where binds timestamps only for strict Y-m-d; invalid dates add no clause.
+     * Build_where binds timestamps only for strict Y-m-d; invalid dates add no clause.
      */
     public function test_build_where_date_bounds(): void {
         [$where, $params] = $this->call_protected('build_where', [

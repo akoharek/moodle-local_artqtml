@@ -15,16 +15,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The single source of truth for the validation problem_category enum (Val-019/Val-028/Val-029).
+ * The single source of truth for the validation problem_category enum.
  *
  * The four fixed machine keys live here and nowhere else: the Gemini response schema
  * ({@see \local_artqtml\task\validate_questions_task::build_schema()}), the validator prompt
- * assembly, and every UI display path all read {@see self::VALUES} / {@see self::label()} from
- * this class, so the schema's value set and the prompt's value set are guaranteed identical
+ * Assembly, and every UI display path all read {@see self::VALUES} / {@see self::label()} from
+ * This class, so the schema's value set and the prompt's value set are guaranteed identical
  * (a technikai melléklet: "Ez a négy érték a JSON séma egyetlen forrása").
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -33,16 +33,16 @@ namespace local_artqtml\local;
  * Canonical list + display helper for the four validation problem categories.
  */
 class problem_category {
-    /** @var string the "no problem" category the AI returns for an acceptable question (Val-019). */
+    /** @var string the "no problem" category the AI returns for an acceptable question . */
     public const OK = 'ok';
 
     /**
-     * The four fixed problem_category enum values, in canonical order (Val-019/Val-028).
+     * The four fixed problem_category enum values, in canonical order.
      *
      * Exactly four members; none is an empty string (an empty string is not a permitted Gemini
-     * structured-output enum value - it fails schema validation with
+     * Structured-output enum value - it fails schema validation with
      * "problem_category.enum[0]: cannot be empty"). Do not add a fifth or reorder without a spec
-     * change: PROB-F004 asserts this set verbatim.
+     * Change: PROB-F004 asserts this set verbatim.
      *
      * @var string[]
      */
@@ -60,9 +60,7 @@ class problem_category {
     }
 
     /**
-     * Human-readable label for a category key, from a lang string (Val-029) - the raw machine
-     * key (e.g. "factual_error") must never reach the UI. The "ok" label is "No issue" /
-     * "Nincs probléma", deliberately distinct from the "Accepted" suggestion label (PROB-F002).
+     * label.
      *
      * @param string $value one of {@see self::VALUES}
      * @return string

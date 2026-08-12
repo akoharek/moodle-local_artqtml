@@ -15,17 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * question_approved event (technical annex 7.1, Jov-016).
+ * Question_approved event.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\event;
 
 /**
  * Triggered when a teacher explicitly approves a draft question - a distinct step from moving
- * it: a question must be approved before it can be moved into a real question bank.
+ * It: a question must be approved before it can be moved into a real question bank.
  */
 class question_approved extends \core\event\base {
     /**

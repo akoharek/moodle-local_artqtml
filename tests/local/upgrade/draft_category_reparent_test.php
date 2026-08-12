@@ -20,12 +20,12 @@ namespace local_artqtml\local\upgrade;
  * Unit tests for the D-3 repair: draft categories left at parent = 0 by earlier versions.
  *
  * The invariant every case below checks is Moodle's own: a context has exactly one question
- * category with parent = 0. That is what question_get_top_category() relies on, and violating it
- * is what broke the demo site's question bank.
+ * Category with parent = 0. That is what question_get_top_category() relies on, and violating it
+ * Is what broke the demo site's question bank.
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\upgrade\draft_category_reparent
  */
 final class draft_category_reparent_test extends \advanced_testcase {
@@ -87,8 +87,8 @@ final class draft_category_reparent_test extends \advanced_testcase {
 
     /**
      * The common case seen on the demo: a real top already exists, and the draft category sits
-     * beside it. The draft category must end up under that existing top - not become a new one,
-     * and not be deleted.
+     * Beside it. The draft category must end up under that existing top - not become a new one,
+     * And not be deleted.
      *
      * @return void
      */
@@ -114,8 +114,8 @@ final class draft_category_reparent_test extends \advanced_testcase {
 
     /**
      * The case draft_bank's docblock describes: no question category had ever been created in that
-     * context, so the draft category became the context's top. A real top has to be created before
-     * the draft one can hang under it.
+     * Context, so the draft category became the context's top. A real top has to be created before
+     * The draft one can hang under it.
      *
      * @return void
      */
@@ -145,7 +145,7 @@ final class draft_category_reparent_test extends \advanced_testcase {
 
     /**
      * Two leftovers in one context: both must land under the same real top, and neither may be
-     * mistaken for the other's top.
+     * Mistaken for the other's top.
      *
      * @return void
      */
@@ -170,7 +170,7 @@ final class draft_category_reparent_test extends \advanced_testcase {
 
     /**
      * A correctly nested draft category - what current code produces - must be left alone. Without
-     * this, a repair that re-parented everything it found would still pass the cases above.
+     * This, a repair that re-parented everything it found would still pass the cases above.
      *
      * @return void
      */
@@ -193,7 +193,7 @@ final class draft_category_reparent_test extends \advanced_testcase {
 
     /**
      * A generation with no draft category at all (never started, or already cleaned up) must not
-     * make the repair touch anything.
+     * Make the repair touch anything.
      *
      * @return void
      */

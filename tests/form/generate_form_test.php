@@ -21,11 +21,11 @@ use local_artqtml\local\question_types;
 /**
  * Unit tests for the question-settings form's server-side validation.
  *
- * ArtQTML Light: scale-only matrix (IH/FE/SR); no per-type instruction fields / security filter.
+ * Scale-only matrix (IH/FE/SR); no per-type instruction fields / security filter.
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\form\generate_form
  */
 final class generate_form_test extends \advanced_testcase {
@@ -105,7 +105,7 @@ final class generate_form_test extends \advanced_testcase {
     }
 
     /**
-     * Light keeps only the three CODES types on the form.
+     * Only the three CODES types appear on the form.
      */
     public function test_form_offers_exactly_the_light_types(): void {
         $this->resetAfterTest();
@@ -130,7 +130,7 @@ final class generate_form_test extends \advanced_testcase {
             $this->assertFalse($mform->elementExists('typeheader_' . $removed), $removed);
             $this->assertFalse($mform->elementExists('instruction_' . $removed), $removed);
         }
-        // Per-type AI instruction boxes were a Full feature.
+        // Per-type AI instruction boxes are not supported.
         $this->assertFalse($mform->elementExists('instruction_IH'));
     }
 

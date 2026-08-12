@@ -15,11 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * An integer admin setting that must stay ordered relative to a sibling setting's value
- * (Admin-025: FE min/max answer options must never cross over each other).
+ * Helper.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\admin;
@@ -28,8 +27,8 @@ namespace local_artqtml\admin;
  * Validates this setting against both a fixed minimum and a sibling setting's submitted value.
  *
  * Used on *both* sides of a min/max pair (with $mustbeatmost flipped accordingly) - cross-
- * checking only the max field against the min would still let a same-submission edit push the
- * min above an unchanged max through independently-valid per-field writes.
+ * Checking only the max field against the min would still let a same-submission edit push the
+ * Min above an unchanged max through independently-valid per-field writes.
  */
 class setting_configtext_atleast extends setting_configtext_min {
     /** @var string the (unqualified) name of the sibling setting to compare against. */
@@ -68,8 +67,8 @@ class setting_configtext_atleast extends setting_configtext_min {
      * Validate the submitted value, including the cross-field comparison.
      *
      * Reads the sibling setting's just-submitted (not yet saved) value straight from the
-     * request, since admin_setting::validate() runs before any setting on the page is written -
-     * config_read() at this point would still return the sibling's pre-submission value.
+     * Request, since admin_setting::validate() runs before any setting on the page is written -
+     * Config_read() at this point would still return the sibling's pre-submission value.
      *
      * @param string $data
      * @return true|string true if valid, an error message string otherwise
@@ -84,8 +83,8 @@ class setting_configtext_atleast extends setting_configtext_min {
         if ($othervalue === null) {
             $otherstored = $this->config_read($this->othersettingname);
             // The sibling isn't configured yet (e.g. while plugin defaults are first applied at
-            // install time, before the other half of the pair exists) - there is nothing to
-            // cross-check against, so accept the value.
+            // Install time, before the other half of the pair exists) - there is nothing to
+            // Cross-check against, so accept the value.
             if ($otherstored === null || $otherstored === false) {
                 return true;
             }

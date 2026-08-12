@@ -21,17 +21,11 @@ use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\userlist;
 
 /**
- * Unit tests for the privacy provider (BL-52, L-6).
- *
- * WHAT THESE ARE FOR. The provider carries a rule that is easy to state and easy to break silently:
- * a deletion removes the person's link and the raw content, and KEEPS the log row (Glob-040). A
- * line that deleted those rows sat here until 2026-08-04, and nothing would have failed if it came
- * back. The two halves are asserted separately on purpose - "the row is gone" and "the row is still
- * identifying" are different defects with the same one-line cause.
+ * Unit tests for the privacy provider (L-6).
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\privacy\provider
  */
 final class provider_test extends \advanced_testcase {
@@ -80,10 +74,6 @@ final class provider_test extends \advanced_testcase {
 
     /**
      * Deleting a user's data removes the generation and keeps the log row, without its user id.
-     *
-     * The single most important assertion in this file is the last one: the row survives. Glob-040
-     * says the log outlives the material it describes, because what it records is what the site
-     * spent, and that has to stay auditable after the document is gone.
      */
     public function test_deleting_a_user_keeps_the_log_row_and_drops_its_identity(): void {
         global $DB;
@@ -104,9 +94,9 @@ final class provider_test extends \advanced_testcase {
         $this->assertFalse($DB->record_exists('local_artqtml_generations', ['id' => $made['generationid']]));
         $this->assertFalse($DB->record_exists('local_artqtml_questions', ['id' => $made['questionid']]));
 
-        // The log row stays - Glob-040.
+        // The log row stays -.
         $log = $DB->get_record('local_artqtml_log', ['id' => $made['logid']]);
-        $this->assertNotFalse($log, 'The log row must survive the deletion (Glob-040).');
+        $this->assertNotFalse($log, 'The log row must survive the deletion .');
 
         // With the identifying link gone and the technical record intact.
         $this->assertNull($log->userid);
@@ -120,8 +110,7 @@ final class provider_test extends \advanced_testcase {
     /**
      * Another user's generation is untouched by the first user's deletion.
      *
-     * The tool is site-wide by decision (Glob-031), so one user's request must not take a
-     * colleague's material with it.
+     * The tool is site-wide, so one user's request must not take a colleague's material with it.
      */
     public function test_another_users_generation_is_untouched(): void {
         global $DB;
@@ -145,10 +134,7 @@ final class provider_test extends \advanced_testcase {
 
     /**
      * A user who only edited or approved somebody else's question loses their name from it, and the
-     * question stays.
-     *
-     * V20 #5: those columns identify a person other than the generation's owner, and the question
-     * itself is that owner's data - so the row must not be deleted with the editor's request.
+     * Question stays.
      */
     public function test_an_editors_footprint_is_scrubbed_but_the_question_stays(): void {
         global $DB;
@@ -180,7 +166,7 @@ final class provider_test extends \advanced_testcase {
      * The user list for the system context names the owner and the editor.
      *
      * Whoever is not named here never gets asked, so an omission is a silent failure to honour a
-     * request.
+     * Request.
      */
     public function test_the_userlist_names_owner_and_editor(): void {
         global $DB;
@@ -204,7 +190,7 @@ final class provider_test extends \advanced_testcase {
      * Deleting every user in the context leaves the log rows behind, redacted.
      *
      * Same rule as the per-user path, checked separately because it is a different method with its
-     * own chance to reintroduce the delete.
+     * Own chance to reintroduce the delete.
      */
     public function test_deleting_the_whole_context_still_keeps_the_log(): void {
         global $DB;

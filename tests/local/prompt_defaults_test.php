@@ -17,12 +17,12 @@
 namespace local_artqtml\local;
 
 /**
- * The shipped prompt seed must stay in step with the code that substitutes into it (Admin-066).
+ * The shipped prompt seed must stay in step with the code that substitutes into it.
  *
- * ArtQTML Light: scale + sourceonly only; no ownknowledge / bloom / freetext / shortanswer seeds.
+ * Scale + sourceonly prompt defaults for IH/FE/SR.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\prompt_seed
  */
 final class prompt_defaults_test extends \advanced_testcase {
@@ -138,13 +138,13 @@ final class prompt_defaults_test extends \advanced_testcase {
     }
 
     /**
-     * Gen-031: the template instructs the model about the language of the questions.
+     * The template instructs the model about the language of the questions.
      */
     public function test_the_template_states_the_output_language_rule(): void {
         $this->assertStringContainsString(
             'language of the source text',
             $this->defaults()['generatorprompttemplate'],
-            'Gen-031: without this sentence the model has no instruction about which language to '
+            'without this sentence the model has no instruction about which language to'
                 . 'generate in, and an English prompt over Hungarian source material is exactly '
                 . 'the case that breaks'
         );
@@ -172,7 +172,7 @@ final class prompt_defaults_test extends \advanced_testcase {
     }
 
     /**
-     * Admin-066: no prompt text is left in the code or the lang packs.
+     * No prompt text is left in the code or the lang packs.
      */
     public function test_the_generator_holds_no_prompt_text(): void {
         global $CFG;
@@ -182,7 +182,7 @@ final class prompt_defaults_test extends \advanced_testcase {
         $this->assertStringNotContainsString(
             "get_string('prompt",
             $source,
-            'generate_questions_task reads prompt text from a lang string. Admin-066 requires every '
+            'generate_questions_task reads prompt text from a lang string. requires every'
                 . 'word of the prompt to come from admin settings.'
         );
     }

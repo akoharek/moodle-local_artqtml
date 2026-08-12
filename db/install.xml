@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/artqtml/db" VERSION="20260811" COMMENT="XMLDB file for Moodle local/artqtml Light"
+<XMLDB PATH="local/artqtml/db" VERSION="20260811" COMMENT="XMLDB file for Moodle local/artqtml"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="local_artqtml_generations" COMMENT="Site-wide AI quiz question generation jobs (Glob-022/023: not course-scoped)">
+    <TABLE NAME="local_artqtml_generations" COMMENT="Site-wide AI quiz question generation jobs (: not course-scoped)">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="User who created the generation"/>
-        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Generation name given by the user (Felt-001/002)"/>
-        <FIELD NAME="shortname" TYPE="char" LENGTH="8" NOTNULL="true" SEQUENCE="false" COMMENT="Alnum shortname used in generated question codes, e.g. BIO1 (Felt-003/004/005)"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Generation name given by the user"/>
+        <FIELD NAME="shortname" TYPE="char" LENGTH="8" NOTNULL="true" SEQUENCE="false" COMMENT="Alnum shortname used in generated question codes, e.g. BIO1"/>
         <FIELD NAME="sourcetext" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Uploaded/typed source text used for generation"/>
-        <FIELD NAME="sourcetexthash" TYPE="char" LENGTH="40" NOTNULL="false" SEQUENCE="false" COMMENT="sha1 of the normalised source text, used for duplicate detection (Felt-021)"/>
-        <FIELD NAME="sourcefilehash" TYPE="char" LENGTH="40" NOTNULL="false" SEQUENCE="false" COMMENT="sha1 of the raw uploaded source file's bytes (before text extraction), null if the source was pasted text with no file (M-19: catches identical files whose extracted text differs)"/>
-        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="started" SEQUENCE="false" COMMENT="started, generating, validating, saving, completed, failed (M-15: saving is a distinct third pipeline stage between validating and completed)"/>
+        <FIELD NAME="sourcetexthash" TYPE="char" LENGTH="40" NOTNULL="false" SEQUENCE="false" COMMENT="sha1 of the normalised source text, used for duplicate detection"/>
+        <FIELD NAME="sourcefilehash" TYPE="char" LENGTH="40" NOTNULL="false" SEQUENCE="false" COMMENT="Column"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="started" SEQUENCE="false" COMMENT="Column"/>
         <FIELD NAME="settings" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON encoded generation settings: difficulty mode, per-type counts and options, seed, knowledge source"/>
-        <FIELD NAME="draftcategoryid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="question_categories.id of this generation's isolated draft bank (Jov-002/Glob-025)"/>
-        <FIELD NAME="error" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Technical error message from the last failed Claude/Gemini API call (Gen-014)"/>
+        <FIELD NAME="draftcategoryid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="question_categories.id of this generation's isolated draft bank"/>
+        <FIELD NAME="error" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Technical error message from the last failed Claude/Gemini API call"/>
         <FIELD NAME="processingtoken" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" COMMENT="Random token set by an atomic UPDATE to claim this generation for processing; NULL means unclaimed (C-02: prevents two concurrent task runs processing the same generation)"/>
-        <FIELD NAME="pendingdata" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="M-15: JSON holding the raw Claude questions and, once validated, the Gemini evaluations - held here (not in local_artqtml_questions) between the generating/validating/saving stages, so nothing is written to local_artqtml_questions until the saving stage commits it all in one transaction. Cleared once saving succeeds."/>
-        <FIELD NAME="countdiscrepancy" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="M-08: JSON list of {type, requested, received} for any question type where Claude's actual output didn't match the requested count, null if none"/>
+        <FIELD NAME="pendingdata" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Column"/>
+        <FIELD NAME="countdiscrepancy" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Column"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
@@ -39,24 +39,24 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="generationid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The generation this question belongs to"/>
         <FIELD NAME="questioncode" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" COMMENT="Plugin-generated code, e.g. BIO1-IH-0001 (spec 3.3.1)"/>
-        <FIELD NAME="typecode" TYPE="char" LENGTH="2" NOTNULL="true" SEQUENCE="false" COMMENT="IH/FE/SR (ArtQTML Light type codes)"/>
+        <FIELD NAME="typecode" TYPE="char" LENGTH="2" NOTNULL="true" SEQUENCE="false" COMMENT="IH/FE/SR type codes"/>
         <FIELD NAME="questiontype" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="Moodle qtype: truefalse, multichoice, ordering, shortanswer, essay"/>
         <FIELD NAME="questiontext" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The generated question text"/>
         <FIELD NAME="difficultylabel" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Emlékezés/Megértés/Alkalmazás, Könnyű/Közepes/Nehéz, or empty for free-text mode"/>
         <FIELD NAME="sourcereference" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Short reference into the source text this question was derived from"/>
         <FIELD NAME="questiondata" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON encoded type-specific fields from the AI response"/>
-        <FIELD NAME="validationsuggestion" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="not_evaluated" SEQUENCE="false" COMMENT="accepted, needs_review, rejected or not_evaluated (Val-017)"/>
-        <FIELD NAME="problemcategory" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Validator problem category: one of ok/factual_error/ambiguous_wording/other; 'ok' for accepted, NULL until evaluated (Val-019/Val-028)"/>
-        <FIELD NAME="justification" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Validator's short justification text (Val-018)"/>
-        <FIELD NAME="confidence" TYPE="int" LENGTH="3" NOTNULL="false" SEQUENCE="false" COMMENT="Validator confidence percentage 0-100 (Val-018)"/>
+        <FIELD NAME="validationsuggestion" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="not_evaluated" SEQUENCE="false" COMMENT="accepted, needs_review, rejected or not_evaluated"/>
+        <FIELD NAME="problemcategory" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Validator problem category: one of ok/factual_error/ambiguous_wording/other; 'ok' for accepted, NULL until evaluated"/>
+        <FIELD NAME="justification" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Validator's short justification text"/>
+        <FIELD NAME="confidence" TYPE="int" LENGTH="3" NOTNULL="false" SEQUENCE="false" COMMENT="Validator confidence percentage 0-100"/>
         <FIELD NAME="validationdata" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Complete raw Gemini evaluation object for this question (question_id/suggestion/problem_category/justification/confidence/hint_quality/feedback_quality as returned), JSON encoded, null if not yet evaluated - problemcategory/justification/confidence above are the normalised/whitelisted values used for sorting and safe display"/>
-        <FIELD NAME="questionbankid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="id of the real Moodle question row, created immediately in the draft bank category (Gen-005)"/>
+        <FIELD NAME="questionbankid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="id of the real Moodle question row, created immediately in the draft bank category"/>
         <FIELD NAME="movedout" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 once the question has been moved out of the draft category into a real target bank"/>
         <FIELD NAME="approved" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 once a teacher has explicitly approved this question; required before it can be moved to a real bank"/>
-        <FIELD NAME="edited" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 if a teacher has edited this question since its last validation (Jov-026/M-20); validationsuggestion is reset to not_evaluated rather than storing a synthetic 'edited' suggestion value, and the UI's Edited badge is driven by this flag instead"/>
-        <FIELD NAME="lasteditedby" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="M-30: userid of whoever last edited this question in the native question editor, null if never edited"/>
-        <FIELD NAME="lasteditedat" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Glob-032: timestamp of lasteditedby's edit, null if never edited - used to find the single most-recently-edited question across a generation for the list page's 'Modified by' column"/>
-        <FIELD NAME="approvedby" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="M-30: userid of whoever approved this question, null if not yet approved"/>
+        <FIELD NAME="edited" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Column"/>
+        <FIELD NAME="lasteditedby" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="userid of whoever last edited this question in the native question editor, null if never edited"/>
+        <FIELD NAME="lasteditedat" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Column"/>
+        <FIELD NAME="approvedby" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="userid of whoever approved this question, null if not yet approved"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
@@ -71,11 +71,11 @@
         <INDEX NAME="movedout" UNIQUE="false" FIELDS="movedout"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="local_artqtml_log" COMMENT="Event log entries for AI quiz question generations (technical annex ch.7/8)">
+    <TABLE NAME="local_artqtml_log" COMMENT="Event log entries for AI quiz question generations">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="generationid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The generation this log entry relates to; NULL for entries not tied to a generation and for entries whose generation has since been deleted - see originalgenerationid"/>
-        <FIELD NAME="originalgenerationid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Historical id of a generation that has been deleted. While the generation exists its id is in generationid and this is NULL; deletion moves the id here and sets generationid to NULL. Glob-040 keeps the log entry itself, and this is what keeps it traceable without leaving generationid pointing at a row that is gone. Deliberately not a foreign key: the row it names no longer exists."/>
+        <FIELD NAME="originalgenerationid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Historical id of a generation that has been deleted"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="User who initiated the action that produced this event"/>
         <FIELD NAME="event" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Event identifier, e.g. generation_started, ai_call_made, ai_call_failed"/>
         <FIELD NAME="calltype" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="generate or validate, for ai_call_* events"/>
@@ -83,8 +83,8 @@
         <FIELD NAME="httpstatus" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="HTTP response status code of the AI call"/>
         <FIELD NAME="tokensinput" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Input token usage for this call"/>
         <FIELD NAME="tokensoutput" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Output token usage for this call"/>
-        <FIELD NAME="jsonattempt" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="1" SEQUENCE="false" COMMENT="JSON-fallback retry sequence number (2.3), independent of the HTTP retry counter"/>
-        <FIELD NAME="isretry" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 if this call is a JSON-fallback retry whose tokens are excluded from the monthly budget (Val-009)"/>
+        <FIELD NAME="jsonattempt" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="1" SEQUENCE="false" COMMENT="JSON-fallback retry sequence number, independent of the HTTP retry counter"/>
+        <FIELD NAME="isretry" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 if this call is a JSON-fallback retry (tokens not counted as a successful attempt)"/>
         <FIELD NAME="requestid" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="API-provided request/trace id, for support escalation"/>
         <FIELD NAME="result" TYPE="char" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="success or error"/>
         <FIELD NAME="errormessage" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Technical error message (error.message), only set when result=error"/>
@@ -101,7 +101,7 @@
         <INDEX NAME="originalgenerationid" UNIQUE="false" FIELDS="originalgenerationid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="local_artqtml_modelcheck" COMMENT="Diagnostic log of scheduled and manual model checks (Admin-061/063). Documented, stable public interface: administrators read it with Configurable Reports, so renaming or dropping a column is a breaking change.">
+    <TABLE NAME="local_artqtml_modelcheck" COMMENT="Diagnostic log of scheduled and manual model checks">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="When the check ran"/>
@@ -110,10 +110,10 @@
         <FIELD NAME="checktype" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="availability or structure"/>
         <FIELD NAME="result" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="success or failure"/>
         <FIELD NAME="errorcode" TYPE="char" LENGTH="30" NOTNULL="false" SEQUENCE="false" COMMENT="AIQ-YYYYMMDD-XXXX, only on failure"/>
-        <FIELD NAME="errormessage" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Shortened error description. The raw provider response is deliberately NOT stored (Admin-061)."/>
+        <FIELD NAME="errormessage" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Shortened error description. The raw provider response is deliberately NOT stored ."/>
         <FIELD NAME="duration" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Call duration in milliseconds"/>
         <FIELD NAME="triggertype" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="scheduled or manual. Named triggertype, not trigger: TRIGGER is a reserved word and cannot be referenced unquoted in MariaDB or PostgreSQL, which would break the Configurable Reports queries this table exists to serve."/>
-        <FIELD NAME="pluginversion" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The plugin version this check ran under (BL-44). A structure failure excludes a model from the dropdown, but only while the plugin is unchanged: on 2026-08-03 two models failed in the morning and worked in the afternoon, because the defect was ours. A version bump therefore reopens every excluded model for checking."/>
+        <FIELD NAME="pluginversion" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The plugin version this check ran under"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

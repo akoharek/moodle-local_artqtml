@@ -20,13 +20,13 @@ namespace local_artqtml\local;
  * Move-target category list must never offer the draft course's banks.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\question_bank_list
  */
 final class question_bank_list_test extends \advanced_testcase {
     /**
      * Categories in the configured draft course are omitted even when the user can add there,
-     * including sibling legacy roots that are not under Light's own artqtml_draft_root.
+     * Including sibling legacy roots that are not under this plugin's artqtml_draft_root.
      */
     public function test_options_exclude_entire_draft_course_context(): void {
         global $CFG, $DB;
@@ -48,12 +48,12 @@ final class question_bank_list_test extends \advanced_testcase {
 
         require_once($CFG->libdir . '/questionlib.php');
 
-        // Light's own draft root + a legacy sibling root (as Full / aiquizgen leave behind).
+        // This plugin's draft root + a legacy sibling root (as earlier installs leave behind).
         $lightroot = draft_bank::get_root_category_id();
         $draftqcontextid = (int) draft_bank::get_draft_context_id();
         $lightdraft = draft_bank::create((object) [
             'id' => 99,
-            'name' => 'Light draft gen',
+            'name' => 'ArtQTML draft gen',
             'shortname' => 'LGD1',
         ]);
 

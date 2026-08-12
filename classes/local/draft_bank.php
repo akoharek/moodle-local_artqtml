@@ -15,23 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Manages the isolated, per-generation "draft" question category (functional spec ch.7).
- *
- * Each generation gets its own question_categories row, named after the generation, so
- * generated questions never mix with real question bank content until the user explicitly
- * approves/moves them (Jov-002). This category only ever holds questions this plugin created
- * and that have never been used in a quiz attempt, so it is always safe to hard-delete its
- * contents directly via the qtype API rather than the slower "move to recycle bin" flow real
- * question bank deletions use.
- *
- * Jov-023: draft categories live under the admin-configured draft course, not context_system —
- * that keeps unreviewed AI content away from ordinary question bank browsing. On Moodle 4.5
- * that means the course context; on Moodle 5.1+ core only allows question categories in
- * CONTEXT_MODULE (mod_qbank), so we create/reuse the course's system-type qbank activity and
- * store drafts there instead.
+ * Manages the isolated, per-generation "draft" question category.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -44,7 +31,7 @@ class draft_bank {
      * The shared root category's idnumber - the plugin's stable handle on its own category.
      *
      * A category's name is a lang string and moves with the site's language; its idnumber does
-     * not. Everything that looks the root up looks it up by this.
+     * Not. Everything that looks the root up looks it up by this.
      */
     public const ROOT_IDNUMBER = 'artqtml_draft_root';
 
@@ -52,10 +39,7 @@ class draft_bank {
     protected static $rootcategoryid = null;
 
     /**
-     * Whether the admin-configured draft course (Jov-023) is actually usable right now - checked
-     * at the "start a new generation" checkpoints (upload.php, generate.php). Callers must check
-     * this before ever calling {@see self::create()}/{@see self::get_root_category_id()}, which
-     * throw if it's false.
+     * is configured.
      *
      * @return bool
      */
@@ -65,10 +49,6 @@ class draft_bank {
 
     /**
      * The configured draft course's id, or null if unset or the course no longer exists.
-     *
-     * Public so callers building native question-bank URLs (approve.php's Edit/Preview
-     * links) can pass the course the draft questions actually live in (Jov-023) rather than
-     * SITEID - the question editor resolves its context from this courseid.
      *
      * @return int|null
      */
@@ -85,7 +65,7 @@ class draft_bank {
 
     /**
      * Fully-qualified class name for Moodle 5.1+ question bank helper (string — not a hard
-     * dependency so PHPStan on Moodle 4.5 still analyses cleanly).
+     * Dependency so PHPStan on Moodle 4.5 still analyses cleanly).
      */
     private const QBANK_HELPER = 'core_question\\local\\bank\\question_bank_helper';
 
@@ -102,7 +82,7 @@ class draft_bank {
      * Course context of the configured draft course (roles / course:view).
      *
      * Distinct from {@see self::get_draft_context()}: on Moodle 5.1+ question categories live in
-     * a mod_qbank module context, but the draft-editing role is still assigned at course level.
+     * A mod_qbank module context, but the draft-editing role is still assigned at course level.
      *
      * @return \context_course|null
      */
@@ -116,15 +96,15 @@ class draft_bank {
     }
 
     /**
-     * Context where draft question categories are stored (Jov-023).
+     * Context where draft question categories are stored.
      *
      * Moodle 4.5: the draft course context. Moodle 5.1+: the draft course's system-type
-     * mod_qbank activity (created on first use).
+     * Mod_qbank activity (created on first use).
      *
      * @return \context
      * @throws \moodle_exception if unset or the course no longer exists - callers are expected
-     *      to have already blocked starting a new generation in that case via
-     *      {@see self::is_configured()}, so reaching here means something raced past that check
+     * To have already blocked starting a new generation in that case via
+     * {@see self::is_configured()}, so reaching here means something raced past that check
      */
     protected static function get_draft_context(): \context {
         $courseid = self::get_draft_courseid();
@@ -150,13 +130,13 @@ class draft_bank {
     }
 
     /**
-     * Context id where draft question categories live (Jov-023).
+     * Context id where draft question categories live.
      *
      * Public: {@see \local_artqtml\local\question_bank_list} needs this to recognise the draft
-     * bank when enumerating move-target categories.
+     * Bank when enumerating move-target categories.
      *
      * @return int|null null if no draft course is configured - callers must check
-     *      {@see self::is_configured()} first
+     * {@see self::is_configured()} first
      */
     public static function get_draft_context_id(): ?int {
         if (!self::is_configured()) {
@@ -178,11 +158,6 @@ class draft_bank {
 
         $draftcontext = self::get_draft_context();
 
-        // M-21: idnumber-tag and label every draft category as unreviewed AI content, so anyone
-        // who does have access to the draft course's context (by construction, only admins/
-        // managers - see get_root_category_id()'s docblock) and browses into it sees at a glance
-        // it isn't meant to be used directly, and other tooling/reports can find/exclude these
-        // by pattern.
         $record = new \stdClass();
         $record->name = get_string(
             'draftbankname',
@@ -202,21 +177,7 @@ class draft_bank {
 
     /**
      * Get (creating if needed) the shared "ArtQTML" category all per-generation draft
-     * banks live under.
-     *
-     * A plain `parent = 0` (as this used to be set to) is Moodle's own marker for a context's
-     * single hidden "top" category - question_get_top_category() looks for exactly that. On a
-     * site where no question category has ever been created at the draft course's context before
-     * this plugin's first draft bank, Moodle would find and treat that first draft category as
-     * if it were the real top category for that context, since nothing else with parent=0
-     * existed yet to disambiguate them. Nesting every draft bank one level deeper, under a
-     * category of our own that itself has a real top category as its parent, avoids ever
-     * creating anything with parent=0 ourselves.
-     *
-     * Public: {@see \local_artqtml\local\question_bank_list} also needs this id, to exclude the
-     * whole draft-bank subtree (this category plus every generation's child category under it)
-     * from the "move to a real bank" target list - not just the current generation's own draft
-     * category, which is all the old parent=0 based filtering used to catch incidentally.
+     * Banks live under.
      *
      * @return int question_categories.id of the shared root category
      */
@@ -235,16 +196,6 @@ class draft_bank {
             throw new \moodle_exception('errordraftcoursenotconfigured', 'local_artqtml');
         }
 
-        // Looked up by idnumber, never by name. The name is a lang string, so it changes with the
-        // site's interface language - and the lookup then fails to find a category this plugin
-        // created itself. What follows is an insert with the same fixed idnumber, which
-        // question_categories rejects: it carries a unique index on (contextid, idnumber). The
-        // user sees "Error writing to database" and cannot start any generation.
-        //
-        // Found on 2026-07-31 by switching the interface to Hungarian: the root had been created
-        // as "ArtQTML" and the Hungarian lookup asked for "ArtQTML". The
-        // idnumber was already there, already fixed, already the stable identifier - it just was
-        // not what the code searched on.
         $existing = $DB->get_record('question_categories', [
             'contextid' => $draftcontext->id,
             'idnumber'  => self::ROOT_IDNUMBER,
@@ -252,8 +203,8 @@ class draft_bank {
 
         if (!$existing) {
             // A root created before this fix may predate the idnumber, or carry it under a name
-            // written in whatever language was active that day. Adopt it and stamp the idnumber on,
-            // rather than creating a second root beside it.
+            // Written in whatever language was active that day. Adopt it and stamp the idnumber on,
+            // Rather than creating a second root beside it.
             $existing = $DB->get_record('question_categories', [
                 'contextid' => $draftcontext->id,
                 'parent'    => $top->id,
@@ -303,7 +254,7 @@ class draft_bank {
 
         // The core question_delete_question() is the entry point that fully cleans up a question
         // (qtype-specific options, versions, bank entry, tags, files) - used here instead of
-        // hand-rolled table deletes so cleanup stays correct as core evolves.
+        // Hand-rolled table deletes so cleanup stays correct as core evolves.
         $entries = $DB->get_records('question_bank_entries', ['questioncategoryid' => $categoryid]);
         foreach ($entries as $entry) {
             $versions = $DB->get_records('question_versions', ['questionbankentryid' => $entry->id]);
@@ -316,9 +267,7 @@ class draft_bank {
     }
 
     /**
-     * Delete the draft category if every question that was ever in it has been processed
-     * (moved out or deleted from the draft list) - i.e. none remain in
-     * local_artqtml_questions with this generationid (Jov-018).
+     * delete if empty.
      *
      * @param int $generationid
      * @param int $categoryid

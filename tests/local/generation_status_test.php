@@ -17,23 +17,20 @@
 namespace local_artqtml\local;
 
 /**
- * Unit tests for the seven generation status values (List-005/List-018).
+ * Unit tests for the seven generation status values.
  *
- * List-018 requires one shared constant that every use site reads from, with the literal list
- * appearing nowhere else ("a literál lista sehol nem ismételhető meg"). The last assertion here
- * greps the whole plugin for a re-typed list, so a future re-inlining fails the build.
+ * Requires one shared constant that every use site reads from, with the literal list
+ * Appearing nowhere else ("a literál lista sehol nem ismételhető meg"). The last assertion here
+ * Greps the whole plugin for a re-typed list, so a future re-inlining fails the build.
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\generation_status
  */
 final class generation_status_test extends \advanced_testcase {
     /**
-     * List-005: exactly seven statuses, in pipeline order, no duplicates, none empty.
-     *
-     * Seven since BL-35 added 'partial' between 'completed' and 'failed': a run that finished and
-     * still delivered less than was asked for is neither of its neighbours.
+     * Exactly seven statuses, in pipeline order, no duplicates, none empty.
      */
     public function test_exactly_seven_statuses(): void {
         $this->assertSame(
@@ -64,8 +61,6 @@ final class generation_status_test extends \advanced_testcase {
             'a status cannot be both in progress and terminal'
         );
         $this->assertSame(['generating', 'validating', 'saving'], generation_status::IN_PROGRESS);
-        // BL-35: partial is terminal, not in progress - the scheduled task must never pick it up
-        // again, and the status page must stop polling on it.
         $this->assertSame(
             ['completed', 'partial', 'failed'],
             generation_status::TERMINAL
@@ -77,7 +72,7 @@ final class generation_status_test extends \advanced_testcase {
     }
 
     /**
-     * List-005: every status has a real lang label, and 'started' shows as "Megkezdett" in
+     * Every status has a real lang label, and 'started' shows as "Megkezdett" in
      * Hungarian - no raw machine key may reach the UI.
      */
     public function test_every_status_has_a_lang_label(): void {
@@ -97,18 +92,18 @@ final class generation_status_test extends \advanced_testcase {
 
         $this->assertSame('Started', generation_status::label(generation_status::STARTED));
 
-        // List-005: "A started státusz megjelenített neve »Megkezdett«". Asserted against the
-        // shipped lang file rather than through get_string() under force_current_language('hu'):
-        // the CI/PHPUnit install has only the English pack, so get_string() would silently fall
-        // back to English and the assertion would test nothing. What the requirement actually
-        // fixes is the string the plugin ships.
+        // "A started státusz megjelenített neve »Megkezdett«". Asserted against the
+        // Shipped lang file rather than through get_string() under force_current_language('hu'):
+        // The CI/PHPUnit install has only the English pack, so get_string() would silently fall
+        // Back to English and the assertion would test nothing. What the requirement actually
+        // Fixes is the string the plugin ships.
         $this->assertSame('Megkezdett', $this->shipped_string('hu', 'status_started'));
         $this->assertSame('Started', $this->shipped_string('en', 'status_started'));
     }
 
     /**
      * Read one string straight out of a shipped language file, independent of which language packs
-     * happen to be installed in the test environment.
+     * Happen to be installed in the test environment.
      *
      * @param string $lang 'en' or 'hu'
      * @param string $key the lang string identifier
@@ -134,8 +129,8 @@ final class generation_status_test extends \advanced_testcase {
     }
 
     /**
-     * normalise() accepts the seven and rejects anything else (including the retired pending/
-     * processing names the pre-v24 specification listed).
+     * Normalise() accepts the seven and rejects anything else (including the retired pending/
+     * Processing names the pre-v24 specification listed).
      */
     public function test_normalise(): void {
         foreach (generation_status::VALUES as $status) {
@@ -166,9 +161,9 @@ final class generation_status_test extends \advanced_testcase {
     }
 
     /**
-     * List-018: the literal seven-value list appears in exactly one file - this constant's own
-     * definition. Anything else re-typing it (a filter builder, a SQL string, a CLI validator)
-     * fails here.
+     * The literal seven-value list appears in exactly one file - this constant's own
+     * Definition. Anything else re-typing it (a filter builder, a SQL string, a CLI validator)
+     * Fails here.
      */
     public function test_no_file_outside_the_constant_repeats_the_literal_list(): void {
         $root = realpath(__DIR__ . '/../..');
@@ -188,7 +183,7 @@ final class generation_status_test extends \advanced_testcase {
             }
             $contents = file_get_contents($file);
             // Any two adjacent members of the list quoted next to each other is enough to catch a
-            // re-typed list, without tripping on a legitimate single-value comparison.
+            // Re-typed list, without tripping on a legitimate single-value comparison.
             if (
                 preg_match(
                     "/'(started|generating|validating|saving|completed|partial|failed)'" .
@@ -210,13 +205,8 @@ final class generation_status_test extends \advanced_testcase {
     }
 
     /**
-     * List-018: every use site the requirement names - the list page, the status page, the
-     * scheduled tasks and the filters - reads the statuses from the shared constant.
-     *
-     * TC-List-077. The companion to
-     * {@see self::test_no_file_outside_the_constant_repeats_the_literal_list()}: that one proves no
-     * file re-types the list, this one proves the files that *need* the list actually reference the
-     * class rather than having quietly stopped handling statuses at all.
+     * Every use site the requirement names - the list page, the status page, the
+     * Scheduled tasks and the filters - reads the statuses from the shared constant.
      */
     public function test_every_use_site_reads_from_the_shared_constant(): void {
         $root = realpath(__DIR__ . '/../..');

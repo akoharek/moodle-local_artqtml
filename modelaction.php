@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Admin actions for the model selector: refresh the cached model list (Admin-046).
+ * Admin actions for the model selector: refresh the cached model list.
  *
  * Deliberately a plain request/redirect rather than an AJAX endpoint. Both actions change server
- * state and the settings page has to re-render from the new state anyway, so a round trip is the
- * honest mechanism - and it keeps the behaviour testable without driving JavaScript.
+ * State and the settings page has to re-render from the new state anyway, so a round trip is the
+ * Honest mechanism - and it keeps the behaviour testable without driving JavaScript.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require(__DIR__ . '/../../config.php');
@@ -39,10 +39,10 @@ $provider = required_param('provider', PARAM_ALPHA);
 $action = required_param('action', PARAM_ALPHA);
 
 // Same reason as delete.php: an act-and-redirect script still needs $PAGE set up, because
-// redirect() renders a full page (theme, favicon, notification) and reads $PAGE->url, and the
-// invalid-provider exception below renders through $PAGE as well. require_login() with no course
-// argument sets neither for a system-level script. Placed before the validation deliberately, so
-// the error page is covered too.
+// Redirect() renders a full page (theme, favicon, notification) and reads $PAGE->url, and the
+// Invalid-provider exception below renders through $PAGE as well. require_login() with no course
+// Argument sets neither for a system-level script. Placed before the validation deliberately, so
+// The error page is covered too.
 $PAGE->set_url('/local/artqtml/modelaction.php', ['provider' => $provider, 'action' => $action]);
 $PAGE->set_context($context);
 
@@ -55,15 +55,14 @@ $section = $provider === model_list::PROVIDER_CLAUDE ? 'local_artqtml_generator'
 $returnurl = new moodle_url('/admin/settings.php', ['section' => $section]);
 
 if ($action === 'refresh') {
-    // Admin-046: the only administrator-initiated path that may touch the provider network. The
-    // settings page itself never does (Admin-045).
+    // The only administrator-initiated path that may touch the provider network. The settings page itself never does.
     $result = model_list::refresh($provider);
 
     if ($result['success']) {
         \core\notification::success(get_string('modellistrefreshed', 'local_artqtml', count($result['models'])));
     } else {
         // A failed refresh leaves the previous cache in place, so the dropdown does not empty out
-        // under an administrator who is mid-configuration.
+        // Under an administrator who is mid-configuration.
         \core\notification::error(get_string('modellistrefreshfailed', 'local_artqtml', $result['error']));
     }
 
@@ -71,8 +70,6 @@ if ($action === 'refresh') {
 }
 
 if ($action === 'check') {
-    // Admin-054: the same check the scheduled task runs. Admin-055 makes this and that task the
-    // only writers of the blocking state - normal generation traffic never touches it.
     $result = \local_artqtml\local\model_checker::check_provider(
         $provider,
         \local_artqtml\local\model_check_log::TRIGGER_MANUAL

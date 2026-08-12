@@ -20,22 +20,22 @@ namespace local_artqtml\local;
  * The draft root category must survive a change of interface language.
  *
  * The defect this guards, found on 2026-07-31 by switching the site to Hungarian and starting a
- * generation. `get_root_category_id()` looked the shared root category up by its **name**, which
- * is a lang string: created on an English site it read "ArtQTML", and the Hungarian
- * lookup asked for "ArtQTML". Finding nothing, the code inserted a new root carrying the
- * same fixed idnumber - and `question_categories` has a unique index on (contextid, idnumber), so
- * the write was rejected.
+ * Generation. `get_root_category_id()` looked the shared root category up by its **name**, which
+ * Is a lang string: created on an English site it read "ArtQTML", and the Hungarian
+ * Lookup asked for "ArtQTML". Finding nothing, the code inserted a new root carrying the
+ * Same fixed idnumber - and `question_categories` has a unique index on (contextid, idnumber), so
+ * The write was rejected.
  *
  * What the user saw was "Error writing to database" on starting any generation, with nothing on
- * screen connecting it to the language switch. The plugin had lost track of a category it created
- * itself, because the handle it searched on was translated.
+ * Screen connecting it to the language switch. The plugin had lost track of a category it created
+ * Itself, because the handle it searched on was translated.
  *
  * Nothing else would catch this. Every test and every manual run had used one language throughout,
- * so the lookup always matched. It only appears when a site's language changes *after* the root
- * category exists - which for a customer is a normal Thursday, not an edge case.
+ * So the lookup always matched. It only appears when a site's language changes *after* the root
+ * Category exists - which for a customer is a normal Thursday, not an edge case.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\draft_bank
  */
 final class draft_bank_language_test extends \advanced_testcase {
@@ -88,8 +88,8 @@ final class draft_bank_language_test extends \advanced_testcase {
      * A root created before the idnumber existed is adopted, not duplicated.
      *
      * Sites that ran an earlier version have a root category with no idnumber, under whatever name
-     * their language gave it. The fix has to take that one over rather than leave it orphaned and
-     * build a second beside it.
+     * Their language gave it. The fix has to take that one over rather than leave it orphaned and
+     * Build a second beside it.
      */
     public function test_a_legacy_root_without_an_idnumber_is_adopted(): void {
         global $DB;

@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Admin "Test connection" button (Admin-011/017) and dynamic model list (Admin-012/018).
+ * Admin "Test connection" button and dynamic model list.
  *
  * Uses the currently saved API key (the admin must Save changes on the settings form before
- * testing/fetching models - avoiding the complexity of round-tripping an unsaved secret
- * through an AJAX call).
+ * Testing/fetching models - avoiding the complexity of round-tripping an unsaved secret
+ * Through an AJAX call).
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\external;
@@ -60,9 +60,6 @@ class test_connection extends external_api {
         self::validate_context(\context_system::instance());
         require_capability('local/artqtml:configure', \context_system::instance());
 
-        // Moodle's \curl class lives in lib/filelib.php, which isn't auto-loaded in the AJAX /
-        // external-service bootstrap this function runs under - without this the test below fails
-        // with "Class 'curl' not found" once a key is actually configured (Admin-011/017).
         global $CFG;
         require_once($CFG->libdir . '/filelib.php');
 
@@ -90,8 +87,8 @@ class test_connection extends external_api {
         $curl = new \curl();
         $curl->setHeader(['x-api-key: ' . $apikey, 'anthropic-version: 2023-06-01']);
         // C7: bound the connection test with an explicit 10-second timeout so a hung or
-        // unreachable provider can never leave this AJAX call (and the admin's browser) waiting
-        // indefinitely.
+        // Unreachable provider can never leave this AJAX call (and the admin's browser) waiting
+        // Indefinitely.
         $response = $curl->get('https://api.anthropic.com/v1/models', [], [
             'CURLOPT_TIMEOUT'        => 10,
             'CURLOPT_CONNECTTIMEOUT' => 10,
@@ -112,15 +109,6 @@ class test_connection extends external_api {
             }
         }
 
-        // Admin-050: the successful connection test is what makes the model dropdown appear, and
-        // it appears from the cache - so populate the cache here, following the provider's
-        // pagination and applying the structured-output filter (which this endpoint's own quick
-        // listing above does not). model_list::refresh() is the single path that writes it.
-        //
-        // 2026-08-03: this block used to refresh 'claude' AND 'gemini', while test_gemini()
-        // refreshed neither. Testing the generator therefore fired an unasked-for call at the other
-        // provider, and testing the validator left its dropdown empty. Each side now refreshes its
-        // own, which is what the comment above always claimed happened.
         \local_artqtml\local\model_list::refresh('claude');
 
         return self::with_structure_check('claude', $models);
@@ -140,8 +128,8 @@ class test_connection extends external_api {
         $curl = new \curl();
         $curl->setHeader(['x-goog-api-key: ' . $apikey]);
         // C7: bound the connection test with an explicit 10-second timeout so a hung or
-        // unreachable provider can never leave this AJAX call (and the admin's browser) waiting
-        // indefinitely.
+        // Unreachable provider can never leave this AJAX call (and the admin's browser) waiting
+        // Indefinitely.
         $response = $curl->get('https://generativelanguage.googleapis.com/v1beta/models', [], [
             'CURLOPT_TIMEOUT'        => 10,
             'CURLOPT_CONNECTTIMEOUT' => 10,
@@ -162,8 +150,6 @@ class test_connection extends external_api {
             }
         }
 
-        // The Gemini side used to refresh nothing at all, so a successful validator test left its
-        // dropdown empty (2026-08-03).
         \local_artqtml\local\model_list::refresh('gemini');
 
         return self::with_structure_check('gemini', $models);
@@ -172,24 +158,14 @@ class test_connection extends external_api {
     /**
      * Probe the listed models and fold the verdict into the key test's message.
      *
-     * BL-44, 2026-08-03. Until that day this button proved one thing: that the provider answers.
-     * It fetched the model list over GET and stopped - no generation request, no schema, nothing
-     * that could tell whether a question comes back in a shape the plugin can read.
-     *
      * That gap had a price. Claude Sonnet 5 and Opus 5 open their reply with a thinking block, the
-     * plugin read the wrong part of the envelope, and nine calls that were HTTP 200 carrying six
-     * usable questions each were thrown away - $0.228 for zero questions. Every one of those calls
-     * would have passed this button.
-     *
-     * So the button now runs the model check's probe across the listed models, each sending ONE
-     * real question built from the generator's own schema and read with the generator's own
-     * extractor. Passing means what an administrator assumes it means: the plugin can read what
-     * this model produces. Models already ruled out by this plugin version are skipped; the
-     * scheduled check keeps to the configured models, per András's decision the same day.
+     * Plugin read the wrong part of the envelope, and nine calls that were HTTP 200 carrying six
+     * Usable questions each were thrown away - $0.228 for zero questions. Every one of those calls
+     * Would have passed this button.
      *
      * A structural failure does not make the key test fail. The key IS valid, and saying otherwise
-     * would send the administrator to the wrong setting. It is reported as its own sentence, and
-     * the failing models drop out of the dropdown on the next page load.
+     * Would send the administrator to the wrong setting. It is reported as its own sentence, and
+     * The failing models drop out of the dropdown on the next page load.
      *
      * @param string $provider 'claude' or 'gemini'
      * @param string[] $models the model ids the key test listed
@@ -198,18 +174,6 @@ class test_connection extends external_api {
     protected static function with_structure_check(string $provider, array $models): array {
         $summary = \local_artqtml\local\model_checker::check_listed_models($provider);
 
-        // MEASURED 2026-08-03, and it cost two runs to find. An earlier version of this method
-        // called \core\notification::add() here so the verdict would survive the page reload the
-        // button's JavaScript performs on success. The probes completed in 33 seconds - the model
-        // check log proves it, one row per model, timestamps 33 seconds apart - and then the
-        // request never returned: the browser sat on "..." for over ten minutes. The two runs
-        // before that change returned normally. Writing to the session from this external function
-        // is what hangs, and it is not worth diagnosing further, because the message did not belong
-        // in a transient notification anyway.
-        //
-        // Where it belongs is the settings page itself, rendered server-side from the check log on
-        // the very reload that used to erase it - see setting_modelselect::output_html(). That is
-        // persistent, survives navigating away, and needs no message passing at all.
         $verdict = $summary['failed'] === []
             ? get_string('testconnectionstructureok', 'local_artqtml', $summary['checked'])
             : get_string('testconnectionstructurefailed', 'local_artqtml', (object) [

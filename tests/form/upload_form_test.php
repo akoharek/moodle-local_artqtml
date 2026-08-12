@@ -17,12 +17,11 @@
 namespace local_artqtml\form;
 
 /**
- * Unit tests for the source-text upload form's server-side validation, in particular the
- * shortname format rule (TC-Felt-010/011 - the PARAM_RAW "reject, don't sanitise" fix).
+ * Unit tests.
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\form\upload_form
  */
 final class upload_form_test extends \advanced_testcase {
@@ -46,10 +45,6 @@ final class upload_form_test extends \advanced_testcase {
         return $form->validation(array_merge($defaults, $data), []);
     }
 
-    /**
-     * TC-Felt-010/011: a shortname containing a non-alphanumeric character is rejected with the
-     * format error, rather than being silently sanitised (the PARAM_RAW fix).
-     */
     public function test_non_alphanumeric_shortname_rejected(): void {
         $this->resetAfterTest();
 
@@ -61,7 +56,7 @@ final class upload_form_test extends \advanced_testcase {
 
     /**
      * A shortname longer than 8 characters fails the same format rule server-side, independent of
-     * the client maxlength attribute.
+     * The client maxlength attribute.
      */
     public function test_overlong_shortname_rejected(): void {
         $this->resetAfterTest();
@@ -102,7 +97,7 @@ final class upload_form_test extends \advanced_testcase {
     }
 
     /**
-     * Accented letters are not ASCII a-z/A-Z, so they must be rejected (Felt-004 / mezotabla).
+     * Accented letters are not ASCII a-z/A-Z, so they must be rejected.
      */
     public function test_accented_shortname_rejected(): void {
         $this->resetAfterTest();
@@ -126,7 +121,7 @@ final class upload_form_test extends \advanced_testcase {
     }
 
     /**
-     * ArtQTML Light: the filepicker accepts TXT only (no PDF/DOCX).
+     * The filepicker accepts TXT uploads.
      */
     public function test_source_filepicker_accepts_txt_only(): void {
         $this->resetAfterTest();
@@ -192,7 +187,7 @@ final class upload_form_test extends \advanced_testcase {
      * The "source text is required" rule still fires, and is not replaced by the size message.
      *
      * An empty textarea is empty, not oversized - the two rules share a field and a mistake here
-     * would show the wrong reason.
+     * Would show the wrong reason.
      */
     public function test_an_empty_source_text_still_reports_the_required_error(): void {
         $this->resetAfterTest();

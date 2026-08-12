@@ -19,15 +19,9 @@ namespace local_artqtml\local;
 /**
  * Pins the mutual exclusion of local/artqtml:use and local/artqtml:configure.
  *
- * Product decision 2026-08-10:
- * - :configure alone → admin settings only (no generation flows, no delete).
- * - :use alone → teacher usage only (no admin/settings).
- * - both → both areas; neither substitutes for the other.
- * - delete → :use + ownership only (covered in generation_delete_policy_test).
- *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversNothing
  */
 final class capability_separation_test extends \advanced_testcase {
@@ -60,7 +54,7 @@ final class capability_separation_test extends \advanced_testcase {
     }
 
     /**
-     * :use alone grants use and never configure.
+     * Use alone grants use and never configure.
      */
     public function test_use_only_has_use_not_configure(): void {
         $user = $this->getDataGenerator()->create_user();
@@ -71,7 +65,7 @@ final class capability_separation_test extends \advanced_testcase {
     }
 
     /**
-     * :configure alone grants configure and never use.
+     * Configure alone grants configure and never use.
      */
     public function test_configure_only_has_configure_not_use(): void {
         $user = $this->getDataGenerator()->create_user();

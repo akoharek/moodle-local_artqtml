@@ -17,17 +17,17 @@
 namespace local_artqtml\local;
 
 /**
- * Unit tests for the status->destination rule (List-018) and its call sites.
+ * Unit tests for the status->destination rule and its call sites.
  *
  * D-5: the rule states where a generation should be opened, given its current status. It exists
- * once, in generation_list::open_url(); the list page, upload.php's duplicate-warning panel and
- * the three event classes all read it from there. These tests pin the rule itself and the two
- * behaviours that are easiest to lose in a refactor: resolving from an id alone, and event links
- * reflecting the generation's status *now* rather than at the moment the event fired.
+ * Once, in generation_list::open_url(); the list page, upload.php's duplicate-warning panel and
+ * The three event classes all read it from there. These tests pin the rule itself and the two
+ * Behaviours that are easiest to lose in a refactor: resolving from an id alone, and event links
+ * Reflecting the generation's status *now* rather than at the moment the event fired.
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\generation_list::open_url
  * @covers     \local_artqtml\local\generation_list::open_url_by_id
  */
@@ -69,11 +69,11 @@ final class generation_open_url_test extends \advanced_testcase {
     }
 
     /**
-     * List-018: completed opens the approval page, the in-progress trio and failed open the
-     * status page, and 'started' falls through to the settings page it can be resumed from.
+     * Completed opens the approval page, the in-progress trio and failed open the
+     * Status page, and 'started' falls through to the settings page it can be resumed from.
      *
      * Deliberately keyed off generation_status::VALUES rather than a re-typed list, so a seventh
-     * status cannot be added without this test forcing a decision about where it opens.
+     * Status cannot be added without this test forcing a decision about where it opens.
      *
      * @return void
      */
@@ -86,9 +86,6 @@ final class generation_open_url_test extends \advanced_testcase {
             generation_status::VALIDATING => ['status.php', 'generationid'],
             generation_status::SAVING     => ['status.php', 'generationid'],
             generation_status::COMPLETED  => ['approve.php', 'generationid'],
-            // BL-35: the status page, because that is the only page that states what is missing
-            // and offers the button that asks for it again. The order here follows
-            // generation_status::VALUES, which the assertion below enforces.
             generation_status::PARTIAL    => ['status.php', 'generationid'],
             generation_status::FAILED     => ['status.php', 'generationid'],
         ];
@@ -107,7 +104,7 @@ final class generation_open_url_test extends \advanced_testcase {
 
     /**
      * A log entry outlives the generation it refers to. Returning null - rather than a link to a
-     * page that would fail - is what lets core's log report render the entry unlinked.
+     * Page that would fail - is what lets core's log report render the entry unlinked.
      *
      * @return void
      */
@@ -124,8 +121,8 @@ final class generation_open_url_test extends \advanced_testcase {
 
     /**
      * The regression this pins: an event's link must lead where the generation can be acted on
-     * now, not to the page that was relevant when the event fired. A generation_started event
-     * read after the generation has completed must open the approval page.
+     * Now, not to the page that was relevant when the event fired. A generation_started event
+     * Read after the generation has completed must open the approval page.
      *
      * @return void
      */
@@ -153,7 +150,7 @@ final class generation_open_url_test extends \advanced_testcase {
 
     /**
      * The other two events resolve through the same helper, so neither can quietly go back to a
-     * fixed destination of its own.
+     * Fixed destination of its own.
      *
      * @return void
      */

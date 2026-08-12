@@ -15,11 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Moves an already-approved draft question into a real question bank (functional spec ch.7,
- * Jov-014) - ArtQTML Light: single-question move only (bulk move removed).
+ * Helper.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local\approve;
@@ -87,9 +86,6 @@ class question_move_service {
             return (int) $row->questionbankid;
         }, $rows);
 
-        // M-22: the Moodle question move and the movedout flag update must succeed or fail
-        // together - without a transaction, a mid-batch failure could leave questions physically
-        // moved into the real bank while local_artqtml_questions still says movedout=0.
         $transaction = $DB->start_delegated_transaction();
 
         question_mover::move($questionids, $categoryvalue);

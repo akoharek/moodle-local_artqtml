@@ -18,22 +18,18 @@
  * Writes the shipped prompt text into the database, without ever overwriting an edit.
  *
  * The rule, in one sentence: **an empty setting is filled from the shipped file; a setting that
- * differs from the shipped text is left exactly as it is.**
- *
- * This class holds the rule, not the text - the text is `db/prompt_defaults.php`, and Admin-066
- * keeps it out of the code. Install and upgrade both call this, so the rule exists once rather
- * than in two copies that could drift.
+ * Differs from the shipped text is left exactly as it is.**
  *
  * **What this deliberately gives up.** A site that never customised its prompt also never receives
- * an improvement to the shipped one: its stored value differs from the new default, and "differs"
- * means "leave alone". Telling an untouched value apart from an edited one would need a fingerprint
- * of whatever was seeded, stored alongside it. That is not built, because the failure it would
- * prevent (a site staying on an older prompt) is visible and recoverable - the administrator can
- * see both texts on one screen - while the failure it could cause (overwriting a customer's tuned
- * prompt during a routine upgrade) is neither.
+ * An improvement to the shipped one: its stored value differs from the new default, and "differs"
+ * Means "leave alone". Telling an untouched value apart from an edited one would need a fingerprint
+ * Of whatever was seeded, stored alongside it. That is not built, because the failure it would
+ * Prevent (a site staying on an older prompt) is visible and recoverable - the administrator can
+ * See both texts on one screen - while the failure it could cause (overwriting a customer's tuned
+ * Prompt during a routine upgrade) is neither.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -58,7 +54,7 @@ class prompt_seed {
 
             if ($current === false || trim((string) $current) === '') {
                 // Nothing there - a prompt setting left empty would silently produce a prompt with
-                // a hole in it, so this is the one case where writing is right.
+                // A hole in it, so this is the one case where writing is right.
                 set_config($setting, $text, 'local_artqtml');
                 $seeded[] = $setting;
                 continue;
@@ -66,8 +62,8 @@ class prompt_seed {
 
             if ((string) $current !== $text) {
                 // Different from what ships. That is either an administrator's edit or an older
-                // shipped version, and this class cannot tell them apart - so it does neither
-                // harm nor good, and says so to the caller.
+                // Shipped version, and this class cannot tell them apart - so it does neither
+                // Harm nor good, and says so to the caller.
                 $kept[] = $setting;
             }
         }

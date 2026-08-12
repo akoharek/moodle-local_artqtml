@@ -15,11 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The single source for what the difficulty levels mean, for both the generator and the validator
- * (Admin-069, Val-031). ArtQTML Light: scale mode only.
+ * Difficulty prompt helpers.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -28,16 +27,16 @@ namespace local_artqtml\local;
  * Renders the admin-configured difficulty definition for a generation's scale mode.
  *
  * Why this is its own class rather than a method on the generating task. The generator writes a
- * question to a level and the validator has to judge whether it hit that level; if each built its
- * own description of what the levels mean, the two would drift, and the validator would be
- * measuring against a scale the generator never saw.
+ * Question to a level and the validator has to judge whether it hit that level; if each built its
+ * Own description of what the levels mean, the two would drift, and the validator would be
+ * Measuring against a scale the generator never saw.
  */
 class difficulty_prompt {
     /**
      * The difficulty description for a generation, ready to drop into a prompt.
      *
-     * Light keeps Easy/Medium/Hard scale only. Older stored settings may still carry bloom or
-     * freetext keys; those are ignored and the scale fragment is used.
+     * Uses the Easy/Medium/Hard scale fragment. Older stored settings keys outside scale
+     * Are ignored.
      *
      * @param array $difficulty the generation's decoded difficulty settings
      * @return string empty only if the admin has emptied the setting

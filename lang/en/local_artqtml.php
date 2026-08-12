@@ -18,7 +18,7 @@
  * English language strings for local_artqtml.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -151,7 +151,6 @@ $string['errorsourcetexttoolong'] = 'The source text is too long.';
 $string['errorsourcetexttoolongdetails'] = 'The source text is estimated at {$a->tokens} tokens ({$a->characters} characters). The configured maximum is {$a->limit} estimated tokens. Shorten the source text or ask an administrator to change the source-text limit.';
 $string['errorsritemcounttoohigh'] = 'An ordering question cannot have more than 10 items.';
 $string['errorsritemcounttoolow'] = 'An ordering question needs at least 2 items - leave this at 0 to use the site default, or enter 2 or more.';
-$string['errortokenbudgetexceeded'] = 'The monthly AI token budget has been reached. New generations cannot be started until the next cycle or until an administrator increases the budget.';
 $string['errortoomanyquestions'] = 'The total exceeds the maximum of {$a} questions per generation set by the administrator.';
 $string['errorunsupportedqtype'] = 'Unsupported question type: {$a}';
 $string['errorvaluetoolow'] = 'Value must be at least {$a}.';
@@ -247,7 +246,7 @@ $string['orderingnumberingtype_iiii'] = 'Upper-case roman numerals (I, II, III, 
 $string['orderingnumberingtype_none'] = 'No numbering';
 $string['pageheading'] = 'ArtQTML';
 $string['pageintro'] = 'Generate quiz questions with AI, then review and add them to a Moodle question bank.';
-$string['plugindesc'] = 'Generate quiz questions with Claude, validate with Gemini, then review and approve into the question bank. Light edition: paste or TXT source; true/false, single choice, and ordering.';
+$string['plugindesc'] = 'Generate quiz questions with Claude, validate with Gemini, then review and approve into the question bank. Paste or TXT source; true/false, single choice, and ordering.';
 $string['plugindisabled'] = 'The ArtQTML is currently disabled by the site administrator.';
 $string['pluginname'] = 'ArtQTML';
 $string['privacy:metadata'] = 'The ArtQTML plugin does not store any personal data beyond generations, their generated questions, and log entries linked to the requesting user. Source text is sent to Claude and Gemini for processing.';
@@ -341,7 +340,7 @@ $string['settinggeneratorcontextwindow_desc'] = 'Used for the generator max_toke
 $string['settingmaxquestionsperrun'] = 'Max questions per generation';
 $string['settingmaxquestionsperrun_desc'] = 'The most questions a user may request in a single generation.';
 $string['settingmaxsourcetokens'] = 'Maximum source-text size';
-$string['settingmaxsourcetokens_desc'] = 'Maximum estimated number of tokens allowed in pasted or uploaded source text. The estimate uses approximately four Unicode characters per token, which is what the counter on the upload page shows - it is not the provider\'s own tokenizer. Set to 0 to use 80% of the configured generator context window, leaving room for the system prompt, the response schema and the model\'s answer. Text over the limit is rejected rather than truncated, so nobody gets questions about a document they did not upload. This setting is independent of the monthly token budget.';
+$string['settingmaxsourcetokens_desc'] = 'Maximum estimated number of tokens allowed in pasted or uploaded source text. The estimate uses approximately four Unicode characters per token, which is what the counter on the upload page shows - it is not the provider\'s own tokenizer. Set to 0 to use 80% of the configured generator context window, leaving room for the system prompt, the response schema and the model\'s answer. Text over the limit is rejected rather than truncated, so nobody gets questions about a document they did not upload. This setting only bounds one source text for a generation.';
 $string['settingnegationhighlightdefault'] = 'Highlight negation words by default';
 $string['settingnegationhighlightdefault_desc'] = 'Default value of the per-generation "highlight negation words" toggle; users can override it per generation.';
 $string['settingorderinggradingtype'] = 'Ordering (SR) default grading type';
@@ -360,7 +359,7 @@ $string['settingtestconnection'] = 'Connection test';
 $string['settingvalidatorcontextwindow'] = 'Validator context window (tokens)';
 $string['settingvalidatorcontextwindow_desc'] = 'The validator model\'s context window, in tokens. The plugin fills at most 80% of it and counts the full source text into every round, so the questions are validated in as many rounds as that allows. Set it below the model\'s real limit and you get more, shorter rounds; set it above and the provider may reject the request.';
 $string['sourcefile'] = 'Or upload a file';
-$string['sourcefile_help'] = 'Optionally upload a plain `.txt` file; its text is loaded into the box below, where you can still edit it. PDF and Word (DOCX) uploads are not supported in this Light edition — paste that material into the source-text field instead.
+$string['sourcefile_help'] = 'Optionally upload a plain `.txt` file; its text is loaded into the box below, where you can still edit it.
 
 You can also skip the file picker and only paste or type into the source-text field.';
 $string['sourcefilemaxsize'] = 'Maximum file size: {$a}';
@@ -408,9 +407,6 @@ $string['testconnectionstructureok'] = 'All {$a} checked model(s) returned a que
 $string['testconnectionsuccess'] = 'Connection successful.';
 $string['textcounterlabel'] = '{$a->chars} characters, {$a->words} words, ~{$a->tokens} tokens (estimated)';
 $string['textcounterlimitlabel'] = 'Estimated limit: {$a} tokens';
-$string['tokenunlimited'] = '{$a} used (no budget configured)';
-$string['tokenwarningbannergenerator'] = 'Token budget warning: the Generator (Claude) API has reached {$a}% of its monthly token budget.';
-$string['tokenwarningbannervalidator'] = 'Token budget warning: the Validator (Gemini) API has reached {$a}% of its monthly token budget.';
 $string['true'] = 'True';
 $string['uploadcancelconfirm'] = 'Any entered text and the uploaded file will be lost. Continue?';
 $string['uploadconflictfileignored'] = 'The uploaded file will be ignored; only your typed text will be used.';

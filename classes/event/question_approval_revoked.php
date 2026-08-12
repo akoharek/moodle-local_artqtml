@@ -15,21 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * question_approval_revoked event (Jov-040).
+ * Question_approval_revoked event.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\event;
 
 /**
  * Triggered when a teacher takes back their own approval of a draft question, before it has been
- * moved into a real question bank.
- *
- * The mirror image of {@see question_approved}, and deliberately its own event rather than a flag
- * on that one: Jov-035 keeps approval, moving and editing as separately auditable steps, and an
- * approval that was later revoked has to be distinguishable in the log from one that still stands.
+ * Moved into a real question bank.
  */
 class question_approval_revoked extends \core\event\base {
     /**

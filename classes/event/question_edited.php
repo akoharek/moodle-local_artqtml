@@ -15,17 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * question_edited event (technical annex 7.1).
+ * Question_edited event.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\event;
 
 /**
  * Triggered when a teacher edits a still-in-draft AI question in the native question editor:
- * its stale Gemini validation result is cleared and it must be re-approved before it can move.
+ * Its stale Gemini validation result is cleared and it must be re-approved before it can move.
  */
 class question_edited extends \core\event\base {
     /**

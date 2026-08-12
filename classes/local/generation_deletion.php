@@ -18,35 +18,22 @@
  * Deletes a generation, its draft question bank and its draft questions - but never its log rows.
  *
  * The single production path for destroying a generation, shared by delete.php (the list page) and
- * generate.php's "delete and exit" abort. Having one path means the diagnostic-log retention rule
- * lives in exactly one place, and a PHPUnit test can pin it against the real deletion code instead
- * of a hand-rolled copy.
+ * Generate.php's "delete and exit" abort. Having one path means the diagnostic-log retention rule
+ * Lives in exactly one place, and a PHPUnit test can pin it against the real deletion code instead
+ * Of a hand-rolled copy.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
 
 /**
- * Generation deletion, minus the diagnostic log (Glob-040).
+ * Generation deletion, minus the diagnostic log.
  */
 class generation_deletion {
     /**
      * Delete a generation, its draft question bank and its draft questions.
-     *
-     * Glob-040 (V-06): the local_artqtml_log rows are deliberately NOT deleted here - they
-     * outlive the generation. The log exists to make an API failure investigable after the fact,
-     * and deleting a generation that failed is a teacher's natural reaction; tying the log's
-     * lifetime to the generation's would destroy the evidence at exactly the moment it becomes
-     * interesting. A log row's generationid may therefore reference a generation that no longer
-     * exists. Do NOT add a local_artqtml_log delete here "for consistency" with the two deletes
-     * below - that is the exact regression the accompanying test pins against.
-     *
-     * Callers own the surrounding concerns: delete.php wraps this in a delegated transaction, the
-     * moved-question guard (Jov-042/043) and the generation_deleted event; generate.php's
-     * abort-delete calls it plainly. No transaction is started here, so it composes inside a
-     * caller's.
      *
      * @param int $generationid
      * @return void
@@ -59,22 +46,13 @@ class generation_deletion {
             return;
         }
 
-        // M-29: the draft category and its real Moodle question objects, or they would be orphaned.
+        // The draft category and its real Moodle question objects, or they would be orphaned.
         if (!empty($generation->draftcategoryid)) {
             draft_bank::delete((int) $generation->draftcategoryid);
         }
 
         $DB->delete_records('local_artqtml_questions', ['generationid' => $generationid]);
 
-        // Glob-040: the log entries stay. What changed on 2026-08-04 is that they no longer stay
-        // POINTING AT A ROW THAT IS ABOUT TO VANISH. The id moves to originalgenerationid and the
-        // live reference is cleared, in that order and before the generation row goes - so the
-        // entries remain findable by the generation they belonged to, while `generationid` stops
-        // asserting a relationship that no longer exists.
-        //
-        // The user id is deliberately NOT cleared here. This is an ordinary deletion, not a data
-        // subject request, and the entries have to stay reachable in that user's own GDPR export.
-        // Anonymising is what the privacy provider does, on request, and it is a different thing.
         $DB->set_field_select(
             'local_artqtml_log',
             'originalgenerationid',

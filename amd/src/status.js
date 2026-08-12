@@ -14,7 +14,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Polling for the local_artqtml status page (functional spec ch.5).
+ * Polling for the local_artqtml status page.
  *
  * Calls the local_artqtml_get_status external function via core/ajax.
  *
@@ -43,16 +43,9 @@ define(['core/ajax'], function(Ajax) {
     };
 
     /**
-     * S-3/S-2: the stage -> percent/colour/striping map, the colour classes and the terminal
-     * status list all come from PHP via data-progress-config, emitted by
-     * \local_artqtml\local\generation_progress. This module deliberately owns no copy of any
-     * of them: they used to be maintained here AND in status.php with nothing checking the two
-     * against each other, so a change to either would silently desynchronise the server-rendered
-     * first paint from this AJAX-updated view.
-     *
-     * @param {Element} root
-     * @return {{stages: Object, failed: Object, colorClasses: Array<string>, terminal: Array<string>}}
-     */
+ * @param {Element} root
+ * @return {{stages: Object, failed: Object, colorClasses: Array<string>, terminal: Array<string>}}
+ */
     function progressConfig(root) {
         return JSON.parse(root.getAttribute('data-progress-config'));
     }
@@ -90,9 +83,6 @@ define(['core/ajax'], function(Ajax) {
             var label;
 
             if (statusdata.status === 'failed') {
-                // M-15: which stage it reached is derived server-side (get_status.php) from
-                // pendingdata's shape, not from questioncount (nothing is saved to
-                // local_artqtml_questions until the saving stage commits it all).
                 percent = statusdata.failedpercent;
                 color = config.failed.color;
                 striped = config.failed.striped;
@@ -104,9 +94,6 @@ define(['core/ajax'], function(Ajax) {
                 striped = info.striped;
                 label = root.getAttribute('data-label-' + statusdata.status);
 
-                // BL-35: the generating stage is one API call per requested question type, so it
-                // advances within itself and the label names the type in flight. Six calls used to
-                // look like one bar stuck at 25% for several minutes.
                 if (statusdata.status === 'generating') {
                     if (typeof statusdata.generatingpercent === 'number' && statusdata.generatingpercent > 0) {
                         percent = statusdata.generatingpercent;
@@ -127,8 +114,6 @@ define(['core/ajax'], function(Ajax) {
                 bar.style.width = percent + '%';
                 bar.setAttribute('aria-valuenow', percent);
 
-                // Gen-004 (S-4): the stage text belongs below the bar, not inside it. Written
-                // into its own region so a 25% bar can never clip its own label away.
                 var stagelabel = root.querySelector(SELECTORS.STAGE_LABEL);
                 if (stagelabel) {
                     stagelabel.textContent = label + ' (' + percent + '%)';
@@ -141,9 +126,6 @@ define(['core/ajax'], function(Ajax) {
             if (continueregion) {
                 continueregion.classList.remove('d-none');
             }
-            // Gen-011: reveal the green success notification and refresh its embedded question
-            // count to the final value (the banner may have been rendered server-side, hidden,
-            // with a mid-generation count of 0 before the saving stage committed anything).
             var successregion = document.querySelector('[data-region="success"]');
             if (successregion) {
                 successregion.classList.remove('d-none');
@@ -156,18 +138,6 @@ define(['core/ajax'], function(Ajax) {
                 abortbutton.style.display = 'none';
             }
         } else if (statusdata.status === 'partial' && root.getAttribute('data-initialstatus') !== 'partial') {
-            // BL-35: unlike completed and failed, this outcome cannot be revealed by unhiding a
-            // region that is already on the page. The partial notice names which types fell short
-            // and carries the "generate the missing types" button, whose confirmation text and
-            // sesskey link are built from a shortfall that did not exist when this page was
-            // rendered. Reloading is what shows the teacher the real thing rather than a
-            // half-populated copy of it.
-            //
-            // The data-initialstatus guard is not decoration. init() polls once even when the page
-            // was rendered in a terminal status (that first poll is what reveals Continue on an
-            // already-completed page), so without it a partly successful generation reloads,
-            // polls, reloads - which is exactly what the screen did before this condition was
-            // added.
             window.location.reload();
         } else if (statusdata.status === 'failed') {
             var errorregion = root.querySelector(SELECTORS.ERROR);
@@ -199,10 +169,6 @@ define(['core/ajax'], function(Ajax) {
             }
         }
 
-        // M-08: appears live as soon as the generating stage finishes, without a page reload.
-        // BL-35: except on a partly successful run, where the partial notice already prints this
-        // same sentence as part of explaining itself - unhiding this region there put two
-        // identical amber boxes on the screen, one above the other.
         if (statusdata.countdiscrepancymessage && statusdata.status !== 'partial') {
             var countdiscrepancy = document.querySelector('[data-region="countdiscrepancy"]');
             var countdiscrepancytext = document.querySelector('[data-region="countdiscrepancy-text"]');
@@ -226,18 +192,12 @@ define(['core/ajax'], function(Ajax) {
     function poll(root, generationid, errorcount) {
         callGetStatus(generationid).then(function(statusdata) {
             updateUi(root, statusdata);
-            // Recoverable rollback (Abort / Finding #5 security gate) returns status to started
-            // while this page is still open — leave for the draft settings page and stop polling.
             if (statusdata.status === 'started') {
                 if (statusdata.restarturl) {
                     window.location.assign(statusdata.restarturl);
                 }
                 return null;
             }
-            // C8: keep polling until a definitive terminal status is reached; a successful poll
-            // also clears any accumulated error backoff (the next poll starts at errorcount 0).
-            // S-2: the terminal list comes from generation_status::TERMINAL via the same
-            // data-progress-config payload, not a copy maintained here.
             if (progressConfig(root).terminal.indexOf(statusdata.status) === -1) {
                 setTimeout(function() {
                     poll(root, generationid, 0);

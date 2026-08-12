@@ -17,34 +17,30 @@
 namespace local_artqtml\local;
 
 /**
- * The English and Hungarian language packs must hold the same keys (TC-Glob-064 / Glob-029).
+ * The English and Hungarian language packs must hold the same keys.
  *
  * Moodle silently falls back to English for a missing Hungarian key, so a pack that drifts never
- * fails loudly - a missing translation looks like one nobody got around to, indefinitely. Nothing
- * else in the suite would notice, so this is the guard: the same defect class the plugin has closed
- * repeatedly in its PHP value sets - one set maintained in two places with nothing checking them.
- *
- * The precondition (Glob-029) is that no Moodle language pack is installed, which is exactly why
- * this is a static test over the two source files: it reads the keys by parsing the files with
- * token_get_all(), never by loading a language string, so it needs nothing from Moodle's lang API.
+ * Fails loudly - a missing translation looks like one nobody got around to, indefinitely. Nothing
+ * Else in the suite would notice, so this is the guard: the same defect class the plugin has closed
+ * Repeatedly in its PHP value sets - one set maintained in two places with nothing checking them.
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversNothing
  */
 final class lang_parity_test extends \advanced_testcase {
     /**
-     * TC-Glob-064: neither pack may hold a key the other lacks, in either direction.
+     * Neither pack may hold a key the other lacks, in either direction.
      */
     public function test_both_packs_hold_the_same_keys(): void {
         $en = self::keys_of('en');
         $hu = self::keys_of('hu');
 
         // Guard against a vacuous pass: if the parser silently returned nothing, array_diff of two
-        // empty sets is also empty and this test would "pass" while checking nothing. This is a
-        // floor to catch a broken parse, NOT a pin on the exact count - it does not fail on a
-        // legitimate key addition.
+        // Empty sets is also empty and this test would "pass" while checking nothing. This is a
+        // Floor to catch a broken parse, NOT a pin on the exact count - it does not fail on a
+        // Legitimate key addition.
         $this->assertGreaterThan(100, count($en), 'Parsed suspiciously few keys from lang/en - the parser is probably broken.');
         $this->assertGreaterThan(100, count($hu), 'Parsed suspiciously few keys from lang/hu - the parser is probably broken.');
 
@@ -67,12 +63,7 @@ final class lang_parity_test extends \advanced_testcase {
     }
 
     /**
-     * TC-Glob-068 - deliberately separate from TC-Glob-064: each pack's keys must stay C-sorted.
-     *
-     * TC-Glob-064 asserts only key-set parity, so this must not be folded into the parity test - a
-     * sort failure has to read as a sort failure, not a spurious parity one. It earns its place
-     * because a drifting sort is exactly how the earlier movesuccess rename nearly went unnoticed,
-     * and the parse is already done here.
+     * Deliberately separate from: each pack's keys must stay C-sorted.
      */
     public function test_each_pack_is_c_sorted(): void {
         foreach (['en', 'hu'] as $lang) {
@@ -93,10 +84,10 @@ final class lang_parity_test extends \advanced_testcase {
      *
      * Including these files is wrong twice over (the prompt's requirement 2): they assign into
      * $string[...], so including both in one process would have the second overwrite the first, and
-     * including either pollutes the test's own scope. token_get_all() parses the PHP without
-     * executing it - and, unlike a regex, it cannot be fooled by the text "$string[" appearing
-     * inside a translated value, because a value is a single string token, not a variable followed
-     * by a bracket. It is also the mechanism ai_request_test already uses for static source checks.
+     * Including either pollutes the test's own scope. token_get_all() parses the PHP without
+     * Executing it - and, unlike a regex, it cannot be fooled by the text "$string[" appearing
+     * Inside a translated value, because a value is a single string token, not a variable followed
+     * By a bracket. It is also the mechanism ai_request_test already uses for static source checks.
      *
      * @param string $lang 'en' or 'hu'
      * @param bool $unique return the unique key set (for parity) or every key in file order (sort)
@@ -121,7 +112,7 @@ final class lang_parity_test extends \advanced_testcase {
             $j = self::skip_whitespace($tokens, $j + 1, $count);
             if ($j < $count && is_array($tokens[$j]) && $tokens[$j][0] === T_CONSTANT_ENCAPSED_STRING) {
                 // The key literal, e.g. 'movesuccess' or "privacy:metadata"; plugin keys carry no
-                // escapes, so stripping the surrounding quotes is exact.
+                // Escapes, so stripping the surrounding quotes is exact.
                 $keys[] = substr($tokens[$j][1], 1, -1);
             }
         }
