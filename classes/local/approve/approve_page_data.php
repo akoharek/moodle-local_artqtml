@@ -239,6 +239,8 @@ class approve_page_data {
     }
 
     /**
+     * Return the question category id and contextid for a question.
+     *
      * @param int $questionid
      * @return \stdClass|null {id, contextid}
      */
