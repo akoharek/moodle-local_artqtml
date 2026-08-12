@@ -228,20 +228,11 @@ class approve_renderer {
 
             $actions = [];
             if (!empty($question->questionbankid) && $candrafteditquestions) {
-                // Finding #1: draft questions live in the admin-configured draft course's context
-                // (Jov-023), not the site/system context - so the native question editor must be
-                // opened with that course's id, otherwise it resolves the wrong context. Falls
-                // back to SITEID only if the draft course somehow became unconfigured (the
-                // $candrafteditquestions gate already implies it is configured here).
-                $editparams = [
-                    'courseid'  => draft_bank::get_draft_courseid() ?? SITEID,
-                    'id'        => $question->questionbankid,
-                    'returnurl' => $pageurl->out_as_local_url(false),
-                ];
-                $categoryvalue = approve_page_data::question_category_value((int) $question->questionbankid);
-                if ($categoryvalue !== null) {
-                    $editparams['category'] = $categoryvalue;
-                }
+                // Moodle 4.5: courseid (draft course). Moodle 5.1+: required cmid for mod_qbank.
+                $editparams = approve_page_data::question_edit_url_params(
+                    (int) $question->questionbankid,
+                    $pageurl
+                );
                 $editurl = new \moodle_url('/question/bank/editquestion/question.php', $editparams);
                 // Glob-031: this is a site-wide tool - any user with local/artqtml:use may act on
                 // any generation, including editing its questions. The page already carries the
