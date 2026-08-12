@@ -1,0 +1,31 @@
+name: Other / code issue
+description: Documentation, packaging, security process, or other code-related topic
+title: "[Other]: "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for topics that are not a clear bug or feature request
+        (docs, install/packaging, clarifications, code quality notes).
+        For suspected security issues that should stay private, do not post secrets here —
+        describe the concern at a high level and we will follow up.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind of report
+      options:
+        - Documentation
+        - Installation / packaging
+        - Code quality / refactoring
+        - Security process question
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: What should maintainers look at? Link files or PRs if relevant. No API keys or secrets.
+    validations:
+      required: true
