@@ -10,24 +10,24 @@ on:
 permissions:
   contents: read
 
-# moodle-plugin-ci matrix values shared by the static-checks and phpunit jobs.
+# Multi-major matrix (2026-08-12): Marketplace validation on 4.5 + 5.1 + 5.2.
 #
-# BL-20: a fixed tag, not MOODLE_405_STABLE. That branch gains commits every week, and
-# moodle-plugin-ci re-clones it on every run, so CI could turn red without a single commit from us -
-# which it did on 2026-07-30, when the local PHPUnit environment refused to run against a tree that
-# had moved underneath it. Following minor releases buys nothing here: a new major Moodle is its own
-# piece of work, planned as such, not something to absorb one weekly commit at a time.
+# BL-20: pin release tags, not MOODLE_*_STABLE. STABLE gains commits every week, and
+# moodle-plugin-ci re-clones it on every run, so CI could turn red without a single commit
+# from us. Tags used here (verify when bumping):
+#   - v4.5.12  — 4.5 LTS pin already in use
+#   - v5.1.6   — latest 5.1.x tag at decision time (prefer over MOODLE_501_STABLE)
+#   - v5.2.2   — latest 5.2.x tag at decision time (prefer over MOODLE_502_STABLE)
+#
+# PHP: 8.3 on every cell (supported on 4.5, 5.1, and 5.2; 5.2 minimum is 8.3).
+# DB: MariaDB 10.11 on all majors; one Postgres cell on 5.2 with PG16 (5.2 minimum).
 #
 # A tag is valid where it is used. moodle-plugin-ci passes this value through
-# Validate::gitBranch(), whose pattern /^[a-zA-Z0-9\/\+\._-]+$/ accepts it, and MoodleInstaller runs
-# `git clone --depth 1 --branch <value>`, which git resolves to a tag. A raw commit hash would NOT
-# work - `git clone --branch` does not take one.
+# Validate::gitBranch(), and MoodleInstaller runs `git clone --depth 1 --branch <value>`,
+# which git resolves to a tag. A raw commit hash would NOT work.
 #
-# Moving to a newer Moodle means editing this line deliberately, and pointing the local checkout
-# (~/projektek/moodle) at the same tag so the two environments stay identical.
-env:
-  MOODLE_BRANCH: v4.5.12
-  PHP_VERSION: "8.3"
+# $plugin->requires stays 4.5.1 (2024100700). Do not add $plugin->supported until CI +
+# business smoke prove each major (see general/moodle-multi-version-smoke.md).
 
 jobs:
 
@@ -36,10 +36,38 @@ jobs:
   # standard). Runs first; the heavier phpunit job gates on it.
   # ---------------------------------------------------------------------------
   static-checks:
-    name: Static checks (lint / phpstan / phpcs)
+    name: Static (${{ matrix.moodle-branch }} / ${{ matrix.database }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - moodle-branch: v4.5.12
+            php: '8.3'
+            database: mariadb
+          - moodle-branch: v5.1.6
+            php: '8.3'
+            database: mariadb
+          - moodle-branch: v5.2.2
+            php: '8.3'
+            database: mariadb
+          - moodle-branch: v5.2.2
+            php: '8.3'
+            database: pgsql
 
     services:
+      # Both services start on every cell; moodle-plugin-ci uses DB= from the matrix.
+      # PG16: required minimum for Moodle 5.2; fine for the single pgsql cell.
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: "postgres"
+          POSTGRES_HOST_AUTH_METHOD: "trust"
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s --health-timeout=5s --health-retries=5
       mariadb:
         image: mariadb:10.11
         env:
@@ -58,35 +86,29 @@ jobs:
         with:
           path: plugin
 
-      - name: Setup PHP ${{ env.PHP_VERSION }}
+      - name: Setup PHP ${{ matrix.php }}
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ env.PHP_VERSION }}
+          php-version: ${{ matrix.php }}
           extensions: mbstring, pgsql, mysqli, gd, zip, curl, xml, openssl, ctype, iconv, intl, soap
           ini-values: max_input_vars=5000
           coverage: none
 
       # Two caches, both purely additive: on a miss the step behaves exactly as it did
-      # before, so neither can turn a run red. They exist because "Install Moodle + plugin"
-      # below downloads a full node toolchain and re-resolves every composer package on
-      # every run - and both jobs run it, so each download happens twice per CI run.
-      #
-      # Keyed on MOODLE_BRANCH because that is what decides both: the composer constraint
-      # set and the node version (moodle-plugin-ci reads Moodle's own .nvmrc). The branch is
-      # a fixed tag since BL-20, so the key cannot silently go stale - which is exactly what
-      # made this cacheable in the first place.
+      # before, so neither can turn a run red. Keyed on moodle-branch because that decides
+      # composer constraints and node version (moodle-plugin-ci reads Moodle's .nvmrc).
       - name: Cache composer downloads
         uses: actions/cache@v4
         with:
           path: ~/.cache/composer
-          key: composer-${{ runner.os }}-${{ env.PHP_VERSION }}-${{ env.MOODLE_BRANCH }}
-          restore-keys: composer-${{ runner.os }}-${{ env.PHP_VERSION }}-
+          key: composer-${{ runner.os }}-${{ matrix.php }}-${{ matrix.moodle-branch }}
+          restore-keys: composer-${{ runner.os }}-${{ matrix.php }}-
 
       - name: Cache node (nvm)
         uses: actions/cache@v4
         with:
           path: ~/.nvm/versions/node
-          key: nvm-${{ runner.os }}-${{ env.MOODLE_BRANCH }}
+          key: nvm-${{ runner.os }}-${{ matrix.moodle-branch }}
 
       - name: Initialise moodle-plugin-ci
         run: |
@@ -98,37 +120,26 @@ jobs:
       - name: Install Moodle + plugin
         run: moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1
         env:
-          DB: mariadb
-          MOODLE_BRANCH: ${{ env.MOODLE_BRANCH }}
+          DB: ${{ matrix.database }}
+          MOODLE_BRANCH: ${{ matrix.moodle-branch }}
 
-      # BL-36: the AMD source and the built file are two files in the repository, and until this
-      # step the only thing keeping them in step was somebody remembering to run `grunt amd`. A
-      # commit that edits amd/src and forgets the build was green, and the browser went on running
-      # the old behaviour. That happened twice on 2026-08-01 - once the shipped
-      # generatesettings.min.js had to be replaced by hand, and once a fixed reload loop kept
-      # looping until the rebuilt file was actually served.
-      #
-      # The node version is NOT pinned here. Moodle's own .nvmrc decides it (lts/jod) and
-      # moodle-plugin-ci installs from that; a second version written into this file would be a
-      # second source for one fact, which is the shape this project keeps removing. What this does
-      # instead is check the one that exists, and say so plainly if it does not fit - because the
-      # failure otherwise arrives as grunt refusing to start, which reads like a broken build.
+      # BL-36: AMD source and build must stay in step. Node version comes from Moodle's
+      # .nvmrc via moodle-plugin-ci — not a second pin in this file.
       - name: AMD build is in step with its source
         working-directory: ${{ github.workspace }}/moodle
         run: |
           node_version="$(node --version)"
-          echo "node: $node_version (Moodle .nvmrc: $(cat .nvmrc))"
+          echo "node: $node_version (Moodle .nvmrc: $(cat .nvmrc 2>/dev/null || echo 'missing'))"
           case "$node_version" in
             v22.*) ;;
             *) echo "::error::Moodle's grunt requires node >=22.11 <23, found $node_version." \
-                    "The .nvmrc says $(cat .nvmrc) - the toolchain install did not honour it."
+                    "The .nvmrc says $(cat .nvmrc 2>/dev/null || echo 'missing') - the toolchain install did not honour it."
                exit 1 ;;
           esac
           npx grunt amd --root=local/artqtml
           # Copy the freshly built files back over the checkout before comparing. Where
           # moodle-plugin-ci symlinked the plugin this is a no-op; where it copied, it is what makes
-          # the comparison mean anything at all. Doing it unconditionally keeps the check honest
-          # under both, instead of silently passing under one of them.
+          # the comparison mean anything at all.
           cp -R local/artqtml/amd/build/. "${{ github.workspace }}/plugin/amd/build/"
       - name: Fail if the committed AMD build is stale
         working-directory: ${{ github.workspace }}/plugin
@@ -141,9 +152,7 @@ jobs:
           fi
           echo "amd/build matches amd/src."
 
-      # The one guard that survived the browser suite's removal (BL-43): every tools/**.sh stays
-      # executable. It is a shell script, so it is tied to every push. Placed before phplint
-      # because it is the cheapest step in the job.
+      # BL-43: every tools/**.sh stays executable.
       - name: Script guards
         run: bash "${{ github.workspace }}/plugin/tools/script-guard.sh"
 
@@ -151,36 +160,17 @@ jobs:
         run: moodle-plugin-ci phplint
 
       - name: PHP CodeSniffer (Moodle standard)
-        # Use the plugin's phpcs.xml (Moodle standard + the dev-only tools/ exclusion) rather than
-        # the bare "moodle" standard moodle-plugin-ci defaults to.
         run: moodle-plugin-ci phpcs --standard "${{ github.workspace }}/plugin/phpcs.xml"
 
-      # moodle-plugin-ci has no phpstan command, so run PHPStan directly against the Moodle tree
-      # it installed, using the plugin's own level-5 config + Moodle-aware bootstrap.
-      #
-      # BL-21: pinned, not "latest". A floating version means a new PHPStan release can turn an
-      # unchanged tree red - the failure arrives with no commit of ours behind it, and a red build
-      # is the wrong way to learn that a new version exists. Pinned, a release changes nothing until
-      # we choose it, and dependabot (.github/dependabot.yml) opens a pull request to tell us.
-      #
-      # Composer-based PHPStan (not the bare phar): phpstan.neon includes
-      # spaze/phpstan-disallowed-calls, which only loads from tools/devtools/vendor. The pin below
-      # must match tools/devtools/composer.json (phpstan/phpstan 2.2.5). tools/check.sh compares
-      # local vs CI; if they drift, "green locally, red on CI" comes back (BL-15).
-      #
-      # Composer package cache is already restored above (~/.cache/composer). Install into the
-      # checkout's tools/devtools; if moodle-plugin-ci copied (not symlinked) the plugin into
-      # the Moodle tree, sync vendor so neon includes resolve under local/artqtml/.
+      # BL-21: PHPStan pinned (must match tools/devtools/composer.json → phpstan/phpstan 2.2.5).
       - name: Install plugin PHPStan toolchain
         working-directory: ${{ github.workspace }}/plugin/tools/devtools
         # No --no-audit: moodle-plugin-ci puts an older Composer on PATH that rejects that flag.
-        # Advisory blocking for pinned phpcs is already off via composer.json audit.block-insecure.
         run: composer install --no-interaction --no-progress
 
       - name: PHPStan (level 5, Moodle-aware + disallowed-calls)
         working-directory: ${{ github.workspace }}/moodle
         env:
-          # Must match tools/devtools/composer.json → phpstan/phpstan.
           PHPSTAN_VERSION: 2.2.5
         run: |
           DEVTOOLS_BIN="${{ github.workspace }}/plugin/tools/devtools/vendor/bin/phpstan"
@@ -194,14 +184,40 @@ jobs:
             --configuration=local/artqtml/phpstan.neon --no-progress
 
   # ---------------------------------------------------------------------------
-  # PHPUnit: full Moodle install, then the plugin's test suite (46 tests).
+  # PHPUnit: full Moodle install, then the plugin's test suite.
   # ---------------------------------------------------------------------------
   phpunit:
-    name: PHPUnit
+    name: PHPUnit (${{ matrix.moodle-branch }} / ${{ matrix.database }})
     needs: static-checks
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - moodle-branch: v4.5.12
+            php: '8.3'
+            database: mariadb
+          - moodle-branch: v5.1.6
+            php: '8.3'
+            database: mariadb
+          - moodle-branch: v5.2.2
+            php: '8.3'
+            database: mariadb
+          - moodle-branch: v5.2.2
+            php: '8.3'
+            database: pgsql
 
     services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: "postgres"
+          POSTGRES_HOST_AUTH_METHOD: "trust"
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s --health-timeout=5s --health-retries=5
       mariadb:
         image: mariadb:10.11
         env:
@@ -220,35 +236,26 @@ jobs:
         with:
           path: plugin
 
-      - name: Setup PHP ${{ env.PHP_VERSION }}
+      - name: Setup PHP ${{ matrix.php }}
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ env.PHP_VERSION }}
+          php-version: ${{ matrix.php }}
           extensions: mbstring, pgsql, mysqli, gd, zip, curl, xml, openssl, ctype, iconv, intl, soap
           ini-values: max_input_vars=5000
           coverage: none
 
-      # Two caches, both purely additive: on a miss the step behaves exactly as it did
-      # before, so neither can turn a run red. They exist because "Install Moodle + plugin"
-      # below downloads a full node toolchain and re-resolves every composer package on
-      # every run - and both jobs run it, so each download happens twice per CI run.
-      #
-      # Keyed on MOODLE_BRANCH because that is what decides both: the composer constraint
-      # set and the node version (moodle-plugin-ci reads Moodle's own .nvmrc). The branch is
-      # a fixed tag since BL-20, so the key cannot silently go stale - which is exactly what
-      # made this cacheable in the first place.
       - name: Cache composer downloads
         uses: actions/cache@v4
         with:
           path: ~/.cache/composer
-          key: composer-${{ runner.os }}-${{ env.PHP_VERSION }}-${{ env.MOODLE_BRANCH }}
-          restore-keys: composer-${{ runner.os }}-${{ env.PHP_VERSION }}-
+          key: composer-${{ runner.os }}-${{ matrix.php }}-${{ matrix.moodle-branch }}
+          restore-keys: composer-${{ runner.os }}-${{ matrix.php }}-
 
       - name: Cache node (nvm)
         uses: actions/cache@v4
         with:
           path: ~/.nvm/versions/node
-          key: nvm-${{ runner.os }}-${{ env.MOODLE_BRANCH }}
+          key: nvm-${{ runner.os }}-${{ matrix.moodle-branch }}
 
       - name: Initialise moodle-plugin-ci
         run: |
@@ -260,8 +267,8 @@ jobs:
       - name: Install Moodle + plugin
         run: moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1
         env:
-          DB: mariadb
-          MOODLE_BRANCH: ${{ env.MOODLE_BRANCH }}
+          DB: ${{ matrix.database }}
+          MOODLE_BRANCH: ${{ matrix.moodle-branch }}
 
       - name: PHPUnit (local_artqtml_testsuite)
         run: moodle-plugin-ci phpunit
