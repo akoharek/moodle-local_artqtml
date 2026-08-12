@@ -37,3 +37,5 @@ Please use the issue templates (Bug report, Feature request, or Other / code iss
 > Magyarul: hibákat, funkciókéréseket és egyéb kódproblémákat a fenti nyilvános GitHub Issues oldalon várjuk (sablonok angolul).
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to report issues and propose changes.
+
+Maintainers: optional Teams/email alerts on new issues — see [SUPPORT.md](SUPPORT.md).

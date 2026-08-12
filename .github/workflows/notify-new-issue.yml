@@ -1,0 +1,145 @@
+# Notify maintainers when a public tracker issue is opened.
+# Soft-fail: missing Teams / SMTP secrets skip with a warning; they must not fail CI.
+name: Notify new issue
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  issues: read
+
+jobs:
+  notify-teams:
+    name: Microsoft Teams
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Resolve webhook secret
+        id: gate
+        env:
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          MS_TEAMS_WEBHOOK_URL: ${{ secrets.MS_TEAMS_WEBHOOK_URL }}
+        run: |
+          WEBHOOK="${TEAMS_WEBHOOK_URL:-$MS_TEAMS_WEBHOOK_URL}"
+          if [ -z "$WEBHOOK" ]; then
+            echo "::warning::TEAMS_WEBHOOK_URL (or MS_TEAMS_WEBHOOK_URL) is not set; skipping Teams notification"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Post MessageCard to Teams
+        if: steps.gate.outputs.skip != 'true'
+        env:
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          MS_TEAMS_WEBHOOK_URL: ${{ secrets.MS_TEAMS_WEBHOOK_URL }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_LABELS: ${{ join(github.event.issue.labels.*.name, ', ') }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          WEBHOOK="${TEAMS_WEBHOOK_URL:-$MS_TEAMS_WEBHOOK_URL}"
+          BODY_EXCERPT="$(printf '%s' "${ISSUE_BODY:-}" | head -c 500)"
+          if [ "${#ISSUE_BODY}" -gt 500 ]; then
+            BODY_EXCERPT="${BODY_EXCERPT}…"
+          fi
+          LABELS="${ISSUE_LABELS:-*(none)*}"
+          PAYLOAD="$(jq -n \
+            --arg title "$ISSUE_TITLE" \
+            --arg url "$ISSUE_URL" \
+            --arg author "$ISSUE_AUTHOR" \
+            --arg labels "$LABELS" \
+            --arg body "$BODY_EXCERPT" \
+            --arg number "$ISSUE_NUMBER" \
+            --arg repo "$REPO" \
+            '{
+              "@type": "MessageCard",
+              "@context": "https://schema.org/extensions",
+              "themeColor": "0078D4",
+              "summary": ("[ArtQTML] New issue #" + $number + ": " + $title),
+              "sections": [{
+                "activityTitle": ("New issue on " + $repo),
+                "activitySubtitle": ("#" + $number + " — " + $title),
+                "facts": [
+                  {"name": "Author", "value": $author},
+                  {"name": "Labels", "value": $labels},
+                  {"name": "URL", "value": $url}
+                ],
+                "text": $body,
+                "markdown": true
+              }],
+              "potentialAction": [{
+                "@type": "OpenUri",
+                "name": "Open issue",
+                "targets": [{"os": "default", "uri": $url}]
+              }]
+            }')"
+          HTTP_CODE="$(curl -sS -o /tmp/teams-response.txt -w '%{http_code}' \
+            -H 'Content-Type: application/json' \
+            -d "$PAYLOAD" \
+            "$WEBHOOK")"
+          if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
+            echo "::error::Teams webhook returned HTTP $HTTP_CODE"
+            cat /tmp/teams-response.txt || true
+            exit 1
+          fi
+          echo "Teams notification sent (HTTP $HTTP_CODE)."
+
+  notify-email:
+    name: Email
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Check SMTP secrets
+        id: gate
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          SMTP_FROM: ${{ secrets.SMTP_FROM }}
+        run: |
+          if [ -z "$SMTP_HOST" ] || [ -z "$SMTP_USER" ] || [ -z "$SMTP_PASSWORD" ] || [ -z "$SMTP_FROM" ]; then
+            echo "::warning::SMTP secrets incomplete (need SMTP_HOST, SMTP_USER, SMTP_PASSWORD, SMTP_FROM); skipping email. Teams-only works until SMTP is configured — see SUPPORT.md."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Resolve SMTP port
+        if: steps.gate.outputs.skip != 'true'
+        id: smtp
+        env:
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+        run: echo "port=${SMTP_PORT:-587}" >> "$GITHUB_OUTPUT"
+
+      - name: Send email
+        if: steps.gate.outputs.skip != 'true'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          # Default 587 + secure false = STARTTLS (typical for Microsoft 365).
+          # For SMTPS on 465, set secret SMTP_PORT=465 and change secure below to true.
+          server_address: ${{ secrets.SMTP_HOST }}
+          server_port: ${{ steps.smtp.outputs.port }}
+          secure: false
+          username: ${{ secrets.SMTP_USER }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: '[ArtQTML] New issue: ${{ github.event.issue.title }}'
+          to: koharek.andras@artudasmenedzsment.hu
+          from: ${{ secrets.SMTP_FROM }}
+          body: |
+            A new issue was opened on ${{ github.repository }}.
+
+            Title: ${{ github.event.issue.title }}
+            Number: #${{ github.event.issue.number }}
+            Author: ${{ github.event.issue.user.login }}
+            Labels: ${{ join(github.event.issue.labels.*.name, ', ') }}
+            URL: ${{ github.event.issue.html_url }}
+
+            ---
+            ${{ github.event.issue.body }}
