@@ -83,6 +83,7 @@ forbidden_prefixes = (
     "artqtml/tools/",
     "artqtml/.git/",
     "artqtml/CLAUDE.md",
+    "artqtml/BACKLOG.md",
     "artqtml/license.php",
 )
 for f in forbidden_prefixes:

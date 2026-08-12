@@ -13,6 +13,8 @@ BYOK; review / approve; easy / medium / hard; thin admin.
 - README and listing docs describe Light scope only (paste/TXT, IH/FE/SR, BYOK,
   review/approve, difficulty scale) — no “not included” feature lists.
 - `COPYRIGHT.txt` title line simplified to `ArtQTML (local_artqtml)`.
+- Remove in-repo `BACKLOG.md` from Light (local-only archive outside the tree;
+  Marketplace ZIP already excluded it).
 
 ## 2026-08-12 — `2026081202` (1.0.0)
 

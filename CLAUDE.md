@@ -64,9 +64,10 @@ This project has Moodle-specific skills preloaded (`.agents/skills/`) — invoke
 ```
 
 The script builds an `artqtml/` top-level tree with English lang only and excludes
-`.git`, tests, tools, CLAUDE.md, BACKLOG.md, and other non-runtime files. `CHANGES.md`
+`.git`, tests, tools, CLAUDE.md, and other non-runtime / local-only files. `CHANGES.md`
 **is** included (installer-facing changelog). Light has no `.lic` / license-integrity
-manifest — do not regenerate or ship license fixtures.
+manifest — do not regenerate or ship license fixtures. Do not add a product `BACKLOG.md`
+in this Light repo (historical notes live outside the tree).
 
 Copy the versioned ZIP to iCloud `riportok/` when cutting a Marketplace build.
 
@@ -104,5 +105,4 @@ Copy the versioned ZIP to iCloud `riportok/` when cutting a Marketplace build.
 
 ## Technical debt
 
-See `BACKLOG.md` for historical notes (many predate the Light fork and refer to Full-only
-paths). Do not start large refactors unless explicitly asked.
+Do not start large refactors unless explicitly asked. Light has no in-repo product backlog.
