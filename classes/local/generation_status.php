@@ -57,7 +57,7 @@ class generation_status {
      * @var string the pipeline finished, but delivered fewer questions than were asked for.
      *
      * BL-35. Before this existed there were two outcomes, and a run that produced nothing at all
-     * took the same one as a run that produced everything: nine consecutive FT generations
+     * took the same one as a run that produced everything: nine consecutive empty generations
      * delivered zero questions and every one of them was shown as "Completed" with a full green
      * bar (BL-30). Neither 'completed' nor 'failed' was honest about them - the pipeline really
      * did run to the end, and the teacher really did not get what they asked for.

@@ -139,9 +139,8 @@ class extraction_result {
             'expandedbytes'  => (int) ($metrics['expandedbytes'] ?? 0),
             'streamcount'    => (int) ($metrics['streamcount'] ?? 0),
             'archiveentries' => (int) ($metrics['archiveentries'] ?? 0),
-            // BL-48: what the page-driven PDF route did. `unmappedglyphs` is the one to watch -
-            // a font whose /ToUnicode table is missing or unreadable shows up here as a large
-            // number beside a small amount of text, which is otherwise a silent failure.
+            // Optional extract metrics retained for diagnostics / logging. Light only accepts
+            // plain TXT, so PDF glyph counters stay at zero unless a caller passes them.
             'pagecount'      => (int) ($metrics['pagecount'] ?? 0),
             'fontcount'      => (int) ($metrics['fontcount'] ?? 0),
             'mappedglyphs'   => (int) ($metrics['mappedglyphs'] ?? 0),

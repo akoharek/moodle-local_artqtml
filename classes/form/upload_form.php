@@ -151,9 +151,9 @@ class upload_form extends \moodleform {
         $hasfile = !empty($files['sourcefile']) || !empty($draftfiles);
 
         // Server-side file checks. The filepicker's own accepted_types and maxfiles are client
-        // configuration and are not evidence about what actually arrived. The deep structural
-        // checks - the ZIP preflight, the PDF stream limits, the hidden-text scan - stay in
-        // text_extractor and are deliberately not repeated here; this is the cheap gate.
+        // configuration and are not evidence about what actually arrived. text_extractor still
+        // rejects unsupported types and oversize drafts; this is the cheap form-level gate for
+        // Light's TXT-only upload.
         if (count($draftfiles) > 1) {
             $errors['sourcefile'] = get_string('errorfiletoomany', 'local_artqtml');
         } else {

@@ -56,7 +56,7 @@ $capabilities = [
         ],
     ],
     'local/artqtml:configure' => [
-        // Admin settings, API keys, license — config + secrets + potential data loss.
+        // Admin settings and API keys — config + secrets + potential data loss.
         'riskbitmask'  => RISK_CONFIG | RISK_XSS | RISK_DATALOSS | RISK_PERSONAL,
         'captype'      => 'write',
         'contextlevel' => CONTEXT_SYSTEM,

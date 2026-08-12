@@ -1,5 +1,9 @@
 # local_artqtml Backlog
 
+> **ArtQTML Light note:** This backlog is largely historical (pre-fork / Full-era). Light ships
+> IH+FE+SR, paste+TXT, thin admin — no PDF/DOCX, Bloom, FT/EH/RV, or `.lic`. Prefer open Light
+> work items and shared-bugfix sync with Full; treat PDF/license/Bloom entries as archive.
+
 > **This file is the single source for the backlog.** It used to exist twice: here, and as a
 > BL-01…BL-11 table restated in every session handover. Nothing kept the two in agreement, which
 > is the same two-source shape this project removed from the specification (markdown → docx) and

@@ -36,7 +36,7 @@ class question_creator {
     /**
      * Create a new question in the given category from AI-generated data.
      *
-     * @param string $typecode IH/FE/FT/SR/EH/RV
+     * @param string $typecode IH/FE/SR
      * @param array $data decoded per-type fields from the AI response (technical annex 3.3)
      * @param int $categoryid target question_categories.id (the generation's draft bank)
      * @param string $questioncode plugin-generated name, e.g. BIO1-IH-0001

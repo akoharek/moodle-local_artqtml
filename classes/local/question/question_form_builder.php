@@ -147,8 +147,8 @@ class question_form_builder {
      *    strip_tags() can no longer swallow the rest of the sentence as if it were a tag. Doing
      *    it the other way round loses text, silently.
      * 2. Turn block boundaries into newlines BEFORE the tags go, or "<p>Első</p><p>Második</p>"
-     *    comes out as "ElsőMásodik" - the same words-run-together defect BL-48 fixed in the PDF
-     *    reader.
+     *    comes out as "ElsőMásodik" - the same words-run-together defect fixed when block tags
+     *    were stripped without inserting separators.
      * 3. Strip everything except the two kept tags.
      * 4. Normalise the whitespace this leaves behind.
      *
