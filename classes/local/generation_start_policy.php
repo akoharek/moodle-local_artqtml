@@ -50,7 +50,7 @@
  * (people retry their own) the two are the same person.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -79,7 +79,7 @@ class generation_start_policy {
         $params['excludeid'] = $excludegenerationid;
 
         // Oldest first: with more than one in progress (possible from rows that predate this rule),
-        // the one to wait for or cancel is the one that has been running longest.
+        // The one to wait for or cancel is the one that has been running longest.
         $records = $DB->get_records_select(
             'local_artqtml_generations',
             'userid = :startedby AND id <> :excludeid AND ' . $statussql,

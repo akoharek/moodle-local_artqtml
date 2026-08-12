@@ -25,7 +25,7 @@ use local_artqtml\local\question_types;
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\form\generate_form
  */
 final class generate_form_test extends \advanced_testcase {

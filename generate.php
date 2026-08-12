@@ -19,7 +19,7 @@
  * Per-type options.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require(__DIR__ . '/../../config.php');
@@ -281,7 +281,6 @@ if (!empty($generation->settings)) {
         $mform->set_data($formdefaults);
     }
 }
-
 
 echo $OUTPUT->header();
 echo local_artqtml_model_warning_banner();

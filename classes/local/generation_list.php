@@ -18,7 +18,7 @@
  * Renders one filterable/sortable/paginated "generations" section of the list page.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -109,7 +109,7 @@ class generation_list {
         $statuscase = self::status_order_case('g');
         // Real column, not just a display concatenation - needed so 'creator' is a valid
         // ORDER BY target (/024): u.firstname/u.lastname alone aren't sortable as a
-        // single key, and there is no "creatorname" column/alias anywhere else in the query.
+        // Single key, and there is no "creatorname" column/alias anywhere else in the query.
         $creatorsort = 'LOWER(' . $DB->sql_concat('u.lastname', 'u.firstname') . ')';
 
         $countsql = "SELECT COUNT(1)
@@ -404,8 +404,8 @@ class generation_list {
         $table->head[] = get_string('colactions', 'local_artqtml');
 
         foreach ($generations as $generation) {
-            // the badge shows the lang label ('started' -> "Megkezdett" / "Started")
-            // never the raw status key.
+            // The badge shows the lang label ('started' -> "Megkezdett" / "Started")
+            // Never the raw status key.
             $statusbadge = \html_writer::span(
                 generation_status::label($generation->status),
                 'badge ' . generation_status::badge_class($generation->status)
@@ -482,7 +482,7 @@ class generation_list {
                 $actionscell,
             ]);
             // A technikai melléklet "Teszthorgonyok" szakasza: row anchor + content identifier, so a row
-            // assertion can select the generation it means rather than the first match.
+            // Assertion can select the generation it means rather than the first match.
             $row->attributes['data-testid'] = 'artqtml-list-row';
             $row->attributes['data-generationid'] = $generation->id;
             $table->data[] = $row;
@@ -539,8 +539,8 @@ class generation_list {
      * @return \moodle_url
      */
     public static function open_url(\stdClass $generation): \moodle_url {
-        // no re-listing of the seven statuses - completed goes to the approval page, the
-        // in-progress trio plus failed and partial go to the status page, and anything else
+        // No re-listing of the seven statuses - completed goes to the approval page, the
+        // In-progress trio plus failed and partial go to the status page, and anything else
         // ('started') falls through to the settings page it can be resumed from.
         if ($generation->status === generation_status::COMPLETED) {
             return new \moodle_url('/local/artqtml/approve.php', ['generationid' => $generation->id]);

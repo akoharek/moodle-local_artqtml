@@ -32,7 +32,7 @@ namespace local_artqtml;
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\observer::question_saved
  */
 final class observer_test extends \advanced_testcase {

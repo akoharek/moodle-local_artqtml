@@ -18,7 +18,7 @@
  * Calls the Gemini API to validate AI-generated quiz questions.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\task;
@@ -37,7 +37,6 @@ class validate_questions_task {
 
     /** @var int maximum JSON-fallback retry attempts (1 initial + 2 fallback, per 2.3). */
     public const MAX_JSON_ATTEMPTS = 3;
-
 
     /**
      * Run the Gemini validation call(s) for one generation's not-yet-evaluated questions.
@@ -85,8 +84,8 @@ class validate_questions_task {
                 $results = $this->call_gemini($generation, $batch);
 
                 // C-03: each Gemini call can take a while, and a generation may have several
-                // batches - re-check before saving every single batch's results, not just once
-                // up front, so an abort/delete mid-run is caught before the very next write.
+                // Batches - re-check before saving every single batch's results, not just once
+                // Up front, so an abort/delete mid-run is caught before the very next write.
                 $generation = $this->reload_if_active($generationid, \local_artqtml\local\generation_status::VALIDATING);
                 if ($generation === null) {
                     $this->log_event($generationid, 'processing_abandoned', [], $userid);
@@ -242,7 +241,7 @@ class validate_questions_task {
             }
 
             $decoded = json_decode((string) $result['body'], true);
-            // see the note on ai_request::extract_text - one place for where the text sits.
+            // See the note on ai_request::extract_text - one place for where the text sits.
             $text = ai_request::extract_text(model_list::PROVIDER_GEMINI, $decoded);
             $parsed = is_string($text) ? json_decode($text, true) : null;
             $evaluations = (is_array($parsed) && is_array($parsed['evaluations'] ?? null)) ? $parsed['evaluations'] : [];
@@ -278,7 +277,7 @@ class validate_questions_task {
                 continue;
             }
 
-            // log usage for the attempt that produced a usable result, regardless of whether it took more than one try.
+            // Log usage for the attempt that produced a usable result, regardless of whether it took more than one try.
             $this->log_ai_call($generation->id, 'validate', 'gemini', [
                 'httpstatus'   => 200,
                 'tokensinput'  => $decoded['usageMetadata']['promptTokenCount'] ?? null,
@@ -338,7 +337,7 @@ class validate_questions_task {
             '{{PROBLEM_CATEGORIES}}' => implode(', ', \local_artqtml\local\problem_category::VALUES),
         ]);
 
-        // the level definitions the generator was given for THIS generation's scale.
+        // The level definitions the generator was given for THIS generation's scale.
         $definitions = \local_artqtml\local\difficulty_prompt::for_generation($generation);
 
         $difficulty = trim($definitions) === ''
@@ -376,9 +375,9 @@ class validate_questions_task {
         $items = [];
         foreach ($questions as $question) {
             // The questiondata field is stored as JSON. Decoding it keeps the structure visible to the
-            // validator instead of handing it a string containing braces; if it will not decode,
-            // the raw value is passed through so the validator can still name the broken question
-            // rather than the batch failing on it.
+            // Validator instead of handing it a string containing braces; if it will not decode,
+            // The raw value is passed through so the validator can still name the broken question
+            // Rather than the batch failing on it.
             $decoded = json_decode((string) $question->questiondata, true);
 
             $items[] = [
@@ -455,7 +454,7 @@ class validate_questions_task {
                         'type' => 'OBJECT',
                         'properties' => [
                             'question_id'      => ['type' => 'STRING'],
-                            // exactly the three verdicts, read from the single source of truth that build_system_instruction also names in the prompt.
+                            // Exactly the three verdicts, read from the single source of truth that build_system_instruction also names in the prompt.
                             'suggestion'       => [
                                 'type' => 'STRING',
                                 'enum' => \local_artqtml\local\validation_suggestion::VALUES,
@@ -490,9 +489,9 @@ class validate_questions_task {
     protected function merge_results(array $evaluations, array $batch, array $results): array {
         foreach ($batch as $pseudoid => $question) {
             // Security: an exact string comparison, not an (int) cast - a cast would silently
-            // truncate/coerce a malformed or unexpected question_id (e.g. "5abc", " 5") into
-            // matching a real pseudo-id it was never actually equal to, letting a malformed or
-            // hallucinated Gemini response get silently (and wrongly) applied to a real question.
+            // Truncate/coerce a malformed or unexpected question_id (e.g. "5abc", " 5") into
+            // Matching a real pseudo-id it was never actually equal to, letting a malformed or
+            // Hallucinated Gemini response get silently (and wrongly) applied to a real question.
             $expectedid = (string) $pseudoid;
             $evaluation = null;
             foreach ($results as $candidate) {
@@ -536,9 +535,9 @@ class validate_questions_task {
                 $suggestion = \local_artqtml\local\validation_suggestion::NEEDS_REVIEW;
             }
             // C3: a hint Gemini judged irrelevant to the question is a real defect too. Guarded
-            // by $hashint for the same reason as is_progressive: "no hint at all" is also reported
-            // as relevance=false, so without the guard every question with hints simply turned off
-            // would wrongly land in needs_review.
+            // By $hashint for the same reason as is_progressive: "no hint at all" is also reported
+            // As relevance=false, so without the guard every question with hints simply turned off
+            // Would wrongly land in needs_review.
             if ($hashint && array_key_exists('relevance', $hintquality) && $hintquality['relevance'] === false) {
                 $suggestion = \local_artqtml\local\validation_suggestion::NEEDS_REVIEW;
             }
@@ -547,8 +546,8 @@ class validate_questions_task {
             }
             // C3: general feedback Gemini judged irrelevant is a real defect as well. Guarded by
             // $hasfeedback: the schema reports relevant=false when there is no feedback at all, so
-            // without the guard every question without general feedback would wrongly land in
-            // needs_review.
+            // Without the guard every question without general feedback would wrongly land in
+            // Needs_review.
             $hasfeedback = is_array($rawquestiondata)
                 && trim((string) ($rawquestiondata['generalfeedback'] ?? '')) !== '';
             if ($hasfeedback && array_key_exists('relevant', $feedbackquality) && $feedbackquality['relevant'] === false) {
@@ -564,7 +563,7 @@ class validate_questions_task {
                 'confidence'           => $confidence,
                 // The complete raw Gemini response for this question, exactly as returned
                 // (unlike the normalised/whitelisted fields above) - save_questions_task stores
-                // this verbatim in local_artqtml_questions.validationdata.
+                // This verbatim in local_artqtml_questions.validationdata.
                 'validationdata'       => $evaluation,
             ];
         }

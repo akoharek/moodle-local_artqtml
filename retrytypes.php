@@ -22,7 +22,7 @@
  * Told what already exists for this text is the entire point of that screen.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require(__DIR__ . '/../../config.php');
@@ -56,7 +56,7 @@ $PAGE->set_title(get_string('retrymissingtypes', 'local_artqtml'));
 $PAGE->set_heading(get_string('retrymissingtypes', 'local_artqtml'));
 
 // The same three gates upload.php puts in front of starting any new generation - this creates one,
-// so it cannot be a way around them.
+// So it cannot be a way around them.
 if (!get_config('local_artqtml', 'enabled')) {
     redirect(new moodle_url('/local/artqtml/index.php'));
 }
@@ -68,14 +68,14 @@ if ($generation->status !== generation_status::PARTIAL) {
 $shortfall = missing_types::shortfall($generation);
 if ($shortfall === []) {
     // Nothing recorded as missing - the button should not have been reachable, so say nothing
-    // clever and just go back rather than creating an empty generation.
+    // Clever and just go back rather than creating an empty generation.
     redirect($statusurl);
 }
 
 $settings = json_decode((string) $generation->settings, true);
 if (!is_array($settings)) {
     // A partial generation always has settings - it ran. Nothing sensible to say if it somehow
-    // does not, and inventing a grid would be worse than going back.
+    // Does not, and inventing a grid would be worse than going back.
     redirect($statusurl);
 }
 

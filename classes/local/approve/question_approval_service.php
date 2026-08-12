@@ -18,7 +18,7 @@
  * Helper.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local\approve;
@@ -90,14 +90,14 @@ class question_approval_service {
         }
 
         // Same atomicity contract as approve_single(): an observer listening on
-        // question_approval_revoked must never see a committed revocation that then rolls back.
+        // Question_approval_revoked must never see a committed revocation that then rolls back.
         $transaction = $DB->start_delegated_transaction();
         try {
             $DB->update_record('local_artqtml_questions', (object) [
                 'id'         => $questionid,
                 'approved'   => 0,
                 // The approver record belongs to the approval that has just been taken back; a
-                // surviving approvedby would keep naming someone who no longer approves this row.
+                // Surviving approvedby would keep naming someone who no longer approves this row.
                 'approvedby' => null,
             ]);
 
@@ -156,13 +156,13 @@ class question_approval_service {
             $transaction->allow_commit();
         } catch (\Throwable $e) {
             // B3: run the whole bulk approval in one transaction so a failure part-way through
-            // never leaves a partially-approved batch. rollback() rethrows $e by contract, so it
-            // propagates to the controller, which turns it into a notification::error.
+            // Never leaves a partially-approved batch. rollback() rethrows $e by contract, so it
+            // Propagates to the controller, which turns it into a notification::error.
             //
             // Az is_disposed() őr akkor számít, ha $e magából az allow_commit()-ból jön:
-            // commit_delegated_transaction() még a hiba előtt disposed-ra állítja a tranzakciót,
-            // és egy disposed tranzakcióra hívott rollback() dml_transaction_exception-t dob,
-            // elfedve a valódi hibát. Ilyenkor az eredeti $e-t dobjuk tovább változatlanul.
+            // Commit_delegated_transaction() még a hiba előtt disposed-ra állítja a tranzakciót,
+            // És egy disposed tranzakcióra hívott rollback() dml_transaction_exception-t dob,
+            // Elfedve a valódi hibát. Ilyenkor az eredeti $e-t dobjuk tovább változatlanul.
             if (!$transaction->is_disposed()) {
                 $transaction->rollback($e);
             }

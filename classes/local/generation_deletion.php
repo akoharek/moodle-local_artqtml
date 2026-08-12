@@ -23,7 +23,7 @@
  * Of a hand-rolled copy.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -46,7 +46,7 @@ class generation_deletion {
             return;
         }
 
-        // the draft category and its real Moodle question objects, or they would be orphaned.
+        // The draft category and its real Moodle question objects, or they would be orphaned.
         if (!empty($generation->draftcategoryid)) {
             draft_bank::delete((int) $generation->draftcategoryid);
         }

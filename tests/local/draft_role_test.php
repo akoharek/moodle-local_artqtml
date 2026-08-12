@@ -25,7 +25,7 @@ namespace local_artqtml\local;
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\draft_role
  */
 final class draft_role_test extends \advanced_testcase {
@@ -82,7 +82,7 @@ final class draft_role_test extends \advanced_testcase {
             array_keys($granted)
         );
         // Named individually as well, because these are the ones an editingteacher enrolment would
-        // have brought along - the breadth this role exists instead of.
+        // Have brought along - the breadth this role exists instead of.
         $this->assertArrayNotHasKey('moodle/course:update', $granted);
         $this->assertArrayNotHasKey('moodle/course:manageactivities', $granted);
         $this->assertArrayNotHasKey('moodle/grade:edit', $granted);
@@ -99,9 +99,9 @@ final class draft_role_test extends \advanced_testcase {
         $roleid = draft_role::ensure_role();
 
         // Cast with intval, because get_role_contextlevels() hands the levels back as they came out
-        // of the database - strings - while CONTEXT_COURSE is an int constant. Comparing them
-        // loosely would hide a genuine type change here, so the cast is explicit and assertSame
-        // stays.
+        // Of the database - strings - while CONTEXT_COURSE is an int constant. Comparing them
+        // Loosely would hide a genuine type change here, so the cast is explicit and assertSame
+        // Stays.
         $levels = array_map('intval', array_values(get_role_contextlevels($roleid)));
 
         $this->assertSame([CONTEXT_COURSE], $levels);

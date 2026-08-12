@@ -18,7 +18,7 @@
  * Step 1 of the "New generation" flow: upload/paste source text.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require(__DIR__ . '/../../config.php');
@@ -121,7 +121,6 @@ function local_artqtml_save_generation(
         (int) $USER->id
     );
 }
-
 
 /**
  * Turn a refused save into the canonical page for the generation's current status.

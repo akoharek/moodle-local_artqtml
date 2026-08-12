@@ -21,7 +21,7 @@ namespace local_artqtml\local;
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\ai_request
  */
 final class ai_request_test extends \advanced_testcase {
@@ -159,8 +159,8 @@ final class ai_request_test extends \advanced_testcase {
         );
 
         // The meaning has to survive the conversion, not just the keyword disappear. Collected by
-        // value rather than asserted at a fixed index, so the test does not quietly depend on the
-        // order build() happens to emit its branches in.
+        // Value rather than asserted at a fixed index, so the test does not quietly depend on the
+        // Order build() happens to emit its branches in.
         $pinned = [];
         foreach ($converted['properties']['questions']['items']['anyOf'] as $branch) {
             $this->assertSame('string', $branch['properties']['type']['type']);
@@ -235,8 +235,8 @@ final class ai_request_test extends \advanced_testcase {
         $allowed = [$root . '/classes/local/ai_request.php'];
 
         // Literals that only a hand-built generation/validation request would contain. The model
-        // list and connection test call the providers' /models endpoints, which is a different
-        // request with no schema and no beta header, so those are deliberately not covered here.
+        // List and connection test call the providers' /models endpoints, which is a different
+        // Request with no schema and no beta header, so those are deliberately not covered here.
         $markers = [
             'output_format',
             'output_config',
@@ -306,7 +306,7 @@ final class ai_request_test extends \advanced_testcase {
         $this->assertSame('the answer', ai_request::extract_text(model_list::PROVIDER_GEMINI, $gemini));
 
         // An envelope carrying no text at all yields null rather than an empty string, so the
-        // caller can tell "nothing came back" from "the model returned an empty answer".
+        // Caller can tell "nothing came back" from "the model returned an empty answer".
         $this->assertNull(ai_request::extract_text(model_list::PROVIDER_CLAUDE, ['content' => []]));
         $this->assertNull(ai_request::extract_text(model_list::PROVIDER_CLAUDE, null));
     }
@@ -353,10 +353,10 @@ final class ai_request_test extends \advanced_testcase {
         $allowed = [$root . '/classes/local/ai_request.php'];
 
         // The envelope paths and the truncation signals, written as they appear in code. Anything
-        // reaching into the provider's reply by hand will contain one of them. The stop reason is
-        // in here because it was the second copy found: Claude spells it `stop_reason`/`max_tokens`
-        // at the top level, Gemini `finishReason`/`MAX_TOKENS` two levels down, and the two were
-        // compared by hand in two files - a difference of spelling is exactly what survives a copy.
+        // Reaching into the provider's reply by hand will contain one of them. The stop reason is
+        // In here because it was the second copy found: Claude spells it `stop_reason`/`max_tokens`
+        // At the top level, Gemini `finishReason`/`MAX_TOKENS` two levels down, and the two were
+        // Compared by hand in two files - a difference of spelling is exactly what survives a copy.
         $markers = [
             "['content'][0]",
             "['candidates'][0]",

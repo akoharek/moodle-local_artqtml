@@ -30,7 +30,7 @@ namespace local_artqtml\local;
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\security_filter
  */
 final class security_filter_test extends \advanced_testcase {
@@ -232,7 +232,7 @@ final class security_filter_test extends \advanced_testcase {
         $this->assertFalse(security_filter::has_sql_injection('The ' . $CFG->prefix . ' is a prefix, mentioned innocently.'));
 
         // The admin list replaces the default here - deliberately different from the prompt
-        // screen, and left that way because the SQL keyword set is site-specific by nature.
+        // Screen, and left that way because the SQL keyword set is site-specific by nature.
         set_config('sqlkeywords', "TRUNCATE\nGRANT", 'local_artqtml');
         $this->assertTrue(security_filter::has_sql_injection('TRUNCATE ' . $CFG->prefix . 'user'));
         $this->assertFalse(security_filter::has_sql_injection('DROP TABLE ' . $CFG->prefix . 'user'));

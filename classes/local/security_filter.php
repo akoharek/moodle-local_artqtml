@@ -23,7 +23,7 @@
  * Job is to catch obviously suspicious source text before it is sent to Claude/Gemini.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -125,7 +125,7 @@ class security_filter {
         $configured = (string) get_config('local_artqtml', 'promptinjectionpatterns');
 
         // The admin list ADDS to the mandatory one. An empty or never-saved setting therefore
-        // leaves the baseline in force, which is the whole point of this merge.
+        // Leaves the baseline in force, which is the whole point of this merge.
         $patterns = array_unique(array_merge(self::DEFAULT_PROMPT_PATTERNS, self::split_list($configured)));
 
         $haystack = self::normalize_for_prompt_matching($text);

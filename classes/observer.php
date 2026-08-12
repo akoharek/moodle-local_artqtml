@@ -18,7 +18,7 @@
  * Moodle event observers for local_artqtml (db/events.php).
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml;
@@ -41,11 +41,11 @@ class observer {
         $questionid = (int) $event->objectid;
 
         // Moodle's question versioning creates a NEW question.id every time a question is
-        // saved, so a stored questionbankid captured at generation/previous-edit time goes
-        // stale after this save. question_bank_entries.id is the one identifier that stays
-        // constant across versions, so match through that instead of a direct id lookup -
-        // otherwise this observer (and the validation panel's own lookup) silently stop
-        // finding the row after the question's first edit.
+        // Saved, so a stored questionbankid captured at generation/previous-edit time goes
+        // Stale after this save. question_bank_entries.id is the one identifier that stays
+        // Constant across versions, so match through that instead of a direct id lookup -
+        // Otherwise this observer (and the validation panel's own lookup) silently stop
+        // Finding the row after the question's first edit.
         $entryid = $DB->get_field('question_versions', 'questionbankentryid', ['questionid' => $questionid]);
         if (!$entryid) {
             return;
@@ -62,7 +62,7 @@ class observer {
 
         if (!$row || $row->movedout) {
             // Not one of ours, or already moved into a real bank - no longer part of the
-            // approval workflow, so its stored validation/approval state is left untouched.
+            // Approval workflow, so its stored validation/approval state is left untouched.
             return;
         }
 
@@ -80,11 +80,11 @@ class observer {
             'validationdata'       => null,
             'approved'             => 0,
             // An edit invalidates any prior approval, so the record of who approved it must be
-            // cleared along with the flag itself - otherwise a stale approvedby would keep
-            // pointing at someone who approved a now-superseded version of the question.
+            // Cleared along with the flag itself - otherwise a stale approvedby would keep
+            // Pointing at someone who approved a now-superseded version of the question.
             'approvedby'           => null,
             'edited'               => 1,
-            // who, and (for the list page's "Modified by" column) when.
+            // Who, and (for the list page's "Modified by" column) when.
             'lasteditedby'         => $event->userid,
             'lasteditedat'         => time(),
         ]);

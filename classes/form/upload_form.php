@@ -18,7 +18,7 @@
  * Source text upload form for a new AI quiz question generation.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\form;
@@ -72,9 +72,9 @@ class upload_form extends \moodleform {
             get_string('sourcefile', 'local_artqtml'),
             null,
             // Maxfiles is explicit rather than left to the default: the specification allows one
-            // source file, and every path downstream (extraction, the combined hash, the size
-            // limit) is written for one. Accepted_types is a browser convenience and is checked
-            // again on the server in validation(), because a direct POST never sees it.
+            // Source file, and every path downstream (extraction, the combined hash, the size
+            // Limit) is written for one. Accepted_types is a browser convenience and is checked
+            // Again on the server in validation(), because a direct POST never sees it.
             ['accepted_types' => ['.txt'], 'maxbytes' => $maxbytes, 'maxfiles' => 1]
         );
         $mform->addHelpButton('sourcefile', 'sourcefile', 'local_artqtml');
@@ -129,8 +129,8 @@ class upload_form extends \moodleform {
         $hasfile = !empty($files['sourcefile']) || !empty($draftfiles);
 
         // Server-side file checks. The filepicker's own accepted_types and maxfiles are client
-        // configuration and are not evidence about what actually arrived. text_extractor still
-        // rejects unsupported types and oversize drafts; this is the cheap form-level gate for
+        // Configuration and are not evidence about what actually arrived. text_extractor still
+        // Rejects unsupported types and oversize drafts; this is the cheap form-level gate for
         // TXT upload path.
         if (count($draftfiles) > 1) {
             $errors['sourcefile'] = get_string('errorfiletoomany', 'local_artqtml');

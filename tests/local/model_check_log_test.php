@@ -21,7 +21,7 @@ namespace local_artqtml\local;
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\model_check_log
  */
 final class model_check_log_test extends \advanced_testcase {
@@ -89,7 +89,7 @@ final class model_check_log_test extends \advanced_testcase {
         $row = reset($rows);
         $this->assertSame('gemini', $row->provider);
         $this->assertSame(model_check_log::TRIGGER_MANUAL, $row->triggertype);
-        // the verdict carries the plugin version it was made under, so our own fix can reopen a model our own defect excluded.
+        // The verdict carries the plugin version it was made under, so our own fix can reopen a model our own defect excluded.
         $this->assertGreaterThan(0, (int) $row->pluginversion);
     }
 

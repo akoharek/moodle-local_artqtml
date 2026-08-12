@@ -18,7 +18,7 @@
  * Semantic validation of AI-generated question data (split out of question_importer - ).
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local\question;
@@ -43,8 +43,8 @@ class question_semantic_validator {
         }
 
         // Source-document meta-references ("szöveg szerint", "according to the text") are
-        // unprofessional scaffolding. The prompt forbids them and the cleaner strips a leading
-        // clause; anything still present in the stem is rejected here rather than imported.
+        // Unprofessional scaffolding. The prompt forbids them and the cleaner strips a leading
+        // Clause; anything still present in the stem is rejected here rather than imported.
         if (source_meta_reference::contains((string) $data['questiontext'])) {
             return $typecode . ': questiontext contains source meta-reference';
         }
@@ -58,7 +58,7 @@ class question_semantic_validator {
 
             case 'FE':
                 $options = $data['options'] ?? [];
-                // reject an empty option array or any blank option text outright.
+                // Reject an empty option array or any blank option text outright.
                 if (!is_array($options) || count($options) === 0) {
                     return 'multichoice (FE): no options';
                 }
@@ -81,7 +81,7 @@ class question_semantic_validator {
                     return "multichoice (FE): expected exactly 1 correct option, got $correctcount";
                 }
 
-                // enforce the admin-configured FE option-count range server-side.
+                // Enforce the admin-configured FE option-count range server-side.
                 $min = (int) (get_config('local_artqtml', 'fefminoptions') ?: 2);
                 $max = (int) (get_config('local_artqtml', 'fefmaxoptions') ?: 5);
                 $count = count($options);
@@ -95,7 +95,7 @@ class question_semantic_validator {
                 if (!is_array($items) || count($items) < 2) {
                     return 'ordering (SR): expected at least 2 items, got ' . (is_array($items) ? count($items) : 0);
                 }
-                // reject any blank item text (items may be strings or {text: ...}).
+                // Reject any blank item text (items may be strings or {text: ...}).
                 foreach ($items as $item) {
                     $text = is_array($item) ? ($item['text'] ?? '') : $item;
                     if (trim((string) $text) === '') {
@@ -105,7 +105,7 @@ class question_semantic_validator {
                         return 'ordering (SR): item text contains source meta-reference';
                     }
                 }
-                // enforce the exact configured item count - the per-generation override if set (> 0), otherwise the admin default.
+                // Enforce the exact configured item count - the per-generation override if set (> 0), otherwise the admin default.
                 $override = (int) ($typesettings['sritemcount'] ?? 0);
                 $expected = $override > 0 ? $override : (int) (get_config('local_artqtml', 'sritemcount') ?: 4);
                 if (count($items) !== $expected) {
@@ -114,7 +114,7 @@ class question_semantic_validator {
                 return null;
 
             default:
-                // an unknown/unsupported type code must be rejected, not silently passed.
+                // An unknown/unsupported type code must be rejected, not silently passed.
                 return 'unsupported type code: ' . $typecode;
         }
     }

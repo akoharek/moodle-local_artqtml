@@ -18,7 +18,7 @@
  * The single source of truth for the status page's progress-bar presentation.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -158,7 +158,7 @@ class generation_progress {
             'stages'       => self::STAGES,
             'failed'       => self::FAILED_STAGE,
             'colorClasses' => self::color_classes(),
-            // the JS used to carry its own two-value copy of this list.
+            // The JS used to carry its own two-value copy of this list.
             'terminal'     => generation_status::TERMINAL,
         ]);
     }

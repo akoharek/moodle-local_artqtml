@@ -20,7 +20,7 @@
  * Resolution; no HTML, no mutation.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local\approve;
@@ -180,7 +180,7 @@ class approve_page_data {
                 $params['cmid'] = $cmid;
             }
         } else {
-            // draft questions live in the draft course context on 4.5.
+            // Draft questions live in the draft course context on 4.5.
             $params['courseid'] = draft_bank::get_draft_courseid() ?? SITEID;
         }
 

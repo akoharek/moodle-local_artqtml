@@ -34,7 +34,7 @@ namespace local_artqtml\local\upgrade;
  * One. It lives here rather than inline in db/upgrade.php purely so it can be unit-tested.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class draft_category_reparent {
     /**
@@ -50,8 +50,8 @@ class draft_category_reparent {
         global $DB;
 
         // Identified through the plugin's own reference (draftcategoryid), not by name or
-        // idnumber: older versions may predate the idnumber tagging, and a name match would be a
-        // guess. A draftcategoryid is a fact.
+        // Idnumber: older versions may predate the idnumber tagging, and a name match would be a
+        // Guess. A draftcategoryid is a fact.
         $orphans = $DB->get_records_sql("
             SELECT qc.id, qc.contextid
               FROM {question_categories} qc
@@ -64,8 +64,8 @@ class draft_category_reparent {
 
             if ($top === null) {
                 // Nothing else has parent = 0 here, so this draft category has been serving as the
-                // context's top all along - exactly the case draft_bank's docblock describes. A
-                // real top has to exist before the draft one can hang under it.
+                // Context's top all along - exactly the case draft_bank's docblock describes. A
+                // Real top has to exist before the draft one can hang under it.
                 $top = self::create_top($orphan->contextid);
             }
 

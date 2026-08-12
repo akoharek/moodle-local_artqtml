@@ -18,7 +18,7 @@
  * One-shot migration from local_aiquizgen to local_artqtml.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -126,8 +126,8 @@ class component_rename {
         $changed = false;
 
         // Admin settings and plugin version rows. Moodle may already have created local_artqtml
-        // rows (including `version`) during install.xml/install.php, so a blind UPDATE of the
-        // plugin column hits the (plugin, name) unique key - merge per-name instead.
+        // Rows (including `version`) during install.xml/install.php, so a blind UPDATE of the
+        // Plugin column hits the (plugin, name) unique key - merge per-name instead.
         $oldconfigs = $DB->get_records('config_plugins', ['plugin' => self::OLD_COMPONENT]);
         foreach ($oldconfigs as $cfg) {
             $exists = $DB->record_exists('config_plugins', [
@@ -136,7 +136,7 @@ class component_rename {
             ]);
             if ($exists) {
                 // Keep the administrator's previous value for real settings; the fresh install's
-                // version row must stay (it matches the code just installed).
+                // Version row must stay (it matches the code just installed).
                 if ($cfg->name !== 'version') {
                     $DB->set_field('config_plugins', 'value', $cfg->value, [
                         'plugin' => self::NEW_COMPONENT,
@@ -158,7 +158,7 @@ class component_rename {
         foreach ($oldcaps as $oldcap => $newcap) {
             if ($DB->record_exists('capabilities', ['name' => $oldcap])) {
                 // If the new capability was already installed, move role assignments onto it and
-                // drop the old definition; otherwise rename in place.
+                // Drop the old definition; otherwise rename in place.
                 if ($DB->record_exists('capabilities', ['name' => $newcap])) {
                     $oldid = (int) $DB->get_field('capabilities', 'id', ['name' => $oldcap]);
                     $newid = (int) $DB->get_field('capabilities', 'id', ['name' => $newcap]);

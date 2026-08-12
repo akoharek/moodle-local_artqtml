@@ -20,7 +20,7 @@
  * Three states, decided entirely by what is in the cache:
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\admin;
@@ -55,8 +55,8 @@ class setting_modelselect extends \admin_setting_configselect {
      */
     public function load_choices() {
         // Moodle calls this more than once per request; recomputing is harmless but pointless, and
-        // the parent declares $choices as an array, so "already loaded" is "not empty" rather than
-        // an is_array() check.
+        // The parent declares $choices as an array, so "already loaded" is "not empty" rather than
+        // An is_array() check.
         if (!empty($this->choices)) {
             return true;
         }

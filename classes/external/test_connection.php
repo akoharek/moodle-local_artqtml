@@ -22,7 +22,7 @@
  * Through an AJAX call).
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\external;
@@ -87,8 +87,8 @@ class test_connection extends external_api {
         $curl = new \curl();
         $curl->setHeader(['x-api-key: ' . $apikey, 'anthropic-version: 2023-06-01']);
         // C7: bound the connection test with an explicit 10-second timeout so a hung or
-        // unreachable provider can never leave this AJAX call (and the admin's browser) waiting
-        // indefinitely.
+        // Unreachable provider can never leave this AJAX call (and the admin's browser) waiting
+        // Indefinitely.
         $response = $curl->get('https://api.anthropic.com/v1/models', [], [
             'CURLOPT_TIMEOUT'        => 10,
             'CURLOPT_CONNECTTIMEOUT' => 10,
@@ -128,8 +128,8 @@ class test_connection extends external_api {
         $curl = new \curl();
         $curl->setHeader(['x-goog-api-key: ' . $apikey]);
         // C7: bound the connection test with an explicit 10-second timeout so a hung or
-        // unreachable provider can never leave this AJAX call (and the admin's browser) waiting
-        // indefinitely.
+        // Unreachable provider can never leave this AJAX call (and the admin's browser) waiting
+        // Indefinitely.
         $response = $curl->get('https://generativelanguage.googleapis.com/v1beta/models', [], [
             'CURLOPT_TIMEOUT'        => 10,
             'CURLOPT_CONNECTTIMEOUT' => 10,

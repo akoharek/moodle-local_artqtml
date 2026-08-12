@@ -25,7 +25,7 @@ namespace local_artqtml\local\upgrade;
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\upgrade\draft_category_reparent
  */
 final class draft_category_reparent_test extends \advanced_testcase {

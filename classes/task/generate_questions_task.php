@@ -24,7 +24,7 @@
  * Be unit-tested and invoked directly without going through Moodle's task runner.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\task;
@@ -96,11 +96,11 @@ class generate_questions_task {
                 return;
             }
 
-            // one call per question type, not one call for the generation.
+            // One call per question type, not one call for the generation.
             [$questions, $outcomes] = $this->call_claude_per_type($generation, $settings);
 
             // C-03: the calls above can take a long time - re-check the generation still exists
-            // and hasn't been aborted/deleted while they were in flight before saving results.
+            // And hasn't been aborted/deleted while they were in flight before saving results.
             $generation = $this->reload_if_active($generationid, \local_artqtml\local\generation_status::GENERATING);
             if ($generation === null) {
                 $this->log_event($generationid, 'processing_abandoned', [], $userid);
@@ -108,8 +108,8 @@ class generate_questions_task {
             }
 
             // Every type failed. There is nothing to validate and nothing to save, so this is a
-            // failure of the whole generation rather than a partial one - and the teacher gets the
-            // retry path that a failed generation has.
+            // Failure of the whole generation rather than a partial one - and the teacher gets the
+            // Retry path that a failed generation has.
             if ($questions === []) {
                 $messages = [];
                 foreach ($outcomes as $code => $outcome) {
@@ -123,7 +123,7 @@ class generate_questions_task {
                 );
             }
 
-            // compare Claude's actual per-type output against what was requested.
+            // Compare Claude's actual per-type output against what was requested.
             $this->store_count_discrepancy($generationid, $settings, $questions, $userid);
 
             $this->log_event($generationid, 'claude_call_completed', [
@@ -263,7 +263,7 @@ class generate_questions_task {
                 $outcomes[$code] = ['result' => 'ok', 'count' => count($typequestions)];
             } catch (\Throwable $e) {
                 // Deliberately not rethrown: the remaining types are still worth generating, and
-                // the teacher is told what is missing by the partly-successful outcome.
+                // The teacher is told what is missing by the partly-successful outcome.
                 $outcomes[$code] = [
                     'result'  => $this->lastfailurekind ?? 'transport',
                     'count'   => 0,
@@ -350,7 +350,7 @@ class generate_questions_task {
             }
 
             // The endpoint, headers and envelope come from ai_request, which the model check's probe
-            // uses too - the probe building its own request is what produced a false site-wide block.
+            // Uses too - the probe building its own request is what produced a false site-wide block.
             $request = \local_artqtml\local\ai_request::claude(
                 (string) $model,
                 (string) $apikey,
@@ -376,7 +376,7 @@ class generate_questions_task {
                 ], $userid);
                 if ($this->is_retryable_http((int) $result['httpcode']) || $result['httpcode'] === 0) {
                     // HTTP-level retries are already exhausted inside http_with_backoff();
-                    // a further JSON-attempt loop iteration would not help a pure HTTP failure.
+                    // A further JSON-attempt loop iteration would not help a pure HTTP failure.
                     break;
                 }
                 if ($this->is_nonretryable_client_error((int) $result['httpcode'])) {
@@ -407,7 +407,7 @@ class generate_questions_task {
                     'requestid'    => $decoded['id'] ?? null,
                     'result'       => 'success',
                 ], $userid);
-                // the process is not blocked - whatever questions did parse are kept.
+                // The process is not blocked - whatever questions did parse are kept.
                 $this->store_token_limit_warning($generation->id, $requestedcount, count($questions), $userid);
                 return $questions;
             }
@@ -431,7 +431,7 @@ class generate_questions_task {
                 continue;
             }
 
-            // log usage for the attempt that produced a usable result, regardless of whether it took more than one try.
+            // Log usage for the attempt that produced a usable result, regardless of whether it took more than one try.
             $this->log_ai_call($generation->id, 'generate', 'claude', [
                 'httpstatus'   => 200,
                 'tokensinput'  => $decoded['usage']['input_tokens'] ?? null,

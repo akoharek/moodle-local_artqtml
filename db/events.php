@@ -18,7 +18,7 @@
  * Event observer definitions for local_artqtml.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -30,7 +30,7 @@ $observers = [
     ],
     [
         // The two narrow paths that do fire question_updated - kept so a rename from the bank
-        // list, or a draft/ready switch, invalidates the verdict the same way an edit does.
+        // List, or a draft/ready switch, invalidates the verdict the same way an edit does.
         'eventname' => '\core\event\question_updated',
         'callback'  => '\local_artqtml\observer::question_saved',
     ],

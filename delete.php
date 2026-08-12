@@ -18,7 +18,7 @@
  * Delete an AI quiz question generation, its draft question bank and its questions.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require(__DIR__ . '/../../config.php');
@@ -32,11 +32,11 @@ require_sesskey();
 $generationid = required_param('id', PARAM_INT);
 
 // This script renders no page of its own - it acts and redirects - but that does not exempt it
-// from setting up $PAGE: format_string() below reads $PAGE->context to resolve filters, and
-// redirect() renders a full page (theme, favicon, notification) which reads $PAGE->url. Without
-// these two lines Moodle emits "$PAGE->context was not set" and "did not call $PAGE->set_url()"
-// developer warnings on top of an otherwise successful delete. require_login() with no course
-// argument does not set them for a system-level script like this one.
+// From setting up $PAGE: format_string() below reads $PAGE->context to resolve filters, and
+// Redirect() renders a full page (theme, favicon, notification) which reads $PAGE->url. Without
+// These two lines Moodle emits "$PAGE->context was not set" and "did not call $PAGE->set_url()"
+// Developer warnings on top of an otherwise successful delete. require_login() with no course
+// Argument does not set them for a system-level script like this one.
 $PAGE->set_url('/local/artqtml/delete.php', ['id' => $generationid]);
 $PAGE->set_context($context);
 

@@ -18,7 +18,7 @@
  * External function returning the status and question count of a generation.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\external;
@@ -60,7 +60,6 @@ class get_status extends external_api {
         \local_artqtml\local\ajax_rate_limiter::require_get_status();
 
         $generation = $DB->get_record('local_artqtml_generations', ['id' => $params['id']], '*', MUST_EXIST);
-
 
         $questioncount = $DB->count_records('local_artqtml_questions', ['generationid' => $generation->id]);
         $unvalidatedcount = $DB->count_records('local_artqtml_questions', [

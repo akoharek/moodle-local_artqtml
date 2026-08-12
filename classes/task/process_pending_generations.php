@@ -22,7 +22,7 @@
  * Waiting for the next scheduled tick.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\task;
@@ -70,19 +70,19 @@ class process_pending_generations extends \core\task\scheduled_task {
             $claimed = $this->claim((int) $generation->id);
             if ($claimed === null) {
                 // Lost the race to another concurrent run (e.g. overlapping cron tick or a
-                // manually triggered admin/cli/scheduled_task.php run) - skip it.
+                // Manually triggered admin/cli/scheduled_task.php run) - skip it.
                 continue;
             }
 
             $generationid = (int) $generation->id;
 
             // C-01: a plain try/finally only protects against catchable Throwables - a true PHP
-            // fatal partway through process_one() (max_execution_time exceeded, memory
-            // exhaustion) terminates the script without ever running the finally block, which
-            // would leave processingtoken set forever and permanently block that generation from
-            // ever being claimed again. register_shutdown_function() is the one mechanism PHP
-            // guarantees still runs even after such a fatal, so it is the actual safety net here;
-            // the $released guard just stops the normal-completion path from releasing twice.
+            // Fatal partway through process_one() (max_execution_time exceeded, memory
+            // Exhaustion) terminates the script without ever running the finally block, which
+            // Would leave processingtoken set forever and permanently block that generation from
+            // Ever being claimed again. register_shutdown_function() is the one mechanism PHP
+            // Guarantees still runs even after such a fatal, so it is the actual safety net here;
+            // The $released guard just stops the normal-completion path from releasing twice.
             $released = false;
             $release = function () use (&$released, $generationid): void {
                 if (!$released) {
@@ -119,8 +119,8 @@ class process_pending_generations extends \core\task\scheduled_task {
         );
 
         // Only the run whose UPDATE actually matched (WHERE processingtoken IS NULL) leaves the
-        // row carrying its own token - a concurrent run's UPDATE affects zero rows once this one
-        // has committed, so re-selecting by our own token is how we tell whether we won.
+        // Row carrying its own token - a concurrent run's UPDATE affects zero rows once this one
+        // Has committed, so re-selecting by our own token is how we tell whether we won.
         return $DB->get_record('local_artqtml_generations', ['id' => $generationid, 'processingtoken' => $token]) ?: null;
     }
 

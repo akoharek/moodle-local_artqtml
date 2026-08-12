@@ -30,7 +30,7 @@
  * - which is precisely why one class has to know both. See claude_schema()/gemini_schema().
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -182,7 +182,7 @@ class ai_request {
      */
     public static function system_from_payload(array $payload): ?string {
         // Claude puts it in 'system', Gemini in 'systemInstruction', so both are read rather than
-        // one being assumed.
+        // One being assumed.
         return $payload['system']
             ?? ($payload['systemInstruction']['parts'][0]['text'] ?? null);
     }
@@ -232,8 +232,8 @@ class ai_request {
     public static function claude_schema(array $schema): array {
         return self::walk_schema($schema, function (array $node): array {
             // Guarded on the node's own type because the walker now reaches every node, not only
-            // objects - Gemini's rule needs to see scalar properties (see gemini_schema()), and
-            // adding additionalProperties to a string would be a new way to fail a live call.
+            // Objects - Gemini's rule needs to see scalar properties (see gemini_schema()), and
+            // Adding additionalProperties to a string would be a new way to fail a live call.
             if (($node['type'] ?? null) === 'object') {
                 $node['additionalProperties'] = false;
             }
@@ -382,9 +382,9 @@ class ai_request {
 
         if ($provider === model_list::PROVIDER_CLAUDE) {
             // Scan rather than index: a reasoning model emits {type: thinking} first and the answer
-            // after it, and a future one may add further block types in front. Taking the first
-            // block that actually carries text is stable against both, and identical to reading
-            // element zero when the reply is a single text block.
+            // After it, and a future one may add further block types in front. Taking the first
+            // Block that actually carries text is stable against both, and identical to reading
+            // Element zero when the reply is a single text block.
             foreach ($decoded['content'] ?? [] as $block) {
                 if (($block['type'] ?? '') === 'text' && is_string($block['text'] ?? null)) {
                     return $block['text'];
@@ -394,7 +394,7 @@ class ai_request {
         }
 
         // Gemini nests one level deeper, and marks its reasoning parts with thought:true rather
-        // than with a distinct type - so the test is "not a thought", not "is a text".
+        // Than with a distinct type - so the test is "not a thought", not "is a text".
         foreach ($decoded['candidates'][0]['content']['parts'] ?? [] as $part) {
             if (!empty($part['thought'])) {
                 continue;

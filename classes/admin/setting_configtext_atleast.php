@@ -18,7 +18,7 @@
  * Helper.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\admin;
@@ -83,8 +83,8 @@ class setting_configtext_atleast extends setting_configtext_min {
         if ($othervalue === null) {
             $otherstored = $this->config_read($this->othersettingname);
             // The sibling isn't configured yet (e.g. while plugin defaults are first applied at
-            // install time, before the other half of the pair exists) - there is nothing to
-            // cross-check against, so accept the value.
+            // Install time, before the other half of the pair exists) - there is nothing to
+            // Cross-check against, so accept the value.
             if ($otherstored === null || $otherstored === false) {
                 return true;
             }

@@ -29,7 +29,7 @@
  * Prompt during a routine upgrade) is neither.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -54,7 +54,7 @@ class prompt_seed {
 
             if ($current === false || trim((string) $current) === '') {
                 // Nothing there - a prompt setting left empty would silently produce a prompt with
-                // a hole in it, so this is the one case where writing is right.
+                // A hole in it, so this is the one case where writing is right.
                 set_config($setting, $text, 'local_artqtml');
                 $seeded[] = $setting;
                 continue;
@@ -62,8 +62,8 @@ class prompt_seed {
 
             if ((string) $current !== $text) {
                 // Different from what ships. That is either an administrator's edit or an older
-                // shipped version, and this class cannot tell them apart - so it does neither
-                // harm nor good, and says so to the caller.
+                // Shipped version, and this class cannot tell them apart - so it does neither
+                // Harm nor good, and says so to the caller.
                 $kept[] = $setting;
             }
         }

@@ -18,7 +18,7 @@
  * Helper.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -75,9 +75,9 @@ class question_bank_list {
         }
 
         // Core's enrol_get_users_courses() only returns courses the user is enrolled in, which misses
-        // courses reachable via a role assigned at a higher context (category/system) - e.g. a
-        // manager/admin account with no per-course enrolment. get_user_capability_course()
-        // checks the capability itself at every context level, however it was granted.
+        // Courses reachable via a role assigned at a higher context (category/system) - e.g. a
+        // Manager/admin account with no per-course enrolment. get_user_capability_course()
+        // Checks the capability itself at every context level, however it was granted.
         $courses = get_user_capability_course('moodle/question:add', $userid, true, 'id,fullname') ?: [];
         foreach ($courses as $course) {
             $coursecontext = \context_course::instance($course->id);

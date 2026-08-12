@@ -23,7 +23,7 @@ use local_artqtml\local\problem_category;
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\problem_category
  * @covers     \local_artqtml\task\validate_questions_task
  */

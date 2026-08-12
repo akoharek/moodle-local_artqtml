@@ -24,7 +24,7 @@
  * Rather than by modifying the native edit form.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -72,8 +72,8 @@ class validation_panel {
         ];
         if ($row->validationsuggestion !== \local_artqtml\local\validation_suggestion::NOT_EVALUATED) {
             // PROB-F001/F002: show the problem category for any validated question, via its lang
-            // label (never the raw key). 'ok' renders as "No issue"/"Nincs probléma", not as an
-            // empty field. normalise() guards against a stale/legacy value reaching get_string().
+            // Label (never the raw key). 'ok' renders as "No issue"/"Nincs probléma", not as an
+            // Empty field. normalise() guards against a stale/legacy value reaching get_string().
             $category = \local_artqtml\local\problem_category::normalise($row->problemcategory);
             if ($category !== null) {
                 $rows[] = [
@@ -93,7 +93,7 @@ class validation_panel {
         }
 
         $table = new \html_table();
-        // fluid + wrapping, never wider than its container.
+        // Fluid + wrapping, never wider than its container.
         $table->attributes['class'] = 'generaltable table-sm mb-0 artqtml-table';
         $table->data = $rows;
 

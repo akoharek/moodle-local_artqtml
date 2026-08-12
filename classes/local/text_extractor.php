@@ -18,7 +18,7 @@
  * Extracts plain text from an uploaded TXT file.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -73,8 +73,8 @@ class text_extractor {
         $prefix = self::read_prefix($file, 8);
 
         // TXT: refuse anything that announces itself as an executable or an archive. A plain text
-        // file has no signature of its own, so this is a deny-list of the shapes that clearly are
-        // not text, plus the NUL-density check inside the TXT reader.
+        // File has no signature of its own, so this is a deny-list of the shapes that clearly are
+        // Not text, plus the NUL-density check inside the TXT reader.
         foreach (["\x7fELF", "MZ", "PK\x03\x04", "%PDF-", "\x1f\x8b"] as $signature) {
             if (strncmp($prefix, $signature, strlen($signature)) === 0) {
                 return false;
@@ -157,8 +157,8 @@ class text_extractor {
         $metrics['expandedbytes'] = strlen($content);
 
         // A binary file renamed to .txt. Checked on a sample rather than the whole content: a
-        // genuine text file has no NUL bytes at all, so a handful in the first kilobytes is
-        // already conclusive.
+        // Genuine text file has no NUL bytes at all, so a handful in the first kilobytes is
+        // Already conclusive.
         $sample = substr($content, 0, 4096);
         if ($sample !== '' && substr_count($sample, "\0") > 0) {
             return extraction_result::rejected(extraction_result::REASON_INVALID_STRUCTURE, $metrics);

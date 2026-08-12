@@ -22,7 +22,7 @@
  * Migrator, so this is mainly for explicit ops and Docker smoke.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 define('CLI_SCRIPT', true);

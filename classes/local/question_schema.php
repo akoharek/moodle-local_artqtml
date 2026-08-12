@@ -19,7 +19,7 @@
  * . Supported types: IH/FE/SR.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -69,7 +69,7 @@ class question_schema {
         }
 
         // Settings with no counts at all keep the previous behaviour rather than producing a
-        // schema that permits nothing.
+        // Schema that permits nothing.
         if ($branches === []) {
             $branches = array_map(static fn(callable $builder): array => $builder(), array_values($builders));
         }

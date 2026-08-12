@@ -32,7 +32,7 @@ namespace local_artqtml\local\approve;
  * Which is why the stored copy stays as the fallback.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class current_question {
     /**
@@ -54,8 +54,8 @@ class current_question {
             $question = \question_bank::load_question($questionid);
         } catch (\Throwable $e) {
             // The question is gone from the bank, or its qtype is no longer installed. The stored
-            // copy is then the only thing left that describes it, and showing that is better than
-            // showing an empty panel - but it is a fallback, not the normal path.
+            // Copy is then the only thing left that describes it, and showing that is better than
+            // Showing an empty panel - but it is a fallback, not the normal path.
             return $stored;
         }
 
@@ -80,7 +80,7 @@ class current_question {
             case 'IH':
                 // True/False keeps the verdict on the definition itself, not in the answers.
                 $data['correctanswer'] = !empty($question->rightanswer);
-                // and its two per-answer explanations in named feedback fields.
+                // And its two per-answer explanations in named feedback fields.
                 $data['explanationtrue'] = self::plain($question->truefeedback ?? '');
                 $data['explanationfalse'] = self::plain($question->falsefeedback ?? '');
                 break;
@@ -100,7 +100,7 @@ class current_question {
 
             case 'SR':
                 // Ordering stores the correct sequence in the answers' fraction field (1, 2, 3 …)
-                // and loads them ordered by it, so the definition's order *is* the answer.
+                // And loads them ordered by it, so the definition's order *is* the answer.
                 $items = [];
                 foreach (self::answers_of($question) as $answer) {
                     $items[] = ['text' => self::plain($answer->answer)];
@@ -110,8 +110,8 @@ class current_question {
         }
 
         // Hints and general feedback are the same two keys for every type, and both are declared
-        // on question_definition itself - array and string, never null - so no fallback is
-        // reachable here.
+        // On question_definition itself - array and string, never null - so no fallback is
+        // Reachable here.
         $hints = array_values($question->hints);
         $data['hint1'] = isset($hints[0]) ? self::plain($hints[0]->hint) : '';
         $data['hint2'] = isset($hints[1]) ? self::plain($hints[1]->hint) : '';

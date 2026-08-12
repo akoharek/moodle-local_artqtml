@@ -25,7 +25,7 @@ namespace local_artqtml\local;
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\generation_status
  */
 final class generation_status_test extends \advanced_testcase {
@@ -93,10 +93,10 @@ final class generation_status_test extends \advanced_testcase {
         $this->assertSame('Started', generation_status::label(generation_status::STARTED));
 
         // "A started státusz megjelenített neve »Megkezdett«". Asserted against the
-        // shipped lang file rather than through get_string() under force_current_language('hu'):
-        // the CI/PHPUnit install has only the English pack, so get_string() would silently fall
-        // back to English and the assertion would test nothing. What the requirement actually
-        // fixes is the string the plugin ships.
+        // Shipped lang file rather than through get_string() under force_current_language('hu'):
+        // The CI/PHPUnit install has only the English pack, so get_string() would silently fall
+        // Back to English and the assertion would test nothing. What the requirement actually
+        // Fixes is the string the plugin ships.
         $this->assertSame('Megkezdett', $this->shipped_string('hu', 'status_started'));
         $this->assertSame('Started', $this->shipped_string('en', 'status_started'));
     }
@@ -183,7 +183,7 @@ final class generation_status_test extends \advanced_testcase {
             }
             $contents = file_get_contents($file);
             // Any two adjacent members of the list quoted next to each other is enough to catch a
-            // re-typed list, without tripping on a legitimate single-value comparison.
+            // Re-typed list, without tripping on a legitimate single-value comparison.
             if (
                 preg_match(
                     "/'(started|generating|validating|saving|completed|partial|failed)'" .

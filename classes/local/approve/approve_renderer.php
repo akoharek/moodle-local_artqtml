@@ -20,7 +20,7 @@
  * Reads via approve_page_data and the lib.php badge helper.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local\approve;
@@ -41,7 +41,7 @@ class approve_renderer {
      */
     public static function validation_summary(array $statuscounts, int $statustotal): string {
         // JOV-F002: exactly four counters plus the total, each individually addressable so the
-        // element-count assertion can check "four + total", not just the rendered text.
+        // Element-count assertion can check "four + total", not just the rendered text.
         $html = \html_writer::start_div('artqtml-validationsummary mb-3', [
             'data-testid' => 'artqtml-approve-validationsummary',
         ]);
@@ -87,7 +87,7 @@ class approve_renderer {
         \stdClass $creator,
         int $generationid
     ): string {
-        // needed to tell "your own generation" from "someone else's" when deciding whether the Edit action prompts first.
+        // Needed to tell "your own generation" from "someone else's" when deciding whether the Edit action prompts first.
         global $USER;
 
         $table = new \html_table();
@@ -144,8 +144,8 @@ class approve_renderer {
                 );
             }
             // The complete raw Gemini response for this question - displayed here in preference to the
-            // normalised problemcategory/justification columns, falling back to those (still validated
-            // the same whitelist way below) for rows that predate validationdata or are not_evaluated.
+            // Normalised problemcategory/justification columns, falling back to those (still validated
+            // The same whitelist way below) for rows that predate validationdata or are not_evaluated.
             $validationdata = json_decode((string) $question->validationdata, true);
             if (is_array($validationdata)) {
                 $displaycategory = (string) ($validationdata['problem_category'] ?? '');
@@ -159,7 +159,7 @@ class approve_renderer {
             $statuscell = $statusbadge;
             if ($question->validationsuggestion !== \local_artqtml\local\validation_suggestion::NOT_EVALUATED) {
                 // PROB-F002: 'ok' shows its "No issue" label here too - not an empty cell, and
-                // distinct from the "Accepted" suggestion badge above it.
+                // Distinct from the "Accepted" suggestion badge above it.
                 if ($displaycategory !== null) {
                     $statuscell .= \html_writer::div(
                         s(\local_artqtml\local\problem_category::label($displaycategory)),
@@ -225,7 +225,6 @@ class approve_renderer {
                     'target'      => '_blank',
                     'data-testid' => 'artqtml-approve-preview-link',
                 ]);
-
             }
 
             if ($question->movedout) {
@@ -246,7 +245,7 @@ class approve_renderer {
                     'data-testid' => 'artqtml-approve-revoke-link',
                 ]);
                 // Single-question move. Uses the shared category select in the form footer;
-                // the server validates categoryvalue.
+                // The server validates categoryvalue.
                 $actions[] = \html_writer::tag('button', get_string('moveselected', 'local_artqtml'), [
                     'type'        => 'submit',
                     'name'        => 'movequestion',
@@ -261,8 +260,8 @@ class approve_renderer {
                     'value'       => $question->id,
                     // No btn-sm: it sets font-size to 0.875rem, which rendered this control at
                     // 13.125px next to the 15px links beside it - measured on the page, not
-                    // guessed. Colour and weight already matched; the size was the whole
-                    // difference, and without btn-sm both come out at 15px / 22.5px line height.
+                    // Guessed. Colour and weight already matched; the size was the whole
+                    // Difference, and without btn-sm both come out at 15px / 22.5px line height.
                     'class'       => 'btn btn-link p-0 align-baseline',
                     'data-testid' => 'artqtml-approve-approve-button',
                 ]);
@@ -321,10 +320,10 @@ class approve_renderer {
 
             $row = new \html_table_row([
                 // The cell and the checkbox inside it must not share a testid, or every row-scoped
-                // lookup for the control resolves to two elements (the <td> and the <input>).
+                // Lookup for the control resolves to two elements (the <td> and the <input>).
                 self::cell('selectcell', $checkbox),
                 self::cell('namecell', $namecell),
-                // icon AND type name, in this column only.
+                // Icon AND type name, in this column only.
                 self::cell('typecell', $typeicon . \html_writer::span($typelabel, '', [
                     'data-testid' => 'artqtml-approve-typelabel',
                 ])),
@@ -338,8 +337,8 @@ class approve_renderer {
                 }, $actions)), 'artqtml-rowactions')),
             ]);
             // A technikai melléklet "Teszthorgonyok" szakasza: every row carries a screen-scoped testid
-            // plus a content identifier, so a row assertion can select the question it means
-            // instead of silently running against the first match.
+            // Plus a content identifier, so a row assertion can select the question it means
+            // Instead of silently running against the first match.
             $row->attributes['data-testid'] = 'artqtml-approve-row';
             $row->attributes['data-questioncode'] = $question->questioncode;
             $table->data[] = $row;
@@ -350,8 +349,8 @@ class approve_renderer {
             $detailscell->colspan = count($table->head);
             $detailscell->attributes['class'] = 'artqtml-question-details d-none';
             // On html_table_cell the id is a dedicated property, not part of ->attributes - setting the
-            // latter silently produces a <td> with no id, leaving the toggle script's
-            // getElementById() lookup unable to find this row.
+            // Latter silently produces a <td> with no id, leaving the toggle script's
+            // GetElementById() lookup unable to find this row.
             $detailscell->id = $detailsid;
             $detailsrow = new \html_table_row([$detailscell]);
             $table->data[] = $detailsrow;
@@ -476,7 +475,7 @@ class approve_renderer {
                 ['class' => 'mr-2']
             );
             // Deliberately NOT required="required": the <select> lives in the same form as every
-            // other control on this page. The move path validates the value server-side.
+            // Other control on this page. The move path validates the value server-side.
             $html .= \html_writer::select($categoryoptions, 'categoryvalue', '', ['' => 'choosedots'], [
                 'id'          => 'artqtml-categoryvalue',
                 'class'       => 'mr-2',
@@ -485,7 +484,7 @@ class approve_renderer {
             $html .= \html_writer::end_div();
         }
 
-        // the confirmation must show how many questions are actually selected at click time.
+        // The confirmation must show how many questions are actually selected at click time.
         $html .= \html_writer::tag(
             'button',
             get_string('bulkdelete', 'local_artqtml'),

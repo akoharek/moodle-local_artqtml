@@ -28,7 +28,7 @@ namespace local_artqtml\local;
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversNothing
  */
 final class entry_script_page_setup_test extends \advanced_testcase {
@@ -43,9 +43,9 @@ final class entry_script_page_setup_test extends \advanced_testcase {
         $found = [];
 
         // The phpstan-bootstrap.php file pulls in config.php for static analysis only - it is never
-        // served
-        // and renders nothing, so the $PAGE rule below does not apply to it. Named here rather
-        // than pattern-matched, so adding a second exception has to be a deliberate act.
+        // Served
+        // And renders nothing, so the $PAGE rule below does not apply to it. Named here rather
+        // Than pattern-matched, so adding a second exception has to be a deliberate act.
         $notserved = ['phpstan-bootstrap.php'];
 
         foreach (glob($root . '/*.php') as $path) {

@@ -25,14 +25,14 @@
  * They are not editable from this page.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 // Moodle can include a plugin's settings.php more than once per request while building/
-// caching the admin tree. require_once is safe against that, and guarantees
-// local_artqtml_render_test_button() is defined before it's used below.
+// Caching the admin tree. require_once is safe against that, and guarantees
+// Local_artqtml_render_test_button() is defined before it's used below.
 require_once($CFG->dirroot . '/local/artqtml/lib.php');
 
 // Visible to site admins and users with local/artqtml:configure (without needing moodle/site:config).

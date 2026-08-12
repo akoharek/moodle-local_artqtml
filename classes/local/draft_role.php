@@ -29,7 +29,7 @@
  * Built-in role's defaults, which is the breadth this class exists to avoid.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -72,8 +72,8 @@ class draft_role {
         }
 
         // The role is only ever assigned on a course context, so that is the only level it may be
-        // assigned at. Without this the role does not appear as assignable anywhere, and an admin
-        // inspecting it sees a role that cannot be used.
+        // Assigned at. Without this the role does not appear as assignable anywhere, and an admin
+        // Inspecting it sees a role that cannot be used.
         set_role_contextlevels($roleid, [CONTEXT_COURSE]);
 
         $systemcontext = \context_system::instance();

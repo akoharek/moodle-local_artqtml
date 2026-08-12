@@ -21,7 +21,7 @@ namespace local_artqtml\local;
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\generation_progress
  */
 final class generation_progress_test extends \advanced_testcase {
@@ -41,12 +41,12 @@ final class generation_progress_test extends \advanced_testcase {
             array_keys(generation_progress::STAGES)
         );
 
-        // partial is the second stage to reach 100 - the pipeline did finish - and the only one that is not green there.
+        // Partial is the second stage to reach 100 - the pipeline did finish - and the only one that is not green there.
         $this->assertSame([25, 50, 75, 100, 100], array_column(generation_progress::STAGES, 'percent'));
         $this->assertSame('bg-warning', generation_progress::STAGES[generation_status::PARTIAL]['color']);
 
         // Every key is a real status, and the two statuses without a fixed stage are the ones
-        // that genuinely have none: 'started' (nothing running yet) and 'failed' (percent derived).
+        // That genuinely have none: 'started' (nothing running yet) and 'failed' (percent derived).
         foreach (array_keys(generation_progress::STAGES) as $status) {
             $this->assertContains($status, generation_status::VALUES, "$status is not a real status");
         }
@@ -147,7 +147,7 @@ final class generation_progress_test extends \advanced_testcase {
         $this->assertIsArray($config);
         $this->assertSame(array_keys(generation_progress::STAGES), array_keys($config['stages']));
         $this->assertSame(generation_progress::color_classes(), $config['colorClasses']);
-        // the terminal list is generation_status::TERMINAL, not a second copy.
+        // The terminal list is generation_status::TERMINAL, not a second copy.
         $this->assertSame(generation_status::TERMINAL, $config['terminal']);
         $this->assertSame(generation_progress::FAILED_STAGE['color'], $config['failed']['color']);
 

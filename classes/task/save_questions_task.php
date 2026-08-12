@@ -21,7 +21,7 @@
  * Touches local_artqtml_questions or creates a real Moodle question until this stage runs).
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\task;
@@ -62,8 +62,8 @@ class save_questions_task {
             $evaluations = is_array($pending['evaluations'] ?? null) ? $pending['evaluations'] : [];
 
             // The transaction is rolled back explicitly (and its exception rethrown) on any
-            // failure, so a partial batch of real questions/local_artqtml_questions rows is
-            // never left half-committed - the outer catch's cleanup then finds nothing to undo.
+            // Failure, so a partial batch of real questions/local_artqtml_questions rows is
+            // Never left half-committed - the outer catch's cleanup then finds nothing to undo.
             $savedcount = 0;
             $transaction = $DB->start_delegated_transaction();
             try {
@@ -147,8 +147,8 @@ class save_questions_task {
         $this->log_event($generation->id, 'save_count_discrepancy', ['discrepancies' => $discrepancies], $userid);
 
         // Only a shortfall makes a generation partly successful. More questions than requested is
-        // also a discrepancy worth showing - it happened once, 7 delivered against 6 asked for -
-        // but the teacher has lost nothing, so the run is complete.
+        // Also a discrepancy worth showing - it happened once, 7 delivered against 6 asked for -
+        // But the teacher has lost nothing, so the run is complete.
         foreach ($discrepancies as $entry) {
             if ($entry['received'] < $entry['requested']) {
                 return true;

@@ -18,7 +18,7 @@
  * Provider model list: fetch, normalise, filter and cache.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -242,7 +242,7 @@ class model_list {
                     'id'           => $id,
                     'display_name' => (string) ($model['display_name'] ?? $id),
                     // The annex names capabilities.structured_outputs as the filter basis. Absent
-                    // means "not advertised", which is treated as unsupported rather than assumed.
+                    // Means "not advertised", which is treated as unsupported rather than assumed.
                     'supports_structured_output' => !empty($model['capabilities']['structured_outputs']),
                 ];
                 $afterid = $id;
@@ -314,7 +314,7 @@ class model_list {
 
             foreach ($data as $model) {
                 // Gemini prefixes ids with "models/"; the settings store the bare id, which is also
-                // what the generateContent URL is built from.
+                // What the generateContent URL is built from.
                 $id = preg_replace('#^models/#', '', (string) ($model['name'] ?? ''));
                 if ($id === '') {
                     continue;
@@ -327,7 +327,7 @@ class model_list {
                     'id'           => $id,
                     'display_name' => (string) ($model['displayName'] ?? $id),
                     // The annex filters Gemini "a támogatott generálási metódusok alapján".
-                    // generateContent is the method the plugin's structured-output calls use.
+                    // GenerateContent is the method the plugin's structured-output calls use.
                     'supports_structured_output' => in_array('generateContent', $methods, true),
                 ];
             }

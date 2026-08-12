@@ -20,7 +20,7 @@
  * (split out of question_importer - ).
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local\question;
@@ -97,7 +97,7 @@ class question_form_builder {
                 }
                 $hints[] = ['text' => $hinttext, 'format' => FORMAT_HTML, 'itemid' => 0];
                 // Only read by save_hints() when $withparts is true (multichoice/ordering) -
-                // harmless to always set for shortanswer too, where it's simply ignored.
+                // Harmless to always set for shortanswer too, where it's simply ignored.
                 $hintclearwrong[] = 0;
                 $hintshownumcorrect[] = 0;
             }

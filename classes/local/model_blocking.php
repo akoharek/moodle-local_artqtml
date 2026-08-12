@@ -18,7 +18,7 @@
  * The model blocking state.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -131,7 +131,7 @@ class model_blocking {
                 continue;
             }
 
-            // name the affected model and carry the traceable error code.
+            // Name the affected model and carry the traceable error code.
             $messages[] = get_string($key, 'local_artqtml', $state['errorcode']);
         }
 

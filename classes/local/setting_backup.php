@@ -25,7 +25,7 @@
  * Written from here on.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -58,8 +58,8 @@ class setting_backup {
         $key = self::backup_key($setting, $version);
 
         // Spec, "A mentés nem íródik felül": if this key already exists (a re-run of the same upgrade
-        // step, or a restored database) the earlier backup is the more original value and wins. A
-        // suffixed key is used rather than clobbering it.
+        // Step, or a restored database) the earlier backup is the more original value and wins. A
+        // Suffixed key is used rather than clobbering it.
         if (get_config('local_artqtml', $key) !== false) {
             $suffix = 2;
             while (get_config('local_artqtml', $key . '_' . $suffix) !== false) {
@@ -71,12 +71,12 @@ class setting_backup {
         $store = $current;
         if ($encrypted) {
             // The original is stored encrypted, so the backup is too - a backup that downgrades a
-            // secret to plaintext would be worse than no backup.
+            // Secret to plaintext would be worse than no backup.
             try {
                 $store = \core\encryption::encrypt((string) $current);
             } catch (\Throwable $e) {
                 // Encryption unavailable: the original could not have been encrypted either, so
-                // the value is already plaintext and is stored as-is rather than lost.
+                // The value is already plaintext and is stored as-is rather than lost.
                 $store = $current;
             }
         }

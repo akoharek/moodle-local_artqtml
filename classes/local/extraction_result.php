@@ -22,7 +22,7 @@
  * Localised strings at display time; they never carry document contents.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -103,8 +103,8 @@ class extraction_result {
             self::REASON_INVALID_STRUCTURE => 'errorfileinvalidstructure',
             self::REASON_RESOURCE_LIMIT    => 'errorfileresourcelimit',
             // Deliberately the same string as the unknown-reason default: it already says exactly
-            // what this case needs - nothing could be extracted, paste the text instead - and a
-            // second wording for the same advice is a second thing to keep in step.
+            // What this case needs - nothing could be extracted, paste the text instead - and a
+            // Second wording for the same advice is a second thing to keep in step.
             self::REASON_NO_TEXT           => 'errorfileextractionfailed',
         ];
 

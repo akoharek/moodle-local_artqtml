@@ -21,7 +21,7 @@ namespace local_artqtml\form;
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\form\upload_form
  */
 final class upload_form_test extends \advanced_testcase {

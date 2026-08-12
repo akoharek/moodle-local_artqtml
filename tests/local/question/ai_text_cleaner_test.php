@@ -26,7 +26,7 @@ namespace local_artqtml\local\question;
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\question\ai_text_cleaner
  */
 final class ai_text_cleaner_test extends \advanced_testcase {

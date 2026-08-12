@@ -18,7 +18,7 @@
  * Install-time setup for local_artqtml.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /**
@@ -28,7 +28,7 @@
  */
 function xmldb_local_artqtml_install(): bool {
     // Frankenstyle rename: if local_aiquizgen tables still exist, install.xml has just created
-    // empty local_artqtml_* tables - swap them for the populated ones and rewrite registry rows.
+    // Empty local_artqtml_* tables - swap them for the populated ones and rewrite registry rows.
     \local_artqtml\local\component_rename::migrate_if_needed();
 
     \local_artqtml\local\draft_role::ensure_role();

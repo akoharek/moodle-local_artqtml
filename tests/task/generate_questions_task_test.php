@@ -24,7 +24,7 @@ namespace local_artqtml\task;
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\task\generate_questions_task
  */
 final class generate_questions_task_test extends \advanced_testcase {

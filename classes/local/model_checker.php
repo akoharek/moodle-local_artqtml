@@ -18,7 +18,7 @@
  * Availability and structured-output probe for configured Claude/Gemini models.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -57,7 +57,7 @@ class model_checker {
 
         if ($model === '') {
             // Nothing to check. The blocking state for an unset model is derived from the setting
-            // itself (model_blocking::state()), so there is nothing to write here either.
+            // Itself (model_blocking::state()), so there is nothing to write here either.
             return ['success' => false, 'messages' => [get_string('modelcheckskippednomodel', 'local_artqtml')]];
         }
 
@@ -181,7 +181,7 @@ class model_checker {
 
             $checked++;
             // A transient outage is neither a pass nor a fail: it is not reported to the
-            // administrator as a model that was struck off, because it was not.
+            // Administrator as a model that was struck off, because it was not.
             if (!$result['success'] && !$transient) {
                 $failed[] = $id;
             }
@@ -220,7 +220,7 @@ class model_checker {
 
         // 128 tokens was enough for {ok: true} and is not enough for a question with its feedback.
         // Kept small deliberately: this runs per model, and the item's whole point is that it stays
-        // cheap enough to run across the list rather than only against the selected model.
+        // Cheap enough to run across the list rather than only against the selected model.
         if ($provider === model_list::PROVIDER_CLAUDE) {
             $request = ai_request::claude($model, $apikey, 1024, $prompt, $prompt, $schema);
         } else {
@@ -230,8 +230,8 @@ class model_checker {
         $result = ai_request::send($request, $timeout);
 
         // A busy or unreachable provider says nothing about this model, so it is recorded and then
-        // ignored when the dropdown is filtered - see model_check_log::excluded_models(). Judged
-        // with ai_request::is_transient() so this and the tasks' backoff cannot drift apart.
+        // Ignored when the dropdown is filtered - see model_check_log::excluded_models(). Judged
+        // With ai_request::is_transient() so this and the tasks' backoff cannot drift apart.
         if (ai_request::is_transient((int) $result['httpcode'], $result['curlerror'])) {
             $message = $result['curlerror'] !== ''
                 ? $result['curlerror']
@@ -248,8 +248,8 @@ class model_checker {
         $classified = ai_request::classify($result['httpcode'], is_array($decoded) ? $decoded : null);
 
         // A hard rejection blocks; a deprecation notice on an otherwise successful call is recorded
-        // by the caller's log entry and does not. The provider telling us something will stop
-        // working one day is not a reason to stop the site generating questions today.
+        // By the caller's log entry and does not. The provider telling us something will stop
+        // Working one day is not a reason to stop the site generating questions today.
         if ($classified['outcome'] === ai_request::OUTCOME_REJECTED) {
             return ['success' => false, 'error' => \core_text::substr($classified['message'], 0, 300)];
         }

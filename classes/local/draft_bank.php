@@ -18,7 +18,7 @@
  * Manages the isolated, per-generation "draft" question category.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -203,8 +203,8 @@ class draft_bank {
 
         if (!$existing) {
             // A root created before this fix may predate the idnumber, or carry it under a name
-            // written in whatever language was active that day. Adopt it and stamp the idnumber on,
-            // rather than creating a second root beside it.
+            // Written in whatever language was active that day. Adopt it and stamp the idnumber on,
+            // Rather than creating a second root beside it.
             $existing = $DB->get_record('question_categories', [
                 'contextid' => $draftcontext->id,
                 'parent'    => $top->id,
@@ -254,7 +254,7 @@ class draft_bank {
 
         // The core question_delete_question() is the entry point that fully cleans up a question
         // (qtype-specific options, versions, bank entry, tags, files) - used here instead of
-        // hand-rolled table deletes so cleanup stays correct as core evolves.
+        // Hand-rolled table deletes so cleanup stays correct as core evolves.
         $entries = $DB->get_records('question_bank_entries', ['questioncategoryid' => $categoryid]);
         foreach ($entries as $entry) {
             $versions = $DB->get_records('question_versions', ['questionbankentryid' => $entry->id]);

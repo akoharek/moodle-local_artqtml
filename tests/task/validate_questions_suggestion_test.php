@@ -23,7 +23,7 @@ use local_artqtml\local\validation_suggestion;
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\validation_suggestion
  * @covers     \local_artqtml\task\validate_questions_task
  */
@@ -44,7 +44,7 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
         );
 
         // The not_evaluated value is the plugin's own marker, never one the validator may return, so it
-        // must stay out of the schema enum while still being displayable.
+        // Must stay out of the schema enum while still being displayable.
         $this->assertNotContains(validation_suggestion::NOT_EVALUATED, validation_suggestion::VALUES);
         $this->assertContains(validation_suggestion::NOT_EVALUATED, validation_suggestion::DISPLAY);
         $this->assertCount(4, validation_suggestion::DISPLAY);
@@ -111,8 +111,8 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
         }
 
         // The shipped template carries a placeholder, never the values themselves. An admin may
-        // rewrite the sentence around {{SUGGESTION_VALUES}}; they cannot make the prompt name a
-        // value the schema would reject, because they never type the list.
+        // Rewrite the sentence around {{SUGGESTION_VALUES}}; they cannot make the prompt name a
+        // Value the schema would reject, because they never type the list.
         global $CFG;
         $shipped = require($CFG->dirroot . '/local/artqtml/db/prompt_defaults.php');
         $this->assertStringContainsString('{{SUGGESTION_VALUES}}', $shipped['validationpromptsuggestion']);

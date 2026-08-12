@@ -18,7 +18,7 @@
  * Reduces AI-generated question text to plain text, keeping only <sub> and <sup>.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local\question;
@@ -95,8 +95,8 @@ class ai_text_cleaner {
         $clean = trim($clean);
 
         // Strip a leading "szöveg szerint / according to the text" clause when the model still
-        // wrote one despite the prompt. Embedded occurrences are left for the semantic validator
-        // to reject - cutting them out mid-sentence would leave broken Hungarian/English.
+        // Wrote one despite the prompt. Embedded occurrences are left for the semantic validator
+        // To reject - cutting them out mid-sentence would leave broken Hungarian/English.
         return source_meta_reference::strip_leading($clean);
     }
 
@@ -134,7 +134,7 @@ class ai_text_cleaner {
         }
 
         // SR: apply_ordering() accepts both shapes ({text: ...} and a bare string), so both are
-        // cleaned here rather than assuming the schema is always honoured.
+        // Cleaned here rather than assuming the schema is always honoured.
         if (isset($question['items']) && is_array($question['items'])) {
             foreach ($question['items'] as $index => $item) {
                 if (is_string($item)) {

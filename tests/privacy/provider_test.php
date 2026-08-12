@@ -25,7 +25,7 @@ use core_privacy\local\request\userlist;
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\privacy\provider
  */
 final class provider_test extends \advanced_testcase {

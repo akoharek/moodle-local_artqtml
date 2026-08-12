@@ -26,7 +26,7 @@ namespace local_artqtml\local;
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversNothing
  */
 final class lang_parity_test extends \advanced_testcase {
@@ -38,9 +38,9 @@ final class lang_parity_test extends \advanced_testcase {
         $hu = self::keys_of('hu');
 
         // Guard against a vacuous pass: if the parser silently returned nothing, array_diff of two
-        // empty sets is also empty and this test would "pass" while checking nothing. This is a
-        // floor to catch a broken parse, NOT a pin on the exact count - it does not fail on a
-        // legitimate key addition.
+        // Empty sets is also empty and this test would "pass" while checking nothing. This is a
+        // Floor to catch a broken parse, NOT a pin on the exact count - it does not fail on a
+        // Legitimate key addition.
         $this->assertGreaterThan(100, count($en), 'Parsed suspiciously few keys from lang/en - the parser is probably broken.');
         $this->assertGreaterThan(100, count($hu), 'Parsed suspiciously few keys from lang/hu - the parser is probably broken.');
 
@@ -112,7 +112,7 @@ final class lang_parity_test extends \advanced_testcase {
             $j = self::skip_whitespace($tokens, $j + 1, $count);
             if ($j < $count && is_array($tokens[$j]) && $tokens[$j][0] === T_CONSTANT_ENCAPSED_STRING) {
                 // The key literal, e.g. 'movesuccess' or "privacy:metadata"; plugin keys carry no
-                // escapes, so stripping the surrounding quotes is exact.
+                // Escapes, so stripping the surrounding quotes is exact.
                 $keys[] = substr($tokens[$j][1], 1, -1);
             }
         }

@@ -18,7 +18,7 @@
  * What a partly successful generation still owes the teacher, and the settings that would ask for it again.
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -107,8 +107,8 @@ class missing_types {
         $settings['matrix'] = $matrix;
 
         // The generation-wide per-level totals are derived from the grid in
-        // local_artqtml_build_settings(); derived again here, from the same grid, so the stored
-        // settings cannot describe a request the grid does not.
+        // Local_artqtml_build_settings(); derived again here, from the same grid, so the stored
+        // Settings cannot describe a request the grid does not.
         // Easy/Medium/Hard scale totals.
         foreach (['easy', 'medium', 'hard'] as $level) {
             $sum = 0;

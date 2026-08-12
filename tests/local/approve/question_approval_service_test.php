@@ -21,7 +21,7 @@ namespace local_artqtml\local\approve;
  *
  * @package    local_artqtml
  * @category   test
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\approve\question_approval_service
  */
 final class question_approval_service_test extends \advanced_testcase {
@@ -103,7 +103,7 @@ final class question_approval_service_test extends \advanced_testcase {
         $this->assertEquals($approved->edited, $revoked->edited);
         $this->assertEquals($approved->movedout, $revoked->movedout);
 
-        // keeps the workflow steps separately auditable.
+        // Keeps the workflow steps separately auditable.
         $this->assertCount(1, $events);
         $this->assertInstanceOf(\local_artqtml\event\question_approval_revoked::class, $events[0]);
         $this->assertEquals($questionid, $events[0]->objectid);

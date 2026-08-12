@@ -19,7 +19,7 @@
  * (IH/FE/SR, scale difficulty).
  *
  * @package    local_artqtml
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\form;
@@ -64,12 +64,12 @@ class generate_form extends \moodleform {
         $mform->setType('id', PARAM_INT);
 
         // Set by amd/src/generatesettings.js immediately before submitting, so generate.php can
-        // tell "Generálás indítása" apart from "Mentés és kilépés".
+        // Tell "Generálás indítása" apart from "Mentés és kilépés".
         $mform->addElement('hidden', 'artqtmlaction', 'generate');
         $mform->setType('artqtmlaction', PARAM_ALPHA);
 
         // Difficulty is always scale. Kept as a hidden field so settings JSON and the AMD
-        // module keep reading the same field name.
+        // Module keep reading the same field name.
         $mform->addElement('hidden', 'difficultymode', 'scale');
         $mform->setType('difficultymode', PARAM_ALPHA);
 
