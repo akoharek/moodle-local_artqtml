@@ -44,3 +44,7 @@ Do not commit real webhook URLs or SMTP passwords.
 - No Teams secret → Teams job warns and skips (`continue-on-error`).
 - Incomplete SMTP secrets → email job warns and skips.
 - Other workflows (phpunit, static analysis) are unaffected.
+
+## Moodle.org reviewer notes
+
+For plugin directory review, use your own Anthropic + Google AI keys in ArtQTML settings (BYOK). Smoke path and configuration steps are in [README.md](README.md). Never commit API keys to the repository.

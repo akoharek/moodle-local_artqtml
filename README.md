@@ -16,11 +16,31 @@ Not included (separate Full product): PDF/DOCX, FT/EH/RV types, Bloom, free-text
 
 - Moodle 4.5.1+
 - `qtype_ordering`
-- Anthropic (Claude) and Google (Gemini) API keys configured by the site admin
+- Anthropic (Claude) and Google (Gemini) API keys configured by the site admin (bring your own keys)
 
 ## Install
 
 Install the ZIP so the folder is `moodle/local/artqtml/`. Then configure keys and a draft course under Site administration → Plugins → Local plugins → ArtQTML.
+
+## Configure API keys (BYOK)
+
+1. Site administration → Plugins → Local plugins → **ArtQTML**.
+2. **Generator** tab: paste your **Anthropic (Claude)** API key, run **Connection test**, then pick a model.
+3. **Validator** tab: paste your **Google AI (Gemini)** API key, run **Connection test**, then pick a model.
+4. **General** tab: set a dedicated **draft course ID** (hidden course, no students).
+
+Do not commit API keys. Reviewers and sites use their own Anthropic + Google AI keys in these settings.
+
+## Reviewer smoke path
+
+Minimal path a Moodle.org reviewer (or site admin) can use after install:
+
+1. Configure Claude + Gemini keys and a draft course (above).
+2. Open the ArtQTML entry point → **New generation**.
+3. Paste a short paragraph of source text (or upload a `.txt` file) → Continue.
+4. Request a few **IH / FE / SR** questions (easy/medium/hard counts) → start generation.
+5. Wait for Claude generation + Gemini validation to finish on the status page.
+6. Open **Approve**, review a question, **Approve**, then move it into a question-bank category.
 
 ## License
 
