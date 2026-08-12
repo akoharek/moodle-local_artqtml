@@ -17,7 +17,7 @@
 namespace local_artqtml\local;
 
 /**
- * Unit tests for the migration setting backup (Glob-037, Glob-038).
+ * Unit tests for the migration setting backup.
  *
  * @package    local_artqtml
  * @category   test
@@ -26,8 +26,8 @@ namespace local_artqtml\local;
  */
 final class setting_backup_test extends \advanced_testcase {
     /**
-     * Glob-037: the previous value is stored under <setting>_backup_<version> before the change.
-     */
+ * the previous value is stored under <setting>_backup_<version> before the change.
+ */
     public function test_backup_stores_the_previous_value(): void {
         $this->resetAfterTest();
 
@@ -83,9 +83,8 @@ final class setting_backup_test extends \advanced_testcase {
     }
 
     /**
-     * Glob-037: an encrypted setting's backup is encrypted too - a backup must not downgrade a
-     * secret to plaintext.
-     */
+ * an encrypted setting's backup is encrypted too - a backup must not downgrade a secret to plaintext.
+ */
     public function test_encrypted_setting_is_backed_up_encrypted(): void {
         $this->resetAfterTest();
 
@@ -101,8 +100,8 @@ final class setting_backup_test extends \advanced_testcase {
     }
 
     /**
-     * Glob-038: the administrator is told which setting changed and where the old value is.
-     */
+ * the administrator is told which setting changed and where the old value is.
+ */
     public function test_notices_are_recorded_rendered_and_cleared(): void {
         $this->resetAfterTest();
 
@@ -118,7 +117,7 @@ final class setting_backup_test extends \advanced_testcase {
 
         $messages = setting_backup::notice_messages();
         $this->assertCount(2, $messages);
-        // The message names both the setting and the key, which is what Glob-038 requires.
+        // The message names both the setting and the key, which is what requires.
         $this->assertStringContainsString('validatorprompttemplate', $messages[0]);
         $this->assertStringContainsString('validatorprompttemplate_backup_2026072602', $messages[0]);
         $this->assertStringNotContainsString('[[', $messages[0], 'settingbackednotice is missing from the lang file');
@@ -144,10 +143,6 @@ final class setting_backup_test extends \advanced_testcase {
         );
     }
 
-    /**
-     * Glob-037 ENFORCEMENT: every prompt-template write in upgrade.php must be paired
-     * with setting_backup::backup(). This plugin ships with zero such writes today.
-     */
     public function test_future_template_migrations_must_back_up(): void {
         $upgrade = file_get_contents(__DIR__ . '/../../db/upgrade.php');
 
@@ -164,7 +159,7 @@ final class setting_backup_test extends \advanced_testcase {
             0,
             $writes - $backups,
             "An upgrade step writes a prompt-template setting without a preceding "
-            . "setting_backup::backup() call (Glob-037). Template set_config writes: $writes; "
+            . "setting_backup::backup call . Template set_config writes: $writes"
             . "backup calls: $backups. Add the backup call before the write."
         );
     }

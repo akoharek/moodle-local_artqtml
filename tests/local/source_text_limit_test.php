@@ -106,8 +106,6 @@ final class source_text_limit_test extends \advanced_testcase {
             'four characters'  => ['abcd', 1],
             'five characters'  => ['abcde', 2],
             'eight characters' => ['abcdefgh', 2],
-            // Counted as Unicode characters, not bytes: these eight accented letters are sixteen
-            // bytes in UTF-8, and counting bytes would over-count every Hungarian source text.
             'accented letters' => ['áéíóöőúü', 2],
         ];
     }

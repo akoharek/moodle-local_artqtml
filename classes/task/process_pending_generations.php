@@ -16,7 +16,7 @@
 
 /**
  * Scheduled task that drives the AI generation/validation pipeline in the background
- * (functional spec ch.5/6): runs every 5 minutes by default via cron, and can also be run
+ * runs every 5 minutes by default via cron, and can also be run
  * on demand - `admin/cli/scheduled_task.php --execute='\local_artqtml\task\process_pending_generations'`
  * - which is the supported way to get near-instant processing during manual testing instead of
  * waiting for the next scheduled tick.
@@ -48,12 +48,6 @@ class process_pending_generations extends \core\task\scheduled_task {
     public function execute() {
         global $DB;
 
-        // C-02: only unclaimed rows are candidates - a row another concurrent run has already
-        // claimed (processingtoken set) is skipped here regardless of status. M-15: 'saving' is
-        // included too, since it's now a genuine third pipeline stage a generation can be left
-        // waiting in (e.g. after a crash between validating and saving on some previous tick).
-        // List-018: the in-progress status set comes from the single source of truth rather than
-        // being inlined into this SQL string.
         [$statussql, $statusparams] = \local_artqtml\local\generation_status::in_progress_sql();
         $pending = $DB->get_records_select(
             'local_artqtml_generations',
@@ -62,21 +56,6 @@ class process_pending_generations extends \core\task\scheduled_task {
             'timecreated ASC'
         );
 
-        // M-13: the default PHP/CLI time limit is nowhere near enough once this loop has to
-        // chain multiple generations' Claude+Gemini calls (each with up to 3 HTTP retry
-        // attempts with backoff) in a single tick - scale the limit to how much work is
-        // actually queued instead of leaving the process to be killed mid-generation.
-        //
-        // V-04: this used to use the technical annex's suggested formula verbatim,
-        // (API timeout x 3) + 30. That formula sizes exactly ONE exhausted HTTP retry cycle,
-        // but a single generation runs several of them: process_one() below drives the Claude
-        // stage and then the Gemini stage in the same tick, and each stage wraps its HTTP
-        // backoff in a JSON-fallback loop of up to MAX_JSON_ATTEMPTS (annex 2.3/2.4 make the
-        // two counters explicitly independent). At the default 60 s timeout the annex formula
-        // yields 210 s against a worst case above 1100 s, so the budget was roughly a fifth of
-        // what it claimed to guarantee.
-        //
-        // Derived from the constants the retry loops actually use, so it cannot drift from them.
         $apitimeout = (int) (get_config('local_artqtml', 'apitimeout') ?: 60);
         $httpcycle = (generate_questions_task::MAX_HTTP_ATTEMPTS * $apitimeout)
             + generate_questions_task::MAX_BACKOFF_SECONDS;
@@ -159,15 +138,9 @@ class process_pending_generations extends \core\task\scheduled_task {
     }
 
     /**
-     * Run one generation through whichever pipeline stage(s) it is still waiting on - the Claude
-     * call if it's "generating", then the Gemini call if that leaves it "validating", then the
-     * transactional write if that leaves it "saving" (M-15) - all chained within this same tick,
-     * matching the previous synchronous behaviour's UX: a single run of this task takes a
-     * generation all the way to completed/failed rather than needing further ticks.
-     *
-     * @param \stdClass $generation
-     * @return void
-     */
+ * @param \stdClass $generation
+ * @return void
+ */
     protected function process_one(\stdClass $generation): void {
         global $DB;
 

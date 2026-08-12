@@ -15,12 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Kérdésbank - Draft jóváhagyó oldal (functional spec ch.7).
- *
- * Reviews AI-generated/validated questions, which already exist as real Moodle question
- * objects in this generation's isolated draft bank category (Gen-005), and lets the teacher
- * edit/preview/tag them via Moodle's own native question bank UI, then move approved ones
- * into a real target question bank or delete them.
+ * Kérdésbank - Draft jóváhagyó oldal.
  *
  * Thin controller: bootstrap -> capability -> parameter parsing -> service call + notification +
  * redirect (POST actions), or data gathering + renderer calls (GET). The business logic lives in
@@ -51,26 +46,11 @@ require_capability('local/artqtml:use', $context);
 $generationid = required_param('generationid', PARAM_INT);
 
 $generation = $DB->get_record('local_artqtml_generations', ['id' => $generationid], '*', MUST_EXIST);
-// Glob-031: collaborative :use by design; delete is owner-only (see delete.php).
-// :use (already required above) opens any generation; owner shown via banner, not access-gated.
 
 $pageurl = new moodle_url('/local/artqtml/approve.php', ['generationid' => $generationid]);
 
 $PAGE->set_url($pageurl);
 $PAGE->set_context($context);
-// These pages carry wide data tables, and 'standard' is the one layout Boost caps at
-// $course-content-maxwidth (830px) from the md breakpoint up
-// (theme/boost/scss/moodle/layout.scss:56-62) - which squeezed the columns into a narrow strip on
-// a full-screen browser while the page around them stayed wide, and pushed the actions column off
-// the right edge. 'report' is byte-for-byte the same layout in Boost's config.php (same file, same
-// regions, same default region) and differs only in the body class, which that rule does not
-// match; it is what core's own wide-table pages use (report/log/index.php:100).
-//
-// 'mediumwidth' then caps the result at $medium-content-maxwidth (1120px, variables.scss:28)
-// instead of letting it run the full viewport width. Decided 2026-07-29 against both extremes:
-// 830px is what the demo complaint was about, and edge-to-edge spreads eight columns thin on a
-// wide screen. Note that core defines this class but never sets it - every core page picks
-// 'limitedwidth' or nothing - so the rule to lean on is the SCSS, not core precedent.
 $PAGE->set_pagelayout('report');
 $PAGE->add_body_class('mediumwidth');
 $PAGE->set_title(get_string('approveheading', 'local_artqtml'));
@@ -87,8 +67,6 @@ if ($approveid) {
     redirect($pageurl);
 }
 
-// Soronkénti jóváhagyás visszavonása (Jov-040): only the approved flag is cleared, the AI's
-// validation verdict is deliberately left untouched.
 $revokeid = optional_param('revokequestion', 0, PARAM_INT);
 if ($revokeid) {
     require_sesskey();
@@ -96,7 +74,6 @@ if ($revokeid) {
     redirect($pageurl);
 }
 
-// Soronkénti törlés (Jov-010/015).
 $deleteid = optional_param('deletequestion', 0, PARAM_INT);
 if ($deleteid) {
     require_sesskey();
@@ -133,7 +110,7 @@ if ($moveid) {
     redirect($pageurl);
 }
 
-// Tömeges műveletek (Jov-013/015/016) — approve-all and bulk delete.
+// Tömeges műveletek — approve-all and bulk delete.
 $bulkaction = optional_param('bulkaction', '', PARAM_ALPHA);
 if (in_array($bulkaction, ['allaccepted', 'delete'], true)) {
     require_sesskey();
@@ -148,8 +125,6 @@ if (in_array($bulkaction, ['allaccepted', 'delete'], true)) {
             $count = question_deletion_service::delete_selected($questionids, $generationid, $context);
             \core\notification::success(get_string('bulkdeletesuccess', 'local_artqtml', $count));
         } catch (\Throwable $e) {
-            // V20 #3: never surface the raw exception message to the user - log the full detail
-            // for admins/developers, show a generic translated message.
             debugging('local_artqtml bulk delete failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
             \core\notification::error(get_string('errorbulkactionfailed', 'local_artqtml'));
         }
@@ -161,14 +136,14 @@ if (in_array($bulkaction, ['allaccepted', 'delete'], true)) {
         $count = question_approval_service::approve_accepted_bulk($generationid, (int) $USER->id, $context);
         \core\notification::success(get_string('bulkapprovesuccess', 'local_artqtml', $count));
     } catch (\Throwable $e) {
-        // V20 #3: log the full detail, show only a generic translated message.
+        // log the full detail, show only a generic translated message.
         debugging('local_artqtml bulk approve failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
         \core\notification::error(get_string('errorbulkactionfailed', 'local_artqtml'));
     }
     redirect($pageurl);
 }
 
-// Jov-011/012, Glob-005: sortable columns and pagination, matching the list page's pattern.
+// sortable columns and pagination, matching the list page's pattern.
 $sort = optional_param('qsort', 'id', PARAM_ALPHA);
 $dir = strtoupper(optional_param('qdir', 'ASC', PARAM_ALPHA)) === 'DESC' ? 'DESC' : 'ASC';
 $page = optional_param('qpage', 0, PARAM_INT);
@@ -176,13 +151,9 @@ $perpage = (int) get_config('moodle', 'perpage') ?: 20;
 
 $totalquestions = approve_page_data::total_questions($generationid);
 
-// Val-017/TC-Val-019: four-status validation summary, counted independently of the per-row
-// badges below so a teacher can see the overall picture without scrolling the whole table.
 $statuscounts = approve_page_data::status_counts($generationid);
 $statustotal = array_sum($statuscounts);
 
-// Same eligibility criteria as the 'allaccepted' bulk action above (accepted, not yet approved,
-// not yet moved out) - TC-Val-019/TC-Val-043: the bulk-approve button reacts to this count.
 $eligibleforapproval = approve_page_data::eligible_for_approval($generationid);
 
 echo $OUTPUT->header();
@@ -192,7 +163,7 @@ echo html_writer::tag('p', format_string($generation->name), [
     'data-testid' => 'artqtml-approve-generationname',
 ]);
 
-// Site-wide list (Glob-022): index.php is context_system, same as this page — no course id.
+// Site-wide list: index.php is context_system, same as this page — no course id.
 $indexurl = new moodle_url('/local/artqtml/index.php');
 echo html_writer::div(
     $OUTPUT->single_button($indexurl, get_string('backtolist', 'local_artqtml'), 'get'),
@@ -200,8 +171,6 @@ echo html_writer::div(
     ['data-testid' => 'artqtml-approve-backtolist']
 );
 
-// M-08: still relevant here even after generation completes - a teacher reviewing questions
-// should know Claude didn't return what was actually requested.
 $countdiscrepancy = json_decode((string) $generation->countdiscrepancy, true);
 if (is_array($countdiscrepancy) && !empty($countdiscrepancy)) {
     echo html_writer::div(question_types::format_count_discrepancy($countdiscrepancy), 'alert alert-warning mb-3');
@@ -232,12 +201,6 @@ $candrafteditquestions = false;
 if (draft_bank::is_configured()) {
     $draftcontextid = draft_bank::get_draft_context_id();
     if ($draftcontextid !== null) {
-        // Jov-036: an administrator or manager holds this over the whole draft course; a generator
-        // holds it through the plugin's own narrow role (draft_role), which grants it and two
-        // other capabilities and nothing else. Glob-031 is why it is the "all" variant: any user
-        // with local/artqtml:use may act on any generation, so the reviewer of a colleague's
-        // questions must be able to correct them, not only approve them. The warning about doing
-        // so is in the Edit action itself (approve_renderer), not in this gate.
         $candrafteditquestions = has_capability('moodle/question:editall', \context::instance_by_id($draftcontextid));
     }
 }

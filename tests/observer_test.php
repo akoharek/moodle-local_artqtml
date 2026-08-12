@@ -17,7 +17,7 @@
 namespace local_artqtml;
 
 /**
- * Unit tests for the question-save observer (BL-28).
+ * Unit tests for the question-save observer.
  *
  * The defect these were written for was not in the observer's body - that was correct all along.
  * It was in which event the plugin listened to. Moodle 4.x versions questions, so an editor save
@@ -144,11 +144,8 @@ final class observer_test extends \advanced_testcase {
     }
 
     /**
-     * The wiring itself: the plugin must listen to the event an editor save actually fires.
-     *
-     * This is the assertion whose absence cost BL-28. It is deliberately about the event name and
-     * nothing else - the observer's body was never the problem.
-     */
+ * The wiring itself: the plugin must listen to the event an editor save actually fires.
+ */
     public function test_the_event_an_editor_save_fires_is_subscribed(): void {
         $observers = [];
         include(__DIR__ . '/../db/events.php');
@@ -160,7 +157,7 @@ final class observer_test extends \advanced_testcase {
             $subscribed,
             'Moodle versions questions, so an editor save fires question_created, not '
                 . 'question_updated. Subscribing to question_updated alone means the observer '
-                . 'never runs on a real edit - see BL-28.'
+                . 'never runs on a real edit - see .'
         );
         $this->assertContains('\core\event\question_updated', $subscribed);
 

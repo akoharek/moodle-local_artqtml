@@ -17,7 +17,7 @@
 namespace local_artqtml\local;
 
 /**
- * Unit tests for the single-source structured-output request (Admin-053, Admin-060).
+ * Unit tests for the single-source structured-output request.
  *
  * @package    local_artqtml
  * @category   test
@@ -26,11 +26,8 @@ namespace local_artqtml\local;
  */
 final class ai_request_test extends \advanced_testcase {
     /**
-     * The probe and the generator must send the same envelope, headers and parameter name.
-     *
-     * This is the regression the whole class exists for: the probe used to omit the beta header the
-     * generator sent, and read the resulting 400 as "the provider is broken".
-     */
+ * The probe and the generator must send the same envelope, headers and parameter name.
+ */
     public function test_probe_and_generator_build_the_same_shape(): void {
         $generator = ai_request::claude('claude-opus-4-8', 'key', 8192, 'system', 'source', [
             'type' => 'object', 'properties' => ['questions' => ['type' => 'array']], 'required' => ['questions'],
@@ -43,11 +40,6 @@ final class ai_request_test extends \advanced_testcase {
         $this->assertSame($generator['headers'], $probe['headers']);
         $this->assertSame(array_keys($generator['payload']), array_keys($probe['payload']));
 
-        // The schemas may differ - the probe asks for one question where a generation asks for
-        // several - but nothing else about the request may. BL-44, 2026-08-03: the probe's schema
-        // is no longer a token {ok: boolean}; it now comes from question_schema::build() with a
-        // count of one, the same builder generation uses. That is what makes a passing probe mean
-        // "the plugin can read this model's questions" rather than "this model can emit JSON".
         $this->assertNotSame(
             $generator['payload']['output_config']['format']['schema'],
             $probe['payload']['output_config']['format']['schema']
@@ -86,10 +78,10 @@ final class ai_request_test extends \advanced_testcase {
     }
 
     /**
-     * A deeply nested schema, used to prove both provider rules reach every object.
-     *
-     * @return array
-     */
+ * A deeply nested schema, used to prove both provider rules reach every object.
+ *
+ * @return array
+ */
     protected function nested_schema(): array {
         return [
             'type' => 'object',
@@ -283,14 +275,8 @@ final class ai_request_test extends \advanced_testcase {
     }
 
     /**
-     * BL-44: a reasoning model puts its thinking first, and the answer after it.
-     *
-     * This is the 2026-08-03 defect, pinned. Claude Sonnet 5 and Opus 5 open the reply with a
-     * thinking block, so reading `content[0]` returned nothing and the plugin declared failure on
-     * nine calls that were HTTP 200 and carried six usable questions - one of them costing $0.228
-     * for zero questions. The old code was `$decoded['content'][0]['text']`, so the first case
-     * below is the one that used to fail.
-     */
+ * a reasoning model puts its thinking first, and the answer after it.
+ */
     public function test_extract_text_survives_a_thinking_block(): void {
         $withthinking = [
             'content' => [
@@ -326,12 +312,8 @@ final class ai_request_test extends \advanced_testcase {
     }
 
     /**
-     * The truncation signal, which the two providers spell differently and nested differently.
-     *
-     * Val-022 / Val-014-016: this has to be readable without the text parsing first, because being
-     * cut off is usually what breaks the JSON. If it is only checked after a successful parse, the
-     * failure lands in the generic invalid-JSON retry and the real cause never reaches the log.
-     */
+ * The truncation signal, which the two providers spell differently and nested differently.
+ */
     public function test_hit_token_limit_reads_both_providers(): void {
         $this->assertTrue(ai_request::hit_token_limit(
             model_list::PROVIDER_CLAUDE,
@@ -355,17 +337,17 @@ final class ai_request_test extends \advanced_testcase {
     }
 
     /**
-     * BL-44's real point: exactly one place knows where the answer sits in the envelope.
-     *
-     * The sibling of the request-building guard above, and it exists for a sharper reason. Until
-     * 2026-08-03 this knowledge was written out three times - generation, validation, model check -
-     * and they agreed only by coincidence. They agreed on something wrong.
-     *
-     * The direction of the danger is what makes a static scan worth it: fix the model check alone
-     * and it will pass a model that generation then fails on, so the connection-test button would
-     * promise something untrue. A copy reappearing anywhere is invisible until exactly that
-     * happens, which is why this is checked in the source rather than left to review.
-     */
+ * 's real point: exactly one place knows where the answer sits in the envelope.
+ *
+ * The sibling of the request-building guard above, and it exists for a sharper reason. Until
+ * 2026-08-03 this knowledge was written out three times - generation, validation, model check -
+ * and they agreed only by coincidence. They agreed on something wrong.
+ *
+ * The direction of the danger is what makes a static scan worth it: fix the model check alone
+ * and it will pass a model that generation then fails on, so the connection-test button would
+ * promise something untrue. A copy reappearing anywhere is invisible until exactly that
+ * happens, which is why this is checked in the source rather than left to review.
+ */
     public function test_nothing_else_reads_the_response_envelope(): void {
         $root = realpath(__DIR__ . '/../..');
         $allowed = [$root . '/classes/local/ai_request.php'];

@@ -15,9 +15,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * A plain integer admin setting that rejects values below a configured minimum
- * (Admin-004/005/013/019: max questions, API timeout, context windows must be positive).
- *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

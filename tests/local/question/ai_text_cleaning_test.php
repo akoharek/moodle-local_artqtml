@@ -17,7 +17,7 @@
 namespace local_artqtml\local\question;
 
 /**
- * BL-55: what reaches the question bank from the model is wording, not appearance.
+ * what reaches the question bank from the model is wording, not appearance.
  *
  * These assert the contract at the only door AI text uses to become a real Moodle question -
  * question_form_builder::build(). The security half (script tags and friends) was already covered
@@ -35,10 +35,6 @@ namespace local_artqtml\local\question;
  * @covers     \local_artqtml\local\question\question_form_builder
  */
 final class ai_text_cleaning_test extends \advanced_testcase {
-    /**
-     * The case András demonstrated: a background colour is not an attack, so the sanitiser let it
-     * through - and it reached the editor as real formatting. The words survive, the styling does not.
-     */
     public function test_background_colour_is_removed_but_the_words_stay(): void {
         $this->assertSame(
             'Az alma rózsaféle.',
@@ -47,8 +43,8 @@ final class ai_text_cleaning_test extends \advanced_testcase {
     }
 
     /**
-     * Sub and sup are meaning, not decoration - the one exception, decided 2026-08-06.
-     */
+ * Sub and sup are meaning, not decoration - the one exception, -08-06.
+ */
     public function test_sub_and_sup_survive(): void {
         $this->assertSame(
             'A H<sub>2</sub>O és az 5 m<sup>2</sup>.',
@@ -69,12 +65,6 @@ final class ai_text_cleaning_test extends \advanced_testcase {
         );
     }
 
-    /**
-     * TEXT LOSS THIS GUARDS. strip_tags() on raw model output reads "< 5 és y >" as a tag and
-     * deletes it, so "x < 5 és y > 3" silently becomes "x 3". Purifying first turns the stray
-     * "<" into an entity, so nothing is swallowed. Without this ordering the bug is invisible:
-     * the output is still a plausible sentence.
-     */
     public function test_a_stray_less_than_sign_does_not_eat_the_sentence(): void {
         $cleaned = $this->cleaned_questiontext('Igaz-e, hogy x < 5 és y > 3?');
 
@@ -83,10 +73,6 @@ final class ai_text_cleaning_test extends \advanced_testcase {
         $this->assertStringContainsString('Igaz-e', $cleaned);
     }
 
-    /**
-     * TEXT LOSS THIS GUARDS. Dropping <p> without putting anything in its place joins the last
-     * word of one paragraph to the first of the next ("Első bekezdésMásodik bekezdés").
-     */
     public function test_paragraphs_do_not_run_together(): void {
         $cleaned = $this->cleaned_questiontext('<p>Első bekezdés</p><p>Második bekezdés</p>');
 
@@ -101,10 +87,6 @@ final class ai_text_cleaning_test extends \advanced_testcase {
         $this->assertSame("Egy\nKettő", $this->cleaned_questiontext('Egy<br>Kettő'));
     }
 
-    /**
-     * The security half still holds - this is what the field had before BL-55 and must not be
-     * lost by it. The script's content must not survive as stray text either.
-     */
     public function test_script_is_still_removed_entirely(): void {
         $cleaned = $this->cleaned_questiontext('Kérdés<script>alert(1)</script>');
 

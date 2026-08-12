@@ -15,17 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Provider model list: fetch, normalise, filter and cache (Admin-044/045/046/047).
- *
- * Admin-044: "A Generátor és a Validátor LLM fülön a modellválasztó legördülő tartalma a
- * szolgáltatói API modell-lista végpontjából származik [...] A listát a plugin nem tartalmazhatja
- * beégetve". The two providers return different shapes, normalised here to one internal form:
- * { id, display_name, supports_structured_output }.
- *
- * Admin-045: the list is cached per provider for 24 hours, and the settings page is built from the
- * cache ALONE - it never makes a synchronous network call, because an admin page that blocks on a
- * provider being reachable is an admin page that cannot be used to fix a broken provider setting.
- * Only the "Refresh models" button and the scheduled model check ever fetch.
+ * Provider model list: fetch, normalise, filter and cache.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -46,7 +36,7 @@ class model_list {
     /** @var string[] both providers, in settings-tab order. */
     public const PROVIDERS = [self::PROVIDER_CLAUDE, self::PROVIDER_GEMINI];
 
-    /** @var int cache lifetime in seconds (Admin-045: 24 hours). */
+    /** @var int cache lifetime in seconds (: 24 hours). */
     public const CACHE_TTL = 86400;
 
     /**
@@ -57,11 +47,6 @@ class model_list {
      * does, so the method check alone lets all of them through. Anthropic's list needs no
      * equivalent because it publishes `capabilities.structured_outputs` per model.
      *
-     * Measured 2026-08-03: the account's catalogue was 42 models, of which **21 matched one of
-     * these** - music (lyria), images (nano-banana and every `-image`), speech (`-tts`), robotics,
-     * computer use, and the deep-research/antigravity agents that run for minutes per call. None
-     * of them can produce a quiz question, and probing them was the reason a sweep could not
-     * finish inside a web request.
      *
      * Matched as substrings against the bare model id, deliberately: Google's naming puts the
      * modality in the id itself, and a new `gemini-4-flash-image` has to be excluded on the day it
@@ -93,19 +78,16 @@ class model_list {
     protected const MAX_PAGES = 20;
 
     /**
-     * The cached model list for a provider, or null if nothing usable is cached.
-     *
-     * This is the ONLY method the settings page may call. It never touches the network: a missing
-     * or expired cache returns null and the page says the list needs refreshing (Admin-045).
-     *
-     * The returned shape is {models: list<array{id, display_name, supports_structured_output}>,
-     * fetchedat: int, error: string}. It is deliberately typed loosely: the value is json_decode'd
-     * from stored config, so it is only that shape if nothing corrupted it, and the runtime guards
-     * below - not the annotation - are what make a corrupt cache harmless on an admin page.
-     *
-     * @param string $provider one of self::PROVIDERS
-     * @return array<string, mixed>|null
-     */
+ * The cached model list for a provider, or null if nothing usable is cached.
+ *
+ * The returned shape is {models: list<array{id, display_name, supports_structured_output}>,
+ * fetchedat: int, error: string}. It is deliberately typed loosely: the value is json_decode'd
+ * from stored config, so it is only that shape if nothing corrupted it, and the runtime guards
+ * below - not the annotation - are what make a corrupt cache harmless on an admin page.
+ *
+ * @param string $provider one of self::PROVIDERS
+ * @return array<string, mixed>|null
+ */
     public static function get_cached(string $provider): ?array {
         $raw = get_config('local_artqtml', self::cache_key($provider));
         if ($raw === false || $raw === '') {
@@ -133,17 +115,17 @@ class model_list {
     }
 
     /**
-     * Fetch from the provider and replace the cache.
-     *
-     * Only the "Refresh models" button (Admin-046) and the scheduled model check call this.
-     *
-     * On failure the previous cache content is deliberately left in place (annex, "Hibakezelés":
-     * "Ha a lekérés meghiúsul, a korábbi gyorsítótár-tartalom marad érvényben"), so a transient
-     * provider outage does not empty the dropdown of an admin who is mid-configuration.
-     *
-     * @param string $provider one of self::PROVIDERS
-     * @return array{success: bool, models: array, error: string}
-     */
+ * Fetch from the provider and replace the cache.
+ *
+ * Only the "Refresh models" button and the scheduled model check call this.
+ *
+ * On failure the previous cache content is deliberately left in place (annex, "Hibakezelés":
+ * "Ha a lekérés meghiúsul, a korábbi gyorsítótár-tartalom marad érvényben"), so a transient
+ * provider outage does not empty the dropdown of an admin who is mid-configuration.
+ *
+ * @param string $provider one of self::PROVIDERS
+ * @return array{success: bool, models: array, error: string}
+ */
     public static function refresh(string $provider): array {
         $apikey = api_key_store::get($provider === self::PROVIDER_CLAUDE ? 'claude' : 'gemini');
         if ($apikey === '') {
@@ -168,22 +150,17 @@ class model_list {
     }
 
     /**
-     * The models a dropdown may offer: cached, and structured-output capable only (Admin-047).
-     *
-     * @param string $provider
-     * @return array<string, string> model id => display label, ready for a select
-     */
+ * The models a dropdown may offer: cached, and structured-output capable only.
+ *
+ * @param string $provider
+ * @return array<string, string> model id => display label, ready for a select
+ */
     public static function selectable_options(string $provider): array {
         $cached = self::get_cached($provider);
         if ($cached === null) {
             return [];
         }
 
-        // BL-44: a model this plugin version has proved it cannot read does not belong in the
-        // dropdown. Choosing it means every generation fails - and the API call is billed anyway,
-        // which is how the item was found: $0.228 for zero questions. Same shape as the Admin-047
-        // filter below, different reason: that one is about what the model supports, this one about
-        // what we have verified.
         $excluded = model_check_log::excluded_models($provider);
 
         $options = [];
@@ -191,11 +168,6 @@ class model_list {
             if (in_array((string) $model['id'], $excluded, true)) {
                 continue;
             }
-            // Only models that support structured output may reach the dropdown, because the plugin
-            // relies on structured output in both directions and a model without it could not be
-            // used at all. The requirement is Admin-047: "A legördülő kizárólag strukturált
-            // kimenetet támogató modelleket kínál fel. A plugin mindkét irányban strukturált
-            // kimenetet használ, ezért más modell nem választható".
             if (empty($model['supports_structured_output'])) {
                 continue;
             }
@@ -210,18 +182,12 @@ class model_list {
     }
 
     /**
-     * Whether a model id is present and selectable in the cached list.
-     *
-     * Used by the availability half of the model check, and by the settings page to decide whether
-     * a saved model needs the "currently unavailable" marker (Admin-049).
-     *
-     * Note this is NOT proof the model works: Admin-052 is explicit that the list endpoint has been
-     * observed still listing a model whose generation calls fail. Only the live probe proves that.
-     *
-     * @param string $provider
-     * @param string $modelid
-     * @return bool
-     */
+ * Whether a model id is present and selectable in the cached list.
+ *
+ * @param string $provider
+ * @param string $modelid
+ * @return bool
+ */
     public static function is_listed(string $provider, string $modelid): bool {
         return $modelid !== '' && array_key_exists($modelid, self::selectable_options($provider));
     }

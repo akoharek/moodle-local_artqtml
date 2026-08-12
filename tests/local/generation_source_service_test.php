@@ -207,7 +207,6 @@ final class generation_source_service_test extends \advanced_testcase {
         // The pending data was prepared while the generation was a draft.
         $pending = ['name' => 'Confirmed', 'shortname' => 'CONF', 'sourcetext' => 'Confirmed text.'];
 
-        // It finished before the user pressed "continue".
         $DB->set_field('local_artqtml_generations', 'status', generation_status::COMPLETED, ['id' => $before->id]);
 
         try {
@@ -231,12 +230,8 @@ final class generation_source_service_test extends \advanced_testcase {
     }
 
     /**
-     * A colleague's draft is still editable - the refusal is about status, never about ownership.
-     *
-     * Glob-031, decided 2026-08-03 and unchanged by this work. Recorded as a test because "we
-     * blocked editing other people's generations" is the wrong lesson to take from this change,
-     * and the wrong lesson is the one somebody acts on later.
-     */
+ * A colleague's draft is still editable - the refusal is about status, never about ownership.
+ */
     public function test_a_colleagues_draft_is_still_editable(): void {
         global $DB;
 

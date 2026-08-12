@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * What a partly successful generation still owes the teacher, and the settings that would ask
- * for it again (BL-35).
+ * What a partly successful generation still owes the teacher, and the settings that would ask for it again.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

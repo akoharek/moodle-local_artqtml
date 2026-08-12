@@ -19,12 +19,6 @@ namespace local_artqtml\local;
 /**
  * Pins the mutual exclusion of local/artqtml:use and local/artqtml:configure.
  *
- * Product decision 2026-08-10:
- * - :configure alone → admin settings only (no generation flows, no delete).
- * - :use alone → teacher usage only (no admin/settings).
- * - both → both areas; neither substitutes for the other.
- * - delete → :use + ownership only (covered in generation_delete_policy_test).
- *
  * @package    local_artqtml
  * @category   test
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

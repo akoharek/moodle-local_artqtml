@@ -31,15 +31,12 @@ use local_artqtml\local\validation_panel;
  */
 class hook_callbacks {
     /**
-     * Inject the read-only AI validation panel into Moodle's native question editor when the
-     * question being edited is one of ours (Jov-019/020).
-     *
-     * Only ever adds HTML on /question/bank/editquestion/question.php for a question that has
-     * a matching local_artqtml_questions row - a cheap no-op everywhere else.
-     *
-     * @param before_standard_top_of_body_html_generation $hook
-     * @return void
-     */
+ * Only ever adds HTML on /question/bank/editquestion/question.php for a question that has
+ * a matching local_artqtml_questions row - a cheap no-op everywhere else.
+ *
+ * @param before_standard_top_of_body_html_generation $hook
+ * @return void
+ */
     public static function before_standard_top_of_body_html(before_standard_top_of_body_html_generation $hook): void {
         global $PAGE;
 

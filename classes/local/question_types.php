@@ -56,50 +56,44 @@ class question_types {
     }
 
     /**
-     * Whether the "multiple attempts" toggle (Beal-014) applies to this type.
-     *
-     * IH only has two possible answers, so retries are not meaningful (Beal-014/Admin-023).
-     *
-     * @param string $code one of self::CODES
-     * @return bool
-     */
+ * Whether the "multiple attempts" toggle applies to this type.
+ *
+ * IH only has two possible answers, so retries are not meaningful.
+ *
+ * @param string $code one of self::CODES
+ * @return bool
+ */
     public static function supports_retry(string $code): bool {
         return $code !== 'IH';
     }
 
     /**
-     * Whether Moodle actually supports per-question hints (question_hints) for this type
-     * (M-24). Narrower than {@see self::supports_retry()}: FE and SR only.
-     *
-     * @param string $code one of self::CODES
-     * @return bool
-     */
+ * @param string $code one of self::CODES
+ * @return bool
+ */
     public static function supports_hints(string $code): bool {
         return in_array($code, ['FE', 'SR'], true);
     }
 
     /**
-     * Whether a per-answer explanation can be stored for this type at all (BL-29).
-     *
-     * - FE is qtype_multichoice, which keeps one feedback per answer.
-     * - IH is qtype_truefalse, whose two answers have feedbacktrue and feedbackfalse.
-     * - SR is qtype_ordering, which has combined feedback only - a sequence item has no
-     *   feedback field, so an explanation generated for one would have nowhere to go.
-     *
-     * @param string $code
-     * @return bool
-     */
+ * Whether a per-answer explanation can be stored for this type at all.
+ *
+ * - FE is qtype_multichoice, which keeps one feedback per answer.
+ * - IH is qtype_truefalse, whose two answers have feedbacktrue and feedbackfalse.
+ * - SR is qtype_ordering, which has combined feedback only - a sequence item has no
+ * feedback field, so an explanation generated for one would have nowhere to go.
+ *
+ * @param string $code
+ * @return bool
+ */
     public static function supports_option_explanation(string $code): bool {
         return in_array($code, ['IH', 'FE'], true);
     }
 
     /**
-     * Render a stored count-discrepancy list (M-08) as a human-readable warning, e.g.
-     * "Requested: 3 True/False, 2 Multiple choice — Received: 5 True/False, 0 Multiple choice."
-     *
-     * @param array $discrepancies list of ['type' => code, 'requested' => int, 'received' => int]
-     * @return string empty string if $discrepancies is empty
-     */
+ * @param array $discrepancies list of ['type' => code, 'requested' => int, 'received' => int]
+ * @return string empty string if $discrepancies is empty
+ */
     public static function format_count_discrepancy(array $discrepancies): string {
         if (empty($discrepancies)) {
             return '';

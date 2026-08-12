@@ -17,7 +17,7 @@
 namespace local_artqtml\local;
 
 /**
- * Unit tests for the provider model list cache and filtering (Admin-044/045/047/049).
+ * Unit tests for the provider model list cache and filtering.
  *
  * The fetch itself is not exercised here - it needs a live provider - but everything the settings
  * page depends on is: that the page reads the cache and only the cache, that the dropdown offers
@@ -60,8 +60,8 @@ final class model_list_test extends \advanced_testcase {
     }
 
     /**
-     * Admin-045: with nothing cached the settings page gets null - and must not fetch.
-     */
+ * with nothing cached the settings page gets null - and must not fetch.
+ */
     public function test_empty_cache_returns_null(): void {
         $this->resetAfterTest();
 
@@ -71,8 +71,8 @@ final class model_list_test extends \advanced_testcase {
     }
 
     /**
-     * Admin-045: 24-hour lifetime, measured from the fetch time.
-     */
+ * 24-hour lifetime, measured from the fetch time.
+ */
     public function test_cache_freshness_window(): void {
         $this->resetAfterTest();
 
@@ -87,8 +87,8 @@ final class model_list_test extends \advanced_testcase {
     }
 
     /**
-     * Admin-047: only structured-output models reach the dropdown.
-     */
+ * only structured-output models reach the dropdown.
+ */
     public function test_only_structured_output_models_are_selectable(): void {
         $this->resetAfterTest();
 
@@ -101,10 +101,6 @@ final class model_list_test extends \advanced_testcase {
         $this->assertCount(2, $options);
     }
 
-    /**
-     * Admin-049: a saved model missing from the list is reported as not listed, so the settings
-     * page can mark it - the value itself is never touched here.
-     */
     public function test_is_listed(): void {
         $this->resetAfterTest();
 
@@ -148,10 +144,6 @@ final class model_list_test extends \advanced_testcase {
         $this->assertFalse(model_list::is_listed(model_list::PROVIDER_GEMINI, 'claude-opus-4-8'));
     }
 
-    /**
-     * refresh() without an API key fails cleanly and leaves any existing cache alone (Admin-050:
-     * the list needs a key; the annex: a failed fetch keeps the previous content).
-     */
     public function test_refresh_without_api_key_preserves_the_cache(): void {
         $this->resetAfterTest();
 

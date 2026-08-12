@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Daily model check (Admin-052).
+ * Daily model check.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -42,8 +42,6 @@ class model_check_task extends \core\task\scheduled_task {
      * @return void
      */
     public function execute() {
-        // Two providers, each doing a list fetch plus one probe call. Sized like the generation
-        // task's budget rather than left on the CLI default (V-04).
         $apitimeout = (int) (get_config('local_artqtml', 'apitimeout') ?: 60);
         set_time_limit((($apitimeout * 2) + 30) * count(\local_artqtml\local\model_list::PROVIDERS));
 

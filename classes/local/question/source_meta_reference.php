@@ -33,12 +33,8 @@ namespace local_artqtml\local\question;
  */
 class source_meta_reference {
     /**
-     * HU/EN phrases that mean "according to / based on the source document".
-     *
-     * Kept as literal multi-word needles (not single words like "szöveg") so a legitimate question
-     * about the word "text" is not rejected. Matching is case-insensitive over whitespace-collapsed
-     * UTF-8 text.
-     */
+ * HU/EN phrases that mean "according to / based on the source document".
+ */
     private const PHRASES = [
         // Hungarian.
         'szöveg szerint',

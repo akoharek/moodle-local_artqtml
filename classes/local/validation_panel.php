@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Read-only AI validation panel injected into Moodle's native question editor (Jov-019/020).
+ * Read-only AI validation panel injected into Moodle's native question editor.
  *
  * The plugin deliberately reuses Moodle's own /question/bank/editquestion/question.php rather
- * than shipping a custom editing form (spec ch.7: "A szerkesztő pontosan ugyanaz az oldal,
+ * than shipping a custom editing form (: "A szerkesztő pontosan ugyanaz az oldal
  * amelyen a tanár bármely kérdésbanki kérdést szerkesztené"). Since that page belongs to core,
  * this panel is injected via the before_standard_top_of_body_html plugin callback (lib.php)
  * rather than by modifying the native edit form.
@@ -48,17 +48,17 @@ class validation_panel {
     }
 
     /**
-     * Render the read-only panel HTML for one question row (Jov-019/020).
-     *
-     * Returned as a hidden <div> plus a small inline script that relocates it immediately
-     * before the native form's "Question name" field (#id_name) once the DOM is ready - the
-     * exact placement the spec calls for ("a kérdés neve előtt"). If that field can't be found
-     * (a future Moodle version changes the form), the panel simply stays visible at the top of
-     * the page instead of disappearing.
-     *
-     * @param \stdClass $row a local_artqtml_questions record
-     * @return string
-     */
+ * Render the read-only panel HTML for one question row.
+ *
+ * Returned as a hidden <div> plus a small inline script that relocates it immediately
+ * before the native form's "Question name" field (#id_name) once the DOM is ready - the
+ * exact placement the spec calls for ("a kérdés neve előtt"). If that field can't be found
+ * (a future Moodle version changes the form), the panel simply stays visible at the top of
+ * the page instead of disappearing.
+ *
+ * @param \stdClass $row a local_artqtml_questions record
+ * @return string
+ */
     public static function render(\stdClass $row): string {
         $panelid = 'artqtml-validation-panel';
 
@@ -93,7 +93,7 @@ class validation_panel {
         }
 
         $table = new \html_table();
-        // Glob-034: fluid + wrapping, never wider than its container.
+        // fluid + wrapping, never wider than its container.
         $table->attributes['class'] = 'generaltable table-sm mb-0 artqtml-table';
         $table->data = $rows;
 

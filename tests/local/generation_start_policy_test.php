@@ -17,19 +17,7 @@
 namespace local_artqtml\local;
 
 /**
- * Unit tests for "one running generation per person" (BL-57, Gen-039).
- *
- * WHAT IS TESTED HERE is the decision rule alone: given what is in the table, does this user
- * already have a generation running, and which one. Each of the three in-progress statuses is
- * asserted separately rather than looped over as a set, because each one is a real state of the
- * pipeline and a rule that stopped covering one of them would still pass a set-level assertion
- * written from the same constant.
- *
- * WHAT IS DELIBERATELY NOT TESTED is the race - two Start presses arriving in the same instant.
- * Andras decided on 2026-08-06 that simultaneity is not a design concern for this product: the
- * limit is written for the everyday case, a teacher starting a second run while the first is still
- * going. There is no per-owner lock to test, and a "start twice in a row, the second is refused"
- * test would read as if the race were covered when it is not.
+ * Unit tests for "one running generation per person".
  *
  * The column this rule counts on, `userid`, is written by the start path to the user who pressed
  * the button, so "whose runs" and "who pressed Start" are the same person by construction. That
@@ -154,14 +142,10 @@ final class generation_start_policy_test extends \advanced_testcase {
     }
 
     /**
-     * The allowance is per person: a colleague's running generation does not block mine.
-     *
-     * Glob-031 lets anyone with local/artqtml:use start anyone's generation, so this is the
-     * assertion that says whose queue place is being spent - the person who started the run, which
-     * is what `userid` holds from the moment the start path writes it there.
-     *
-     * @return void
-     */
+ * The allowance is per person: a colleague's running generation does not block mine.
+ *
+ * @return void
+ */
     public function test_a_colleagues_running_generation_does_not_block(): void {
         $this->resetAfterTest();
 

@@ -16,7 +16,7 @@
 
 /**
  * Builds the Claude Structured Outputs JSON schema for generated questions
- * (technical annex 3.3). Supported types: IH/FE/SR.
+ * . Supported types: IH/FE/SR.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -29,7 +29,7 @@ namespace local_artqtml\local;
  */
 class question_schema {
     /**
-     * Fields present on every question type regardless of settings (technical annex 3.3.1).
+     * Fields present on every question type regardless of settings.
      *
      * hint1/hint2/generalfeedback are added per-type by {@see self::apply_hint_feedback()}
      * only when actually enabled for that type in this generation's settings.
@@ -47,17 +47,12 @@ class question_schema {
     }
 
     /**
-     * Build the full output_config.format.schema object sent to the Claude API (3.3.8).
-     *
-     * The FE min/max answer-option count (Admin-025) and the SR fixed item count
-     * (Admin-036) are not expressible here: Claude Structured Outputs only allows
-     * minItems/maxItems values of 0 or 1. Those counts are instead communicated to the
-     * model via the prompt (see generate_questions_task::build_prompt()).
-     *
-     * @param array $settings this generation's decoded settings (settings['types'][$typecode]
-     *      ['hintenabled'|'feedbackenabled'])
-     * @return array
-     */
+ * Build the full output_config.format.schema object sent to the Claude API (3.3.8).
+ *
+ * @param array $settings this generation's decoded settings (settings['types'][$typecode]
+ * ['hintenabled'|'feedbackenabled'])
+ * @return array
+ */
     public static function build(array $settings): array {
         $builders = [
             'IH' => fn(): array => self::ih_schema($settings),
@@ -163,10 +158,10 @@ class question_schema {
     }
 
     /**
-     * Gen-023/024: two progressive hints.
-     *
-     * @return array
-     */
+ * two progressive hints.
+ *
+ * @return array
+ */
     protected static function hint_property(): array {
         return [
             'hint1' => [
@@ -184,10 +179,10 @@ class question_schema {
     }
 
     /**
-     * M-25: shown to the student regardless of which answer they picked.
-     *
-     * @return array
-     */
+ * shown to the student regardless of which answer they picked.
+ *
+ * @return array
+ */
     protected static function feedback_property(): array {
         return [
             'generalfeedback' => [
@@ -201,10 +196,10 @@ class question_schema {
     }
 
     /**
-     * The per-option explanation for a true/false question (BL-29).
-     *
-     * @return array
-     */
+ * The per-option explanation for a true/false question.
+ *
+ * @return array
+ */
     protected static function ih_explanation_property(): array {
         return [
             'explanationtrue' => [

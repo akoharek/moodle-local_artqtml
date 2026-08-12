@@ -17,7 +17,7 @@
 namespace local_artqtml\local;
 
 /**
- * Unit tests for the status->destination rule (List-018) and its call sites.
+ * Unit tests for the status->destination rule and its call sites.
  *
  * D-5: the rule states where a generation should be opened, given its current status. It exists
  * once, in generation_list::open_url(); the list page, upload.php's duplicate-warning panel and
@@ -69,7 +69,7 @@ final class generation_open_url_test extends \advanced_testcase {
     }
 
     /**
-     * List-018: completed opens the approval page, the in-progress trio and failed open the
+     * completed opens the approval page, the in-progress trio and failed open the
      * status page, and 'started' falls through to the settings page it can be resumed from.
      *
      * Deliberately keyed off generation_status::VALUES rather than a re-typed list, so a seventh
@@ -86,9 +86,6 @@ final class generation_open_url_test extends \advanced_testcase {
             generation_status::VALIDATING => ['status.php', 'generationid'],
             generation_status::SAVING     => ['status.php', 'generationid'],
             generation_status::COMPLETED  => ['approve.php', 'generationid'],
-            // BL-35: the status page, because that is the only page that states what is missing
-            // and offers the button that asks for it again. The order here follows
-            // generation_status::VALUES, which the assertion below enforces.
             generation_status::PARTIAL    => ['status.php', 'generationid'],
             generation_status::FAILED     => ['status.php', 'generationid'],
         ];

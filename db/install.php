@@ -17,11 +17,6 @@
 /**
  * Install-time setup for local_artqtml.
  *
- * A fresh install never runs db/upgrade.php, so anything an upgrade step creates has to be created
- * here too. Today that is three things: the draft-editing role (Jov-036), the starting text of
- * the generator system prompt (Admin-066), and — when this site previously had local_aiquizgen —
- * renaming that plugin's tables/registry into local_artqtml.
- *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -38,9 +33,6 @@ function xmldb_local_artqtml_install(): bool {
 
     \local_artqtml\local\draft_role::ensure_role();
 
-    // Admin-066: the generator system prompt lives only in the database, so a fresh site has to be
-    // given a starting value - otherwise the first generation would run with an empty prompt.
-    // The same rule runs on upgrade, from the same class: fill what is empty, never overwrite.
     \local_artqtml\local\prompt_seed::apply();
 
     return true;

@@ -15,15 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The single source of truth for the seven generation status values (List-005/List-018).
+ * Single source of truth for generation status values.
  *
- * List-018: "A hat státuszérték egyetlen közös konstansban van definiálva, és minden felhasználási
- * hely (lista oldal, státusz oldal, ütemezett taskok, szűrők) onnan olvassa; a literál lista sehol
- * nem ismételhető meg." The list page, the status page, the scheduled task and the filters all read
- * {@see self::VALUES} / {@see self::IN_PROGRESS} from here, so the status list appears exactly
- * once in the codebase.
- *
- * Deliberately shaped like {@see \local_artqtml\local\problem_category} so the two read alike.
+ * List page, status page, scheduled tasks and filters all read {@see self::VALUES} /
+ * {@see self::IN_PROGRESS} from here.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -35,7 +30,7 @@ namespace local_artqtml\local;
  * Canonical list + display helper for the seven generation statuses.
  */
 class generation_status {
-    /** @var string queued, or picked up by the task but not yet calling an API (List-005: "Megkezdett"). */
+    /** @var string queued, or picked up by the task but not yet calling an API. */
     public const STARTED = 'started';
 
     /** @var string the Claude generation call is running. */
@@ -54,28 +49,15 @@ class generation_status {
     public const FAILED = 'failed';
 
     /**
-     * @var string the pipeline finished, but delivered fewer questions than were asked for.
-     *
-     * BL-35. Before this existed there were two outcomes, and a run that produced nothing at all
-     * took the same one as a run that produced everything: nine consecutive empty generations
-     * delivered zero questions and every one of them was shown as "Completed" with a full green
-     * bar (BL-30). Neither 'completed' nor 'failed' was honest about them - the pipeline really
-     * did run to the end, and the teacher really did not get what they asked for.
-     */
+ * @var string the pipeline finished, but delivered fewer questions than were asked for.
+ */
     public const PARTIAL = 'partial';
 
     /**
-     * The seven generation status values, in pipeline order (List-005).
-     *
-     * Seven members since BL-35 added 'partial'. List-005 spells out that this level of detail is
-     * intentional
-     * ("ez szándékos, a scheduled task késleltetése és a hosszú AI feldolgozás miatt a részletes
-     * státusz hasznos a felhasználónak"), and that 'started' is displayed as "Megkezdett", covering
-     * both queueing and the task having begun work. Do not add an eighth or rename one without a
-     * spec change: generation_status_test asserts this set verbatim.
-     *
-     * @var string[]
-     */
+ * The seven generation status values, in pipeline order.
+ *
+ * @var string[]
+ */
     public const VALUES = [
         self::STARTED,
         self::GENERATING,
@@ -126,7 +108,7 @@ class generation_status {
 
     /**
      * Human-readable label for a status, from a lang string - the raw machine key (e.g. 'started')
-     * must never reach the UI. List-005 fixes the 'started' label as "Megkezdett" in Hungarian.
+     * must never reach the UI. fixes the 'started' label as "Megkezdett" in Hungarian.
      *
      * @param string $value one of {@see self::VALUES}
      * @return string
@@ -158,7 +140,7 @@ class generation_status {
      * An SQL fragment matching the in-progress statuses, plus its named parameters.
      *
      * Lets the scheduled task build its WHERE clause from {@see self::IN_PROGRESS} instead of
-     * inlining the list into a SQL string (List-018).
+     * inlining the list into a SQL string.
      *
      * @param string $field the column to match, qualified if needed
      * @param string $prefix named-parameter prefix, so several fragments can coexist in one query

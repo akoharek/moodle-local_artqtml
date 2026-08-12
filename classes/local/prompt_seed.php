@@ -20,10 +20,6 @@
  * The rule, in one sentence: **an empty setting is filled from the shipped file; a setting that
  * differs from the shipped text is left exactly as it is.**
  *
- * This class holds the rule, not the text - the text is `db/prompt_defaults.php`, and Admin-066
- * keeps it out of the code. Install and upgrade both call this, so the rule exists once rather
- * than in two copies that could drift.
- *
  * **What this deliberately gives up.** A site that never customised its prompt also never receives
  * an improvement to the shipped one: its stored value differs from the new default, and "differs"
  * means "leave alone". Telling an untouched value apart from an edited one would need a fingerprint

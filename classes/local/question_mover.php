@@ -15,13 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Moves already-created draft questions into a real Moodle question bank category
- * (functional spec Jov-013/014/016, technical annex ch.6).
- *
- * Since question_importer already creates a real Moodle question object immediately at
- * generation time (Gen-005), "approving" a question is just relocating it into the category
- * the teacher picked - using Moodle's own question_move_questions_to_category() so version/
- * usage bookkeeping stays consistent with how the native question bank UI moves questions.
+ * Moves already-created draft questions into a real Moodle question bank category.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

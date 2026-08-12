@@ -15,33 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The one place that decides how much source text this plugin will accept.
+ * How much source text this plugin will accept.
  *
- * WHY THIS CLASS EXISTS. Until 2026-08-04 the size of a source text was a display detail: the
- * upload page ran a live character/word/token counter in JavaScript and coloured it red past the
- * context window, and that was the whole of it. Nothing on the server ever compared a number to a
- * limit - not the form, not the upload handler, not the task that makes the API call. A pasted
- * document of any size was saved, hashed, and sent to the provider, and a crafted POST skipped even
- * the colouring.
- *
- * WHAT THE NUMBER IS, AND WHAT IT IS NOT. The estimate is characters divided by four - the same
- * approximation the counter has always shown the user, kept deliberately identical so the two
- * cannot disagree about the same text. It is NOT the provider's tokenizer: real tokenization is
- * model-specific, and Hungarian text in particular will not divide neatly by four. This is a
- * resource guard with a predictable number behind it, not a billing figure.
- *
- * Three things it is explicitly not:
- *
- *  - It is not a context-fit calculation. A request that passes this can still be too large for a
- *    model once the system prompt, the schema and the answer are added; that is what the 80%
- *    headroom is for, and it is a margin rather than a proof.
- *  - It is not a monthly site-wide token quota; it only bounds one source text.
- *  - It does not truncate. Silently shortening a teacher's material would produce questions about
- *    a document they did not upload, and nothing on screen would say so.
- *
- * Everything about the limit lives here - the /4 estimate, the 80% formula, the fallback context
- * window and the comparison - because the alternative is the same arithmetic in the form, the
- * upload handler, the AJAX endpoint and the task, drifting apart one edit at a time.
+ * Uses characters/4 as a predictable resource guard (same estimate as the UI counter).
+ * Does not claim provider tokenization, does not truncate, and is not a site-wide quota.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -115,17 +92,10 @@ class source_text_limit {
     }
 
     /**
-     * The limit expressed in characters.
-     *
-     * NOT USED IN A DECISION ANYWHERE, and that is on purpose rather than an oversight - the
-     * docblock used to claim it fed the messages and the browser counter, and neither is true.
-     * Both work in tokens, because the token limit is the one the provider actually enforces and
-     * the character figure is an estimate derived from it ({@see self::CHARS_PER_TOKEN}). This
-     * exists so that a character figure, where one is wanted, comes from the same arithmetic as
-     * everything else rather than from a second copy of it.
-     *
-     * @return int
-     */
+ * The limit expressed in characters.
+ *
+ * @return int
+ */
     public static function character_limit(): int {
         return self::token_limit() * self::CHARS_PER_TOKEN;
     }

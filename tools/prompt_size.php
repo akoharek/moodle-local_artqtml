@@ -3,12 +3,6 @@
  * Standalone dev/QA tool: measures what a generation actually sends to the generator API, and
  * projects what the same generation would cost if it were split into one call per question type.
  *
- * Written for the "one prompt or one per type?" decision (BL-33). The argument for splitting is
- * that the schema becomes unambiguous and the type/difficulty pairing becomes exact; the argument
- * against is that the source text is re-sent with every call. Which wins depends on how much of a
- * request the source text actually is - a number nobody had, so this prints it instead of
- * estimating it.
- *
  * It measures through the plugin's own code (`generate_questions_task::build_prompt()` and
  * `question_schema::build()`), reached by reflection because both are protected. A second
  * implementation here would be a second source of truth, and the whole point is to measure what
@@ -21,8 +15,8 @@
  * from phpstan.
  *
  * Usage, from the Moodle root inside the webserver container:
- *   php local/artqtml/tools/prompt_size.php --generationid=1258
- *   php local/artqtml/tools/prompt_size.php --latest
+ * php local/artqtml/tools/prompt_size.php --generationid=1258
+ * php local/artqtml/tools/prompt_size.php --latest
  */
 
 define('CLI_SCRIPT', true);

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * External function returning the status and question count of a generation (Glob-006).
+ * External function returning the status and question count of a generation.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -61,9 +61,6 @@ class get_status extends external_api {
 
         $generation = $DB->get_record('local_artqtml_generations', ['id' => $params['id']], '*', MUST_EXIST);
 
-        // Glob-031: collaborative :use by design; delete is owner-only (see delete.php).
-        // Deliberately no per-owner check here — must match status/generate/approve page load
-        // (C6; reverts the earlier M-28 ownership gate on the AJAX poll).
 
         $questioncount = $DB->count_records('local_artqtml_questions', ['generationid' => $generation->id]);
         $unvalidatedcount = $DB->count_records('local_artqtml_questions', [
@@ -71,21 +68,13 @@ class get_status extends external_api {
             'validationsuggestion' => 'not_evaluated',
         ]);
 
-        // Gen-014/M-27: the raw technical error is shown to anyone allowed to configure the
-        // plugin (not gated on debug mode - a configure-capable admin/teacher needs the real
-        // provider error to diagnose a failure regardless of whether debug mode happens to be on).
         $technicalerror = has_capability('local/artqtml:configure', $context) ? (string) ($generation->error ?? '') : '';
 
-        // M-08: surfaced live through the same AJAX poll status.php's JS already uses, same as
-        // status regions below, rather than only ever appearing after a page reload.
         $countdiscrepancy = json_decode((string) $generation->countdiscrepancy, true);
         $countdiscrepancymessage = (is_array($countdiscrepancy) && !empty($countdiscrepancy))
             ? \local_artqtml\local\question_types::format_count_discrepancy($countdiscrepancy)
             : '';
 
-        // M-15: which stage a failed generation actually got to is no longer reflected by
-        // $questioncount (nothing is saved to local_artqtml_questions until the saving stage
-        // commits it all) - mirrors status.php's own server-rendered derivation from pendingdata.
         $failedpercent = 25;
         if ($generation->status === \local_artqtml\local\generation_status::FAILED) {
             $pendingdata = json_decode((string) $generation->pendingdata, true);
@@ -96,9 +85,6 @@ class get_status extends external_api {
             }
         }
 
-        // BL-35: the generating stage is one API call per requested question type, so the poll has
-        // to carry how far through that loop the run is - otherwise the bar sits at 25% for
-        // several minutes and the only thing it communicates is that nothing has crashed.
         $generatingpercent = \local_artqtml\local\generation_progress::generating_percent($generation->pendingdata);
         $generatingtype = \local_artqtml\local\generation_progress::generating_type($generation->pendingdata);
 
@@ -114,8 +100,6 @@ class get_status extends external_api {
             'generatingtypelabel'     => $generatingtype === ''
                 ? ''
                 : \local_artqtml\local\question_types::label($generatingtype),
-            // Finding #5 / Abort: when the pipeline rolls back to started mid-poll, the status page
-            // must leave — settings (and from there upload) are the editable draft surfaces.
             'restarturl'              => $generation->status === \local_artqtml\local\generation_status::STARTED
                 ? (new \moodle_url('/local/artqtml/generate.php', ['id' => (int) $generation->id]))->out(false)
                 : '',
@@ -144,11 +128,11 @@ class get_status extends external_api {
             ),
             'generatingpercent' => new external_value(
                 PARAM_INT,
-                'Progress-bar percent within the generating stage, 25-45, from how many question types are done (BL-35)'
+                'Progress-bar percent within the generating stage, 25-45, from how many question types are done'
             ),
             'generatingtypelabel' => new external_value(
                 PARAM_RAW,
-                'Human-readable name of the question type currently being generated, empty if none (BL-35)'
+                'Human-readable name of the question type currently being generated, empty if none'
             ),
             'restarturl' => new external_value(
                 PARAM_RAW,

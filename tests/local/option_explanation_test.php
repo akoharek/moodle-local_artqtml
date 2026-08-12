@@ -17,7 +17,7 @@
 namespace local_artqtml\local;
 
 /**
- * The per-answer explanation (BL-29): the switch, the schema and where the text lands.
+ * The per-answer explanation: the switch, the schema and where the text lands.
  *
  * IH and FE can store per-answer explanations; SR cannot.
  *

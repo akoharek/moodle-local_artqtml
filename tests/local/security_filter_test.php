@@ -17,7 +17,7 @@
 namespace local_artqtml\local;
 
 /**
- * Unit tests for the content screens (Felt-017/018, Admin-028/029).
+ * Unit tests for the content screens.
  *
  * This file did not exist before 2026-08-04. The prompt-injection screen had no test at all,
  * which is how it could sit there with no baseline - an empty admin setting made it match
@@ -201,10 +201,10 @@ final class security_filter_test extends \advanced_testcase {
     }
 
     /**
-     * Invalid UTF-8 does not fatal.
-     *
-     * A teacher pasting from a badly encoded source must get a screening decision, not a crash.
-     */
+ * Invalid UT does not fatal.
+ *
+ * A teacher pasting from a badly encoded source must get a screening decision, not a crash.
+ */
     public function test_invalid_utf8_does_not_fatal(): void {
         $this->resetAfterTest();
 
@@ -239,11 +239,8 @@ final class security_filter_test extends \advanced_testcase {
     }
 
     /**
-     * The settings page default and the enforced baseline are the same list.
-     *
-     * They used to be two hand-maintained copies, and they had already drifted: the field showed
-     * three phrases, one of which ('you are now') was not in the code at all.
-     */
+ * The settings page default and the enforced baseline are the same list.
+ */
     public function test_settings_default_is_not_a_second_copy(): void {
         $patterns = security_filter::default_prompt_patterns();
 

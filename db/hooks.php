@@ -25,8 +25,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $callbacks = [
     [
-        // Jov-019/020: injects the read-only AI validation panel into the native question
-        // editor. Replaces the legacy before_standard_top_of_body_html() lib.php callback.
         'hook'     => \core\hook\output\before_standard_top_of_body_html_generation::class,
         'callback' => \local_artqtml\hook_callbacks::class . '::before_standard_top_of_body_html',
     ],

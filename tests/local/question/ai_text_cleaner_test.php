@@ -17,8 +17,7 @@
 namespace local_artqtml\local\question;
 
 /**
- * BL-58: the whole question is cleaned at the parse step, so the validator judges what the
- * teacher will see.
+ * the whole question is cleaned at the parse step, so the validator judges what the teacher will see.
  *
  * The sibling file ai_text_cleaning_test.php asserts the same cleaning at the SAVE door
  * (question_form_builder). This one is about the earlier door and about the two properties that

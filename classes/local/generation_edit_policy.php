@@ -17,30 +17,9 @@
 /**
  * When a generation's source text and identifiers may still be changed.
  *
- * THE DEFECT THIS ANSWERS. `upload.php` loaded and saved any generation whose id it was handed,
- * with no regard for what had happened to it since. `upload.php?id=<n>` on a finished generation
- * rewrote its name, its short name, its source text and both of its hashes - and the questions
- * already made from the old text stayed exactly as they were. Nothing broke visibly, which is what
- * makes it worth fixing: the questions and the material they were made from simply stopped
- * describing each other, with no record that they ever had.
- *
- * The worse case is a generation still running. The pipeline reads the source text more than once
- * - the generator reads it, and the validator reads it again to judge the questions against it -
- * so a save landing between the two hands Claude and Gemini different documents, and the validator
- * marks questions wrong for not matching a source that was not there when they were written.
- *
- * THE RULE IS A WHITELIST, deliberately. Only `started` is editable; every other status is not,
- * including any status added later. The alternative - listing the statuses that are forbidden -
- * fails open the day somebody adds an eighth, and it would fail silently.
- *
- * WHAT THIS IS NOT: an ownership check. Any user with `local/artqtml:use` may still edit any
- * draft generation, including a colleague's, and that is Glob-031 working as decided on
- * 2026-08-03 - the tool is a site-wide collaborative one on purpose. The refusal here is about
- * WHAT STATE the generation is in, never about who created it, and the message says so: the user
- * is not being told they lack permission, because they do not.
- *
- * `generate.php` has held the same boundary for the settings page since 2026-08-03. This is the
- * same status line applied to the other half of the same generation.
+ * Only draft (`started`) generations are editable. Changing source after questions exist
+ * (or while the pipeline is running) would desync stored questions from their material.
+ * New statuses default to non-editable (whitelist).
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

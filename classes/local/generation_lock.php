@@ -27,17 +27,11 @@
  * between its read and its write. Making the read locking would mean database-specific SQL across
  * every engine Moodle supports.
  *
- * WHAT THE PARTIAL UPDATE ALREADY FIXED, so this is not asked to do it twice. Until 2026-08-05
- * these paths wrote back the whole record they had read, so the source page's save also rewrote
- * `status` and the settings page's save also rewrote the source text (BL-51, first half). Each path
- * now writes only its own columns. That removed the damage the columns did to *each other*; it
- * cannot remove the damage a path does to its own column, which is what this class is for:
- *
- *  - a source text replaced from an older tab while the generation is already being read by the
- *    model - the questions come from the old text, the screen shows the new one, and nothing says
- *    they are not the same thing;
- *  - two people pressing "Start generation" in the same instant - both pass the status check, both
- *    set `generating`, both clear the question rows, and the run is paid for twice.
+ * - a source text replaced from an older tab while the generation is already being read by the
+ * model - the questions come from the old text, the screen shows the new one, and nothing says
+ * they are not the same thing;
+ * - two people pressing "Start generation" in the same instant - both pass the status check, both
+ * set `generating`, both clear the question rows, and the run is paid for twice.
  *
  * THESE LOCKS MUST NEVER BE NESTED, and the reason was measured rather than assumed. The protection
  * is between requests, not within one: `lock_config::get_lock_factory()` returns a NEW factory
@@ -46,15 +40,6 @@
  * ran inside another one's locked section would therefore take the same lock a second time and
  * carry on as if it held it alone. None of the four call sites nests today; this paragraph is why
  * none of them may be made to.
- *
- * A PER-OWNER KEYING WAS BUILT AND THEN REMOVED on 2026-08-06, and it is recorded here so that
- * nobody derives it a second time from the same starting point. BL-57 limits an owner to one
- * running generation, and the check that enforces it spans generations - so a per-owner key was
- * added to hold it under two Start presses in the same instant. ANDRAS DECIDED that simultaneous
- * button presses are not a design concern for this product: the limit is there for the everyday
- * case. The start path is therefore back to the per-generation key this class has always had, and
- * with it the BL-51 protection it was there for in the first place - the SAME generation started
- * twice, which would otherwise create two draft categories and pay for the run twice.
  *
  * THE TIMEOUT IS SHORT ON PURPOSE. These are user-facing page submits, not background work: a
  * teacher waiting on a lock is a teacher watching a spinner. Five seconds is far longer than the

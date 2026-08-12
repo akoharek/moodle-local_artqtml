@@ -17,12 +17,6 @@
 /**
  * Creates a generation, or updates the source of one that is still a draft.
  *
- * WHY THIS IS A CLASS AND NOT A FUNCTION IN upload.php. It used to be
- * `local_artqtml_save_generation()`, declared at file scope in a controller that starts a
- * session, reads request parameters and redirects. Nothing could call it in a test, which meant
- * the one behaviour that actually needed proving here - that a form submitted after the
- * generation's status changed writes nothing - could not be proven at all.
- *
  * The division of labour is deliberate: this decides whether a write may happen and performs it;
  * the controller decides what the user is then shown. It never redirects, never renders and never
  * touches capabilities - the capability check belongs to the page, and has already happened by the
@@ -83,11 +77,6 @@ class generation_source_service {
         global $DB;
 
         if ($editingid > 0) {
-            // The lock, not the transaction, is what makes the three lines below one decision. The
-            // transaction gives atomicity; it issues no row-level SELECT ... FOR UPDATE, so without
-            // this another request could start the generation between the status check and the
-            // write, and the source text would be replaced under a model already reading it
-            // (2026-08-05, BL-51). The lock is released whether this returns or throws.
             return (int) generation_lock::run(
                 $editingid,
                 static fn(): int => self::update_draft_source($editingid, $name, $shortname, $sourcetext, $filehash)
@@ -135,17 +124,8 @@ class generation_source_service {
 
         $record = $DB->get_record('local_artqtml_generations', ['id' => $editingid], '*', MUST_EXIST);
 
-        // Glob-031: collaborative :use by design; delete is owner-only (see delete.php).
-        // Deliberately no owner check here or at the call site — any :use holder may edit any
-        // DRAFT (including a colleague's). What follows is a status boundary, not ownership.
         generation_edit_policy::require_source_editable($record);
 
-        // ONLY THIS PAGE'S OWN COLUMNS ARE WRITTEN, and that is the point of the object below
-        // rather than the record that was just read. Moodle's update_record() writes every
-        // property it is given, so handing back the whole loaded record wrote every column -
-        // including `status`. A generation started in another tab between the read above and the
-        // write here therefore had its status pushed back from `generating` to `started` by a form
-        // that never meant to touch it (2026-08-05, BL-51).
         $DB->update_record('local_artqtml_generations', (object) [
             'id'             => $editingid,
             'name'           => $name,

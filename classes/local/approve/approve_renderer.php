@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * HTML/JS rendering for the draft approval page (functional spec ch.7) - split out of the
+ * HTML/JS rendering for the draft approval page - split out of the
  * approve.php controller. Presentation only: returns markup strings, performs no DB mutation;
  * reads via approve_page_data and the lib.php badge helper.
  *
@@ -33,12 +33,12 @@ use local_artqtml\local\draft_bank;
  */
 class approve_renderer {
     /**
-     * The four-status validation summary row of badges (Val-017/TC-Val-019).
-     *
-     * @param array<string,int> $statuscounts from approve_page_data::status_counts()
-     * @param int $statustotal
-     * @return string
-     */
+ * The four-status validation summary row of badges.
+ *
+ * @param array<string,int> $statuscounts from approve_page_data::status_counts()
+ * @param int $statustotal
+ * @return string
+ */
     public static function validation_summary(array $statuscounts, int $statustotal): string {
         // JOV-F002: exactly four counters plus the total, each individually addressable so the
         // element-count assertion can check "four + total", not just the rendered text.
@@ -87,16 +87,10 @@ class approve_renderer {
         \stdClass $creator,
         int $generationid
     ): string {
-        // Glob-031: needed to tell "your own generation" from "someone else's" when deciding
-        // whether the Edit action prompts first.
+        // needed to tell "your own generation" from "someone else's" when deciding whether the Edit action prompts first.
         global $USER;
 
         $table = new \html_table();
-        // Spec v26, "Kérdéslista táblázat": "A táblázat oszlopai: jelölőnégyzet, kérdés neve,
-        // kérdéstípus (Moodle natív ikon és a típus neve), nehézségi mód, validációs javaslat,
-        // létrehozó, utoljára szerkesztette, dátum, műveletek. Konfidencia oszlop a táblázatban nem
-        // jelenik meg - a konfidencia % a kérdésszerkesztő csak olvasható validációs szekciójába
-        // tartozik (Jov-020)." Exactly nine columns; a tenth (Confidence) is a defect.
         $table->head = [
             self::header_cell(
                 'selectall',
@@ -109,18 +103,11 @@ class approve_renderer {
             self::sortable_header_cell($pageurl, 'type', 'type', 'coltype', $sort, $dir),
             self::sortable_header_cell($pageurl, 'difficulty', 'difficulty', 'coldifficulty', $sort, $dir),
             self::sortable_header_cell($pageurl, 'validation', 'validation', 'colvalidationstatus', $sort, $dir),
-            // V20 #14: sortable for UI consistency with the list page (the value is invariant per
-            // page here - the generation owner - so the sort itself is effectively a no-op).
             self::sortable_header_cell($pageurl, 'creator', 'creator', 'colcreatedby', $sort, $dir),
             self::sortable_header_cell($pageurl, 'lasteditedby', 'lasteditedby', 'collasteditedby', $sort, $dir),
             self::sortable_header_cell($pageurl, 'date', 'timecreated', 'coldate', $sort, $dir),
             self::header_cell('actions', get_string('colactions', 'local_artqtml')),
         ];
-        // Glob-034/035: fluid, wrapping table - no horizontal scroller, and no clipped Actions
-        // column (this table was the known worst case, overflowing its container with the actions
-        // cut off entirely). Type/difficulty/creator/last-editor/date collapse below lg via Boost's
-        // own display utilities and reappear as a secondary line inside the name cell; the select,
-        // name, validation and actions columns are never collapsed.
         $table->attributes['class'] = 'generaltable table table-striped artqtml-table';
         $table->colclasses = [
             0 => 'artqtml-col-select',
@@ -137,23 +124,12 @@ class approve_renderer {
         foreach ($questions as $question) {
             $typelabel = question_types::label($question->typecode);
             $qtype = question_types::QTYPE[$question->typecode] ?? $question->questiontype;
-            // Jov-005: "A Típus oszlop a Moodle natív kérdéstípus ikonját ÉS a típus nevét is
-            // megjeleníti (ikon + szöveg). Az ikon kizárólag a Típus oszlopban jelenhet meg, a
-            // kérdés neve előtt nem". pix_icon() already emits class="icon"; passing 'icon' again in
-            // the class attribute produced class="icon icon mr-1" - harmless but duplicated, and it
-            // is what made the icon inherit the surrounding link's colour/underline when it sat
-            // inside the question-name anchor. The icon is decorative here (the type name is right
-            // next to it), so it carries an empty alt and is hidden from assistive technology
-            // rather than repeating the label a screen reader already reads from the cell text.
             $typeicon = $output->pix_icon('icon', '', 'qtype_' . $qtype, [
                 'class'       => 'mr-1',
                 'aria-hidden' => 'true',
                 'data-testid' => 'artqtml-approve-typeicon',
             ]);
 
-            // M-20: "Edited" is its own flag now (set by classes/observer.php when a teacher edits the
-            // question in the native question editor), not a synthetic validationsuggestion value -
-            // it takes display priority over the (now reset to not_evaluated) underlying suggestion.
             if (!empty($question->edited)) {
                 $statusbadge = \html_writer::span(
                     \local_artqtml\local\validation_suggestion::label(\local_artqtml\local\validation_suggestion::EDITED),
@@ -178,8 +154,6 @@ class approve_renderer {
                 $displaycategory = (string) $question->problemcategory;
                 $displayjustification = (string) $question->justification;
             }
-            // Gemini's own hallucinated/invalid/legacy category strings must never reach
-            // get_string() as a key - normalise to one of the four fixed keys or null (Val-028).
             $displaycategory = \local_artqtml\local\problem_category::normalise($displaycategory);
 
             $statuscell = $statusbadge;
@@ -199,12 +173,6 @@ class approve_renderer {
                 }
             }
 
-            // Jov-027: "Szerkesztett kérdésnél a validációs javaslat oszlopban »Szerkesztett« jelzés
-            // jelenik meg az ikon és a Gemini javaslat szövege HELYETT" - instead of, not in addition
-            // to. The former "Edited by <name>" sub-line under the badge supplemented the badge with
-            // content the requirement replaces, and duplicated the "Last edited by" column (Glob-033)
-            // that already carries exactly that name. Only the approver line survives, and an edit
-            // always resets approved to 0 (classes/observer.php), so the two can never both appear.
             if (empty($question->edited) && !empty($question->approved) && !empty($question->approvedby)) {
                 $approver = \core_user::get_user($question->approvedby);
                 if ($approver) {
@@ -215,11 +183,6 @@ class approve_renderer {
                 }
             }
 
-            // Jov-041: "A kérdésbankba áthelyezett kérdés sora nem jelölhető ki: a jelölőnégyzete
-            // tiltott". The checkbox is rendered but disabled, not omitted - a missing control can't
-            // communicate that the row is deliberately locked, and a disabled input is never
-            // submitted by the browser, so this holds the selection closed on the client while
-            // question_move_service/question_deletion_service keep filtering movedout = 0 server-side.
             $checkboxattrs = ['class' => 'artqtml-rowselect', 'data-testid' => 'artqtml-approve-rowselect'];
             if ($question->movedout) {
                 $checkboxattrs['disabled'] = 'disabled';
@@ -234,13 +197,6 @@ class approve_renderer {
                     $pageurl
                 );
                 $editurl = new \moodle_url('/question/bank/editquestion/question.php', $editparams);
-                // Glob-031: this is a site-wide tool - any user with local/artqtml:use may act on
-                // any generation, including editing its questions. The page already carries the
-                // yellow owner banner at the top (local_artqtml_owner_warning_banner), but a
-                // banner read on arrival is not the same as a prompt at the moment of acting, and
-                // editing someone else's question is the one action here that leaves the plugin for
-                // Moodle's own editor. So: no prompt on your own questions, one prompt on other
-                // people's, naming whose they are.
                 if ((int) $creator->id === (int) $USER->id) {
                     $actions[] = \html_writer::link($editurl, get_string('actionedit', 'local_artqtml'), [
                         'data-testid' => 'artqtml-approve-edit-link',
@@ -270,28 +226,14 @@ class approve_renderer {
                     'data-testid' => 'artqtml-approve-preview-link',
                 ]);
 
-                // A third link, "Tags", used to sit here: the same edit URL with an #id_tagsheader
-                // anchor, scrolling the native editor to its tag section. Removed on 2026-07-30.
-                // Nothing required it - Jov-023 asks only for "Szerkesztés: Moodle natív
-                // kérdésszerkesztőben", and the Edit link already opens that editor, tag section
-                // included. It arrived with the ch.1-9 rebuild (7a6bcb4) as an elaboration, and
-                // gave a reviewer a third thing to read in the narrowest column of the table.
             }
 
-            // Jov-039: "A Műveletek oszlop kérdésenként pontosan egy állapotot mutat: (1) jóváhagyás
-            // előtt »Jóváhagyás« gomb; (2) jóváhagyás után »Jóváhagyva« badge és mellette
-            // »Visszavonás« link; (3) a kérdésbankba áthelyezés után »Áthelyezve« badge. Az
-            // »Áthelyezve« felváltja a »Jóváhagyva« badge-et; a három állapot kölcsönösen kizárja
-            // egymást". Written as one if/else-if/else so the other two states' elements are absent
-            // from the DOM rather than merely hidden - a hidden control is still findable, still
-            // focusable by keyboard, and (for a submit button) still submitted.
             if ($question->movedout) {
                 $actions[] = \html_writer::span(get_string('moved_badge', 'local_artqtml'), 'badge badge-info', [
                     'data-testid' => 'artqtml-approve-moved-badge',
                 ]);
             } else if (!empty($question->approved)) {
-                // Jov-040: "a badge maga nem kattintható" - a plain span, with the revoke action as
-                // its own separate link beside it.
+                // "a badge maga nem kattintható" - a plain span, with the revoke action as its own separate link beside it.
                 $actions[] = \html_writer::span(get_string('approvedlabel', 'local_artqtml'), 'badge badge-success', [
                     'data-testid' => 'artqtml-approve-approved-badge',
                 ]);
@@ -313,17 +255,6 @@ class approve_renderer {
                     'data-testid' => 'artqtml-approve-move-button',
                 ]);
             } else {
-                // Jov-031 calls this a gomb (button), and the field table (JOV-F020) types it as one,
-                // so it is a real submit button in the surrounding form rather than the state-changing
-                // GET link it used to be. The form already carries the sesskey and the generationid.
-                // That much is not negotiable: approving over a GET link means a browser prefetcher
-                // or any link follower can approve questions by visiting the page.
-                //
-                // Its appearance is a separate matter, and it is a link's. 2026-07-30: the filled
-                // primary button made one row action shout over the three next to it, for no reason
-                // - Edit, Preview and Delete change as much or more. btn-link keeps the element a
-                // button (the requirement's word, and what the POST needs) while giving it the same
-                // weight as its neighbours.
                 $actions[] = \html_writer::tag('button', get_string('actionapprove', 'local_artqtml'), [
                     'type'        => 'submit',
                     'name'        => 'approvequestion',
@@ -337,8 +268,6 @@ class approve_renderer {
                 ]);
             }
 
-            // Jov-041: "Áthelyezett kérdés soronként sem törölhető" - so the Delete action exists
-            // only while the question is still in the draft bank.
             if (!$question->movedout) {
                 $deleteurl = new \moodle_url('/local/artqtml/approve.php', [
                     'generationid'   => $generationid,
@@ -353,8 +282,6 @@ class approve_renderer {
                 );
             }
 
-            // Glob-033: empty if never edited - independent of (and persists past) the "Edited" badge
-            // above, which resets once the question is re-validated; this is the plain historical record.
             $lasteditorname = '';
             if (!empty($question->lasteditedby)) {
                 $lasteditor = \core_user::get_user($question->lasteditedby);
@@ -363,12 +290,6 @@ class approve_renderer {
                 }
             }
 
-            // Jov-004: the question name/text toggles an inline details row (below) open/closed,
-            // instead of being plain unclickable text - js/approve... (inline script further down)
-            // wires the click handler, matching this file's existing plain-JS style.
-            //
-            // Jov-005 forbids any icon before the question name, so the type icon that used to be
-            // concatenated in front of this label now lives in the Type cell and nowhere else.
             $detailsid = 'artqtml-details-' . $question->id;
             $nametoggle = \html_writer::link(
                 '#',
@@ -380,11 +301,6 @@ class approve_renderer {
                 ]
             );
 
-            // Glob-034: the values of the columns that collapse on narrower screens, repeated
-            // inside the name cell so collapsing a column never makes its information
-            // unreachable. Hidden at >= xl, where every real column is visible. These carry no
-            // data-testid on purpose: T-10 - the same values appear twice in the DOM at narrow
-            // widths, so element-count assertions must be able to target the real cells only.
             $collapsedparts = [
                 \html_writer::span($typelabel),
                 \html_writer::span(s($question->difficultylabel)),
@@ -408,7 +324,7 @@ class approve_renderer {
                 // lookup for the control resolves to two elements (the <td> and the <input>).
                 self::cell('selectcell', $checkbox),
                 self::cell('namecell', $namecell),
-                // Jov-005: icon AND type name, in this column only.
+                // icon AND type name, in this column only.
                 self::cell('typecell', $typeicon . \html_writer::span($typelabel, '', [
                     'data-testid' => 'artqtml-approve-typelabel',
                 ])),
@@ -417,8 +333,6 @@ class approve_renderer {
                 self::cell('creatorcell', fullname($creator)),
                 self::cell('lasteditedbycell', $lasteditorname),
                 self::cell('datecell', userdate($question->timecreated, get_string('datetimeformat', 'local_artqtml'))),
-                // Glob-035: the actions wrap onto as many lines as they need instead of forcing
-                // the table wider; a separator character would defeat flex-wrap.
                 self::cell('actionscell', \html_writer::div(implode('', array_map(static function (string $action): string {
                     return \html_writer::span($action, 'artqtml-rowaction');
                 }, $actions)), 'artqtml-rowactions')),
@@ -430,9 +344,6 @@ class approve_renderer {
             $row->attributes['data-questioncode'] = $question->questioncode;
             $table->data[] = $row;
 
-            // BL-28: what the question says now, not what the AI first returned. The stored copy
-            // stays as the record of the generation; this panel is what a teacher reads before
-            // pressing Approve, so it must not show a version they have already replaced.
             $detailscell = new \html_table_cell(
                 self::question_details_html($question->typecode, current_question::data_for($question))
             );
@@ -504,10 +415,10 @@ class approve_renderer {
     }
 
     /**
-     * The inline script wiring each question name toggle to show/hide its detail row (Jov-004).
-     *
-     * @return string
-     */
+ * The inline script wiring each question name toggle to show/hide its detail row.
+ *
+ * @return string
+ */
     public static function toggle_script(): string {
         return \html_writer::script(
             "document.querySelectorAll('.artqtml-question-toggle').forEach(function(link) {" .
@@ -521,20 +432,13 @@ class approve_renderer {
     }
 
     /**
-     * The bulk action buttons: approve-all-accepted, the target-category select for single-row
-     * move, and the bulk-delete button (Jov-013/015).
-     *
-     * @param \core_renderer $output the page output renderer (passed in rather than pulled from
-     *      the global $OUTPUT, as this is a plain helper, not a plugin_renderer_base)
-     * @param int $eligibleforapproval count for the approve-all button label/disabled state
-     * @param array<string,string> $categoryoptions move-target options ("categoryid,contextid" => label)
-     * @return string
-     */
+ * @param \core_renderer $output the page output renderer (passed in rather than pulled from
+ * the global $OUTPUT, as this is a plain helper, not a plugin_renderer_base)
+ * @param int $eligibleforapproval count for the approve-all button label/disabled state
+ * @param array<string,string> $categoryoptions move-target options ("categoryid,contextid" => label)
+ * @return string
+ */
     public static function bulk_action_buttons(\core_renderer $output, int $eligibleforapproval, array $categoryoptions): string {
-        // Jov-045: "A célkérdésbank kategória választó vizuálisan a »Kijelöltek áthelyezése« és
-        // »Kijelöltek törlése« gombokkal egy blokkban helyezkedik el; az »Összes elfogadható
-        // jóváhagyása« gomb ettől vizuálisan elkülönül". Two containers, separated by a rule.
-        // Category select is for per-row move.
         $approveallattrs = [
             'type'        => 'submit',
             'name'        => 'bulkaction',
@@ -579,7 +483,7 @@ class approve_renderer {
             $html .= \html_writer::end_div();
         }
 
-        // M-05: the confirmation must show how many questions are actually selected at click time.
+        // the confirmation must show how many questions are actually selected at click time.
         $html .= \html_writer::tag(
             'button',
             get_string('bulkdelete', 'local_artqtml'),
@@ -602,15 +506,9 @@ class approve_renderer {
         return \html_writer::script("
 document.addEventListener('DOMContentLoaded', function() {
     var selectall = document.getElementById('artqtml-selectall');
-    // Jov-041: the header 'select all' must skip moved rows, whose checkboxes are rendered
-    // disabled - :not(:disabled) is what excludes them, so ticking the master box can never
-    // select a question that is already in the real question bank.
     var selectable = function() {
         return document.querySelectorAll('.artqtml-rowselect:not(:disabled)');
     };
-    // Jov-044: 'Kijelöltek törlése' is disabled while nothing is
-    // selected. They render disabled server-side (nothing is selected on load), so this only ever
-    // has to react to the selection changing.
     var syncBulkButtons = function() {
         var anyselected = document.querySelectorAll('.artqtml-rowselect:not(:disabled):checked').length > 0;
         document.querySelectorAll('[data-selectionrequired]').forEach(function(button) {
@@ -671,17 +569,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
-     * Build the inline expand/collapse detail block for one question (Jov-004): its answers/items,
-     * hints and general feedback.
-     *
-     * BL-28: the array this renders is now resolved from the live Moodle question by
-     * current_question::data_for(), falling back to the stored generation-time JSON only when the
-     * question can no longer be loaded. The shape is unchanged, so this method did not have to.
-     *
-     * @param string $typecode IH/FE/SR
-     * @param array $questiondata question data in the stored JSON's shape
-     * @return string
-     */
+ * Build the inline expand/collapse detail block for one question: its answers/items, hints and general feedback.
+ *
+ * @param string $typecode IH/FE/SR
+ * @param array $questiondata question data in the stored JSON's shape
+ * @return string
+ */
     protected static function question_details_html(string $typecode, array $questiondata): string {
         $parts = [];
 
@@ -694,8 +587,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     'p',
                     \html_writer::tag('strong', get_string('detailscorrectanswer', 'local_artqtml')) . ' ' . $answerlabel
                 );
-                // BL-29: True/False keeps its two explanations in named fields rather than in an
-                // options array, so they are listed against the answer each one belongs to.
                 foreach (['explanationtrue' => 'true', 'explanationfalse' => 'false'] as $key => $labelkey) {
                     $explanation = trim((string) ($questiondata[$key] ?? ''));
                     if ($explanation === '') {
@@ -714,9 +605,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 foreach ((array) ($questiondata['options'] ?? []) as $option) {
                     $text = s((string) ($option['text'] ?? ''));
                     $iscorrect = !empty($option['correct']);
-                    // BL-29: the per-option explanation, shown here so the teacher reviews it
-                    // before approving - it is what the student will read after choosing this
-                    // option, and it is generated text like everything else on this panel.
                     $explanation = trim((string) ($option['explanation'] ?? ''));
                     $items[] = \html_writer::tag(
                         'li',

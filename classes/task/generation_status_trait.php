@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Shared status/log helpers for local_artqtml adhoc tasks (technical annex 2.5, 7, 8).
+ * Shared status/log helpers for local_artqtml adhoc tasks (7, 8).
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -69,14 +69,14 @@ trait generation_status_trait {
     }
 
     /**
-     * Insert a plain lifecycle row into local_artqtml_log (e.g. processing_started).
-     *
-     * @param int $generationid the owning generation id
-     * @param string $event event identifier
-     * @param array $data extra event data
-     * @param int|null $userid the user who initiated the generation (Val-020), null if unknown
-     * @return void
-     */
+ * Insert a plain lifecycle row into local_artqtml_log (e.g. processing_started).
+ *
+ * @param int $generationid the owning generation id
+ * @param string $event event identifier
+ * @param array $data extra event data
+ * @param int|null $userid the user who initiated the generation, null if unknown
+ * @return void
+ */
     protected function log_event(int $generationid, string $event, array $data = [], ?int $userid = null): void {
         global $DB;
 
@@ -91,17 +91,16 @@ trait generation_status_trait {
     }
 
     /**
-     * Record one AI API call attempt (technical annex 2.5/7.2) and trigger the matching
-     * Moodle event (Glob-010).
-     *
-     * @param int $generationid
-     * @param string $calltype 'generate' or 'validate'
-     * @param string $provider 'claude' or 'gemini'
-     * @param array $details httpstatus, tokensinput, tokensoutput, jsonattempt, isretry,
-     *      requestid, result ('success'|'error'), errormessage
-     * @param int|null $userid the user who initiated the generation (Val-020), null if unknown
-     * @return void
-     */
+ * Record one AI API call attempt and trigger the matching Moodle event.
+ *
+ * @param int $generationid
+ * @param string $calltype 'generate' or 'validate'
+ * @param string $provider 'claude' or 'gemini'
+ * @param array $details httpstatus, tokensinput, tokensoutput, jsonattempt, isretry,
+ * requestid, result ('success'|'error'), errormessage
+ * @param int|null $userid the user who initiated the generation, null if unknown
+ * @return void
+ */
     protected function log_ai_call(
         int $generationid,
         string $calltype,

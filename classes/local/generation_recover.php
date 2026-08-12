@@ -30,18 +30,14 @@ namespace local_artqtml\local;
  */
 class generation_recover {
     /**
-     * Delete draft bank / question rows / pending pipeline junk and return the generation to
-     * {@see generation_status::STARTED} so upload.php and generate.php are editable again.
-     *
-     * Mirrors the Abort path in status.php (Gen-008/009/010). Optional $usermessage is stored on
-     * the generation's error field for the next page load to surface - keep it generic; never put
-     * security-filter match details here.
-     *
-     * @param \stdClass $generation a local_artqtml_generations record (id required; other fields
-     *      refreshed from the DB inside this method)
-     * @param string|null $usermessage teacher-facing message, or null to clear any previous error
-     * @return \stdClass the updated generation record
-     */
+ * Delete draft bank / question rows / pending pipeline junk and return the generation to
+ * {@see generation_status::STARTED} so upload.php and generate.php are editable again.
+ *
+ * @param \stdClass $generation a local_artqtml_generations record (id required; other fields
+ * refreshed from the DB inside this method)
+ * @param string|null $usermessage teacher-facing message, or null to clear any previous error
+ * @return \stdClass the updated generation record
+ */
     public static function to_started(\stdClass $generation, ?string $usermessage = null): \stdClass {
         global $DB;
 

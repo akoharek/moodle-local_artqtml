@@ -35,9 +35,7 @@ defined('MOODLE_INTERNAL') || die();
 // local_artqtml_render_test_button() is defined before it's used below.
 require_once($CFG->dirroot . '/local/artqtml/lib.php');
 
-// Product decision 2026-08-10: settings are local/artqtml:configure territory only.
-// Register for site admins (hassiteconfig) and for users who hold :configure without
-// moodle/site:config - otherwise a configure-only manager would never see the panel.
+// Visible to site admins and users with local/artqtml:configure (without needing moodle/site:config).
 if ($hassiteconfig || has_capability('local/artqtml:configure', context_system::instance())) {
     $ADMIN->add('localplugins', new admin_category('local_artqtml_category', get_string('pluginname', 'local_artqtml')));
 

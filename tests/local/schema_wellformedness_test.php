@@ -100,12 +100,12 @@ final class schema_wellformedness_test extends \advanced_testcase {
     }
 
     /**
-     * F-4: no enum member anywhere may be an empty string, and no enum may be empty.
-     *
-     * An empty-string member is what made every Gemini validation call fail schema validation with
-     * "problem_category.enum[0]: cannot be empty"; an empty enum is unsatisfiable and would reject
-     * every response.
-     */
+ * no enum member anywhere may be an empty string, and no enum may be empty.
+ *
+ * An empty-string member is what made every Gemini validation call fail schema validation with
+ * "problem_category.enum[0]: cannot be empty"; an empty enum is unsatisfiable and would reject
+ * every response.
+ */
     public function test_no_schema_enum_contains_an_empty_string_or_is_empty(): void {
         $totalenums = 0;
 

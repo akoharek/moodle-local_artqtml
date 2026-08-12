@@ -140,12 +140,12 @@ class text_extractor {
     }
 
     /**
-     * Extract text from a plain-text file, converting to UTF-8 if needed.
-     *
-     * @param \stored_file $file
-     * @param array $metrics
-     * @return array the extraction result
-     */
+ * Extract text from a plain-text file, converting to UT if needed.
+ *
+ * @param \stored_file $file
+ * @param array $metrics
+ * @return array the extraction result
+ */
     protected static function extract_txt(\stored_file $file, array $metrics): array {
         if ((int) $file->get_filesize() > self::MAX_SOURCE_FILE_BYTES) {
             return extraction_result::rejected(extraction_result::REASON_RESOURCE_LIMIT, $metrics);

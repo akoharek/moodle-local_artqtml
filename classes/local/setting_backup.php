@@ -15,11 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Migration backup for admin-editable settings (Glob-037, Glob-038).
- *
- * Glob-037: "Minden adatbázis-migráció, amely adminisztrátor által szerkeszthető beállítás értékét
- * módosítja, a módosítás előtt elmenti a korábbi értéket. Titkosítva tárolt beállítás esetén a
- * mentés is titkosítva történik."
+ * Migration backup for admin-editable settings.
  *
  * The reason this exists at all: the validator prompt template is the administrator's own work - an
  * evaluation instruction tuned to their subject area - and a plugin upgrade must not destroy it
@@ -103,12 +99,12 @@ class setting_backup {
     }
 
     /**
-     * Record that a setting was backed up, for the post-upgrade administrator notice (Glob-038).
-     *
-     * @param string $setting
-     * @param string $key
-     * @return void
-     */
+ * Record that a setting was backed up, for the post-upgrade administrator notice.
+ *
+ * @param string $setting
+ * @param string $key
+ * @return void
+ */
     protected static function add_notice(string $setting, string $key): void {
         $notices = self::pending_notices();
         $notices[$setting] = $key;
@@ -141,10 +137,10 @@ class setting_backup {
     }
 
     /**
-     * Glob-038: the notice text telling the administrator what changed and where the old value is.
-     *
-     * @return string[] one rendered message per backed-up setting
-     */
+ * the notice text telling the administrator and where the old value is.
+ *
+ * @return string[] one rendered message per backed-up setting
+ */
     public static function notice_messages(): array {
         $messages = [];
         foreach (self::pending_notices() as $setting => $key) {

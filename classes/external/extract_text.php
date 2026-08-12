@@ -15,9 +15,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * External function extracting text from a just-picked upload-page draft file (Felt-010/011),
- * so it can be loaded into the source text box for review before the user submits.
- *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

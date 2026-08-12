@@ -15,17 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Ask again for the question types a partly successful generation did not deliver (BL-35).
- *
- * Not a retry of the original generation: that one is finished, its questions are real and are
- * waiting for approval, and re-running it would throw them away. This starts a NEW generation on
- * the same source text, with the grid narrowed to what is missing - which is also why it goes
- * through the duplicate check like any other new generation, and why it stops on the settings page
- * instead of calling the API. Both are András's decisions, 2026-08-01:
+ * Ask again for the question types a partly successful generation did not deliver.
  *
  * - the teacher presses the button; the system never re-runs anything by itself;
  * - the duplicate check stays, because the teacher may come back to this days later, and being
- *   told what already exists for this text is the entire point of that screen.
+ * told what already exists for this text is the entire point of that screen.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -103,10 +97,6 @@ function local_artqtml_create_followup(stdClass $source, array $settings, array 
     $record = new stdClass();
     $record->userid = $USER->id;
     $record->name = get_string('retrymissingtypesname', 'local_artqtml', format_string($source->name));
-    // Felt-003/004/005: the shortname is alphanumeric, 8 characters, and ends up inside every
-    // generated question code - so it cannot simply be the original with a suffix bolted on. Seven
-    // characters of the original plus '2' keeps it recognisable, legal and distinguishable from
-    // the questions the first run already produced. The teacher can change it on the settings page.
     $record->shortname = \core_text::substr((string) $source->shortname, 0, 7) . '2';
     $record->sourcetext = $source->sourcetext;
     $record->sourcetexthash = $source->sourcetexthash;
@@ -118,8 +108,6 @@ function local_artqtml_create_followup(stdClass $source, array $settings, array 
 
     $newid = $DB->insert_record('local_artqtml_generations', $record);
 
-    // Written on the source generation, not the new one: the fact worth being able to find later
-    // is that this partial run was followed up, and by which generation.
     $log = new stdClass();
     $log->generationid = $source->id;
     $log->userid = $USER->id;
@@ -131,10 +119,6 @@ function local_artqtml_create_followup(stdClass $source, array $settings, array 
     redirect(new moodle_url('/local/artqtml/generate.php', ['id' => $newid]));
 }
 
-// Felt-021-024: the duplicate screen. Unlike upload.php this compares against every generation
-// including the source one - being told "you already generated questions from this text on
-// Saturday, and here it is" is exactly the information the teacher needs before spending money on
-// the same text again.
 $match = $confirmed ? null : duplicate_detector::find_match((string) $generation->sourcetext, 0);
 
 if ($match === null) {

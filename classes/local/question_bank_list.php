@@ -15,9 +15,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Enumerates the real (non-draft) question bank categories a user may move approved
- * questions into (functional spec Jov-013/014: system-level and course-level banks).
- *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -105,12 +102,6 @@ class question_bank_list {
     ): void {
         global $DB;
 
-        // Jov-023: the admin-configured draft course exists only to hold unreviewed AI drafts.
-        // Nothing in that course's question bank is a valid move target — not this plugin's
-        // artqtml_draft_* tree, and not leftover sibling roots from earlier installs
-        // (e.g. aiquizgen_draft_*) that share the same course. Skipping the whole context is
-        // stronger than filtering one root's children, which previously leaked hundreds of
-        // legacy draft categories into the approve-page dropdown.
         if (draft_bank::is_configured()) {
             $draftcourseid = draft_bank::get_draft_courseid();
             if (
@@ -130,11 +121,6 @@ class question_bank_list {
             if ((int) $category->id === $excludecategoryid) {
                 continue;
             }
-            // Every context has exactly one hidden "top" category (parent = 0) that Moodle uses
-            // purely as the internal root of that context's category tree - it is never a valid
-            // storage target and Moodle's own question bank pickers always exclude it. Including
-            // it here let a question be "successfully" moved into a category the native question
-            // bank UI never actually browses into, making it look like it vanished.
             if ((int) $category->parent === 0) {
                 continue;
             }

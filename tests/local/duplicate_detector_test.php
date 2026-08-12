@@ -17,8 +17,7 @@
 namespace local_artqtml\local;
 
 /**
- * Unit tests for duplicate/near-duplicate source-text detection (functional spec Felt-021/022,
- * technical annex 5.3, M-19).
+ * Unit tests for duplicate/near-duplicate source-text detection.
  *
  * @package    local_artqtml
  * @category   test
@@ -71,16 +70,16 @@ final class duplicate_detector_test extends \advanced_testcase {
     }
 
     /**
-     * Raw file-byte hashing (M-19) is a plain sha1 of the exact bytes.
-     */
+ * Raw file-byte hashing is a plain sha1 of the exact bytes.
+ */
     public function test_hash_file_bytes(): void {
         $bytes = "\x00\x01binary\xffcontent";
         $this->assertSame(sha1($bytes), duplicate_detector::hash_file_bytes($bytes));
     }
 
     /**
-     * Felt-021: an exact (post-normalisation) match is found via the hash and reported at 100%.
-     */
+ * an exact (post-normalisation) match is found via the hash and reported at 100%.
+ */
     public function test_find_match_exact(): void {
         $this->resetAfterTest();
 
@@ -95,8 +94,8 @@ final class duplicate_detector_test extends \advanced_testcase {
     }
 
     /**
-     * Felt-022: a near-duplicate over the 0.90 Jaccard threshold is detected via shingling.
-     */
+ * a near-duplicate over the 0.90 Jaccard threshold is detected via shingling.
+ */
     public function test_find_match_near_duplicate(): void {
         $this->resetAfterTest();
 
@@ -117,9 +116,8 @@ final class duplicate_detector_test extends \advanced_testcase {
     }
 
     /**
-     * Beal-023/024: a generation editing its own unchanged text must not flag itself, so the
-     * excluded id is never returned.
-     */
+ * a generation editing its own unchanged text must not flag itself, so the excluded id is never returned.
+ */
     public function test_find_match_excludes_self(): void {
         $this->resetAfterTest();
 

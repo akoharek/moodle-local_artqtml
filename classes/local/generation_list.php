@@ -17,11 +17,6 @@
 /**
  * Renders one filterable/sortable/paginated "generations" section of the list page.
  *
- * The list page (functional spec ch.2) has two independent sections - "My generations" and
- * "Others' generations" (List-003) - each with its own filter bar (List-009-013), sortable
- * columns (List-007/008) and pagination (Glob-005). This class is instantiated twice with a
- * different $prefix so their GET params (sort/dir/page/filters) never collide on one page.
- *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -33,11 +28,11 @@ namespace local_artqtml\local;
  */
 class generation_list {
     /**
-     * @var string default sort column - newest generation first (Cursor audit v3 #8), not the
-     * previous status-based default. Status remains available as an explicit, user-chosen sort
-     * (see the "status"/"statusorder" SORTABLE entries and STATUS_ORDER below) - only the
-     * implicit default view changed.
-     */
+ * @var string default sort column - newest generation first ( v3 #8), not the
+ * previous status-based default. Status remains available as an explicit, user-chosen sort
+ * (see the "status"/"statusorder" SORTABLE entries and STATUS_ORDER below) - only the
+ * implicit default view changed.
+ */
     protected const DEFAULT_SORT = 'timecreated';
 
     /** @var string default sort direction - paired with DEFAULT_SORT above. */
@@ -46,7 +41,7 @@ class generation_list {
     /**
      * @var array<string,int> status -> sort weight for the status column's ordering.
      *
-     * List-018: the seven status values themselves come from
+     * the seven status values themselves come from
      * {@see \local_artqtml\local\generation_status}; only the weights are list-page-specific.
      * generation_status_test asserts these keys are exactly that class's VALUES.
      */
@@ -57,10 +52,6 @@ class generation_list {
         generation_status::VALIDATING => 1,
         generation_status::SAVING     => 2,
         generation_status::COMPLETED  => 3,
-        // BL-35: partial weighs the same as completed. The weight answers "how far did it get",
-        // and a partly successful run got all the way to the end - it just brought back less than
-        // was ordered. Sorting it next to the runs that finished is where a teacher will look for
-        // it; the amber badge is what tells the two apart.
         generation_status::PARTIAL    => 3,
     ];
 
@@ -113,7 +104,7 @@ class generation_list {
         $namefields = \core_user\fields::for_name()->get_sql('u')->selects;
         $statuscase = self::status_order_case('g');
         // Real column, not just a display concatenation - needed so 'creator' is a valid
-        // ORDER BY target (List-007/024): u.firstname/u.lastname alone aren't sortable as a
+        // ORDER BY target (/024): u.firstname/u.lastname alone aren't sortable as a
         // single key, and there is no "creatorname" column/alias anywhere else in the query.
         $creatorsort = 'LOWER(' . $DB->sql_concat('u.lastname', 'u.firstname') . ')';
 
@@ -124,9 +115,6 @@ class generation_list {
         $total = $DB->count_records_sql($countsql, $params);
 
         $orderby = self::SORTABLE[$sort] . ' ' . $dir . ', g.timecreated DESC';
-        // Jov-043: movedoutcount drives the "this generation can no longer be deleted" state of the
-        // row's Delete button. Counted in the same query as the other per-row aggregates rather than
-        // one extra query per rendered row.
         $sql = "SELECT g.*$namefields, $statuscase AS statusorder, $creatorsort AS creatorname,
                        (SELECT COUNT(1) FROM {local_artqtml_questions} q WHERE q.generationid = g.id) AS questioncount,
                        (SELECT COUNT(1) FROM {local_artqtml_questions} q
@@ -141,9 +129,6 @@ class generation_list {
         $params['notevaluated'] = validation_suggestion::NOT_EVALUATED;
         $generations = $DB->get_records_sql($sql, $params, $page * $perpage, $perpage);
 
-        // All current state (filters + sort/dir) merged onto the base URL, so that sort-header
-        // links, the paging bar, and the filter form each only need to override the one param
-        // they're actually changing without dropping the other two (List-025/Glob-005).
         $stateurl = self::section_url($baseurl, $prefix, [
             $prefix . '_status'   => $status !== '' ? $status : null,
             $prefix . '_datefrom' => $datefrom !== '' ? $datefrom : null,
@@ -161,10 +146,6 @@ class generation_list {
             return $out;
         }
 
-        // Product decision 2026-08-10: Delete is :use + ownership only. The "mine" section is the
-        // owner's rows; "others" never shows Delete - :configure is not a bypass for colleagues'
-        // generations. The page already requires :use, but the check stays explicit so a later
-        // reader does not reintroduce a configure branch.
         $candelete = $onlymine && has_capability('local/artqtml:use', \context_system::instance());
         $out .= self::render_table($prefix, $stateurl, $generations, $sort, $dir, $candelete);
 
@@ -247,7 +228,7 @@ class generation_list {
     }
 
     /**
-     * Build a SQL CASE expression mapping status to the default sort weight (List-006).
+     * Build a SQL CASE expression mapping status to the default sort weight.
      *
      * @param string $alias table alias for local_artqtml_generations
      * @return string
@@ -261,7 +242,7 @@ class generation_list {
     }
 
     /**
-     * Render the filter bar for one section (List-009-013).
+     * Render the filter bar for one section (-013).
      *
      * Filters auto-submit on change via a small inline script, giving a "real time"
      * feel without a full AJAX rewrite of the table.
@@ -303,14 +284,9 @@ class generation_list {
         foreach ($baseurl->params() as $name => $value) {
             $html .= \html_writer::empty_tag('input', ['type' => 'hidden', 'name' => $name, 'value' => $value]);
         }
-        // Carry the active sort forward (List-025); deliberately not carrying the page number,
-        // so that changing a filter resets to page 1 as required (Glob-005).
         $html .= \html_writer::empty_tag('input', ['type' => 'hidden', 'name' => $prefix . '_sort', 'value' => $sort]);
         $html .= \html_writer::empty_tag('input', ['type' => 'hidden', 'name' => $prefix . '_dir', 'value' => $dir]);
 
-        // List-005/List-018: the six filter options come from the single source of truth, and each
-        // is labelled from its lang string ('started' shows as "Megkezdett" / "Started") - the raw
-        // key is only ever the option's value, never its visible text.
         $statusoptions = ['' => get_string('filterany', 'local_artqtml')];
         foreach (generation_status::VALUES as $statusvalue) {
             $statusoptions[$statusvalue] = generation_status::label($statusvalue);
@@ -369,7 +345,7 @@ class generation_list {
     }
 
     /**
-     * Render the generations table for one section (List-004, List-007/008, List-014/015/016).
+     * Render the generations table for one section (/008, /015/016).
      *
      * @param string $prefix
      * @param \moodle_url $baseurl
@@ -398,15 +374,6 @@ class generation_list {
         ];
 
         $table = new \html_table();
-        // Glob-034/035: fluid, wrapping table - no horizontal scroller. The lower-priority columns
-        // collapse below lg via Boost's own display utilities and reappear as a secondary line
-        // inside the name cell, so collapsing hides the cell, never the information. The actions
-        // column carries no d-none and is therefore reachable at every width.
-        // List-004 specifies exactly seven columns: Név/cím, Létrehozó, Létrehozás dátuma, Státusz,
-        // Kérdések száma, Validálásra vár, Műveletek. The eighth "Módosította" column came from
-        // Glob-032, which was deleted in spec v25/v26 (nyitott_kerdesek NY-03) - a list of
-        // generations does not need to name whoever last touched a question inside one; the approve
-        // page's own "Utoljára szerkesztette" column (Glob-033) is where that belongs.
         $table->attributes['class'] = 'generaltable table table-striped artqtml-table';
         $table->colclasses = [
             0 => 'artqtml-col-name',
@@ -433,15 +400,13 @@ class generation_list {
         $table->head[] = get_string('colactions', 'local_artqtml');
 
         foreach ($generations as $generation) {
-            // List-005: the badge shows the lang label ('started' -> "Megkezdett" / "Started"),
+            // the badge shows the lang label ('started' -> "Megkezdett" / "Started")
             // never the raw status key.
             $statusbadge = \html_writer::span(
                 generation_status::label($generation->status),
                 'badge ' . generation_status::badge_class($generation->status)
             );
 
-            // Glob-031: collaborative :use by design; delete is owner-only (see delete.php).
-            // Open is offered in both "mine" and "others" sections; Delete only when $candelete.
             $openurl = self::open_url($generation);
             $openlink = \html_writer::link($openurl, get_string('actionopen', 'local_artqtml'), [
                 'data-testid' => 'artqtml-list-open-link',
@@ -450,13 +415,6 @@ class generation_list {
             $actions = $openlink;
             $deletereason = '';
             if ($candelete) {
-                // Jov-043/List-016: "Ha a generálás tartalmaz legalább egy áthelyezett kérdést, a
-                // generálás nem törölhető [...] A tiltott Törlés gomb indoklást jelenít meg arról,
-                // hogy a generálás áthelyezett kérdést tartalmaz." Rendered as a genuinely disabled
-                // <button> (so it cannot be clicked or focused into a submit) carrying the reason as
-                // its title, plus the same reason as visible adjacent text - a title tooltip alone is
-                // unreachable by keyboard and by touch, so it cannot be the only place the
-                // explanation lives.
                 if ((int) $generation->movedoutcount > 0) {
                     $deletereason = get_string('cannotdeletemoved', 'local_artqtml');
                     $actions .= ' | ' . \html_writer::tag(
@@ -494,9 +452,6 @@ class generation_list {
                 ]);
             }
 
-            // Glob-034: the values of the columns that collapse below lg, repeated inside the
-            // name cell so nothing becomes unreachable on a narrow screen. Hidden at >= lg by
-            // .d-lg-none, where the real columns are visible instead.
             $collapsedparts = [
                 \html_writer::span(fullname($generation)),
                 \html_writer::span(userdate($generation->timecreated, get_string('datetimeformat', 'local_artqtml'))),
@@ -533,7 +488,7 @@ class generation_list {
     }
 
     /**
-     * Build a clickable, direction-aware sort header for one column (List-007/008).
+     * Build a clickable, direction-aware sort header for one column (/008).
      *
      * @param string $prefix
      * @param \moodle_url $baseurl
@@ -570,35 +525,22 @@ class generation_list {
     }
 
     /**
-     * Return the open-URL for a generation, contextual to its current status.
-     *
-     * List-015 sends the user to the draft approval page; for generations still in
-     * progress or not yet started, the more useful destination is the settings/status
-     * page they can actually act on (Gen-021, Beal-027: a "started" generation must be
-     * resumable from the list page).
-     *
-     * Glob-031: collaborative :use by design; delete is owner-only (see delete.php).
-     * This helper has no ownership gate — list Open links (including "Others' generations")
-     * intentionally reach any generation the caller may open with :use.
-     *
-     * Public: upload.php's duplicate-warning panel ("Megnyitom a meglévőt") links to the same
-     * generation and must land on the same page the list page would, so the status->destination
-     * rule stays stated in exactly one place. Do not re-derive it at the call site.
-     *
-     * @param \stdClass $generation needs ->id and ->status
-     * @return \moodle_url
-     */
+ * Return the open-URL for a generation, contextual to its current status.
+ *
+ * Public: upload.php's duplicate-warning panel ("Megnyitom a meglévőt") links to the same
+ * generation and must land on the same page the list page would, so the status->destination
+ * rule stays stated in exactly one place. Do not re-derive it at the call site.
+ *
+ * @param \stdClass $generation needs ->id and ->status
+ * @return \moodle_url
+ */
     public static function open_url(\stdClass $generation): \moodle_url {
-        // List-018: no re-listing of the seven statuses - completed goes to the approval page, the
+        // no re-listing of the seven statuses - completed goes to the approval page, the
         // in-progress trio plus failed and partial go to the status page, and anything else
         // ('started') falls through to the settings page it can be resumed from.
         if ($generation->status === generation_status::COMPLETED) {
             return new \moodle_url('/local/artqtml/approve.php', ['generationid' => $generation->id]);
         }
-        // BL-35: partial belongs on the status page, not the approval page and certainly not the
-        // settings page it was falling through to. Everything the teacher needs to decide about a
-        // partly successful run is there and nowhere else: what is missing, the button that asks
-        // for it again, and the Continue link to the questions that did get made.
         if (
             generation_status::is_in_progress($generation->status)
             || $generation->status === generation_status::FAILED

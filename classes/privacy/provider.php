@@ -17,8 +17,7 @@
 /**
  * Privacy provider for local_artqtml.
  *
- * The plugin is site-wide (Glob-022/023): generations are not tied to a course, so all
- * personal data lives at the system context.
+ * The plugin is site-wide: generations are not tied to a course, so all personal data lives at the system context.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -73,8 +72,6 @@ class provider implements
                 'justification' => 'privacy:metadata:local_artqtml_questions:justification',
                 'confidence' => 'privacy:metadata:local_artqtml_questions:confidence',
                 'timecreated' => 'privacy:metadata:local_artqtml_questions:timecreated',
-                // V20 #5: these can identify a user other than the generation owner (M-30/Glob-032:
-                // any local/artqtml:use user can edit/approve any generation's questions).
                 'lasteditedby' => 'privacy:metadata:local_artqtml_questions:lasteditedby',
                 'approvedby' => 'privacy:metadata:local_artqtml_questions:approvedby',
             ],
@@ -134,9 +131,6 @@ class provider implements
 
         $contextlist = new contextlist();
 
-        // V20 #5: a user has data here not only as a generation owner, but also as the editor or
-        // approver of any question (possibly in someone else's generation - M-30/Glob-032), or as
-        // the actor on a log entry.
         $hasdata = $DB->record_exists('local_artqtml_generations', ['userid' => $userid])
             || $DB->record_exists('local_artqtml_questions', ['lasteditedby' => $userid])
             || $DB->record_exists('local_artqtml_questions', ['approvedby' => $userid])
@@ -162,8 +156,7 @@ class provider implements
         }
 
         $userlist->add_from_sql('userid', 'SELECT DISTINCT g.userid FROM {local_artqtml_generations} g', []);
-        // V20 #5: also the editors/approvers of questions and the actors on log entries, who need
-        // not own any generation of their own.
+        // also the editors/approvers of questions and the actors on log entries, who need not own any generation of their own.
         $userlist->add_from_sql(
             'lasteditedby',
             'SELECT DISTINCT q.lasteditedby FROM {local_artqtml_questions} q WHERE q.lasteditedby IS NOT NULL',
@@ -229,9 +222,6 @@ class provider implements
             ];
         }
 
-        // V20 #5: the user's cross-user footprint - questions they edited or approved in ANY
-        // generation (including other users'). Without this, a user who only ever edited/approved
-        // someone else's questions (and never owned a generation) would export nothing.
         $footprintrows = $DB->get_records_sql(
             "SELECT q.id, q.questioncode, q.questiontext, q.approvedby, q.lasteditedby, q.lasteditedat,
                     g.name AS generationname
@@ -252,22 +242,6 @@ class provider implements
             ];
         }, array_values($footprintrows));
 
-        // The log entries, found by user id and NOT through the generations.
-        //
-        // This is the defect being fixed. They used to be collected inside the loop above, one
-        // generation at a time - so an entry whose generation had since been deleted was in the
-        // table, carried this user's id, and appeared in no export at all. Those are exactly the
-        // entries Glob-040 keeps on purpose, which made the gap invisible: the data was retained
-        // deliberately and then omitted accidentally.
-        //
-        // Not joined to the generations table, for the same reason: the row it would join to is
-        // the row that is gone. The historical id is exported as its own field instead, so the
-        // export says which generation an entry belonged to without pretending it still exists.
-        //
-        // The data field is exported as stored. Within the retention period that includes the full
-        // system prompt and provider response - which is the user's own data, and an export is
-        // where it belongs. An export never redacts and never writes: redaction is a separate,
-        // deliberate act.
         $logrows = $DB->get_records('local_artqtml_log', ['userid' => $user->id], 'timecreated ASC');
         $logs = array_map(static function ($entry) {
             return [
@@ -339,8 +313,6 @@ class provider implements
             }
 
             self::delete_generations(['userid' => $user->id]);
-            // V20 #5: also remove the user's identity from questions/log that belong to OTHER
-            // users' generations, which delete_generations() above deliberately leaves in place.
             self::scrub_user_references((int) $user->id);
         }
     }
@@ -359,24 +331,18 @@ class provider implements
 
         foreach ($userlist->get_userids() as $userid) {
             self::delete_generations(['userid' => $userid]);
-            // V20 #5: scrub the user's editor/approver/log footprint from other users' generations.
+            // scrub the user's editor/approver/log footprint from other users' generations.
             self::scrub_user_references((int) $userid);
         }
     }
 
     /**
-     * Delete generations matching the given conditions (empty = all), along with their questions
-     * and draft bank categories.
-     *
-     * THE LOG ENTRIES ARE NOT DELETED, they are anonymised - which is deliberate and is Glob-040:
-     * a log entry outlives the generation it describes, because what it records is what the site
-     * spent and what it asked for, and that has to remain auditable after the material is gone.
-     * The identifying part goes: the generation reference is moved to `originalgenerationid`,
-     * and only then is the generation itself removed.
-     *
-     * @param array $conditions conditions passed to get_records() on local_artqtml_generations
-     * @return void
-     */
+ * Delete generations matching the given conditions (empty = all), along with their questions
+ * and draft bank categories.
+ *
+ * @param array $conditions conditions passed to get_records() on local_artqtml_generations
+ * @return void
+ */
     protected static function delete_generations(array $conditions): void {
         global $DB;
 

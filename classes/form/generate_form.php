@@ -71,7 +71,7 @@ class generate_form extends \moodleform {
         $mform->addElement('hidden', 'difficultymode', 'scale');
         $mform->setType('difficultymode', PARAM_ALPHA);
 
-        // Azonosítók (Beal-022): read-only.
+        // Azonosítók: read-only.
         $mform->addElement('header', 'idheader', get_string('idsectionheading', 'local_artqtml'));
         $mform->setExpanded('idheader');
         $mform->addElement(
@@ -142,7 +142,7 @@ class generate_form extends \moodleform {
 
         // Knowledge source is always the uploaded/pasted source text.
 
-        // Tagadó kérdés kiemelése (Beal-016), generálásonként felülírható.
+        // Tagadó kérdés kiemelése, generálásonként felülírható.
         $mform->addElement('advcheckbox', 'negationhighlight', get_string('negationhighlight', 'local_artqtml'));
         $mform->setDefault('negationhighlight', get_config('local_artqtml', 'negationhighlightdefault') ? 1 : 0);
 
@@ -248,8 +248,6 @@ class generate_form extends \moodleform {
             $errors[$firstfield] = get_string('errortoomanyquestions', 'local_artqtml', $maxperrun);
         }
 
-        // M-26: 0 means "use the admin default"; an explicit override only makes sense if it can
-        // actually satisfy M-07's own >= 2 items rule.
         $sritemcount = (int) ($data['sritemcount'] ?? 0);
         $srcount = 0;
         foreach (self::MODE_LEVELS[$mode] as $level) {

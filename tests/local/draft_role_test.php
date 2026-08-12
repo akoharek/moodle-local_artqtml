@@ -17,7 +17,7 @@
 namespace local_artqtml\local;
 
 /**
- * Unit tests for the draft-editing role (Jov-036).
+ * Unit tests for the draft-editing role.
  *
  * The point of this role is what it does NOT carry, so the assertions are mostly about absence:
  * the exact capability set, and no enrolment. A role that quietly grew a fourth capability would
@@ -107,12 +107,6 @@ final class draft_role_test extends \advanced_testcase {
         $this->assertSame([CONTEXT_COURSE], $levels);
     }
 
-    /**
-     * What the user gets out of it: every draft in the draft course is editable and previewable
-     * (Glob-031 - this is a site-wide tool, and a reviewer must be able to correct a colleague's
-     * question, not only approve it), while no enrolment appears and no course-management
-     * capability comes with it.
-     */
     public function test_grant_gives_the_capabilities_without_enrolling(): void {
         $this->resetAfterTest();
 

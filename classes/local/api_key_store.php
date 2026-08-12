@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Reads the Claude/Gemini API key, transparently decrypting it (Admin-010/016).
+ * Reads the Claude/Gemini API key, transparently decrypting it.
  *
  * `get_config()` reads `config_plugins` directly, bypassing
  * {@see \local_artqtml\admin\setting_encryptedapikey}'s own decrypt-on-display logic - every

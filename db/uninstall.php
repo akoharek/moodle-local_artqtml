@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Uninstall cleanup for local_artqtml (Glob-019).
+ * Uninstall cleanup for local_artqtml.
  *
  * Moodle's standard uninstall already drops every table defined in db/install.xml and every
  * config_plugins/capability row for this component automatically - no code is needed for that.
@@ -38,12 +38,6 @@
 function xmldb_local_artqtml_uninstall(): bool {
     global $DB;
 
-    // Jov-036: the draft-editing role is created by this plugin (db/install.php and the 2026073001
-    // upgrade step), so it is this plugin's to remove. delete_role() takes its assignments and
-    // capability rows with it. Moodle drops rows keyed to this component automatically, but a role
-    // is not keyed to a component at all, so it would otherwise survive as an orphan an
-    // administrator has no way to place. Done before the table check below, because the role
-    // exists whether or not any generation ever ran.
     $roleid = (int) $DB->get_field('role', 'id', [
         'shortname' => \local_artqtml\local\draft_role::SHORTNAME,
     ]);

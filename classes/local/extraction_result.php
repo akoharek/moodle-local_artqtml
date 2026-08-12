@@ -15,24 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The outcome of trying to read text out of an uploaded document.
+ * Outcome of reading text from an uploaded document.
  *
- * WHY THIS EXISTS. `text_extractor::extract()` returned a string, and an empty string had to stand
- * for four completely different situations: a document with no text in it, a file the parser could
- * not open, a file too large to expand safely, and a file deliberately carrying text the reader
- * cannot see. The upload page treated all four the same way - "extraction produced nothing" - so a
- * document that was refused for a security reason looked exactly like an empty one.
- *
- * WHAT IS NOT A REASON, and was for half of 2026-08-04: hidden text. A document carrying a
- * vanished, two-point or white run was first refused outright, then quietly stripped of it. Both
- * are gone - the text goes into the source-text box, where the teacher reads it, so there was
- * nothing for the parser to protect anyone from by guessing at appearance.
- *
- * The reason codes are a closed set, and deliberately technical rather than descriptive: they are
- * matched in code and mapped to a localised message at the point of display. What they never carry
- * is any part of the document - not the hidden text that caused a rejection, not a file path, not a
- * parser warning. A rejection message is shown on screen and may be logged, and a document's
- * contents have no business in either.
+ * Distinguishes empty documents, unreadable files, oversize files, and hidden-text rejections
+ * so the upload page can show the right message. Reason codes are a closed set mapped to
+ * localised strings at display time; they never carry document contents.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -63,13 +50,8 @@ class extraction_result {
     public const REASON_RESOURCE_LIMIT = 'resourcelimit';
 
     /**
-     * @var string the document was read successfully and holds no text this extractor can reach.
-     *
-     * Separate from an empty result rather than the same thing, because the two are answered
-     * differently: an empty result used to send the document to the older whole-file scan in the
-     * hope of partial text. Decided by András on 2026-08-05: a document that cannot be read is
-     * refused, not partially processed. The teacher is told, instead of being handed an empty box.
-     */
+ * @var string the document was read successfully and holds no text this extractor can reach.
+ */
     public const REASON_NO_TEXT = 'notext';
 
     /**

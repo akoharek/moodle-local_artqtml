@@ -17,9 +17,6 @@
 namespace local_artqtml\form;
 
 /**
- * Unit tests for the source-text upload form's server-side validation, in particular the
- * shortname format rule (TC-Felt-010/011 - the PARAM_RAW "reject, don't sanitise" fix).
- *
  * @package    local_artqtml
  * @category   test
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -46,10 +43,6 @@ final class upload_form_test extends \advanced_testcase {
         return $form->validation(array_merge($defaults, $data), []);
     }
 
-    /**
-     * TC-Felt-010/011: a shortname containing a non-alphanumeric character is rejected with the
-     * format error, rather than being silently sanitised (the PARAM_RAW fix).
-     */
     public function test_non_alphanumeric_shortname_rejected(): void {
         $this->resetAfterTest();
 
@@ -102,8 +95,8 @@ final class upload_form_test extends \advanced_testcase {
     }
 
     /**
-     * Accented letters are not ASCII a-z/A-Z, so they must be rejected (Felt-004 / mezotabla).
-     */
+ * Accented letters are not ASCII a-z/A-Z, so they must be rejected.
+ */
     public function test_accented_shortname_rejected(): void {
         $this->resetAfterTest();
 

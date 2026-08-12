@@ -17,12 +17,7 @@
 namespace local_artqtml\local;
 
 /**
- * Pins Glob-040 (V-06): deleting a generation must NOT delete its diagnostic log rows.
- *
- * This exercises the real production deletion path (generation_deletion::purge(), which delete.php
- * and generate.php's abort-delete both call), not a hand-rolled copy of the deletes - so if anyone
- * re-adds a local_artqtml_log delete to that path "for consistency" with the other two, this
- * fails. TC to register at the next register change (alongside TC-Gen-060): TC-Glob-067.
+ * Pins: deleting a generation must NOT delete its diagnostic log rows.
  *
  * @package    local_artqtml
  * @category   test
@@ -30,11 +25,6 @@ namespace local_artqtml\local;
  * @covers     \local_artqtml\local\generation_deletion
  */
 final class generation_deletion_test extends \advanced_testcase {
-    /**
-     * Seed a generation with questions and log rows, delete it through the production path, and
-     * assert the generation and its questions are gone while its log rows remain (Glob-040) -
-     * carrying the deleted generation's id in originalgenerationid, with generationid cleared.
-     */
     public function test_deleting_a_generation_keeps_its_log_rows(): void {
         global $DB;
         $this->resetAfterTest();
@@ -104,10 +94,6 @@ final class generation_deletion_test extends \advanced_testcase {
         $this->assertFalse($DB->record_exists('local_artqtml_generations', ['id' => $generationid]));
         // 2. Its question rows are gone.
         $this->assertEquals(0, $DB->count_records('local_artqtml_questions', ['generationid' => $generationid]));
-        // 3. Its log rows are still there (Glob-040) and since 2026-08-04 they no longer point at
-        // the row that has just been deleted. The id moved to originalgenerationid, which is what
-        // keeps them findable; generationid is NULL, which is what stops it asserting a
-        // relationship that is not there.
         $this->assertEquals(0, $DB->count_records('local_artqtml_log', ['generationid' => $generationid]));
         $this->assertEquals(2, $DB->count_records('local_artqtml_log', ['originalgenerationid' => $generationid]));
 

@@ -99,12 +99,8 @@ final class generation_edit_policy_test extends \advanced_testcase {
     }
 
     /**
-     * The rule looks at status and nothing else - ownership is not part of it.
-     *
-     * Glob-031: any :use holder edits any colleague's draft, by decision. This test exists so that
-     * a later reader does not "tighten" the policy by adding an owner check to it, which would
-     * remove a supported workflow while looking like a security improvement.
-     */
+ * The rule looks at status and nothing else - ownership is not part of it.
+ */
     public function test_the_rule_does_not_consider_ownership(): void {
         $mine = (object) ['status' => generation_status::STARTED, 'userid' => 1];
         $theirs = (object) ['status' => generation_status::STARTED, 'userid' => 999];

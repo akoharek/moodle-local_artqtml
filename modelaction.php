@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Admin actions for the model selector: refresh the cached model list (Admin-046).
+ * Admin actions for the model selector: refresh the cached model list.
  *
  * Deliberately a plain request/redirect rather than an AJAX endpoint. Both actions change server
  * state and the settings page has to re-render from the new state anyway, so a round trip is the
@@ -55,8 +55,7 @@ $section = $provider === model_list::PROVIDER_CLAUDE ? 'local_artqtml_generator'
 $returnurl = new moodle_url('/admin/settings.php', ['section' => $section]);
 
 if ($action === 'refresh') {
-    // Admin-046: the only administrator-initiated path that may touch the provider network. The
-    // settings page itself never does (Admin-045).
+    // the only administrator-initiated path that may touch the provider network. The settings page itself never does.
     $result = model_list::refresh($provider);
 
     if ($result['success']) {
@@ -71,8 +70,6 @@ if ($action === 'refresh') {
 }
 
 if ($action === 'check') {
-    // Admin-054: the same check the scheduled task runs. Admin-055 makes this and that task the
-    // only writers of the blocking state - normal generation traffic never touches it.
     $result = \local_artqtml\local\model_checker::check_provider(
         $provider,
         \local_artqtml\local\model_check_log::TRIGGER_MANUAL

@@ -15,21 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Model chooser for the Generator/Validator LLM tabs (Admin-047/048/049/050/051).
- *
- * A select whose options come from the cached provider model list, never from a hardcoded array
- * and never from a synchronous network call. Replaces the free-text field, which Admin-048 forbids
- * outright: "A modell azonosítója kizárólag legördülőből választható; szabad szöveges beviteli mező
- * a Generátor és a Validátor LLM fülön nem jelenhet meg".
+ * Model chooser for the Generator/Validator LLM tabs.
  *
  * Three states, decided entirely by what is in the cache:
- *
- *  - No cached list (no successful connection test yet): Admin-050 says the select must not appear
- *    at all, and the field explains that a connection test is needed first.
- *  - Cached list present: the structured-output capable models are offered.
- *  - Cached list present but the saved model is not in it: Admin-049 requires the saved value to
- *    stay selected and stay stored, with a visible warning. It is never silently dropped or
- *    overwritten - that is precisely how a working install would become mysteriously broken.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -57,10 +45,6 @@ class setting_modelselect extends \admin_setting_configselect {
     public function __construct(string $name, string $visiblename, string $description, string $provider) {
         $this->provider = $provider;
 
-        // Admin-051: no factory default. "A claudemodel és a geminimodel beállításnak nincs gyári
-        // alapértelmezett értéke: friss telepítésen mindkettő üresen indul." A baked-in default can
-        // be dead on arrival, because availability differs by provider AND by API project, and
-        // providers retire models - gemini-2.0-flash did exactly that while still being listed.
         parent::__construct($name, $visiblename, $description, '', null);
     }
 
@@ -79,11 +63,6 @@ class setting_modelselect extends \admin_setting_configselect {
 
         $this->choices = model_list::selectable_options($this->provider);
 
-        // Admin-049: a saved model missing from the list stays selectable, so saving the form
-        // cannot silently rewrite it to something else. It is only marked "unavailable", though,
-        // when a list has actually been fetched and it is missing from THAT - with an empty cache no
-        // list has been fetched, so the model gets a plain label and the availability warning is left
-        // to output_html()'s neutral-vs-warning decision (Admin-049 corrected).
         $saved = (string) $this->get_setting();
         if ($saved !== '' && !array_key_exists($saved, $this->choices)) {
             $listfetched = model_list::get_cached($this->provider) !== null;
@@ -92,8 +71,6 @@ class setting_modelselect extends \admin_setting_configselect {
                 : $saved;
         }
 
-        // An empty choice is always offered: Admin-051 starts both settings empty, and an admin
-        // must be able to represent "not chosen yet" rather than being forced onto a model.
         if (!array_key_exists('', $this->choices)) {
             $this->choices = ['' => get_string('choosedots')] + $this->choices;
         }
@@ -112,9 +89,6 @@ class setting_modelselect extends \admin_setting_configselect {
         $cached = model_list::get_cached($this->provider);
         $saved = (string) $this->get_setting();
 
-        // Admin-050: "Sikeres kapcsolatteszt előtt a legördülő nem jelenik meg; ilyenkor a felület
-        // jelzi, hogy a modellválasztáshoz kapcsolatteszt szükséges." The cache is only ever
-        // written by a successful fetch, so "no cache" is exactly "no successful test yet".
         if ($cached === null && $saved === '') {
             $notice = \html_writer::div(
                 get_string('modelselectneedstest', 'local_artqtml'),
@@ -127,20 +101,6 @@ class setting_modelselect extends \admin_setting_configselect {
 
         $html = parent::output_html($data, $query);
 
-        // BL-44: what the last structural sweep found, read from the check log rather than passed
-        // back from the button. The button's own JavaScript reloads this page on success, so a
-        // message returned by the call is wiped before anyone reads it - and routing it through a
-        // session notification hung the request for over ten minutes (measured 2026-08-03, while
-        // the probes themselves took 33 seconds). Rendering it here turns the reload from the thing
-        // that destroyed the verdict into the thing that shows it, and it still says so tomorrow.
-        // The summary is scoped to THIS plugin version, exactly like the exclusions it describes -
-        // otherwise the two could contradict each other. A version bump reopens every excluded model
-        // (deliberately: on 2026-08-03 the exclusions came from our own parser defect), so a sweep
-        // made under an older build no longer describes the list being shown.
-        //
-        // Which leaves the case this branch exists for, and it is the one that bit on the day this
-        // was written: after a version bump there is no sweep for the current build, and saying
-        // NOTHING is worse than saying so. A silent settings page reads as "everything is fine".
         $sweep = \local_artqtml\local\model_check_log::latest_sweep($this->provider);
         if ($sweep !== null) {
             $html .= \html_writer::div(
@@ -160,22 +120,14 @@ class setting_modelselect extends \admin_setting_configselect {
             );
         }
 
-        // Three states for a saved model, told apart by whether a list has been fetched at all
-        // (get_cached() is null only when the 24-hour cache is empty - fresh install, before any
-        // successful connection test). The availability warning presupposes a fetched list; applying
-        // it to an empty cache was the Admin-049 defect - it labelled a working model unavailable.
         if ($saved !== '') {
             if ($cached === null) {
-                // Empty cache: no list to check against, so no availability claim either way. A
-                // neutral notice, not a false warning (Admin-049 corrected).
                 $html .= \html_writer::div(
                     get_string('modellistnotfetched', 'local_artqtml'),
                     'alert alert-info mt-2',
                     ['data-testid' => 'artqtml-admin-modellistnotfetched-' . $this->provider]
                 );
             } else if (!model_list::is_listed($this->provider, $saved)) {
-                // A list WAS fetched and the saved model is not in it - the real Admin-049 case.
-                // Name the problem where the admin is looking, not only in the option label.
                 $html .= \html_writer::div(
                     get_string('modelunavailable_warning', 'local_artqtml'),
                     'alert alert-warning mt-2',

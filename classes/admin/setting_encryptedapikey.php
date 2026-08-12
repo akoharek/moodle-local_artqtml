@@ -15,9 +15,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Password field for the Claude/Gemini API keys, encrypted at rest via \core\encryption
- * (Admin-010/016: spec explicitly claims the key "is stored encrypted").
- *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

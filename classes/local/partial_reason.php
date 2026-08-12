@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * User-facing reasons why a partly successful generation fell short (BL-30 / BL-35).
+ * User-facing reasons why a partly successful generation fell short.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -78,8 +78,6 @@ class partial_reason {
                 continue;
             }
 
-            // Last completed Claude summary wins: a retry-from-failed run appends a new row, and
-            // Glob-040 keeps the old one. The screen must describe this attempt.
             if ($log->event === 'claude_call_completed' && is_array($data['outcomes'] ?? null)) {
                 $outcomes = $data['outcomes'];
             }

@@ -15,9 +15,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Orchestrates creating a real Moodle question from AI-generated data, in a generation's
- * isolated draft bank category (Gen-005, technical annex ch.6) - split out of question_importer.
- *
  * Uses question_bank::get_qtype($qtype)->save_question(), the same stable entry point
  * Moodle's own question edit forms and import formats use.
  *
@@ -34,20 +31,20 @@ use local_artqtml\local\question_types;
  */
 class question_creator {
     /**
-     * Create a new question in the given category from AI-generated data.
-     *
-     * @param string $typecode IH/FE/SR
-     * @param array $data decoded per-type fields from the AI response (technical annex 3.3)
-     * @param int $categoryid target question_categories.id (the generation's draft bank)
-     * @param string $questioncode plugin-generated name, e.g. BIO1-IH-0001
-     * @param array $typesettings this type's generation settings (feedback/retry/negation)
-     * @param int $userid the generation's owner (Gen-005/M-06) - questions are created here from
-     *      a background scheduled task with no logged-in user of its own, so $USER cannot be
-     *      relied on for authorship; the caller must always pass the owning generation's userid
-     * @param int $generationid Gen-026: only used to attribute a local_artqtml_log entry if
-     *      generalfeedback needs truncating - not otherwise part of question creation
-     * @return int the id of the newly created question table row
-     */
+ * Create a new question in the given category from AI-generated data.
+ *
+ * @param string $typecode IH/FE/SR
+ * @param array $data decoded per-type fields from the AI response
+ * @param int $categoryid target question_categories.id (the generation's draft bank)
+ * @param string $questioncode plugin-generated name, e.g. BIO1-IH-0001
+ * @param array $typesettings this type's generation settings (feedback/retry/negation)
+ * @param int $userid the generation's owner - questions are created here from
+ * a background scheduled task with no logged-in user of its own, so $USER cannot be
+ * relied on for authorship; the caller must always pass the owning generation's userid
+ * @param int $generationid only used to attribute a local_artqtml_log entry if
+ * generalfeedback needs truncating - not otherwise part of question creation
+ * @return int the id of the newly created question table row
+ */
     public static function create(
         string $typecode,
         array $data,

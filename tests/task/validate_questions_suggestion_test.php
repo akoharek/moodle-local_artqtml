@@ -19,12 +19,7 @@ namespace local_artqtml\task;
 use local_artqtml\local\validation_suggestion;
 
 /**
- * Unit tests for the validator's suggestion enum (Val-017/Val-018) as a single source of truth.
- *
- * F-1: the three values used to live in a code constant AND as English prose inside the
- * admin-editable prompt template, with nothing checking the two against each other - the same
- * two-source arrangement that let problem_category drift apart and cost nine days. These tests
- * are the check that makes reintroducing it fail the build.
+ * Unit tests for the validator's suggestion enum as a single source of truth.
  *
  * @package    local_artqtml
  * @category   test
@@ -34,8 +29,8 @@ use local_artqtml\local\validation_suggestion;
  */
 final class validate_questions_suggestion_test extends \advanced_testcase {
     /**
-     * Val-017: exactly the three verdicts, in order, none empty, no duplicates.
-     */
+ * exactly the three verdicts, in order, none empty, no duplicates.
+ */
     public function test_enum_is_exactly_three_values(): void {
         $this->assertSame(
             ['accepted', 'needs_review', 'rejected'],
@@ -88,8 +83,6 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
         global $CFG;
 
         $this->resetAfterTest();
-        // Admin-066: an empty setting is now an empty prompt - there is no fallback to a shipped
-        // template. Seed the same file install and upgrade use.
         foreach (require($CFG->dirroot . '/local/artqtml/db/prompt_defaults.php') as $s => $v) {
             set_config($s, $v, 'local_artqtml');
         }
@@ -133,16 +126,9 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
     }
 
     /**
-     * An admin who rewrites the template around the placeholder still gets all three values, and
-     * never types one of them.
-     *
-     * This test used to assert that the values survived *any* template, because the code appended
-     * the clause after it. Since 2026-07-31 the whole prompt is editable (Admin-066/067), so a
-     * template without {{SUGGESTION_INSTRUCTION}} has no clause - the accepted cost of a readable
-     * prompt. What survives, and is the guarantee worth pinning, is that the values themselves are
-     * still code-owned: the administrator writes the sentence, the placeholder brings the list, and
-     * nothing an administrator types can name a value the schema would reject.
-     */
+ * An admin who rewrites the template around the placeholder still gets all three values, and
+ * never types one of them.
+ */
     public function test_values_survive_an_admin_template_override(): void {
         global $CFG;
 
@@ -173,8 +159,8 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
     }
 
     /**
-     * Val-017: every displayable value has a lang label; the raw key never reaches the UI.
-     */
+ * every displayable value has a lang label; the raw key never reaches the UI.
+ */
     public function test_every_value_has_a_lang_label(): void {
         $this->resetAfterTest();
 
@@ -187,9 +173,6 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
 
         $this->assertSame('Accepted', validation_suggestion::label(validation_suggestion::ACCEPTED));
 
-        // Val-017's Hungarian labels are asserted against the shipped lang file rather than via
-        // force_current_language('hu'): the CI/PHPUnit install carries only the English pack, so
-        // get_string() would silently fall back to English and assert nothing.
         $hu = [];
         require(__DIR__ . '/../../lang/hu/local_artqtml.php');
         $hu = $string;
@@ -217,8 +200,8 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
     }
 
     /**
-     * F-1: no file outside the constant's own definition re-types the three-value list.
-     */
+ * no file outside the constant's own definition re-types the three-value list.
+ */
     public function test_no_file_outside_the_constant_repeats_the_literal_list(): void {
         $root = realpath(__DIR__ . '/../..');
         $allowed = [
@@ -259,13 +242,8 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
     }
 
     /**
-     * A minimal generation for build_system_instruction(), which since Val-031 takes the record so
-     * it can substitute the difficulty definitions for THAT generation's mode. Scale mode, because
-     * that is what the shipped default is and what these assertions describe; free text would
-     * deliberately leave the difficulty clause empty.
-     *
-     * @return \stdClass
-     */
+ * @return \stdClass
+ */
     private function scale_generation(): \stdClass {
         $generation = new \stdClass();
         $generation->settings = json_encode([

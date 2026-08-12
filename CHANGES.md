@@ -6,6 +6,16 @@ the number in parentheses is `$plugin->release`.
 Scope: IH / FE / SR; paste + plain `.txt`; Claude + Gemini BYOK; review / approve;
 easy / medium / hard; thin admin.
 
+## 2026-08-12 — `2026081206` (1.0.0)
+
+**Comment scrub for Moodle.org review**
+
+- Remove spec IDs (Admin-/Val-/TC-/Gen-/Glob-/…), decision/history essays, and
+  dated “why we chose X” commentary from PHP/JS/XML (and matching AMD builds).
+- Keep short comments that explain non-obvious algorithms or Moodle API quirks.
+- `phpcs.xml` stays a slim Moodle ruleset; `SUPPORT.md` remains deleted (tracker +
+  BYOK live in README).
+
 ## 2026-08-12 — `2026081205` (1.0.0)
 
 **Neutralize product-variant wording in comments and strings**

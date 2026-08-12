@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Step 1 of the "New generation" flow: upload/paste source text (functional spec ch.3).
+ * Step 1 of the "New generation" flow: upload/paste source text.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -40,8 +40,6 @@ if (!get_config('local_artqtml', 'enabled')) {
     redirect(new moodle_url('/local/artqtml/index.php'));
 }
 
-// Jov-023: an unconfigured/invalid draft course blocks starting a new generation too - there is
-// nowhere safe to create the draft question bank otherwise.
 if (!\local_artqtml\local\draft_bank::is_configured()) {
     \core\notification::error(get_string('errordraftcoursenotconfigured', 'local_artqtml'));
     redirect(new moodle_url('/local/artqtml/index.php'));
@@ -49,19 +47,6 @@ if (!\local_artqtml\local\draft_bank::is_configured()) {
 
 $PAGE->set_url('/local/artqtml/upload.php');
 $PAGE->set_context($context);
-// These pages carry wide data tables, and 'standard' is the one layout Boost caps at
-// $course-content-maxwidth (830px) from the md breakpoint up
-// (theme/boost/scss/moodle/layout.scss:56-62) - which squeezed the columns into a narrow strip on
-// a full-screen browser while the page around them stayed wide, and pushed the actions column off
-// the right edge. 'report' is byte-for-byte the same layout in Boost's config.php (same file, same
-// regions, same default region) and differs only in the body class, which that rule does not
-// match; it is what core's own wide-table pages use (report/log/index.php:100).
-//
-// 'mediumwidth' then caps the result at $medium-content-maxwidth (1120px, variables.scss:28)
-// instead of letting it run the full viewport width. Decided 2026-07-29 against both extremes:
-// 830px is what the demo complaint was about, and edge-to-edge spreads eight columns thin on a
-// wide screen. Note that core defines this class but never sets it - every core page picks
-// 'limitedwidth' or nothing - so the rule to lean on is the SCSS, not core precedent.
 $PAGE->set_pagelayout('report');
 $PAGE->add_body_class('mediumwidth');
 $PAGE->set_title(get_string('newgeneration', 'local_artqtml'));
@@ -69,25 +54,11 @@ $PAGE->set_heading(get_string('newgeneration', 'local_artqtml'));
 
 $indexurl = new moodle_url('/local/artqtml/index.php');
 
-// Beal-023/024: "Vissza" on the question settings page returns here with the generation's own
-// id, to edit its already-saved identifiers/source text in place rather than starting a new one.
 $editid = optional_param('id', 0, PARAM_INT);
 $editgeneration = null;
 if ($editid > 0) {
     $editgeneration = $DB->get_record('local_artqtml_generations', ['id' => $editid], '*', MUST_EXIST);
 
-    // 2026-08-04: only a draft's source may be edited. Until this line existed, this page loaded
-    // and saved a generation in ANY state - so `upload.php?id=<n>` on a finished one rewrote its
-    // name, source text and both hashes while its questions, made from the old text, stayed as
-    // they were. Nothing appeared to break; the questions and the material they came from simply
-    // stopped describing each other.
-    //
-    // NOT an ownership rule. Glob-031 is untouched: any :use holder still edits any colleague's
-    // draft, and the message deliberately does not say "permission" - the user has permission,
-    // the generation is just past the point where this page applies.
-    //
-    // The destination comes from generation_list::open_url(), which is the one place that maps a
-    // status to its page; generate.php does exactly the same on the settings half.
     if (!\local_artqtml\local\generation_edit_policy::can_edit_source($editgeneration)) {
         redirect(
             \local_artqtml\local\generation_list::open_url($editgeneration),
@@ -104,23 +75,6 @@ if ($editid > 0) {
         $DB->set_field('local_artqtml_generations', 'error', null, ['id' => $editid]);
         $editgeneration->error = null;
     }
-    // Glob-031: no owner check here. Until 2026-08-03 this page required
-    // local/artqtml:configure to open somebody else's generation, and it was the only page in the
-    // plugin that did - every other one lets any :use holder open any generation, because the tool
-    // is deliberately site-wide and collaborative.
-    //
-    // That single stricter rule did not protect anything; it only broke a supported route. Walked
-    // through on 2026-08-03 as a real non-editing teacher: opening a colleague's draft works and the
-    // page even says whose it is, but the "Back" button on it failed with "you do not have
-    // permission to edit the ArtQTML admin settings" - an error naming a capability the
-    // teacher was not exercising. Meanwhile the same source text was fully readable through the
-    // "generate the missing types" route, which copies it into a new generation owned by whoever
-    // clicked. Same data, one route closed, the other open, and the closed one is the one a teacher
-    // would use.
-    //
-    // Decided by András, 2026-08-03: **the source text is shared working material.** The check is
-    // removed rather than the other route being closed, because it was the check that contradicted
-    // the product's stated principle.
 }
 
 $maxbytes = $CFG->maxbytes;
@@ -139,11 +93,7 @@ if ($editgeneration && !$mform->is_submitted()) {
 /**
  * Save a new generation, or update the source of one that is still a draft.
  *
- * A thin pass-through to {@see \local_artqtml\local\generation_source_service::save()}, which
- * is where the write and the status check now live. The logic moved out of this file on
- * 2026-08-04 for one reason: a function declared at the top of a controller that starts a session
- * and redirects cannot be called from a test, and the behaviour that most needed proving here is
- * what happens when the generation stops being a draft between opening the form and submitting it.
+ * Pass-through to {@see \local_artqtml\local\generation_source_service::save()}.
  *
  * @param string $name
  * @param string $shortname
@@ -198,13 +148,6 @@ function local_artqtml_redirect_after_refused_save(int $generationid, \moodle_ur
     );
 }
 
-// Step 2 of the duplicate confirmation popup (Felt-023/024): the user chose "Folytatom".
-//
-// M-17: this is a bare HTML form that only ever posts sesskey + artqtmlconfirmdup=1, not a
-// resubmission of upload_form's own fields - $mform->get_data() would therefore always return
-// false for it (missing required fields/wrong submit button name), so this must be handled
-// entirely on its own, before ever touching $mform->get_data(), using the data stashed in the
-// session when the popup was first shown - not nested inside the $mform->get_data() branch below.
 $confirmed = optional_param('artqtmlconfirmdup', 0, PARAM_BOOL);
 if ($confirmed) {
     require_sesskey();
@@ -244,24 +187,6 @@ if ($confirmed) {
 if ($mform->is_cancelled()) {
     redirect($indexurl);
 } else if ($data = $mform->get_data()) {
-    // NO ID-MISMATCH CHECK HERE, and the absence is deliberate - there was one between
-    // 2026-08-04 morning and afternoon, and it was removed for two independent reasons.
-    //
-    // It could not fire. The comment claimed "the URL is the authority", but this page's URL
-    // carries no id ($PAGE->set_url above), the form posts to that URL, and optional_param reads
-    // `id` out of the same POST body that the hidden field is in. The two values it compared were
-    // one value read twice.
-    //
-    // And there was nothing for it to protect. Submitting a different generation's id opens that
-    // generation - which any :use holder is entitled to do, because Glob-031 makes the tool
-    // site-wide and collaborative. What actually bounds this page is the status gate above and the
-    // re-read inside the transaction in generation_source_service::save(): only a draft may be
-    // written, and its status is checked again immediately before the write.
-    //
-    // Felt-002 (C1): the browser enforces maxlength=100 on the name field, but the form binds it
-    // as PARAM_TEXT which does not bound length, so a hand-crafted/altered POST could exceed it.
-    // Enforce the 100-character limit server-side (core_text::strlen counts characters, matching
-    // the browser's maxlength semantics for multibyte Hungarian names).
     if (\core_text::strlen((string) $data->name) > 100) {
         \core\notification::error(get_string('errornametoolong', 'local_artqtml'));
         redirect(new moodle_url('/local/artqtml/upload.php', $editid ? ['id' => $editid] : []));
@@ -269,31 +194,6 @@ if ($mform->is_cancelled()) {
 
     $sourcetext = (string) $data->sourcetext;
 
-    // Merge in any uploaded file's extracted text (Felt-010/011), and separately hash the raw
-    // file bytes (M-19) so an identical re-upload is still caught as a duplicate even if text
-    // extraction happens to produce slightly different output than it did the first time.
-    //
-    // 2026-08-04, two changes here.
-    //
-    // The raw bytes are no longer concatenated into a variable. The only thing that string was
-    // ever used for was the hash, and Moodle has already hashed every stored file - reading a
-    // whole upload into memory a second time to compute a number the File API is holding was pure
-    // cost. `get_contenthash()` is that number, and it stands for the same thing: the identity of
-    // the bytes, as a supplementary signal beside the text hash (M-19/C2 - see duplicate_detector),
-    // because the same content in a different format hashes differently.
-    //
-    // THE STORED VALUE IS NOT THE SAME NUMBER IT USED TO BE, and that is worth saying plainly
-    // rather than leaving it to be discovered. Rows written before 2026-08-04 hold the sha1 of the
-    // raw bytes; rows written after hold the sha1 of the File API's content hashes. An old row and
-    // a new row for the identical file will not match. Nothing compares them - duplicate_detector
-    // decides on the text hash alone - so there is nothing to migrate; the column is a record, not
-    // a key. If anything ever does start comparing it, this is the paragraph that says why it must
-    // not compare across that date.
-    //
-    // And extraction now reports WHY it produced nothing. A refused document - unreadable, of an
-    // unsupported type, or over a processing limit - used to be indistinguishable from an empty
-    // one, so the page carried on with whatever else it had. It now stops here, before the
-    // security screen, before duplicate detection, before anything is stored.
     $draftitemid = (int) ($data->sourcefile ?? 0);
     $contenthashes = [];
     foreach (text_extractor::draft_files($draftitemid) as $file) {
@@ -309,15 +209,6 @@ if ($mform->is_cancelled()) {
             $sourcetext = $sourcetext !== '' ? ($sourcetext . "\n\n" . $report['text']) : $report['text'];
         }
 
-        // BL-48, the plausibility check. Extraction "succeeding" with almost nothing is the silent
-        // failure this exists for: a 1.1 MB, 21-page presentation returned 64 characters, and
-        // because 64 is not zero the upload was accepted, the teacher saw no problem, and the
-        // questions were generated from a fragment.
-        //
-        // A WARNING, NOT A REFUSAL. A large file with genuinely little text - one slide, many
-        // images - is a legitimate document, and refusing it would take the decision away from the
-        // person who can actually see what is in it. What they need is to be told, so that pasting
-        // the text becomes an obvious next step rather than a discovery made later.
         $littletext = $report['status'] === extraction_result::STATUS_OK
             && (int) $file->get_filesize() > 1048576
             && \core_text::strlen($report['text']) < 500;
@@ -335,30 +226,17 @@ if ($mform->is_cancelled()) {
         redirect(new moodle_url('/local/artqtml/upload.php', $editid ? ['id' => $editid] : []));
     }
 
-    // 2026-08-04: the size limit, on the MERGED text - pasted plus everything extracted from the
-    // uploaded files. The form's own check saw only the textarea, so a small paste beside a large
-    // document passed it.
-    //
-    // Its position in this sequence is the point. It runs before the security screen, before
-    // duplicate detection, before anything is written to $SESSION and before anything reaches the
-    // database - so an oversized text is never stored, never hashed and never queued. Putting it
-    // after any of those would leave a row behind that only the API call would eventually refuse.
     if (source_text_limit::is_exceeded($sourcetext)) {
         \core\notification::error(source_text_limit::error_message($sourcetext));
         redirect(new moodle_url('/local/artqtml/upload.php', $editid ? ['id' => $editid] : []));
     }
 
-    // Felt-017-020: security screen. On failure the text is deliberately never redisplayed.
+    // 020: security screen. On failure the text is deliberately never redisplayed.
     if (security_filter::has_sql_injection($sourcetext) || security_filter::has_prompt_injection($sourcetext)) {
         \core\notification::error(get_string('errorsecurityfilter', 'local_artqtml'));
         redirect(new moodle_url('/local/artqtml/upload.php', $editid ? ['id' => $editid] : []));
     }
 
-    // Felt-021-024: duplicate/similarity screen ($confirmed is always false here - the true case
-    // returned above before ever reaching $mform->get_data()).
-    // C2 (Felt-021): duplicate detection is text-content based (sourcetexthash), not file-byte
-    // based - see duplicate_detector::find_match(). $filehash is still recorded on the generation
-    // row for reference but is intentionally not used to decide duplicates.
     $match = duplicate_detector::find_match($sourcetext, $editid);
     if ($match !== null) {
         $SESSION->artqtml_pending = [
@@ -428,44 +306,22 @@ if ($mform->is_cancelled()) {
 
 echo $OUTPUT->header();
 echo local_artqtml_model_warning_banner();
-// Glob-031, 2026-08-03: this page was the only one that could show another user's generation
-// without saying so, and only because until today it could not show one at all - the owner check
-// removed above kept it out. The warning belongs wherever a colleague's generation is on screen,
-// which is why approve.php, generate.php and status.php have carried it all along. Walking the
-// page as a teacher is what surfaced the gap: the source text appeared with nothing naming whose
-// it was.
 if ($editgeneration) {
     echo local_artqtml_owner_warning_banner($editgeneration);
 }
 echo $OUTPUT->heading(get_string('uploadheading', 'local_artqtml'));
 $mform->display();
 
-// Felt-016: the warning is relative to the generating model's context window, not a flat
-// admin-configured token count. The context window is no longer passed to the counter separately,
-// because source_text_limit::token_limit() already derives the limit from it when no explicit one
-// is set - passing both meant two places could disagree about the same number.
-//
-// 2026-08-04: the counter now also shows the server-side limit and blocks an ordinary submission
-// past it. Every string handed to JavaScript goes through json_encode - a lang string concatenated
-// raw into a <script> block is a quoting bug waiting for the first apostrophe in a translation.
 $sourcetokenlimit = source_text_limit::token_limit();
 $counterlimittemplate = get_string('textcounterlimitlabel', 'local_artqtml', $sourcetokenlimit);
 $countererrormessage = get_string('errorsourcetexttoolong', 'local_artqtml');
 
-// Felt-015/Glob-029: the counter text must come from a lang string, not be hardcoded in JS -
-// render it with sentinel placeholders here, substituted for the live counts in textcounter.js.
 $countertemplate = get_string('textcounterlabel', 'local_artqtml', (object) [
     'chars'  => '__CHARS__',
     'words'  => '__WORDS__',
     'tokens' => '__TOKENS__',
 ]);
 
-// THE PLUGIN VERSION IS IN THE URL, added 2026-08-04 after the browser proved it was needed. This
-// file is linked directly rather than served through Moodle's JavaScript cache, so a browser holds
-// on to whatever copy it fetched last. When init()'s parameter list changed, the cached copy went
-// on being called with the new arguments in the old positions - and the counter showed the limit
-// where the character count should have been, on a page that looked perfectly healthy. The version
-// changes whenever the file can have changed, which is exactly when the cache must be given up.
 $PAGE->requires->js(new moodle_url('/local/artqtml/js/textcounter.js', [
     'v' => (int) get_config('local_artqtml', 'version'),
 ]));
@@ -478,8 +334,6 @@ echo html_writer::script(
     '}});'
 );
 
-// Felt-010/011/012/013/014: extracts a picked file's text into the box for review/editing, and
-// warns when the user mixes typed text and an uploaded file.
 $PAGE->requires->js_call_amd('local_artqtml/uploadconflict', 'init', [
     'id_sourcetext',
     'id_sourcefile',
@@ -492,7 +346,7 @@ $PAGE->requires->js_call_amd('local_artqtml/uploadconflict', 'init', [
     ],
 ]);
 
-// Felt-025: the Continue button is only active once all three required fields are filled.
+// the Continue button is only active once all three required fields are filled.
 $PAGE->requires->js(new moodle_url('/local/artqtml/js/continuebutton.js'));
 echo html_writer::script(
     'document.addEventListener("DOMContentLoaded", function() {' .
@@ -501,7 +355,7 @@ echo html_writer::script(
     '}});'
 );
 
-// Felt-027/028/029: confirm before discarding entered data via the Cancel button.
+// confirm before discarding entered data via the Cancel button.
 echo html_writer::script(
     'document.addEventListener("DOMContentLoaded", function() {' .
     'var cancelbtn = document.querySelector(\'input[name="cancel"], button[name="cancel"]\');' .

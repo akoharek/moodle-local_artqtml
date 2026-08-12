@@ -17,16 +17,12 @@
 namespace local_artqtml\local;
 
 /**
- * The English and Hungarian language packs must hold the same keys (TC-Glob-064 / Glob-029).
+ * The English and Hungarian language packs must hold the same keys.
  *
  * Moodle silently falls back to English for a missing Hungarian key, so a pack that drifts never
  * fails loudly - a missing translation looks like one nobody got around to, indefinitely. Nothing
  * else in the suite would notice, so this is the guard: the same defect class the plugin has closed
  * repeatedly in its PHP value sets - one set maintained in two places with nothing checking them.
- *
- * The precondition (Glob-029) is that no Moodle language pack is installed, which is exactly why
- * this is a static test over the two source files: it reads the keys by parsing the files with
- * token_get_all(), never by loading a language string, so it needs nothing from Moodle's lang API.
  *
  * @package    local_artqtml
  * @category   test
@@ -35,8 +31,8 @@ namespace local_artqtml\local;
  */
 final class lang_parity_test extends \advanced_testcase {
     /**
-     * TC-Glob-064: neither pack may hold a key the other lacks, in either direction.
-     */
+ * neither pack may hold a key the other lacks, in either direction.
+ */
     public function test_both_packs_hold_the_same_keys(): void {
         $en = self::keys_of('en');
         $hu = self::keys_of('hu');
@@ -67,13 +63,8 @@ final class lang_parity_test extends \advanced_testcase {
     }
 
     /**
-     * TC-Glob-068 - deliberately separate from TC-Glob-064: each pack's keys must stay C-sorted.
-     *
-     * TC-Glob-064 asserts only key-set parity, so this must not be folded into the parity test - a
-     * sort failure has to read as a sort failure, not a spurious parity one. It earns its place
-     * because a drifting sort is exactly how the earlier movesuccess rename nearly went unnoticed,
-     * and the parse is already done here.
-     */
+ * deliberately separate from: each pack's keys must stay C-sorted.
+ */
     public function test_each_pack_is_c_sorted(): void {
         foreach (['en', 'hu'] as $lang) {
             $keys = self::keys_of($lang, false);

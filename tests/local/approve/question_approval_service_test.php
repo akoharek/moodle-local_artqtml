@@ -17,12 +17,7 @@
 namespace local_artqtml\local\approve;
 
 /**
- * Unit tests for approval and its revocation (Jov-031, Jov-039, Jov-040).
- *
- * The state transitions themselves are covered end-to-end in tests/approve-statemachine.spec.ts;
- * what is asserted here is the part a UI test cannot see - exactly which database columns each
- * operation is allowed to touch. Jov-040 turns on that distinction: "A visszavonás az approved
- * jelzőt 0-ra állítja; a validációs státuszt nem módosítja."
+ * Unit tests for approval and its revocation.
  *
  * @package    local_artqtml
  * @category   test
@@ -76,10 +71,6 @@ final class question_approval_service_test extends \advanced_testcase {
         return [(int) $generationid, (int) $DB->insert_record('local_artqtml_questions', $question)];
     }
 
-    /**
-     * Jov-040: revoking clears approved/approvedby and touches nothing else - in particular the
-     * AI's verdict survives, so a revoked question does not silently become "Not evaluated".
-     */
     public function test_revoke_clears_only_the_approval_columns(): void {
         global $DB, $USER;
 
@@ -112,17 +103,12 @@ final class question_approval_service_test extends \advanced_testcase {
         $this->assertEquals($approved->edited, $revoked->edited);
         $this->assertEquals($approved->movedout, $revoked->movedout);
 
-        // Jov-035 keeps the workflow steps separately auditable.
+        // keeps the workflow steps separately auditable.
         $this->assertCount(1, $events);
         $this->assertInstanceOf(\local_artqtml\event\question_approval_revoked::class, $events[0]);
         $this->assertEquals($questionid, $events[0]->objectid);
     }
 
-    /**
-     * Jov-039/Jov-040: revocation only exists in the "Jóváhagyva" state. An unapproved row and a
-     * row already moved into a real question bank are both no-ops, so a stale or replayed link
-     * cannot reopen a closed state.
-     */
     public function test_revoke_is_a_noop_outside_the_approved_state(): void {
         global $DB, $USER;
 
@@ -144,9 +130,8 @@ final class question_approval_service_test extends \advanced_testcase {
     }
 
     /**
-     * Jov-041/Jov-043: a moved question is not deletable row-by-row, and its generation reports
-     * that it holds one.
-     */
+ * a moved question is not deletable row-by-row, and its generation reports that it holds one.
+ */
     public function test_moved_questions_are_not_deletable_and_block_generation_deletion(): void {
         global $DB, $USER;
 

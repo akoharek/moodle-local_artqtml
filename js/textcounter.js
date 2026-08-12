@@ -14,7 +14,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Live character/word/token counter for the source text upload page (Felt-015/016).
+ * Live character/word/token counter for the source text upload page.
  *
  * Plain JS (no AMD/grunt build), matching js/status.js's approach elsewhere in this plugin.
  *
@@ -37,40 +37,24 @@ window.ArtqtmlTextCounter = (function() {
     }
 
     /**
-     * Wire up a textarea to update a counter region on every keystroke.
-     *
-     * WHAT CHANGED 2026-08-04. This counter used to be the ONLY size check in the plugin, and it
-     * was never a check: it coloured a number and let any text through. There is now a server-side
-     * limit ({@see \local_artqtml\local\source_text_limit}), and this function's job is to
-     * show it coming and stop an ordinary submission before it wastes a round trip. It is not the
-     * enforcement - a crafted POST bypasses every line of this file, which is why the same limit
-     * is applied again in the form, the upload handler and the task.
-     *
-     * A NOTE ON THE TWO COUNTS. JavaScript's text.length counts UTF-16 code units; PHP's
-     * \core_text::strlen counts Unicode characters. For ordinary text - including Hungarian
-     * accents - they agree. They differ on emoji and some composed characters, where this counter
-     * reads high by one per affected character. The server's answer is the one that decides, and
-     * it is the more permissive of the two, so the disagreement can only ever show a warning
-     * slightly early - never let an oversized text through.
-     *
-     * THE CONTEXT-WINDOW COLOURING IS GONE, removed 2026-08-04 evening. It was the behaviour for
-     * the case where no source-text limit applied, and there is no such case: the server's
-     * source_text_limit::token_limit() derives a limit from the context window when none is set
-     * explicitly and never returns less than 1. So the branch could not be reached, and a reader
-     * comparing this file with the settings screen would have concluded the two disagreed.
-     *
-     * @param {string} textareaid
-     * @param {string} counterid
-     * @param {number} sourcetokenlimit the effective server-side source-text limit in estimated
-     *      tokens (Felt-016: the warning is relative to this, not a flat count)
-     * @param {string} labeltemplate the "textcounterlabel" lang string, pre-rendered server-side
-     *      with '__CHARS__'/'__WORDS__'/'__TOKENS__' sentinels in place of the real counts
-     *      (Felt-015/Glob-029: the counter text must be lang-string based, not hardcoded English)
-     * @param {string} limittemplate the "textcounterlimitlabel" lang string, already carrying the
-     *      limit, appended after the counts
-     * @param {string} errormessage the localised message shown by the browser when the text is
-     *      over the limit
-     */
+ * Wire up a textarea to update a counter region on every keystroke.
+ *
+ * THE CONTEXT-WINDOW COLOURING IS GONE, removed 2026-08-04 evening. It was the behaviour for
+ * the case where no source-text limit applied, and there is no such case: the server's
+ * source_text_limit::token_limit() derives a limit from the context window when none is set
+ * explicitly and never returns less than 1. So the branch could not be reached, and a reader
+ * comparing this file with the settings screen would have concluded the two disagreed.
+ *
+ * @param {string} textareaid
+ * @param {string} counterid
+ * @param {number} sourcetokenlimit the effective server-side source-text limit in estimated
+ * tokens (: the warning is relative to this, not a flat count)
+ * @param {string} labeltemplate the "textcounterlabel" lang string, pre-rendered server-side
+ * @param {string} limittemplate the "textcounterlimitlabel" lang string, already carrying the
+ * limit, appended after the counts
+ * @param {string} errormessage the localised message shown by the browser when the text is
+ * over the limit
+ */
     function init(textareaid, counterid, sourcetokenlimit, labeltemplate, limittemplate, errormessage) {
         var textarea = document.getElementById(textareaid);
         var counter = document.getElementById(counterid);

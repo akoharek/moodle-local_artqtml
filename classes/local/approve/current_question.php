@@ -19,12 +19,6 @@ namespace local_artqtml\local\approve;
 /**
  * What the question says *now*, in the shape the approve page's detail panel already reads.
  *
- * BL-28, second half. The panel used to render `local_artqtml_questions.questiondata` - the JSON
- * the AI returned at generation time - and nothing ever updated it. Measured on 2026-08-02: after a
- * teacher rewrote an answer option in Moodle's editor, the panel still listed the option they had
- * replaced. That panel is what a teacher reads before pressing Approve, so it was showing one
- * version and approving another.
- *
  * The fix keeps the stored copy as what it is - the record of what the AI produced, which the
  * validator judged and the privacy export describes - and resolves what is displayed from Moodle at
  * read time. Derived, not stored twice, so the two cannot drift; the same rule the question grid
@@ -86,7 +80,7 @@ class current_question {
             case 'IH':
                 // True/False keeps the verdict on the definition itself, not in the answers.
                 $data['correctanswer'] = !empty($question->rightanswer);
-                // BL-29: and its two per-answer explanations in named feedback fields.
+                // and its two per-answer explanations in named feedback fields.
                 $data['explanationtrue'] = self::plain($question->truefeedback ?? '');
                 $data['explanationfalse'] = self::plain($question->falsefeedback ?? '');
                 break;
@@ -97,7 +91,7 @@ class current_question {
                     $options[] = [
                         'text'    => self::plain($answer->answer),
                         'correct' => (float) $answer->fraction > 0,
-                        // BL-29: Moodle keeps the per-option explanation in the answer's feedback.
+                        // Moodle keeps the per-option explanation in the answer's feedback.
                         'explanation' => self::plain($answer->feedback ?? ''),
                     ];
                 }
@@ -139,11 +133,6 @@ class current_question {
     /**
      * Moodle's HTML, reduced to the plain text the stored JSON always held.
      *
-     * The detail panel escapes what it is given, because the AI's output is plain text. Moodle
-     * stores the same fields as HTML, so handing them over unchanged printed the markup itself -
-     * `<p>Bőséges napfény</p>` on the screen, seen on 2026-08-02 the first time this ran. Stripping
-     * here rather than un-escaping there keeps this class's promise: the array it returns is in the
-     * shape the stored JSON was, and the panel needs no knowledge of where it came from.
      *
      * @param string|null $html
      * @return string

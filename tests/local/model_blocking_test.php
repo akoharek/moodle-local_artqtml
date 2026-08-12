@@ -17,7 +17,7 @@
 namespace local_artqtml\local;
 
 /**
- * Unit tests for the model blocking state (Admin-055, Admin-065, Glob-036).
+ * Unit tests for the model blocking state.
  *
  * @package    local_artqtml
  * @category   test
@@ -35,10 +35,6 @@ final class model_blocking_test extends \advanced_testcase {
         set_config('geminimodel', 'gemini-3.5-flash', 'local_artqtml');
     }
 
-    /**
-     * Admin-065: an unset model is itself a blocking state, and its message is distinguishable
-     * from the unusable-model one - the two need different administrator actions.
-     */
     public function test_unset_model_blocks_with_its_own_message(): void {
         $this->resetAfterTest();
 
@@ -71,8 +67,8 @@ final class model_blocking_test extends \advanced_testcase {
     }
 
     /**
-     * Glob-036/Admin-056/057: a blocked provider names the model and carries the traceable code.
-     */
+ * a blocked provider names the model and carries the traceable code.
+ */
     public function test_block_records_reason_model_and_code(): void {
         $this->resetAfterTest();
         $this->configure_models();
@@ -100,8 +96,8 @@ final class model_blocking_test extends \advanced_testcase {
     }
 
     /**
-     * Admin-054: a successful check clears it again.
-     */
+ * a successful check clears it again.
+ */
     public function test_clear_unblocks(): void {
         $this->resetAfterTest();
         $this->configure_models();
@@ -120,17 +116,14 @@ final class model_blocking_test extends \advanced_testcase {
     }
 
     /**
-     * Admin-055: "A blokkoló állapotot kizárólag a modellellenőrzés írja [...] A normál generálási
-     * forgalom soha nem állítja be, még HTTP 404 esetén sem."
-     *
-     * A static scan, because the rule is about who may call block()/clear() - the generation and
-     * validation tasks must not, no matter what HTTP status they see.
-     */
+ * A static scan, because the rule is about who may call block()/clear() - the generation and
+ * validation tasks must not, no matter what HTTP status they see.
+ */
     public function test_only_the_model_checker_writes_the_blocking_state(): void {
         $root = realpath(__DIR__ . '/../..');
         $allowed = [
             $root . '/classes/local/model_blocking.php', // The class itself.
-            $root . '/classes/local/model_checker.php', // Admin-055's sole permitted writer.
+            $root . '/classes/local/model_checker.php', // 's sole permitted writer.
         ];
 
         $offenders = [];
@@ -148,7 +141,7 @@ final class model_blocking_test extends \advanced_testcase {
         $this->assertSame(
             [],
             $offenders,
-            'only the model check may set or clear the blocking state (Admin-055): ' . implode(', ', $offenders)
+            'only the model check may set or clear the blocking state' . implode(', ', $offenders)
         );
     }
 

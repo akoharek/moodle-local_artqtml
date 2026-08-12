@@ -19,11 +19,7 @@ namespace local_artqtml\task;
 use local_artqtml\local\problem_category;
 
 /**
- * Unit tests for the validation problem_category enum (Val-019/Val-028/Val-029, PROB-F004).
- *
- * The empty-string enum member used to fail Gemini's structured-output schema validation
- * ("problem_category.enum[0]: cannot be empty"); these tests lock in the four-key replacement,
- * the single source of truth, and the lang-string labelling.
+ * Unit tests for the validation problem_category enum (//, PROB-F004).
  *
  * @package    local_artqtml
  * @category   test
@@ -65,11 +61,6 @@ final class validate_questions_problemcategory_test extends \advanced_testcase {
         $this->assertContains('problem_category', $required, 'problem_category must stay required');
     }
 
-    /**
-     * Val-029 / PROB-F001: every key has a non-empty lang label, and the label is never the raw
-     * machine key. The 'ok' label ("No issue") is distinct from the "Accepted" suggestion label
-     * (PROB-F002).
-     */
     public function test_every_key_has_a_distinct_lang_label(): void {
         foreach (problem_category::VALUES as $key) {
             $label = problem_category::label($key);
@@ -99,14 +90,8 @@ final class validate_questions_problemcategory_test extends \advanced_testcase {
         $this->assertSame('other', problem_category::normalise('bogus', 'other'));
     }
 
-    /**
-     * Admin-021/Val-028: the assembled system instruction lists exactly the four code-owned keys
-     * and carries no "empty if accepted" stipulation, whatever the (default) template says.
-     */
     public function test_system_instruction_uses_the_four_keys_and_no_empty_if_accepted(): void {
         $this->resetAfterTest();
-        // Admin-066: an empty template is now an empty prompt - there is no fallback. Seed the
-        // same file install and upgrade use, which is also what a real site runs.
         global $CFG;
         foreach (require($CFG->dirroot . '/local/artqtml/db/prompt_defaults.php') as $s => $v) {
             set_config($s, $v, 'local_artqtml');
@@ -125,13 +110,8 @@ final class validate_questions_problemcategory_test extends \advanced_testcase {
     }
 
     /**
-     * A minimal generation for build_system_instruction(), which since Val-031 takes the record so
-     * it can substitute the difficulty definitions for THAT generation's mode. Scale mode, because
-     * that is what the shipped default is and what these assertions describe; free text would
-     * deliberately leave the difficulty clause empty.
-     *
-     * @return \stdClass
-     */
+ * @return \stdClass
+ */
     private function scale_generation(): \stdClass {
         $generation = new \stdClass();
         $generation->settings = json_encode([

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Magyar nyelvi fájl a local_artqtml pluginhoz (Glob-015).
+ * Magyar nyelvi fájl a local_artqtml pluginhoz.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

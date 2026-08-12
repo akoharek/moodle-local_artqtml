@@ -17,7 +17,7 @@
 namespace local_artqtml\local\approve;
 
 /**
- * The approve page's detail panel must describe the question as it is now (BL-28).
+ * The approve page's detail panel must describe the question as it is now.
  *
  * Measured on 2026-08-02, before this class existed: a teacher rewrote an answer option in Moodle's
  * editor, and the panel went on listing the option they had replaced - because it rendered the JSON

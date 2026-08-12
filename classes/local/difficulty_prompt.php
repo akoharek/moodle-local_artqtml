@@ -15,9 +15,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The single source for what the difficulty levels mean, for both the generator and the validator
- * (Admin-069, Val-031). Easy/Medium/Hard scale mode.
- *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

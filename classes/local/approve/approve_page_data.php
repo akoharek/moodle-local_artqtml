@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Read-only data gathering for the draft approval page (functional spec ch.7) - split out of the
+ * Read-only data gathering for the draft approval page - split out of the
  * approve.php controller. Counters, the paginated/sorted question query and the category
  * resolution; no HTML, no mutation.
  *
@@ -32,30 +32,16 @@ use local_artqtml\local\draft_bank;
  */
 class approve_page_data {
     /**
-     * The sortable column key -> SQL order-by expression map (Jov-011/012). 'lasteditedby' sorts
-     * by the editor's name via the lasteditorname alias the {@see self::questions()} query builds.
-     *
-     * @return array<string,string>
-     */
+ * @return array<string,string>
+ */
     public static function sortable_columns(): array {
         return [
             'name'         => 'q.questioncode',
             'type'         => 'q.typecode',
             'difficulty'   => 'q.difficultylabel',
             'validation'   => 'q.validationsuggestion',
-            // No 'confidence' entry: spec v26 removed the Confidence column from this table
-            // ("Konfidencia oszlop a táblázatban nem jelenik meg"), and an unsortable-because-
-            // unrendered column must not keep a sort key that a stale bookmarked URL could still
-            // reach. The confidence % itself lives on in the question editor's read-only
-            // validation section (Jov-020) - see classes/local/validation_panel.php.
             'timecreated'  => 'q.timecreated',
-            // V20 #14: sortable creator column, consistent with the list page. On this page every
-            // row shares the generation owner as its creator, so the sort is effectively a no-op
-            // here, but the header is made sortable for UI consistency. Backed by creatorname below.
             'creator'      => 'creatorname',
-            // Jov-011: sort by the editor's name (not the raw userid), so a teacher can group a
-            // generation's questions by who last touched them; unedited rows have no editor and sort
-            // together at the start/end. Backed by the LEFT JOIN + lasteditorname alias in the query below.
             'lasteditedby' => 'lasteditorname',
         ];
     }
@@ -73,12 +59,9 @@ class approve_page_data {
     }
 
     /**
-     * Val-017/TC-Val-019: the four-status validation summary counts, in a fixed key order
-     * (accepted, needs_review, rejected, not_evaluated) that drives the badge display order.
-     *
-     * @param int $generationid
-     * @return array<string,int>
-     */
+ * @param int $generationid
+ * @return array<string,int>
+ */
     public static function status_counts(int $generationid): array {
         global $DB;
 
@@ -100,12 +83,9 @@ class approve_page_data {
     }
 
     /**
-     * Same eligibility criteria as the 'allaccepted' bulk action (accepted, not yet approved, not
-     * yet moved out) - TC-Val-019/TC-Val-043: the bulk-approve button reacts to this count.
-     *
-     * @param int $generationid
-     * @return int
-     */
+ * @param int $generationid
+ * @return int
+ */
     public static function eligible_for_approval(int $generationid): int {
         global $DB;
 
@@ -133,14 +113,7 @@ class approve_page_data {
         $sortable = self::sortable_columns();
         $orderby = ($sortable[$sort] ?? 'q.id') . ' ' . $dir . ', q.id ASC';
 
-        // Jov-011: LEFT JOIN the editor so "Last edited by" can be sorted by name (lasteditorname),
-        // not by the raw q.lasteditedby id. COALESCE keeps unedited rows (no join match) as an empty
-        // name rather than a NULL that some engines refuse to concatenate. q.id stays the leading unique
-        // column get_records_sql() requires.
         $editornamesort = 'LOWER(' . $DB->sql_concat("COALESCE(ue.lastname, '')", "COALESCE(ue.firstname, '')") . ')';
-        // V20 #14: the generation owner's name, so the "Created by" column is a valid ORDER BY
-        // target. INNER JOINs are safe: every question has a generation (FK), and a generation
-        // has a userid (NOT NULL).
         $creatornamesort = 'LOWER(' . $DB->sql_concat('uc.lastname', 'uc.firstname') . ')';
 
         return $DB->get_records_sql(
@@ -201,7 +174,7 @@ class approve_page_data {
                 $params['cmid'] = $cmid;
             }
         } else {
-            // Finding #1: draft questions live in the draft course context on 4.5.
+            // draft questions live in the draft course context on 4.5.
             $params['courseid'] = draft_bank::get_draft_courseid() ?? SITEID;
         }
 

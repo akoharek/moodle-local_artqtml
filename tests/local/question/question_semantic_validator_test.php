@@ -19,9 +19,6 @@ namespace local_artqtml\local\question;
 use local_artqtml\local\question_types;
 
 /**
- * Unit tests for M-07 semantic validation of AI-generated question data (technical annex ch.6,
- * v20 #6/#7 - server-side FE/SR enforcement). Supported types: IH/FE/SR.
- *
  * @package    local_artqtml
  * @category   test
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

@@ -14,9 +14,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * "Test connection" + dynamic model list buttons on the Generator/Validator LLM admin tabs
- * (Admin-011/012/017/018). Plain JS (no AMD/grunt build).
- *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -59,18 +56,13 @@ window.ArtqtmlAdminTest = (function() {
     }
 
     /**
-     * Wire the "Test connection" button on one LLM tab.
-     *
-     * Admin-048: this no longer populates a model control. It used to fill its own <select> and
-     * mirror the choice into a text input, leaving two model controls on the tab at once. The
-     * model field is now itself a select fed from the cached list (setting_modelselect), so a
-     * successful test refreshes that cache server-side and the page reloads to pick it up.
-     *
-     * @param {string} provider 'claude' or 'gemini'
-     * @param {string} buttonid id of the test button
-     * @param {string} statusid id of the status span
-     * @return {void}
-     */
+ * Wire the "Test connection" button on one LLM tab.
+ *
+ * @param {string} provider 'claude' or 'gemini'
+ * @param {string} buttonid id of the test button
+ * @param {string} statusid id of the status span
+ * @return {void}
+ */
     function init(provider, buttonid, statusid) {
         var button = document.getElementById(buttonid);
         var status = document.getElementById(statusid);
@@ -87,8 +79,7 @@ window.ArtqtmlAdminTest = (function() {
                 status.textContent = data.message;
                 status.className = 'ml-2 ' + (data.success ? 'text-success' : 'text-danger');
                 if (data.success) {
-                    // Admin-050: the dropdown only exists once a test has succeeded, and it is
-                    // built server-side from the cache that test populated.
+                    // the dropdown only exists once a test has succeeded, and it is built server-side from the cache that test populated.
                     window.location.reload();
                 }
                 return null;

@@ -25,8 +25,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $tasks = [
     [
-        // Admin-052: once a day. Deliberately not more often - each run makes a real (if tiny)
-        // billable call per provider, and a withdrawn model is not a minute-to-minute risk.
         'classname' => 'local_artqtml\task\model_check_task',
         'blocking'  => 0,
         'minute'    => '15',
@@ -36,9 +34,6 @@ $tasks = [
         'month'     => '*',
     ],
     [
-        // Gen-001-021/Val-*: runs the Claude/Gemini calls in the background instead of inline
-        // in the web request. Every 5 minutes by default; can also be run on demand via
-        // admin/cli/scheduled_task.php --execute for near-instant processing while testing.
         'classname' => 'local_artqtml\task\process_pending_generations',
         'blocking'  => 0,
         'minute'    => '*/5',

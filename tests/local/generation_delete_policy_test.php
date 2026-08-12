@@ -19,9 +19,6 @@ namespace local_artqtml\local;
 /**
  * Unit tests for generation deletion authorisation.
  *
- * Product decision 2026-08-10: delete requires local/artqtml:use and ownership.
- * local/artqtml:configure never authorises deletion.
- *
  * @package    local_artqtml
  * @category   test
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
