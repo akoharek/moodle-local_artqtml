@@ -68,8 +68,8 @@ félévente. Arra a mérőműszer való, nem a kapu.
 kódot**. A CI-ben nem fut. A `tests/`, a `tools/` és a `node_modules/` ki van zárva belőle — egy
 teszt hosszú törzse nem karbantartási adósság.
 
-**A `db/upgrade.php` is kizárva, és ez nem kényelmi döntés.** A Moodle előírt alakja egy hosszú
-lánc `if ($oldversion < X) { … }` blokkokból, minden korábbi verzióhoz egy; minden plugin upgrade
+**A `db/upgrade.php` is kizárva.** A Moodle előírt alakja egy hosszú lánc
+`if ($oldversion < X) { … }` blokkokból, minden korábbi verzióhoz egy; minden plugin upgrade
 fájlja így néz ki, és nem is szabad átalakítani. A phpmd 2026-07-31-én **CC=94-et, 766 sort és
 `9223372036854775807` NPath-ot** mért rá — az utóbbi a PHP legnagyobb egész száma, vagyis a számolás
 túlcsordult. Bennhagyva a három találata elnyomná azt, ami valóban ránézést érdemel.

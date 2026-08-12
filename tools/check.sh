@@ -140,11 +140,8 @@ echo
 
 echo "==> PHPMD (codesize + design) — tájékoztató, nem kapu"
 if inweb test -x "$TOOLS/phpmd" 2>/dev/null; then
-    # A db/upgrade.php kizárása nem kényelmi döntés. A Moodle előírt alakja egy hosszú lánc
-    # `if ($oldversion < X) { ... }` blokkokból, minden korábbi verzióhoz egy — minden plugin
-    # upgrade fájlja így néz ki, és nem is szabad átalakítani. A phpmd 2026-07-31-én CC=94-et,
-    # 766 sort és PHP_INT_MAX NPath-ot mért rá (vagyis túlcsordult a számoláson). Bennhagyva a
-    # három találata elnyomná azt, ami valóban ránézést érdemel.
+    # Exclude db/upgrade.php: Moodle requires a long chain of `if ($oldversion < X)` blocks,
+    # one per past version. phpmd reports huge complexity on that shape and would drown real hits.
     phpmd_out="$(inweb php "$TOOLS/phpmd" "$PLUGIN_PATH" text codesize,design \
         --exclude "$PLUGIN_PATH/tools/*,$PLUGIN_PATH/tests/*,$PLUGIN_PATH/node_modules/*,$PLUGIN_PATH/db/upgrade.php" 2>&1)"
 
