@@ -48,7 +48,7 @@ final class question_bank_list_test extends \advanced_testcase {
 
         require_once($CFG->libdir . '/questionlib.php');
 
-        // Light's own draft root + a legacy sibling root (as Full / aiquizgen leave behind).
+        // This plugin's draft root + a legacy sibling root (as earlier installs leave behind).
         $lightroot = draft_bank::get_root_category_id();
         $draftqcontextid = (int) draft_bank::get_draft_context_id();
         $lightdraft = draft_bank::create((object) [

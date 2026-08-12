@@ -1,32 +1,42 @@
-# Changelog — ArtQTML Light (`local_artqtml`)
+# Changelog — ArtQTML (`local_artqtml`)
 
 Newest release first. Version numbers match `version.php` `$plugin->version`;
 the number in parentheses is `$plugin->release`.
 
-This is the **Light** edition: IH / FE / SR; paste + plain `.txt`; Claude + Gemini
-BYOK; review / approve; easy / medium / hard; thin admin.
+Scope: IH / FE / SR; paste + plain `.txt`; Claude + Gemini BYOK; review / approve;
+easy / medium / hard; thin admin.
+
+## 2026-08-12 — `2026081204` (1.0.0)
+
+**HQ review docs: positive scope only**
+
+- README and SUPPORT describe what ships (paste/TXT, IH/FE/SR, BYOK, tracker) with
+  no absence lists or dual-product wording.
+- Delete in-repo `BACKLOG.md` and `CLAUDE.md` (dev clutter).
+- `COPYRIGHT.txt` title simplified to `ArtQTML (local_artqtml)`.
+- Neutralize remaining product-variant hints in comments, lang strings, and tests.
 
 ## 2026-08-12 — `2026081203` (1.0.0)
 
-**Marketplace copy: claim only what Light includes**
+**Marketplace copy: claim only shipping features**
 
-- README and listing docs describe Light scope only (paste/TXT, IH/FE/SR, BYOK,
-  review/approve, difficulty scale) — no “not included” feature lists.
+- README and listing docs describe scope only (paste/TXT, IH/FE/SR, BYOK,
+  review/approve, difficulty scale).
 - `COPYRIGHT.txt` title line simplified to `ArtQTML (local_artqtml)`.
-- Remove in-repo `BACKLOG.md` from Light (local-only archive outside the tree;
+- Remove in-repo `BACKLOG.md` (local-only archive outside the tree;
   Marketplace ZIP already excluded it).
 
 ## 2026-08-12 — `2026081202` (1.0.0)
 
-**Marketplace docs/comments: remove remaining Full-era smell**
+**Marketplace docs/comments: Light-aligned wording**
 
-- `CHANGES.md` rewritten as an honest Light changelog.
+- `CHANGES.md` rewritten as an honest changelog for this plugin.
 - Code comments in shipping PHP/XML updated so type codes, upload path, and admin
-  capabilities describe Light (IH/FE/SR, TXT-only).
+  capabilities describe IH/FE/SR and TXT-only.
 
 ## 2026-08-12 — `2026081201` (1.0.0)
 
-**Marketplace copy: TXT-only and strip Full lang leftovers**
+**Marketplace copy: TXT-only and lang pack cleanup**
 
 - User-facing EN/HU strings and reviewer docs aligned with paste + `.txt` and
   IH/FE/SR only.
@@ -46,13 +56,13 @@ BYOK; review / approve; easy / medium / hard; thin admin.
 
 - `tools/package_marketplace_zip.sh` builds an `artqtml/` top-level ZIP with
   English lang only (dev HU pack stays in the repo).
-- README, COPYING, and Light-aligned PHPUnit coverage for the IH/FE/SR matrix.
+- README, COPYING, and PHPUnit coverage for the IH/FE/SR matrix.
 
 ## 2026-08-11 — `2026081100` (1.0.0)
 
-**Light edition strip (fork)**
+**Marketplace feature set**
 
-- Feature matrix set to IH / FE / SR; source input is paste + plain `.txt`.
+- Feature set: IH / FE / SR; source input is paste + plain `.txt`.
 - Single-question move and thin admin settings (BYOK, models, draft course).
 - GPL `COPYRIGHT.txt` for Marketplace distribution.
 

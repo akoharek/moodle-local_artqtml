@@ -2,7 +2,7 @@
 
 Public tracker: https://github.com/akoharek/moodle-local_artqtml/issues
 
-When someone opens, edits, closes, labels, or otherwise changes an issue, GitHub Actions can notify maintainers via **Microsoft Teams** (preferred) and optionally **email**. Alerts run only on this public Light repo. Missing secrets skip with a warning and do not fail other CI.
+When someone opens, edits, closes, labels, or otherwise changes an issue, GitHub Actions can notify maintainers via **Microsoft Teams** (preferred) and optionally **email**. Missing secrets skip with a warning and do not fail other CI.
 
 Workflow: [`.github/workflows/notify-issue.yml`](.github/workflows/notify-issue.yml)
 

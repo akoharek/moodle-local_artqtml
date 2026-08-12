@@ -130,7 +130,7 @@ final class generate_form_test extends \advanced_testcase {
             $this->assertFalse($mform->elementExists('typeheader_' . $removed), $removed);
             $this->assertFalse($mform->elementExists('instruction_' . $removed), $removed);
         }
-        // Per-type AI instruction boxes were a Full feature.
+        // Per-type AI instruction boxes are not supported.
         $this->assertFalse($mform->elementExists('instruction_IH'));
     }
 

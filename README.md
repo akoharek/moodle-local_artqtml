@@ -2,7 +2,7 @@
 
 Moodle local plugin that generates quiz questions with **Claude**, validates them with **Gemini**, then lets teachers review and approve into the question bank.
 
-This is the **Light** Marketplace edition (GPLv3+):
+Scope (GPLv3+):
 
 - Source: paste/type or **`.txt`** upload
 - Types: true/false (IH), single-choice (FE), ordering (SR — requires `qtype_ordering`)

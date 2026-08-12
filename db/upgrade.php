@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Upgrade steps for local_artqtml Light.
+ * Upgrade steps for local_artqtml.
  *
- * This is a new plugin identity (never installed as Full artqtml), so there is no
- * migration history to carry forward. Schema is created from install.xml only.
+ * New plugin identity: no prior migration history to carry forward.
+ * Schema is created from install.xml only.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

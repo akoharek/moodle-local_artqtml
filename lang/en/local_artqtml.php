@@ -247,7 +247,7 @@ $string['orderingnumberingtype_iiii'] = 'Upper-case roman numerals (I, II, III, 
 $string['orderingnumberingtype_none'] = 'No numbering';
 $string['pageheading'] = 'ArtQTML';
 $string['pageintro'] = 'Generate quiz questions with AI, then review and add them to a Moodle question bank.';
-$string['plugindesc'] = 'Generate quiz questions with Claude, validate with Gemini, then review and approve into the question bank. Light edition: paste or TXT source; true/false, single choice, and ordering.';
+$string['plugindesc'] = 'Generate quiz questions with Claude, validate with Gemini, then review and approve into the question bank. Paste or TXT source; true/false, single choice, and ordering.';
 $string['plugindisabled'] = 'The ArtQTML is currently disabled by the site administrator.';
 $string['pluginname'] = 'ArtQTML';
 $string['privacy:metadata'] = 'The ArtQTML plugin does not store any personal data beyond generations, their generated questions, and log entries linked to the requesting user. Source text is sent to Claude and Gemini for processing.';
@@ -360,7 +360,7 @@ $string['settingtestconnection'] = 'Connection test';
 $string['settingvalidatorcontextwindow'] = 'Validator context window (tokens)';
 $string['settingvalidatorcontextwindow_desc'] = 'The validator model\'s context window, in tokens. The plugin fills at most 80% of it and counts the full source text into every round, so the questions are validated in as many rounds as that allows. Set it below the model\'s real limit and you get more, shorter rounds; set it above and the provider may reject the request.';
 $string['sourcefile'] = 'Or upload a file';
-$string['sourcefile_help'] = 'Optionally upload a plain `.txt` file; its text is loaded into the box below, where you can still edit it. PDF and Word (DOCX) uploads are not supported in this Light edition — paste that material into the source-text field instead.
+$string['sourcefile_help'] = 'Optionally upload a plain `.txt` file; its text is loaded into the box below, where you can still edit it. PDF and Word (DOCX) uploads are not supported — paste that material into the source-text field instead.
 
 You can also skip the file picker and only paste or type into the source-text field.';
 $string['sourcefilemaxsize'] = 'Maximum file size: {$a}';

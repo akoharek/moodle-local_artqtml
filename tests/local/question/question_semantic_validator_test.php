@@ -100,9 +100,9 @@ final class question_semantic_validator_test extends \advanced_testcase {
     }
 
     /**
-     * Removed Full types (FT/RV/EH) are rejected as unsupported.
+     * Unsupported type codes (FT/RV/EH) are rejected.
      */
-    public function test_removed_full_types_are_unsupported(): void {
+    public function test_unsupported_type_codes_are_rejected(): void {
         foreach (['FT', 'RV', 'EH'] as $type) {
             $reason = question_semantic_validator::validate($type, ['questiontext' => 'Q?']);
             $this->assertNotNull($reason, $type);

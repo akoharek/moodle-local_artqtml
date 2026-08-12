@@ -260,8 +260,7 @@ if ($hassiteconfig || has_capability('local/artqtml:configure', context_system::
         1
     ));
 
-    // Local copies of qtype_ordering option sets (see Full plugin notes) — avoid loading the
-    // qtype class from settings.php.
+    // Local copies of qtype_ordering option sets — avoid loading the qtype class from settings.php.
     $qtypes->add(new admin_setting_configselect(
         'local_artqtml/orderinggradingtype',
         get_string('settingorderinggradingtype', 'local_artqtml'),

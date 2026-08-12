@@ -247,7 +247,7 @@ $string['orderingnumberingtype_iiii'] = 'Nagybetűs római számok (I, II, III, 
 $string['orderingnumberingtype_none'] = 'Nincs számozás';
 $string['pageheading'] = 'ArtQTML';
 $string['pageintro'] = 'Generálj kérdéseket AI segítségével, majd tekintsd át és helyezd át őket a Moodle kérdésbankba.';
-$string['plugindesc'] = 'Kvízkérdések generálása Claude-dal, ellenőrzés Gemini-vel, majd átnézés és jóváhagyás a kérdésbankba. Light kiadás: beillesztett vagy TXT forrás; igaz/hamis, egy helyes válasz, sorrendezés.';
+$string['plugindesc'] = 'Kvízkérdések generálása Claude-dal, ellenőrzés Gemini-vel, majd átnézés és jóváhagyás a kérdésbankba. Beillesztett vagy TXT forrás; igaz/hamis, egy helyes válasz, sorrendezés.';
 $string['plugindisabled'] = 'A ArtQTML jelenleg le van tiltva az adminisztrátor által.';
 $string['pluginname'] = 'ArtQTML';
 $string['privacy:metadata'] = 'A ArtQTML plugin a generálásokon, a generált kérdéseken és a kezdeményező felhasználóhoz kötött naplóbejegyzéseken túl nem tárol személyes adatot. A forrásszöveg feldolgozás céljából elküldésre kerül a Claude és Gemini szolgáltatásoknak.';
@@ -360,7 +360,7 @@ $string['settingtestconnection'] = 'Kapcsolat tesztelése';
 $string['settingvalidatorcontextwindow'] = 'Validáló context window (token)';
 $string['settingvalidatorcontextwindow_desc'] = 'A validáló modell context window mérete tokenben. A plugin ennek legfeljebb 80%-át tölti ki, és minden körbe beleszámítja a teljes forrásszöveget - a kérdések ennyi körben mennek át a validáláson. Ha a modell valódi korlátjánál kisebbre állítod, több és rövidebb kör lesz; ha nagyobbra, a szolgáltató visszautasíthatja a kérést.';
 $string['sourcefile'] = 'Vagy tölts fel egy fájlt';
-$string['sourcefile_help'] = 'Opcionálisan tölts fel egy egyszerű `.txt` fájlt; a szövege a lenti mezőbe kerül, ahol szabadon szerkeszthető. PDF és Word (DOCX) feltöltés ebben a Light kiadásban nem támogatott — azt az anyagot illeszd be a forrásszöveg mezőbe.
+$string['sourcefile_help'] = 'Opcionálisan tölts fel egy egyszerű `.txt` fájlt; a szövege a lenti mezőbe kerül, ahol szabadon szerkeszthető. PDF és Word (DOCX) feltöltés nem támogatott — azt az anyagot illeszd be a forrásszöveg mezőbe.
 
 A fájlválasztót ki is hagyhatod, és csak a forrásszöveg mezőbe írhatsz vagy illeszthetsz be.';
 $string['sourcefilemaxsize'] = 'Legnagyobb fájlméret: {$a}';

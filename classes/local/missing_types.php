@@ -110,7 +110,7 @@ class missing_types {
         // The generation-wide per-level totals are derived from the grid in
         // local_artqtml_build_settings(); derived again here, from the same grid, so the stored
         // settings cannot describe a request the grid does not.
-        // Light: Easy/Medium/Hard scale only (Bloom totals are Full-only).
+        // Easy/Medium/Hard scale only (Bloom totals are not supported).
         foreach (['easy', 'medium', 'hard'] as $level) {
             $sum = 0;
             foreach ($matrix as $bytype) {

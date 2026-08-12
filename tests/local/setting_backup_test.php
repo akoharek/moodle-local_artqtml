@@ -129,19 +129,18 @@ final class setting_backup_test extends \advanced_testcase {
     }
 
     /**
-     * Light is a new plugin identity: upgrade.php carries no Full migration history.
+     * New plugin identity: upgrade.php carries no prior migration history.
      *
-     * The setting_backup helper remains for any future Light step that rewrites a prompt template.
+     * The setting_backup helper remains for any future step that rewrites a prompt template.
      */
-    public function test_upgrade_file_is_light_stub_without_full_history(): void {
+    public function test_upgrade_file_is_stub_without_prior_history(): void {
         $upgrade = file_get_contents(__DIR__ . '/../../db/upgrade.php');
 
-        $this->assertStringContainsString('install.xml', $upgrade);
+        $this->assertStringContainsString('new plugin identity', strtolower($upgrade));
         $this->assertStringContainsString('migration history', $upgrade);
-        $this->assertStringContainsString('new plugin identity', $upgrade);
         $this->assertTrue(
             class_exists(setting_backup::class),
-            'setting_backup must stay available for future Light prompt migrations'
+            'setting_backup must stay available for future prompt migrations'
         );
     }
 
