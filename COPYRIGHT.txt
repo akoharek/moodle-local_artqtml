@@ -1,4 +1,4 @@
-ArtQTML (local_artqtml) — Light / Moodle Marketplace edition
+ArtQTML (local_artqtml)
 
 Copyright (C) 2026 AR Tudásmenedzsment Kft.
 

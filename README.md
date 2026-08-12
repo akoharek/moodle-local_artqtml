@@ -8,9 +8,7 @@ This is the **Light** Marketplace edition (GPLv3+):
 - Types: true/false (IH), single-choice (FE), ordering (SR — requires `qtype_ordering`)
 - Difficulty: easy / medium / hard
 - Review: edit, approve, delete, **single-question** move to the bank
-- Admin: API keys (BYOK), models, connection test, draft course, thin type defaults
-
-Not included (separate Full product): PDF/DOCX, FT/EH/RV types, Bloom, free-text instruction, own-knowledge mode, bulk move, institutional prompt editing, token admin UI, `.lic` entitlement.
+- Admin: API keys (BYOK — Claude + Gemini), models, connection test, draft course, thin type defaults
 
 ## Requirements
 

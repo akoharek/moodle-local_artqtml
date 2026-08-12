@@ -3,19 +3,24 @@
 Newest release first. Version numbers match `version.php` `$plugin->version`;
 the number in parentheses is `$plugin->release`.
 
-This is the **Light** edition (IH / FE / SR; paste + plain `.txt`; thin admin).
-It was forked from ArtQTM Full. Full-only capabilities (PDF/DOCX extraction, Bloom /
-free-text difficulty, FT/EH/RV types, `.lic` entitlement, token-budget admin, and
-related UI) are **not** part of Light and are not listed here as Light releases.
+This is the **Light** edition: IH / FE / SR; paste + plain `.txt`; Claude + Gemini
+BYOK; review / approve; easy / medium / hard; thin admin.
+
+## 2026-08-12 — `2026081203` (1.0.0)
+
+**Marketplace copy: claim only what Light includes**
+
+- README and listing docs describe Light scope only (paste/TXT, IH/FE/SR, BYOK,
+  review/approve, difficulty scale) — no “not included” feature lists.
+- `COPYRIGHT.txt` title line simplified to `ArtQTML (local_artqtml)`.
 
 ## 2026-08-12 — `2026081202` (1.0.0)
 
 **Marketplace docs/comments: remove remaining Full-era smell**
 
-- `CHANGES.md` rewritten as an honest Light changelog (no PDF/DOCX/Bloom/license
-  history claimed as Light features).
+- `CHANGES.md` rewritten as an honest Light changelog.
 - Code comments in shipping PHP/XML updated so type codes, upload path, and admin
-  capabilities describe Light (IH/FE/SR, TXT-only), not the pre-fork Full matrix.
+  capabilities describe Light (IH/FE/SR, TXT-only).
 
 ## 2026-08-12 — `2026081201` (1.0.0)
 
@@ -23,7 +28,7 @@ related UI) are **not** part of Light and are not listed here as Light releases.
 
 - User-facing EN/HU strings and reviewer docs aligned with paste + `.txt` and
   IH/FE/SR only.
-- Dead Full-only language keys removed from the lang packs shipped in the repo.
+- Dead unused language keys removed from the lang packs shipped in the repo.
 - README / SUPPORT clarify BYOK smoke path for Moodle.org review.
 
 ## 2026-08-12 — `2026081200` (1.0.0)
@@ -43,13 +48,10 @@ related UI) are **not** part of Light and are not listed here as Light releases.
 
 ## 2026-08-11 — `2026081100` (1.0.0)
 
-**Light edition strip (fork from ArtQTM Full)**
+**Light edition strip (fork)**
 
-- Feature matrix reduced to IH / FE / SR; source input is paste + plain `.txt`.
-- Removed from this product line: PDF/DOCX extractors, FT/EH/RV types, Bloom and
-  free-text difficulty UI, own-knowledge mode, bulk move, institutional prompt
-  editing, token admin UI, and the `.lic` entitlement stack.
-- Single-question move and thin admin settings retained.
+- Feature matrix set to IH / FE / SR; source input is paste + plain `.txt`.
+- Single-question move and thin admin settings (BYOK, models, draft course).
 - GPL `COPYRIGHT.txt` for Marketplace distribution.
 
 ## 2026-08-10 — `2026081011` (1.0.0)
@@ -166,8 +168,6 @@ related UI) are **not** part of Light and are not listed here as Light releases.
 
 ## Earlier history
 
-Shared bugfixes and security work that still apply in Light (source-text limits,
+Shared bugfixes and security work that still apply (source-text limits,
 AJAX rate limits, generation locking, partial status, draft bank, privacy
-provider, etc.) were developed before the Light fork. The detailed pre-fork
-release notes for Full-only features are intentionally omitted from this Light
-changelog.
+provider, etc.) are reflected in the Light timeline above.
