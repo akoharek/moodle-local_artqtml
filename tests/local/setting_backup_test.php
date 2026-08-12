@@ -145,8 +145,8 @@ final class setting_backup_test extends \advanced_testcase {
     }
 
     /**
-     * Glob-037 ENFORCEMENT for Light: every prompt-template write in upgrade.php must be paired
-     * with setting_backup::backup(). Light ships with zero such writes today.
+     * Glob-037 ENFORCEMENT: every prompt-template write in upgrade.php must be paired
+     * with setting_backup::backup(). This plugin ships with zero such writes today.
      */
     public function test_future_template_migrations_must_back_up(): void {
         $upgrade = file_get_contents(__DIR__ . '/../../db/upgrade.php');

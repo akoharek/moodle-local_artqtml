@@ -16,7 +16,7 @@
 
 /**
  * The single source for what the difficulty levels mean, for both the generator and the validator
- * (Admin-069, Val-031). ArtQTML Light: scale mode only.
+ * (Admin-069, Val-031). Easy/Medium/Hard scale mode.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -36,8 +36,8 @@ class difficulty_prompt {
     /**
      * The difficulty description for a generation, ready to drop into a prompt.
      *
-     * Light keeps Easy/Medium/Hard scale only. Older stored settings may still carry bloom or
-     * freetext keys; those are ignored and the scale fragment is used.
+     * Uses the Easy/Medium/Hard scale fragment. Older stored settings keys outside scale
+     * are ignored.
      *
      * @param array $difficulty the generation's decoded difficulty settings
      * @return string empty only if the admin has emptied the setting

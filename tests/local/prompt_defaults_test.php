@@ -19,7 +19,7 @@ namespace local_artqtml\local;
 /**
  * The shipped prompt seed must stay in step with the code that substitutes into it (Admin-066).
  *
- * ArtQTML Light: scale + sourceonly only; no ownknowledge / bloom / freetext / shortanswer seeds.
+ * Scale + sourceonly prompt defaults for IH/FE/SR.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

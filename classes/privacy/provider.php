@@ -320,7 +320,7 @@ class provider implements
         self::delete_generations([]);
 
         // Orphan log rows (generation already gone) may still carry a userid; clear it.
-        // Light does not store full diagnostic payloads in log.data.
+        // Log rows do not store full diagnostic payloads in log.data.
         $DB->set_field_select('local_artqtml_log', 'userid', null, 'userid IS NOT NULL');
     }
 

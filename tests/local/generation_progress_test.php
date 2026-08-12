@@ -76,7 +76,7 @@ final class generation_progress_test extends \advanced_testcase {
             return json_encode(['generating' => ['done' => $done, 'total' => $total, 'current' => $current]]);
         };
 
-        // Light's three types: 25 at the start, then a step per finished type, 45 at the end.
+        // Three types: 25 at the start, then a step per finished type, 45 at the end.
         $this->assertSame(25, generation_progress::generating_percent($progress(0, 3, 'IH')));
         $this->assertSame(32, generation_progress::generating_percent($progress(1, 3, 'FE')));
         $this->assertSame(38, generation_progress::generating_percent($progress(2, 3, 'SR')));

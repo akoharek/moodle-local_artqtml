@@ -26,7 +26,7 @@ namespace local_artqtml\local;
 final class question_bank_list_test extends \advanced_testcase {
     /**
      * Categories in the configured draft course are omitted even when the user can add there,
-     * including sibling legacy roots that are not under Light's own artqtml_draft_root.
+     * including sibling legacy roots that are not under this plugin's artqtml_draft_root.
      */
     public function test_options_exclude_entire_draft_course_context(): void {
         global $CFG, $DB;
@@ -53,7 +53,7 @@ final class question_bank_list_test extends \advanced_testcase {
         $draftqcontextid = (int) draft_bank::get_draft_context_id();
         $lightdraft = draft_bank::create((object) [
             'id' => 99,
-            'name' => 'Light draft gen',
+            'name' => 'ArtQTML draft gen',
             'shortname' => 'LGD1',
         ]);
 

@@ -21,7 +21,7 @@ use local_artqtml\local\question_types;
 /**
  * Unit tests for the question-settings form's server-side validation.
  *
- * ArtQTML Light: scale-only matrix (IH/FE/SR); no per-type instruction fields / security filter.
+ * Scale-only matrix (IH/FE/SR); no per-type instruction fields / security filter.
  *
  * @package    local_artqtml
  * @category   test
@@ -105,7 +105,7 @@ final class generate_form_test extends \advanced_testcase {
     }
 
     /**
-     * Light keeps only the three CODES types on the form.
+     * Only the three CODES types appear on the form.
      */
     public function test_form_offers_exactly_the_light_types(): void {
         $this->resetAfterTest();

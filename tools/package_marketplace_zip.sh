@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build a Moodle Marketplace ZIP for ArtQTML Light: top-level folder artqtml/, lang/en only.
+# Build a Moodle Marketplace ZIP for ArtQTML: top-level folder artqtml/, lang/en only.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"

@@ -1,4 +1,4 @@
-# ArtQTML (local_artqtml) — Light
+# ArtQTML (local_artqtml)
 
 Moodle local plugin that generates quiz questions with **Claude**, validates them with **Gemini**, then lets teachers review and approve into the question bank.
 

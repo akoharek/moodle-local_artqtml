@@ -6,12 +6,21 @@ the number in parentheses is `$plugin->release`.
 Scope: IH / FE / SR; paste + plain `.txt`; Claude + Gemini BYOK; review / approve;
 easy / medium / hard; thin admin.
 
+## 2026-08-12 — `2026081205` (1.0.0)
+
+**Neutralize product-variant wording in comments and strings**
+
+- PHP/JS/XML comments, tests, and `phpcs.xml` describe current behavior only —
+  no edition framing or historical strip notes.
+- Drop unused monthly token-budget language strings; clarify source-text limit copy.
+- README title is `ArtQTML (local_artqtml)` without an edition suffix.
+
 ## 2026-08-12 — `2026081204` (1.0.0)
 
 **HQ review docs: positive scope only**
 
 - README describes what ships (paste/TXT, IH/FE/SR, BYOK, tracker + reviewer smoke)
-  with no absence lists or dual-product wording.
+  with no absence lists or product-variant wording.
 - Delete redundant `SUPPORT.md` (tracker/BYOK live in README; Teams/SMTP setup is
   maintainer-only and not required for Marketplace).
 - Delete in-repo `BACKLOG.md` and `CLAUDE.md` (dev clutter).
@@ -30,7 +39,7 @@ easy / medium / hard; thin admin.
 
 ## 2026-08-12 — `2026081202` (1.0.0)
 
-**Marketplace docs/comments: Light-aligned wording**
+**Marketplace docs/comments: scope-aligned wording**
 
 - `CHANGES.md` rewritten as an honest changelog for this plugin.
 - Code comments in shipping PHP/XML updated so type codes, upload path, and admin
@@ -184,4 +193,4 @@ easy / medium / hard; thin admin.
 
 Shared bugfixes and security work that still apply (source-text limits,
 AJAX rate limits, generation locking, partial status, draft bank, privacy
-provider, etc.) are reflected in the Light timeline above.
+provider, etc.) are reflected in the timeline above.

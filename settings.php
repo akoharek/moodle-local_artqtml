@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Admin settings for local_artqtml Light: general, generator LLM, validator LLM,
+ * Admin settings for local_artqtml: general, generator LLM, validator LLM,
  * question-type defaults (IH/FE/SR), and security.
  *
  * Moodle's admin_settingpage API does not support in-page tabs for a single settings form,
@@ -183,7 +183,7 @@ if ($hassiteconfig || has_capability('local/artqtml:configure', context_system::
     $ADMIN->add('local_artqtml_category', $validator);
 
     // ------------------------------------------------------------------
-    // Question-type defaults — Light: IH / FE / SR only.
+    // Question-type defaults — IH / FE / SR.
     $qtypes = new admin_settingpage(
         'local_artqtml_qtypes',
         get_string('tabqtypes', 'local_artqtml'),

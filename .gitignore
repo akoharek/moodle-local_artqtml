@@ -18,14 +18,8 @@
 # lemezen maradnak, csak a verziókövetésből kerülnek ki.
 /assets/
 
-# Never commit signed license files or private/signing keys. The dev .lic is generated
-# on demand (see the runbook §5) and lives only under tools/ transiently; the RSA private
-# key stays outside the repo entirely.
-*.lic
+# Never commit private keys or stray signed blobs.
 *.pem
-# Exception: the small signed .lic fixtures the PHPUnit license tests read (no secrets - they
-# are signed with the dev key and carry no file-integrity manifest).
-!tests/fixtures/licenses/*.lic
 
 # Working documents left the repository on 2026-07-30, and the product documents followed them on
 # 2026-08-04 (BL-45). Both now live in
@@ -62,3 +56,6 @@
 # .claude/skills/ tree stays tracked.
 /.claude/settings.local.json
 /dist/
+
+# Local one-off audit helpers (not shipped).
+.devtools/

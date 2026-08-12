@@ -16,7 +16,7 @@
 
 /**
  * Moves an already-approved draft question into a real question bank (functional spec ch.7,
- * Jov-014) - ArtQTML Light: single-question move only (bulk move removed).
+ * Jov-014) - single-question move to the bank.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

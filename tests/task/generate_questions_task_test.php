@@ -20,7 +20,7 @@ namespace local_artqtml\task;
  * Unit tests for the Claude generation task's system-prompt building (technical annex 3.2) -
  * specifically that every {{PLACEHOLDER}} in the template is substituted.
  *
- * ArtQTML Light: scale + sourceonly; user message is source text only (no teacher_preferences).
+ * Scale + sourceonly; user message is source text only.
  *
  * @package    local_artqtml
  * @category   test
@@ -70,7 +70,7 @@ final class generate_questions_task_test extends \advanced_testcase {
         $this->assertStringContainsString('(SR)', $prompt);
         $this->assertStringContainsString('szöveg szerint', $prompt);
         $this->assertStringContainsString('according to the text', $prompt);
-        // Light always uses the sourceonly knowledge fragment.
+        // Always uses the sourceonly knowledge fragment.
         $this->assertStringContainsString('Only use facts found in the source text', $prompt);
     }
 
@@ -193,7 +193,7 @@ final class generate_questions_task_test extends \advanced_testcase {
     }
 
     /**
-     * Light: the user payload is only content_type + source_text (no teacher_preferences).
+     * The user payload is only content_type + source_text.
      */
     public function test_user_payload_has_no_teacher_preferences(): void {
         $this->resetAfterTest();

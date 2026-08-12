@@ -303,8 +303,8 @@ class approve_renderer {
                 $actions[] = \html_writer::link($revokeurl, get_string('revokeapproval', 'local_artqtml'), [
                     'data-testid' => 'artqtml-approve-revoke-link',
                 ]);
-                // ArtQTML Light: single-question move (bulk move removed). Uses the shared
-                // category select in the form footer; the server validates categoryvalue.
+                // Single-question move. Uses the shared category select in the form footer;
+                // the server validates categoryvalue.
                 $actions[] = \html_writer::tag('button', get_string('moveselected', 'local_artqtml'), [
                     'type'        => 'submit',
                     'name'        => 'movequestion',
@@ -522,7 +522,7 @@ class approve_renderer {
 
     /**
      * The bulk action buttons: approve-all-accepted, the target-category select for single-row
-     * move, and the bulk-delete button (Jov-013/015). ArtQTML Light: bulk move removed.
+     * move, and the bulk-delete button (Jov-013/015).
      *
      * @param \core_renderer $output the page output renderer (passed in rather than pulled from
      *      the global $OUTPUT, as this is a plain helper, not a plugin_renderer_base)
@@ -534,7 +534,7 @@ class approve_renderer {
         // Jov-045: "A célkérdésbank kategória választó vizuálisan a »Kijelöltek áthelyezése« és
         // »Kijelöltek törlése« gombokkal egy blokkban helyezkedik el; az »Összes elfogadható
         // jóváhagyása« gomb ettől vizuálisan elkülönül". Two containers, separated by a rule.
-        // Light keeps the category select for per-row move; the bulk move button is gone.
+        // Category select is for per-row move.
         $approveallattrs = [
             'type'        => 'submit',
             'name'        => 'bulkaction',

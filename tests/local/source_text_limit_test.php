@@ -162,7 +162,7 @@ final class source_text_limit_test extends \advanced_testcase {
     }
 
     /**
-     * The monthly token budget has no effect on this limit.
+     * Unrelated generator/validator config values must not change this limit.
      *
      * They are separate things that both count tokens, which is exactly the pair somebody will
      * later assume are connected. One limits a single request's input; the other limits spending

@@ -322,8 +322,8 @@ class validate_questions_task {
                 continue;
             }
 
-            // Val-009: only the attempt that actually produced a usable result counts toward
-            // the monthly token budget, regardless of whether it took more than one try.
+            // Val-009: log usage for the attempt that produced a usable result,
+            // regardless of whether it took more than one try.
             $this->log_ai_call($generation->id, 'validate', 'gemini', [
                 'httpstatus'   => 200,
                 'tokensinput'  => $decoded['usageMetadata']['promptTokenCount'] ?? null,

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Single source of truth for the three supported question types (ArtQTML Light).
+ * Single source of truth for the three supported question types (IH/FE/SR).
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -69,7 +69,7 @@ class question_types {
 
     /**
      * Whether Moodle actually supports per-question hints (question_hints) for this type
-     * (M-24). Narrower than {@see self::supports_retry()}: Light keeps FE and SR only.
+     * (M-24). Narrower than {@see self::supports_retry()}: FE and SR only.
      *
      * @param string $code one of self::CODES
      * @return bool

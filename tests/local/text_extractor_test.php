@@ -17,7 +17,7 @@
 namespace local_artqtml\local;
 
 /**
- * Unit tests for uploaded-file text extraction (TXT only in ArtQTML Light).
+ * Unit tests for uploaded-file text extraction (TXT).
  *
  * @package    local_artqtml
  * @category   test
@@ -99,7 +99,7 @@ final class text_extractor_test extends \advanced_testcase {
     }
 
     /**
-     * TXT remains a supported upload extension in Light.
+     * TXT is a supported upload extension.
      */
     public function test_txt_is_supported(): void {
         $this->resetAfterTest();

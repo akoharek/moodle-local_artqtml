@@ -139,8 +139,8 @@ class extraction_result {
             'expandedbytes'  => (int) ($metrics['expandedbytes'] ?? 0),
             'streamcount'    => (int) ($metrics['streamcount'] ?? 0),
             'archiveentries' => (int) ($metrics['archiveentries'] ?? 0),
-            // Optional extract metrics retained for diagnostics / logging. Light only accepts
-            // plain TXT, so PDF glyph counters stay at zero unless a caller passes them.
+            // Optional extract metrics retained for diagnostics / logging.
+            // Unused counters stay at zero unless a caller passes them.
             'pagecount'      => (int) ($metrics['pagecount'] ?? 0),
             'fontcount'      => (int) ($metrics['fontcount'] ?? 0),
             'mappedglyphs'   => (int) ($metrics['mappedglyphs'] ?? 0),

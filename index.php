@@ -91,8 +91,6 @@ foreach ($stats as [$labelkey, $value]) {
 }
 echo html_writer::end_div();
 
-// ArtQTML Light: license and token-budget gates removed.
-
 // Admin-065/Glob-036: an unset or unusable model blocks new generations the same way, and for the
 // same reason - starting one would fail at the first API call.
 $modelblocked = \local_artqtml\local\model_blocking::is_blocked();

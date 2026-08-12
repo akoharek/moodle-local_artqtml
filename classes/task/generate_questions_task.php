@@ -85,7 +85,6 @@ class generate_questions_task {
             // into the log - it is the teacher's material, and a log is exactly where it should
             // not accumulate.
             //
-            // Deliberately NOT a monthly token-budget check — that feature is removed in Light.
             $sourcetext = (string) $generation->sourcetext;
             if (source_text_limit::is_exceeded($sourcetext)) {
                 $usage = source_text_limit::usage($sourcetext);
@@ -523,8 +522,8 @@ class generate_questions_task {
                 continue;
             }
 
-            // Val-009: only the attempt that actually produced a usable result counts toward
-            // the monthly token budget, regardless of whether it took more than one try.
+            // Val-009: log usage for the attempt that produced a usable result,
+            // regardless of whether it took more than one try.
             $this->log_ai_call($generation->id, 'generate', 'claude', [
                 'httpstatus'   => 200,
                 'tokensinput'  => $decoded['usage']['input_tokens'] ?? null,
@@ -573,10 +572,10 @@ class generate_questions_task {
     }
 
     /**
-     * Build the untrusted user message payload for Claude (source text only in Light).
+     * Build the untrusted user message payload for Claude (source text only).
      *
      * @param \stdClass $generation
-     * @param array $settings decoded settings JSON (unused in Light; kept for call-site parity)
+     * @param array $settings decoded settings JSON (unused; kept for call-site parity)
      * @return string JSON body for the user turn
      */
     protected function build_user_content(\stdClass $generation, array $settings): string {
@@ -609,7 +608,7 @@ class generate_questions_task {
             }
         }
 
-        // Light: knowledge source is always sourceonly.
+        // Knowledge source fragment is always the source-only template.
         $knowledgesourcetext = (string) get_config('local_artqtml', 'promptknowledgesourceonly');
 
         $typeinstructions = [];

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details for ArtQTML Light (local_artqtml).
+ * Version details for ArtQTML (local_artqtml).
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -24,7 +24,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_artqtml';
-$plugin->version   = 2026081204;
+$plugin->version   = 2026081205;
 $plugin->requires  = 2024100700; // Moodle 4.5.1.
 $plugin->release   = '1.0.0';
 $plugin->maturity  = MATURITY_STABLE;

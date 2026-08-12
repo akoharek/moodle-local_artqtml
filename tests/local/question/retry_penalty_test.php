@@ -96,7 +96,7 @@ final class retry_penalty_test extends \advanced_testcase {
     }
 
     /**
-     * Light: FE uses the same retry-driven penalty as IH (essay/EH removed).
+     * FE uses the same retry-driven penalty as IH.
      */
     public function test_fe_retry_on_default_is_33_percent(): void {
         $this->assertEqualsWithDelta(

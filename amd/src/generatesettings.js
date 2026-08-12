@@ -14,7 +14,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Live total and token estimate for ArtQTML Light question settings (IH/FE/SR, scale only).
+ * Live total and token estimate for ArtQTML question settings (IH/FE/SR, scale only).
  *
  * @module     local_artqtml/generatesettings
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -22,7 +22,7 @@
 define(['jquery', 'core/str'], function($, Str) {
     'use strict';
 
-    /** @var {string[]} Light type codes matching matrix_<code>_<level> fields. */
+    /** @var {string[]} Type codes matching matrix_<code>_<level> fields. */
     var TYPE_CODES = ['IH', 'FE', 'SR'];
 
     /** @var {Object} scale levels only. */

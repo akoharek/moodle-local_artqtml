@@ -104,7 +104,7 @@ if ($deleteid) {
     redirect($pageurl);
 }
 
-// ArtQTML Light: single-question move (bulk move removed).
+// Single-question move to the bank.
 $moveid = optional_param('movequestion', 0, PARAM_INT);
 if ($moveid) {
     require_sesskey();
@@ -133,7 +133,7 @@ if ($moveid) {
     redirect($pageurl);
 }
 
-// Tömeges műveletek (Jov-013/015/016) — approve-all and bulk delete only (no bulk move).
+// Tömeges műveletek (Jov-013/015/016) — approve-all and bulk delete.
 $bulkaction = optional_param('bulkaction', '', PARAM_ALPHA);
 if (in_array($bulkaction, ['allaccepted', 'delete'], true)) {
     require_sesskey();

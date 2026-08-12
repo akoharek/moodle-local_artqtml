@@ -77,7 +77,7 @@ class get_status extends external_api {
         $technicalerror = has_capability('local/artqtml:configure', $context) ? (string) ($generation->error ?? '') : '';
 
         // M-08: surfaced live through the same AJAX poll status.php's JS already uses, same as
-        // the token-budget warning below, rather than only ever appearing after a page reload.
+        // status regions below, rather than only ever appearing after a page reload.
         $countdiscrepancy = json_decode((string) $generation->countdiscrepancy, true);
         $countdiscrepancymessage = (is_array($countdiscrepancy) && !empty($countdiscrepancy))
             ? \local_artqtml\local\question_types::format_count_discrepancy($countdiscrepancy)
@@ -133,7 +133,7 @@ class get_status extends external_api {
             'questioncount' => new external_value(PARAM_INT, 'Number of questions generated so far'),
             'unvalidatedcount' => new external_value(PARAM_INT, 'Number of questions not yet validated'),
             'error' => new external_value(PARAM_RAW, 'Technical error message from the last failed API call, empty if none'),
-            'tokenwarningmessage' => new external_value(PARAM_RAW, 'Token-limit warning message, empty if none logged'),
+            'tokenwarningmessage' => new external_value(PARAM_RAW, 'Reserved warning message field (always empty)'),
             'countdiscrepancymessage' => new external_value(
                 PARAM_RAW,
                 'Requested-vs-received question count warning, empty if none (M-08)'

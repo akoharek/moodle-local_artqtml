@@ -153,7 +153,7 @@ class upload_form extends \moodleform {
         // Server-side file checks. The filepicker's own accepted_types and maxfiles are client
         // configuration and are not evidence about what actually arrived. text_extractor still
         // rejects unsupported types and oversize drafts; this is the cheap form-level gate for
-        // Light's TXT-only upload.
+        // TXT upload path.
         if (count($draftfiles) > 1) {
             $errors['sourcefile'] = get_string('errorfiletoomany', 'local_artqtml');
         } else {

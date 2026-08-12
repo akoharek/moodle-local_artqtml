@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Extracts plain text from an uploaded TXT file (ArtQTML Light: TXT only).
+ * Extracts plain text from an uploaded TXT file.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

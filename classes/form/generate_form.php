@@ -16,7 +16,7 @@
 
 /**
  * Question settings form: scale difficulty, per-type counts and detailed options
- * (ArtQTML Light: IH/FE/SR, scale mode only).
+ * (IH/FE/SR, scale difficulty).
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -66,7 +66,7 @@ class generate_form extends \moodleform {
         $mform->addElement('hidden', 'artqtmlaction', 'generate');
         $mform->setType('artqtmlaction', PARAM_ALPHA);
 
-        // Light: difficulty is always scale. Kept as a hidden field so settings JSON and the AMD
+        // Difficulty is always scale. Kept as a hidden field so settings JSON and the AMD
         // module keep reading the same field name.
         $mform->addElement('hidden', 'difficultymode', 'scale');
         $mform->setType('difficultymode', PARAM_ALPHA);
@@ -87,7 +87,7 @@ class generate_form extends \moodleform {
             s($generation->shortname)
         );
 
-        // 1. lépés — Light: scale only (no bloom / freetext UI).
+        // 1. lépés — Easy/Medium/Hard scale.
         $mform->addElement('header', 'step1header', get_string('step1heading', 'local_artqtml'));
         $mform->setExpanded('step1header');
         $mform->addElement(
@@ -140,7 +140,7 @@ class generate_form extends \moodleform {
             ]
         ));
 
-        // Light: knowledge source is always sourceonly (no select).
+        // Knowledge source is always the uploaded/pasted source text.
 
         // Tagadó kérdés kiemelése (Beal-016), generálásonként felülírható.
         $mform->addElement('advcheckbox', 'negationhighlight', get_string('negationhighlight', 'local_artqtml'));
@@ -196,7 +196,7 @@ class generate_form extends \moodleform {
         $mform->addElement('header', 'actionsheader', get_string('actionsheading', 'local_artqtml'));
         $mform->setExpanded('actionsheader', true, true);
 
-        // Pre-start size estimate (matrix: keep). Informational only — no monthly budget bar in Light.
+        // Pre-start size estimate (informational).
         $mform->addElement('html', \html_writer::div('', '', ['id' => 'artqtml-tokenestimate']));
     }
 

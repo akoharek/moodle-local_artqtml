@@ -16,7 +16,7 @@
 
 /**
  * Builds the Claude Structured Outputs JSON schema for generated questions
- * (technical annex 3.3). ArtQTML Light: IH/FE/SR only.
+ * (technical annex 3.3). Supported types: IH/FE/SR.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

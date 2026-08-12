@@ -108,9 +108,9 @@ class question_bank_list {
         // Jov-023: the admin-configured draft course exists only to hold unreviewed AI drafts.
         // Nothing in that course's question bank is a valid move target — not this plugin's
         // artqtml_draft_* tree, and not leftover sibling roots from earlier installs
-        // (aiquizgen_draft_*, artqtm_draft_*) that share the same course. Skipping the whole
-        // context is stronger than filtering one root's children, which previously leaked
-        // hundreds of legacy draft categories into the approve-page dropdown.
+        // (e.g. aiquizgen_draft_*) that share the same course. Skipping the whole context is
+        // stronger than filtering one root's children, which previously leaked hundreds of
+        // legacy draft categories into the approve-page dropdown.
         if (draft_bank::is_configured()) {
             $draftcourseid = draft_bank::get_draft_courseid();
             if (

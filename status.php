@@ -165,7 +165,7 @@ echo local_artqtml_model_warning_banner();
 echo local_artqtml_owner_warning_banner($generation);
 echo html_writer::tag('p', format_string($generation->name));
 
-// Token-budget warning removed in ArtQTML Light; keep the region empty for status.js compatibility.
+// Reserved warning region for status.js polling compatibility (message stays empty).
 echo html_writer::div(
     html_writer::div($tokenwarningmessage, 'alert alert-warning mb-0', ['data-region' => 'tokenwarning-text']),
     'mb-3 d-none',
@@ -173,7 +173,7 @@ echo html_writer::div(
 );
 
 // M-08: only known once the generating stage has run - rendered up front if already known,
-// otherwise revealed live by amd/src/status.js the same way the token-budget warning above is.
+// otherwise revealed live by amd/src/status.js the same way as other status regions above.
 $countdiscrepancy = json_decode((string) $generation->countdiscrepancy, true);
 $countdiscrepancymessage = (is_array($countdiscrepancy) && !empty($countdiscrepancy))
     ? question_types::format_count_discrepancy($countdiscrepancy)

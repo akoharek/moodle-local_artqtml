@@ -16,7 +16,7 @@
 
 /**
  * The shipped starting text of the generator system prompt (Admin-066, Admin-067).
- * ArtQTML Light: IH/FE/SR, scale + sourceonly only.
+ * Prompt defaults for IH/FE/SR with scale difficulty and source-only knowledge.
  *
  * This file is a SEED, not a source. It is read once, by install.php and by the upgrade step that
  * introduces these settings, and written into `config_plugins`. From that moment the database is

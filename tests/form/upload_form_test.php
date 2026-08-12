@@ -126,7 +126,7 @@ final class upload_form_test extends \advanced_testcase {
     }
 
     /**
-     * ArtQTML Light: the filepicker accepts TXT only (no PDF/DOCX).
+     * The filepicker accepts TXT uploads.
      */
     public function test_source_filepicker_accepts_txt_only(): void {
         $this->resetAfterTest();
