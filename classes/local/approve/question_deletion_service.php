@@ -28,11 +28,11 @@ use local_artqtml\local\draft_bank;
  */
 class question_deletion_service {
     /**
- * @param int $questionid local_artqtml_questions.id
- * @param int $generationid
- * @param \context $context system context, for the event
- * @return bool true if the question was deleted, false if it was absent or already moved out
- */
+     * @param int $questionid local_artqtml_questions.id
+     * @param int $generationid
+     * @param \context $context system context, for the event
+     * @return bool true if the question was deleted, false if it was absent or already moved out
+     */
     public static function delete_single(int $questionid, int $generationid, \context $context): bool {
         global $DB;
 
@@ -67,11 +67,11 @@ class question_deletion_service {
     }
 
     /**
- * Whether the generation still contains at least one question that has been moved into a real Moodle question bank.
- *
- * @param int $generationid
- * @return bool
- */
+     * Whether the generation still contains at least one question that has been moved into a real Moodle question bank.
+     *
+     * @param int $generationid
+     * @return bool
+     */
     public static function has_moved_questions(int $generationid): bool {
         global $DB;
 
@@ -82,14 +82,14 @@ class question_deletion_service {
     }
 
     /**
- * Bulk-delete the selected, not-yet-moved questions in one transaction.
- *
- * @param int[] $questionids the selected local_artqtml_questions ids
- * @param int $generationid
- * @param \context $context system context, for the events
- * @return int number of questions deleted
- * @throws \Throwable rethrown on any mid-batch failure (after rollback), for the caller to report
- */
+     * Bulk-delete the selected, not-yet-moved questions in one transaction.
+     *
+     * @param int[] $questionids the selected local_artqtml_questions ids
+     * @param int $generationid
+     * @param \context $context system context, for the events
+     * @return int number of questions deleted
+     * @throws \Throwable rethrown on any mid-batch failure (after rollback), for the caller to report
+     */
     public static function delete_selected(array $questionids, int $generationid, \context $context): int {
         global $DB;
 

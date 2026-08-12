@@ -19,8 +19,8 @@
  *
  * The four fixed machine keys live here and nowhere else: the Gemini response schema
  * ({@see \local_artqtml\task\validate_questions_task::build_schema()}), the validator prompt
- * assembly, and every UI display path all read {@see self::VALUES} / {@see self::label()} from
- * this class, so the schema's value set and the prompt's value set are guaranteed identical
+ * Assembly, and every UI display path all read {@see self::VALUES} / {@see self::label()} from
+ * This class, so the schema's value set and the prompt's value set are guaranteed identical
  * (a technikai melléklet: "Ez a négy érték a JSON séma egyetlen forrása").
  *
  * @package    local_artqtml
@@ -37,15 +37,15 @@ class problem_category {
     public const OK = 'ok';
 
     /**
- * The four fixed problem_category enum values, in canonical order.
- *
- * Exactly four members; none is an empty string (an empty string is not a permitted Gemini
- * structured-output enum value - it fails schema validation with
- * "problem_category.enum[0]: cannot be empty"). Do not add a fifth or reorder without a spec
- * change: PROB-F004 asserts this set verbatim.
- *
- * @var string[]
- */
+     * The four fixed problem_category enum values, in canonical order.
+     *
+     * Exactly four members; none is an empty string (an empty string is not a permitted Gemini
+     * Structured-output enum value - it fails schema validation with
+     * "problem_category.enum[0]: cannot be empty"). Do not add a fifth or reorder without a spec
+     * Change: PROB-F004 asserts this set verbatim.
+     *
+     * @var string[]
+     */
     public const VALUES = ['ok', 'factual_error', 'ambiguous_wording', 'other'];
 
     /**
@@ -60,9 +60,9 @@ class problem_category {
     }
 
     /**
- * @param string $value one of {@see self::VALUES}
- * @return string
- */
+     * @param string $value one of {@see self::VALUES}
+     * @return string
+     */
     public static function label(string $value): string {
         return get_string('problemcategory_' . $value, 'local_artqtml');
     }

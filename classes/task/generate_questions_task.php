@@ -21,7 +21,7 @@
  * AI pipeline in the background (every 5 minutes by default, or manually via
  * `admin/cli/scheduled_task.php --execute='\local_artqtml\task\process_pending_generations'`
  * - see that class). This is a plain processor, not itself an adhoc/scheduled task, so it can
- * be unit-tested and invoked directly without going through Moodle's task runner.
+ * Be unit-tested and invoked directly without going through Moodle's task runner.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -52,13 +52,13 @@ class generate_questions_task {
     protected const DEFAULT_SR_ITEM_COUNT = 4;
 
     /**
- * Run the Claude call for one generation. On success, leaves the generation in
- * "validating" status - it is the caller's (process_pending_generations') job to then hand
- * it to {@see validate_questions_task::process()}, not this method's.
- *
- * @param \stdClass $generation the local_artqtml_generations record to process
- * @return void
- */
+     * Run the Claude call for one generation. On success, leaves the generation in
+     * "validating" status - it is the caller's (process_pending_generations') job to then hand
+     * It to {@see validate_questions_task::process()}, not this method's.
+     *
+     * @param \stdClass $generation the local_artqtml_generations record to process
+     * @return void
+     */
     public function process(\stdClass $generation): void {
         $generationid = (int) $generation->id;
         $userid = (int) $generation->userid;
@@ -140,14 +140,14 @@ class generate_questions_task {
     }
 
     /**
- * @param int $generationid
- * @param array $settings decoded settings JSON (requested counts)
- * @param array $questions raw question arrays as returned by Claude (before validation
- * this is about what Claude actually produced, independent of whether it later turns
- * out to be semantically valid enough to import)
- * @param int $userid
- * @return void
- */
+     * @param int $generationid
+     * @param array $settings decoded settings JSON (requested counts)
+     * @param array $questions raw question arrays as returned by Claude (before validation
+     * This is about what Claude actually produced, independent of whether it later turns
+     * Out to be semantically valid enough to import)
+     * @param int $userid
+     * @return void
+     */
     protected function store_count_discrepancy(int $generationid, array $settings, array $questions, int $userid): void {
         global $DB;
 
@@ -182,11 +182,11 @@ class generate_questions_task {
     }
 
     /**
- * @param int $generationid
- * @param string $errormessage
- * @param int|null $userid
- * @return void
- */
+     * @param int $generationid
+     * @param string $errormessage
+     * @param int|null $userid
+     * @return void
+     */
     protected function rollback(int $generationid, string $errormessage, ?int $userid = null): void {
         global $DB;
 
@@ -208,17 +208,17 @@ class generate_questions_task {
     }
 
     /**
- * @var string|null how the last call_claude() failed - 'transport' or 'content'.
- */
+     * @var string|null how the last call_claude() failed - 'transport' or 'content'.
+     */
     protected $lastfailurekind = null;
 
     /**
- * Generate one question type at a time, and let the others through when one fails.
- *
- * @param \stdClass $generation
- * @param array $settings the generation's decoded settings
- * @return array{0: array, 1: array<string, array>} all questions, and the per-type outcome
- */
+     * Generate one question type at a time, and let the others through when one fails.
+     *
+     * @param \stdClass $generation
+     * @param array $settings the generation's decoded settings
+     * @return array{0: array, 1: array<string, array>} all questions, and the per-type outcome
+     */
     protected function call_claude_per_type(\stdClass $generation, array $settings): array {
         global $DB;
 
@@ -278,22 +278,22 @@ class generate_questions_task {
     }
 
     /**
- * A copy of the generation's settings narrowed to one question type.
- *
- * Two things are narrowed, and the second is the point of the exercise. The counts keep only
- * this type, so the response schema carries a single branch. The difficulty levels are taken
- * from **this type's row of the grid**, so a call asking for two easy True/False questions says
- * exactly that - rather than "six questions, two of them easy, three of them True/False" and
- * leaving the model to pair them up.
- *
- * A generation saved before the grid existed has no 'matrix'. Its per-type levels were never
- * recorded and cannot be invented, so the generation-wide levels are passed through unchanged:
- * such a run behaves exactly as it did before, one type at a time.
- *
- * @param array $settings the whole generation's settings
- * @param string $code one of question_types::CODES
- * @return array
- */
+     * A copy of the generation's settings narrowed to one question type.
+     *
+     * Two things are narrowed, and the second is the point of the exercise. The counts keep only
+     * This type, so the response schema carries a single branch. The difficulty levels are taken
+     * From **this type's row of the grid**, so a call asking for two easy True/False questions says
+     * Exactly that - rather than "six questions, two of them easy, three of them True/False" and
+     * Leaving the model to pair them up.
+     *
+     * A generation saved before the grid existed has no 'matrix'. Its per-type levels were never
+     * Recorded and cannot be invented, so the generation-wide levels are passed through unchanged:
+     * Such a run behaves exactly as it did before, one type at a time.
+     *
+     * @param array $settings the whole generation's settings
+     * @param string $code one of question_types::CODES
+     * @return array
+     */
     protected function settings_for_type(array $settings, string $code): array {
         $one = $settings;
 
@@ -456,12 +456,12 @@ class generate_questions_task {
     }
 
     /**
- * @param int $generationid
- * @param int $requested
- * @param int $actual
- * @param int|null $userid
- * @return void
- */
+     * @param int $generationid
+     * @param int $requested
+     * @param int $actual
+     * @param int|null $userid
+     * @return void
+     */
     protected function store_token_limit_warning(int $generationid, int $requested, int $actual, ?int $userid = null): void {
         $this->log_event($generationid, 'token_limit_warning', [
             'stage'     => 'generate',

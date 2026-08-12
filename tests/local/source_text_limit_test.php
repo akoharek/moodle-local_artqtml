@@ -21,7 +21,7 @@ namespace local_artqtml\local;
  *
  * The limit did not exist before 2026-08-04: the size of a source text was shown to the user by a
  * JavaScript counter and never compared to anything on the server. These tests pin the arithmetic,
- * because four call sites now depend on it giving the same answer every time.
+ * Because four call sites now depend on it giving the same answer every time.
  *
  * @package    local_artqtml
  * @category   test
@@ -57,8 +57,8 @@ final class source_text_limit_test extends \advanced_testcase {
      * With no context window configured either, the documented fallback applies.
      *
      * Every call site asks this class rather than reading config itself, so "no configuration at
-     * all" has to produce a working number rather than zero - a limit of zero would refuse every
-     * source text on a freshly installed site.
+     * All" has to produce a working number rather than zero - a limit of zero would refuse every
+     * Source text on a freshly installed site.
      */
     public function test_a_missing_context_window_falls_back(): void {
         $this->resetAfterTest();
@@ -114,7 +114,7 @@ final class source_text_limit_test extends \advanced_testcase {
      * Text exactly at the limit is accepted; one character more is not.
      *
      * The boundary matters because the counter shows the user the same number: refusing a text the
-     * counter had just displayed as being at the maximum would look like a bug.
+     * Counter had just displayed as being at the maximum would look like a bug.
      */
     public function test_the_boundary_is_inclusive(): void {
         $this->resetAfterTest();
@@ -132,7 +132,7 @@ final class source_text_limit_test extends \advanced_testcase {
     }
 
     /**
-     * usage() reports every number the error message needs.
+     * Usage() reports every number the error message needs.
      */
     public function test_usage_reports_every_number(): void {
         $this->resetAfterTest();
@@ -163,8 +163,8 @@ final class source_text_limit_test extends \advanced_testcase {
      * Unrelated generator/validator config values must not change this limit.
      *
      * They are separate things that both count tokens, which is exactly the pair somebody will
-     * later assume are connected. One limits a single request's input; the other limits spending
-     * over a billing cycle.
+     * Later assume are connected. One limits a single request's input; the other limits spending
+     * Over a billing cycle.
      */
     public function test_the_monthly_budget_does_not_affect_this_limit(): void {
         $this->resetAfterTest();
@@ -185,7 +185,7 @@ final class source_text_limit_test extends \advanced_testcase {
      * The error message names the sizes and never quotes the text.
      *
      * It is shown on screen and written to the generation log, and source material has no business
-     * in either place.
+     * In either place.
      */
     public function test_the_error_message_carries_numbers_not_content(): void {
         $this->resetAfterTest();

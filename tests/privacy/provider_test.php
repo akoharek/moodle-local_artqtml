@@ -73,8 +73,8 @@ final class provider_test extends \advanced_testcase {
     }
 
     /**
- * Deleting a user's data removes the generation and keeps the log row, without its user id.
- */
+     * Deleting a user's data removes the generation and keeps the log row, without its user id.
+     */
     public function test_deleting_a_user_keeps_the_log_row_and_drops_its_identity(): void {
         global $DB;
 
@@ -108,10 +108,10 @@ final class provider_test extends \advanced_testcase {
     }
 
     /**
- * Another user's generation is untouched by the first user's deletion.
- *
- * The tool is site-wide, so one user's request must not take a colleague's material with it.
- */
+     * Another user's generation is untouched by the first user's deletion.
+     *
+     * The tool is site-wide, so one user's request must not take a colleague's material with it.
+     */
     public function test_another_users_generation_is_untouched(): void {
         global $DB;
 
@@ -133,9 +133,9 @@ final class provider_test extends \advanced_testcase {
     }
 
     /**
- * A user who only edited or approved somebody else's question loses their name from it, and the
- * question stays.
- */
+     * A user who only edited or approved somebody else's question loses their name from it, and the
+     * Question stays.
+     */
     public function test_an_editors_footprint_is_scrubbed_but_the_question_stays(): void {
         global $DB;
 
@@ -166,7 +166,7 @@ final class provider_test extends \advanced_testcase {
      * The user list for the system context names the owner and the editor.
      *
      * Whoever is not named here never gets asked, so an omission is a silent failure to honour a
-     * request.
+     * Request.
      */
     public function test_the_userlist_names_owner_and_editor(): void {
         global $DB;
@@ -190,7 +190,7 @@ final class provider_test extends \advanced_testcase {
      * Deleting every user in the context leaves the log rows behind, redacted.
      *
      * Same rule as the per-user path, checked separately because it is a different method with its
-     * own chance to reintroduce the delete.
+     * Own chance to reintroduce the delete.
      */
     public function test_deleting_the_whole_context_still_keeps_the_log(): void {
         global $DB;

@@ -20,7 +20,7 @@ namespace local_artqtml\local;
  * Tests for the aiquizgen → artqtml component migration helper.
  *
  * Table rename is covered by Docker upgrade/smoke (DDL inside PHPUnit breaks the shared
- * schema snapshot). This test covers the registry merge that install/upgrade also run.
+ * Schema snapshot). This test covers the registry merge that install/upgrade also run.
  *
  * @package    local_artqtml
  * @category   test

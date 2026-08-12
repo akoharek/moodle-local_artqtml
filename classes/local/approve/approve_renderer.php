@@ -16,8 +16,8 @@
 
 /**
  * HTML/JS rendering for the draft approval page - split out of the
- * approve.php controller. Presentation only: returns markup strings, performs no DB mutation;
- * reads via approve_page_data and the lib.php badge helper.
+ * Approve.php controller. Presentation only: returns markup strings, performs no DB mutation;
+ * Reads via approve_page_data and the lib.php badge helper.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -33,12 +33,12 @@ use local_artqtml\local\draft_bank;
  */
 class approve_renderer {
     /**
- * The four-status validation summary row of badges.
- *
- * @param array<string,int> $statuscounts from approve_page_data::status_counts()
- * @param int $statustotal
- * @return string
- */
+     * The four-status validation summary row of badges.
+     *
+     * @param array<string,int> $statuscounts from approve_page_data::status_counts()
+     * @param int $statustotal
+     * @return string
+     */
     public static function validation_summary(array $statuscounts, int $statustotal): string {
         // JOV-F002: exactly four counters plus the total, each individually addressable so the
         // element-count assertion can check "four + total", not just the rendered text.
@@ -64,7 +64,7 @@ class approve_renderer {
 
     /**
      * The full question table: header (with sortable columns), one row per question (badges,
-     * validation detail, creator/editor, actions) and an inline collapsible detail row each.
+     * Validation detail, creator/editor, actions) and an inline collapsible detail row each.
      *
      * @param \core_renderer $output the page output renderer (passed in rather than pulled from
      *      the global $OUTPUT, as this is a plain helper, not a plugin_renderer_base)
@@ -415,10 +415,10 @@ class approve_renderer {
     }
 
     /**
- * The inline script wiring each question name toggle to show/hide its detail row.
- *
- * @return string
- */
+     * The inline script wiring each question name toggle to show/hide its detail row.
+     *
+     * @return string
+     */
     public static function toggle_script(): string {
         return \html_writer::script(
             "document.querySelectorAll('.artqtml-question-toggle').forEach(function(link) {" .
@@ -432,12 +432,12 @@ class approve_renderer {
     }
 
     /**
- * @param \core_renderer $output the page output renderer (passed in rather than pulled from
- * the global $OUTPUT, as this is a plain helper, not a plugin_renderer_base)
- * @param int $eligibleforapproval count for the approve-all button label/disabled state
- * @param array<string,string> $categoryoptions move-target options ("categoryid,contextid" => label)
- * @return string
- */
+     * @param \core_renderer $output the page output renderer (passed in rather than pulled from
+     * The global $OUTPUT, as this is a plain helper, not a plugin_renderer_base)
+     * @param int $eligibleforapproval count for the approve-all button label/disabled state
+     * @param array<string,string> $categoryoptions move-target options ("categoryid,contextid" => label)
+     * @return string
+     */
     public static function bulk_action_buttons(\core_renderer $output, int $eligibleforapproval, array $categoryoptions): string {
         $approveallattrs = [
             'type'        => 'submit',
@@ -569,12 +569,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
- * Build the inline expand/collapse detail block for one question: its answers/items, hints and general feedback.
- *
- * @param string $typecode IH/FE/SR
- * @param array $questiondata question data in the stored JSON's shape
- * @return string
- */
+     * Build the inline expand/collapse detail block for one question: its answers/items, hints and general feedback.
+     *
+     * @param string $typecode IH/FE/SR
+     * @param array $questiondata question data in the stored JSON's shape
+     * @return string
+     */
     protected static function question_details_html(string $typecode, array $questiondata): string {
         $parts = [];
 

@@ -54,7 +54,7 @@ final class capability_separation_test extends \advanced_testcase {
     }
 
     /**
-     * :use alone grants use and never configure.
+     * Use alone grants use and never configure.
      */
     public function test_use_only_has_use_not_configure(): void {
         $user = $this->getDataGenerator()->create_user();
@@ -65,7 +65,7 @@ final class capability_separation_test extends \advanced_testcase {
     }
 
     /**
-     * :configure alone grants configure and never use.
+     * Configure alone grants configure and never use.
      */
     public function test_configure_only_has_configure_not_use(): void {
         $user = $this->getDataGenerator()->create_user();

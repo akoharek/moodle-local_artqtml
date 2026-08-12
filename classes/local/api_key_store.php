@@ -19,8 +19,8 @@
  *
  * `get_config()` reads `config_plugins` directly, bypassing
  * {@see \local_artqtml\admin\setting_encryptedapikey}'s own decrypt-on-display logic - every
- * place that actually needs to use the key for a real API call (not just display it in the
- * settings form) must go through this helper instead of a plain `get_config()` call.
+ * Place that actually needs to use the key for a real API call (not just display it in the
+ * Settings form) must go through this helper instead of a plain `get_config()` call.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -36,7 +36,7 @@ class api_key_store {
      * Get the decrypted API key for one provider.
      *
      * Decrypt failure is treated as a missing key (empty string). The stored ciphertext is never
-     * returned for API calls — admins must re-save the key in plugin settings.
+     * Returned for API calls — admins must re-save the key in plugin settings.
      *
      * @param string $provider 'claude' or 'gemini'
      * @return string empty string if none configured or decrypt fails

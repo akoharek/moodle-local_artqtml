@@ -49,15 +49,15 @@ class generation_status {
     public const FAILED = 'failed';
 
     /**
- * @var string the pipeline finished, but delivered fewer questions than were asked for.
- */
+     * @var string the pipeline finished, but delivered fewer questions than were asked for.
+     */
     public const PARTIAL = 'partial';
 
     /**
- * The seven generation status values, in pipeline order.
- *
- * @var string[]
- */
+     * The seven generation status values, in pipeline order.
+     *
+     * @var string[]
+     */
     public const VALUES = [
         self::STARTED,
         self::GENERATING,
@@ -71,7 +71,7 @@ class generation_status {
     /**
      * The statuses the scheduled task actively drives forward, i.e. "work in progress".
      *
-     * process_pending_generations claims rows in these states, and status.php shows a live
+     * Process_pending_generations claims rows in these states, and status.php shows a live
      * (polling) progress bar for them. A strict subset of {@see self::VALUES}.
      *
      * @var string[]
@@ -108,7 +108,7 @@ class generation_status {
 
     /**
      * Human-readable label for a status, from a lang string - the raw machine key (e.g. 'started')
-     * must never reach the UI. fixes the 'started' label as "Megkezdett" in Hungarian.
+     * Must never reach the UI. fixes the 'started' label as "Megkezdett" in Hungarian.
      *
      * @param string $value one of {@see self::VALUES}
      * @return string
@@ -140,7 +140,7 @@ class generation_status {
      * An SQL fragment matching the in-progress statuses, plus its named parameters.
      *
      * Lets the scheduled task build its WHERE clause from {@see self::IN_PROGRESS} instead of
-     * inlining the list into a SQL string.
+     * Inlining the list into a SQL string.
      *
      * @param string $field the column to match, qualified if needed
      * @param string $prefix named-parameter prefix, so several fragments can coexist in one query

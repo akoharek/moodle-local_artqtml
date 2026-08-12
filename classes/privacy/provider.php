@@ -2,17 +2,17 @@
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
+// It under the terms of the GNU General Public License as published by
+// The Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
 // Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// But WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// Along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Privacy provider for local_artqtml.
@@ -79,8 +79,8 @@ class provider implements
         );
 
         // Every column, not the four that happened to be listed. A privacy declaration is a
-        // statement about what is stored, and a partial one is a wrong one - the table has always
-        // held the provider, the token counts and the request id as well.
+        // Statement about what is stored, and a partial one is a wrong one - the table has always
+        // Held the provider, the token counts and the request id as well.
         $collection->add_database_table(
             'local_artqtml_log',
             [
@@ -156,7 +156,7 @@ class provider implements
         }
 
         $userlist->add_from_sql('userid', 'SELECT DISTINCT g.userid FROM {local_artqtml_generations} g', []);
-        // also the editors/approvers of questions and the actors on log entries, who need not own any generation of their own.
+        // Also the editors/approvers of questions and the actors on log entries, who need not own any generation of their own.
         $userlist->add_from_sql(
             'lasteditedby',
             'SELECT DISTINCT q.lasteditedby FROM {local_artqtml_questions} q WHERE q.lasteditedby IS NOT NULL',
@@ -331,18 +331,18 @@ class provider implements
 
         foreach ($userlist->get_userids() as $userid) {
             self::delete_generations(['userid' => $userid]);
-            // scrub the user's editor/approver/log footprint from other users' generations.
+            // Scrub the user's editor/approver/log footprint from other users' generations.
             self::scrub_user_references((int) $userid);
         }
     }
 
     /**
- * Delete generations matching the given conditions (empty = all), along with their questions
- * and draft bank categories.
- *
- * @param array $conditions conditions passed to get_records() on local_artqtml_generations
- * @return void
- */
+     * Delete generations matching the given conditions (empty = all), along with their questions
+     * And draft bank categories.
+     *
+     * @param array $conditions conditions passed to get_records on local_artqtml_generations
+     * @return void
+     */
     protected static function delete_generations(array $conditions): void {
         global $DB;
 
@@ -360,7 +360,7 @@ class provider implements
         }
 
         // Log entries are anonymised (not deleted): preserve id into originalgenerationid, clear
-        // the live generationid and userid, then delete generation/question rows.
+        // The live generationid and userid, then delete generation/question rows.
         [$insql, $inparams] = $DB->get_in_or_equal($generationids, SQL_PARAMS_NAMED);
 
         $DB->execute(
@@ -382,8 +382,8 @@ class provider implements
 
     /**
      * Anonymise a user's editor/approver/log footprint on content that belongs to OTHER users'
-     * generations (v20 #5). The questions/log rows themselves are another user's data and must
-     * stay, so only the user-identifying columns are nulled - all three columns are nullable.
+     * Generations. The questions/log rows themselves are another user's data and must
+     * Stay, so only the user-identifying columns are nulled - all three columns are nullable.
      *
      * @param int $userid
      * @return void
@@ -392,8 +392,8 @@ class provider implements
         global $DB;
 
         // The lasteditedat field is paired with lasteditedby ("who edited, and when") - null it first,
-        // while
-        // the lasteditedby = :userid rows can still be found, then null lasteditedby itself.
+        // While
+        // The lasteditedby = :userid rows can still be found, then null lasteditedby itself.
         $DB->set_field('local_artqtml_questions', 'lasteditedat', null, ['lasteditedby' => $userid]);
         $DB->set_field('local_artqtml_questions', 'lasteditedby', null, ['lasteditedby' => $userid]);
         $DB->set_field('local_artqtml_questions', 'approvedby', null, ['approvedby' => $userid]);

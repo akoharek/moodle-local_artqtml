@@ -37,7 +37,7 @@ class text_extractor {
 
     /**
      * Fetch the real (non-directory) stored_file objects for a filepicker/filemanager
-     * element's draft item id.
+     * Element's draft item id.
      *
      * @param int $draftitemid the draft area item id (the raw value submitted by the element)
      * @return \stored_file[]
@@ -55,8 +55,8 @@ class text_extractor {
      * Whether this file is one the plugin will open at all.
      *
      * The filepicker's `accepted_types` is a convenience for the browser and nothing more - it is
-     * client-side, and a direct POST never sees it. This is the server's answer, and it checks the
-     * file's actual first bytes rather than trusting either the extension or the browser-supplied
+     * Client-side, and a direct POST never sees it. This is the server's answer, and it checks the
+     * File's actual first bytes rather than trusting either the extension or the browser-supplied
      * MIME type, which the client controls.
      *
      * @param \stored_file $file
@@ -140,12 +140,12 @@ class text_extractor {
     }
 
     /**
- * Extract text from a plain-text file, converting to UT if needed.
- *
- * @param \stored_file $file
- * @param array $metrics
- * @return array the extraction result
- */
+     * Extract text from a plain-text file, converting to UT if needed.
+     *
+     * @param \stored_file $file
+     * @param array $metrics
+     * @return array the extraction result
+     */
     protected static function extract_txt(\stored_file $file, array $metrics): array {
         if ((int) $file->get_filesize() > self::MAX_SOURCE_FILE_BYTES) {
             return extraction_result::rejected(extraction_result::REASON_RESOURCE_LIMIT, $metrics);

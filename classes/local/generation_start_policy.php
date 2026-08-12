@@ -18,7 +18,7 @@
  * One running generation per person.
  *
  * WHAT IT DECIDES, in one sentence: whether this person already has another generation being
- * worked on right now - and if so, which one, so the refusal can name it and lead there.
+ * Worked on right now - and if so, which one, so the refusal can name it and lead there.
  *
  * HOW THAT IS MADE TRUE, because it is not true of the stored row by itself: the start path in
  * `generate.php` WRITES `userid` to the starting user in the same locked step that sets
@@ -26,27 +26,27 @@
  * `userid` - is counting the right person's runs.
  *
  * THE VISIBLE SIDE EFFECT OF THAT WRITE, said here so it is not discovered later. `userid` is
- * also what the list page's "Létrehozó" column shows and what
+ * Also what the list page's "Létrehozó" column shows and what
  * {@see local_artqtml_owner_warning_banner()} names in its yellow "you are viewing someone
- * else's generation" bar. After a colleague starts a generation that somebody else created, both
- * name the colleague - the person who started it - not the original creator. The column keeps its
- * label; what it reports is now the last person to start the run.
+ * Else's generation" bar. After a colleague starts a generation that somebody else created, both
+ * Name the colleague - the person who started it - not the original creator. The column keeps its
+ * Label; what it reports is now the last person to start the run.
  *
  * WHAT COUNTS AS RUNNING is {@see generation_status::IN_PROGRESS} - generating, validating, saving
- * read from there rather than re-listed here. `started` is deliberately NOT running
- * a teacher may keep as many drafts as they like, and a draft costs nothing until it is started.
+ * Read from there rather than re-listed here. `started` is deliberately NOT running
+ * A teacher may keep as many drafts as they like, and a draft costs nothing until it is started.
  * The terminal three (completed, partial, failed) are finished by definition.
  *
  * WHAT THIS COSTS, written down before it is discovered. A generation stuck in `generating` - a
- * cron that died, a run cut off half-way - now locks the person it belongs to out of starting
- * anything at all, where before they would simply have started another one. The way out is the
- * status page's "Megszakítás" (Cancel) button, which rolls the generation back to `started`; that
- * is why both refusals below redirect the teacher to exactly that page rather than merely saying
- * no.
+ * Cron that died, a run cut off half-way - now locks the person it belongs to out of starting
+ * Anything at all, where before they would simply have started another one. The way out is the
+ * Status page's "Megszakítás" (Cancel) button, which rolls the generation back to `started`; that
+ * Is why both refusals below redirect the teacher to exactly that page rather than merely saying
+ * No.
  *
  * WHAT RETRY DOES NOT DO, so the seam is written down rather than found. It asks this question
- * about `$USER`, but it does NOT rewrite `userid` to them - status.php's full-record write-back was
- * checks one person's allowance and leaves the row counted against another's. In the everyday case
+ * About `$USER`, but it does NOT rewrite `userid` to them - status.php's full-record write-back was
+ * Checks one person's allowance and leaves the row counted against another's. In the everyday case
  * (people retry their own) the two are the same person.
  *
  * @package    local_artqtml
@@ -60,17 +60,17 @@ namespace local_artqtml\local;
  */
 class generation_start_policy {
     /**
- * This person's generation that is running right now, if there is one.
- *
- * WHAT TO PASS AS $userid: the user who pressed the button - `$USER->id` at both call sites.
- * It is matched against `local_artqtml_generations.userid`, which the start path sets to the
- * starting user, so the two are the same thing by construction (see the file comment above).
- *
- * @param int $userid the person whose allowance is being counted; matched on
- * local_artqtml_generations.userid
- * @param int $excludegenerationid the generation being started, left out of its own check
- * @return \stdClass|null id, name and status of the blocking generation, or null if free
- */
+     * This person's generation that is running right now, if there is one.
+     *
+     * WHAT TO PASS AS $userid: the user who pressed the button - `$USER->id` at both call sites.
+     * It is matched against `local_artqtml_generations.userid`, which the start path sets to the
+     * Starting user, so the two are the same thing by construction (see the file comment above).
+     *
+     * @param int $userid the person whose allowance is being counted; matched on
+     * Local_artqtml_generations.userid
+     * @param int $excludegenerationid the generation being started, left out of its own check
+     * @return \stdClass|null id, name and status of the blocking generation, or null if free
+     */
     public static function find_running(int $userid, int $excludegenerationid = 0): ?\stdClass {
         global $DB;
 

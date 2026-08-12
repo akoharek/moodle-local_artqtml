@@ -47,9 +47,9 @@ class extract_text extends external_api {
     /**
      * Extract text from the first file in the given draft area.
      *
-     * text_extractor::draft_files() only ever looks at the current $USER's own draft file area
+     * Text_extractor::draft_files() only ever looks at the current $USER's own draft file area
      * (context_user::instance($USER->id)), so a caller cannot use this to read another user's
-     * files by guessing item ids.
+     * Files by guessing item ids.
      *
      * @param int $draftitemid
      * @return array

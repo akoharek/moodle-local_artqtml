@@ -27,10 +27,10 @@ namespace local_artqtml\local;
  * Builds plain-language reasons from log rows the pipeline already writes.
  *
  * After a successful save, pendingdata is cleared and countdiscrepancy only stores
- * requested/received counts. The why lives in local_artqtml_log:
- * type_generation_failed, question_rejected, and claude_call_completed outcomes.
+ * Requested/received counts. The why lives in local_artqtml_log:
+ * Type_generation_failed, question_rejected, and claude_call_completed outcomes.
  * Raw semantic-validator English strings stay in the log; this class maps them to
- * lang strings rather than printing them.
+ * Lang strings rather than printing them.
  */
 class partial_reason {
     /**
@@ -126,7 +126,7 @@ class partial_reason {
 
     /**
      * Markup for the partial panel: a short heading plus a list, or empty when nothing useful
-     * can be said beyond the requested/received line.
+     * Can be said beyond the requested/received line.
      *
      * @param int $generationid
      * @return string HTML fragment (already escaped via get_string / s())

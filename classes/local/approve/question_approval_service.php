@@ -26,15 +26,15 @@ namespace local_artqtml\local\approve;
  */
 class question_approval_service {
     /**
- * Approve a single question (a human step independent of the AI's validationsuggestion - a
- * question must be approved before it can be moved into a real question bank).
- *
- * @param int $questionid local_artqtml_questions.id
- * @param int $generationid
- * @param int $userid the approving user
- * @param \context $context system context, for the event
- * @return bool true if a not-yet-approved, not-yet-moved row was actually approved
- */
+     * Approve a single question (a human step independent of the AI's validationsuggestion - a
+     * Question must be approved before it can be moved into a real question bank).
+     *
+     * @param int $questionid local_artqtml_questions.id
+     * @param int $generationid
+     * @param int $userid the approving user
+     * @param \context $context system context, for the event
+     * @return bool true if a not-yet-approved, not-yet-moved row was actually approved
+     */
     public static function approve_single(int $questionid, int $generationid, int $userid, \context $context): bool {
         global $DB;
 
@@ -69,16 +69,16 @@ class question_approval_service {
     }
 
     /**
- * Revoke a single question's approval.
- *
- * Only a currently-approved, not-yet-moved row can be revoked, so a stale link or a replayed
- * request against an already-moved question is a no-op rather than an error.
- *
- * @param int $questionid local_artqtml_questions.id
- * @param int $generationid
- * @param \context $context system context, for the event
- * @return bool true if an approved, not-yet-moved row was actually revoked
- */
+     * Revoke a single question's approval.
+     *
+     * Only a currently-approved, not-yet-moved row can be revoked, so a stale link or a replayed
+     * Request against an already-moved question is a no-op rather than an error.
+     *
+     * @param int $questionid local_artqtml_questions.id
+     * @param int $generationid
+     * @param \context $context system context, for the event
+     * @return bool true if an approved, not-yet-moved row was actually revoked
+     */
     public static function revoke_single(int $questionid, int $generationid, \context $context): bool {
         global $DB;
 
@@ -117,12 +117,12 @@ class question_approval_service {
     }
 
     /**
- * @param int $generationid
- * @param int $userid the approving user
- * @param \context $context system context, for the events
- * @return int number of questions approved
- * @throws \Throwable rethrown on any mid-batch failure (after rollback), for the caller to report
- */
+     * @param int $generationid
+     * @param int $userid the approving user
+     * @param \context $context system context, for the events
+     * @return int number of questions approved
+     * @throws \Throwable rethrown on any mid-batch failure (after rollback), for the caller to report
+     */
     public static function approve_accepted_bulk(int $generationid, int $userid, \context $context): int {
         global $DB;
 

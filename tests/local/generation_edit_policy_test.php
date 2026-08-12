@@ -29,8 +29,8 @@ final class generation_edit_policy_test extends \advanced_testcase {
      * Draft is editable; every other status the plugin has is not.
      *
      * Driven from generation_status::VALUES rather than a hand-written list, so a status added
-     * later is covered by this test on the day it is added rather than the day somebody
-     * remembers to come back here.
+     * Later is covered by this test on the day it is added rather than the day somebody
+     * Remembers to come back here.
      */
     public function test_only_a_draft_is_editable(): void {
         foreach (generation_status::VALUES as $status) {
@@ -48,7 +48,7 @@ final class generation_edit_policy_test extends \advanced_testcase {
      * An unknown or missing status is not editable.
      *
      * The rule is a whitelist for exactly this reason: anything the code does not recognise fails
-     * closed. A deny-list would have let both of these through.
+     * Closed. A deny-list would have let both of these through.
      */
     public function test_an_unrecognised_status_is_not_editable(): void {
         $this->assertFalse(generation_edit_policy::can_edit_source((object) ['status' => 'somethingnew']));
@@ -69,8 +69,8 @@ final class generation_edit_policy_test extends \advanced_testcase {
      * And throws the specific exception - not a generic one - for everything else.
      *
      * The error code matters beyond tidiness: upload.php catches this one by code and turns it
-     * into a redirect, and rethrows anything else. A generic exception here would be swallowed as
-     * if it were this case.
+     * Into a redirect, and rethrows anything else. A generic exception here would be swallowed as
+     * If it were this case.
      *
      * @dataProvider non_draft_status_provider
      * @param string $status
@@ -99,8 +99,8 @@ final class generation_edit_policy_test extends \advanced_testcase {
     }
 
     /**
- * The rule looks at status and nothing else - ownership is not part of it.
- */
+     * The rule looks at status and nothing else - ownership is not part of it.
+     */
     public function test_the_rule_does_not_consider_ownership(): void {
         $mine = (object) ['status' => generation_status::STARTED, 'userid' => 1];
         $theirs = (object) ['status' => generation_status::STARTED, 'userid' => 999];

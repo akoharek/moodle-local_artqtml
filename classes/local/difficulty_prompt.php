@@ -25,16 +25,16 @@ namespace local_artqtml\local;
  * Renders the admin-configured difficulty definition for a generation's scale mode.
  *
  * Why this is its own class rather than a method on the generating task. The generator writes a
- * question to a level and the validator has to judge whether it hit that level; if each built its
- * own description of what the levels mean, the two would drift, and the validator would be
- * measuring against a scale the generator never saw.
+ * Question to a level and the validator has to judge whether it hit that level; if each built its
+ * Own description of what the levels mean, the two would drift, and the validator would be
+ * Measuring against a scale the generator never saw.
  */
 class difficulty_prompt {
     /**
      * The difficulty description for a generation, ready to drop into a prompt.
      *
      * Uses the Easy/Medium/Hard scale fragment. Older stored settings keys outside scale
-     * are ignored.
+     * Are ignored.
      *
      * @param array $difficulty the generation's decoded difficulty settings
      * @return string empty only if the admin has emptied the setting

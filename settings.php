@@ -16,13 +16,13 @@
 
 /**
  * Admin settings for local_artqtml: general, generator LLM, validator LLM,
- * question-type defaults (IH/FE/SR), and security.
+ * Question-type defaults (IH/FE/SR), and security.
  *
  * Moodle's admin_settingpage API does not support in-page tabs for a single settings form,
- * so tabs are sibling pages under one admin_category.
+ * So tabs are sibling pages under one admin_category.
  *
  * Institutional prompt templates live in code (db/prompt_defaults.php / prompt_seed) only —
- * they are not editable from this page.
+ * They are not editable from this page.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

@@ -19,6 +19,8 @@ namespace local_artqtml\local\question;
 use local_artqtml\local\question_types;
 
 /**
+ * Unit tests.
+ *
  * @package    local_artqtml
  * @category   test
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,7 +28,7 @@ use local_artqtml\local\question_types;
  */
 final class question_semantic_validator_test extends \advanced_testcase {
     /**
-     * Every supported type rejects a blank question stem (v20 #6).
+     * Every supported type rejects a blank question stem.
      */
     public function test_blank_questiontext_rejected_for_every_type(): void {
         foreach (question_types::CODES as $type) {
@@ -75,7 +77,7 @@ final class question_semantic_validator_test extends \advanced_testcase {
     }
 
     /**
-     * v20 #7: the admin-configured FE option-count range is enforced server-side.
+     * The admin-configured FE option-count range is enforced server-side.
      */
     public function test_fe_option_count_range_enforced(): void {
         $this->resetAfterTest();
@@ -108,7 +110,7 @@ final class question_semantic_validator_test extends \advanced_testcase {
     }
 
     /**
-     * v20 #7: SR (ordering) must have exactly the configured item count - the per-generation
+     * SR (ordering) must have exactly the configured item count - the per-generation
      * override wins over the admin default when set.
      */
     public function test_sr_exact_item_count_enforced(): void {
@@ -137,7 +139,7 @@ final class question_semantic_validator_test extends \advanced_testcase {
     }
 
     /**
-     * v20 #6: an unknown type code is rejected outright rather than silently passed.
+     * An unknown type code is rejected outright rather than silently passed.
      */
     public function test_unknown_typecode_rejected(): void {
         $this->assertNotNull(question_semantic_validator::validate('ZZ', ['questiontext' => 'Q?']));

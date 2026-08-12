@@ -18,7 +18,7 @@ namespace local_artqtml\task;
 
 /**
  * Unit tests for the Claude generation task's system-prompt building
- * specifically that every {{PLACEHOLDER}} in the template is substituted.
+ * Specifically that every {{PLACEHOLDER}} in the template is substituted.
  *
  * Scale + sourceonly; user message is source text only.
  *
@@ -48,7 +48,7 @@ final class generate_questions_task_test extends \advanced_testcase {
 
     /**
      * Every placeholder is replaced (no {{...}} token survives) and the substituted values are
-     * present.
+     * Present.
      */
     public function test_build_prompt_replaces_all_placeholders(): void {
         $this->resetAfterTest();
@@ -109,8 +109,8 @@ final class generate_questions_task_test extends \advanced_testcase {
     }
 
     /**
- * the True/False explanation clause goes only to True/False, and only when asked for.
- */
+     * The True/False explanation clause goes only to True/False, and only when asked for.
+     */
     public function test_the_truefalse_explanation_clause_goes_only_to_truefalse(): void {
         $this->resetAfterTest();
 
@@ -174,8 +174,8 @@ final class generate_questions_task_test extends \advanced_testcase {
     }
 
     /**
- * Invalid UT produces a message rather than a failed generation.
- */
+     * Invalid UT produces a message rather than a failed generation.
+     */
     public function test_invalid_utf8_does_not_break_the_user_message(): void {
         $this->resetAfterTest();
 
@@ -213,8 +213,8 @@ final class generate_questions_task_test extends \advanced_testcase {
     }
 
     /**
- * Admin per-type defaults still reach the system prompt.
- */
+     * Admin per-type defaults still reach the system prompt.
+     */
     public function test_admin_instruction_defaults_reach_the_system_prompt(): void {
         $this->resetAfterTest();
 

@@ -18,9 +18,9 @@
  * Creates a generation, or updates the source of one that is still a draft.
  *
  * The division of labour is deliberate: this decides whether a write may happen and performs it;
- * the controller decides what the user is then shown. It never redirects, never renders and never
- * touches capabilities - the capability check belongs to the page, and has already happened by the
- * time anything gets here.
+ * The controller decides what the user is then shown. It never redirects, never renders and never
+ * Touches capabilities - the capability check belongs to the page, and has already happened by the
+ * Time anything gets here.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -36,26 +36,26 @@ class generation_source_service {
      * Create a generation, or update the source of an existing draft.
      *
      * THE STATUS IS READ AGAIN HERE, from the database, in the same breath as the write. The page
-     * checked it too, when it opened - and that check is worth nothing by the time a form comes
-     * back. The sequence this guards against needs no attacker:
+     * Checked it too, when it opened - and that check is worth nothing by the time a form comes
+     * Back. The sequence this guards against needs no attacker:
      *
      *   1. a teacher opens a draft's source page;
      *   2. in another tab - or another teacher, the tool is site-wide - the generation is started;
      *   3. the first tab's form is submitted.
      *
      * Without the re-read, step 3 rewrites the source text of a generation that is at that moment
-     * being read by Claude, and will shortly be read again by Gemini.
+     * Being read by Claude, and will shortly be read again by Gemini.
      *
      * THE TRANSACTION IS SHORT ON PURPOSE. It wraps the re-read and the update and nothing else -
-     * file extraction, the security screen, duplicate detection and the whole of the page's
-     * rendering happen outside it. A transaction held across those would be a long-lived lock on a
-     * user-facing path.
+     * File extraction, the security screen, duplicate detection and the whole of the page's
+     * Rendering happen outside it. A transaction held across those would be a long-lived lock on a
+     * User-facing path.
      *
      * WHAT IT STILL DOES NOT CLOSE, stated rather than glossed over: this is a read-then-write
-     * inside one transaction, not a database-level compare-and-swap. Two saves landing in the same
-     * instant on the same draft can still interleave. That was not worth a non-portable
+     * Inside one transaction, not a database-level compare-and-swap. Two saves landing in the same
+     * Instant on the same draft can still interleave. That was not worth a non-portable
      * `SELECT ... FOR UPDATE` across every database Moodle supports, and the case it would fix -
-     * two people editing the same draft in the same second - is not the case this change is about.
+     * Two people editing the same draft in the same second - is not the case this change is about.
      *
      * @param string $name the generation's display name
      * @param string $shortname the short identifier
@@ -101,7 +101,7 @@ class generation_source_service {
      * Re-read the status and write the source columns, with the generation already locked.
      *
      * Split out of {@see self::save()} only so that the locked section is a named thing rather than
-     * a closure body - the sequence, not the layout, is what matters.
+     * A closure body - the sequence, not the layout, is what matters.
      *
      * @param int $editingid the generation being edited
      * @param string $name the generation's display name

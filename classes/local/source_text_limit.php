@@ -34,7 +34,7 @@ class source_text_limit {
      * Percentage of the generator's context window used as the automatic limit.
      *
      * The remaining fifth is not slack: the request also carries the system prompt, the response
-     * schema and the provider envelope, and the model's own answer has to fit in the same window.
+     * Schema and the provider envelope, and the model's own answer has to fit in the same window.
      *
      * @var int
      */
@@ -50,11 +50,11 @@ class source_text_limit {
      * The effective source-text limit in estimated tokens.
      *
      * An administrator may set `maxsourcetokens` explicitly. Zero - the default - means "work it
-     * out from the generator's context window", so a site that raises its context window does not
-     * also have to remember to raise a second number that nothing links to the first.
+     * Out from the generator's context window", so a site that raises its context window does not
+     * Also have to remember to raise a second number that nothing links to the first.
      *
      * A negative or unreadable stored value falls back to the automatic mode rather than being
-     * used, because the alternative to a nonsensical limit is a working one, not no limit at all.
+     * Used, because the alternative to a nonsensical limit is a working one, not no limit at all.
      *
      * @return int always at least 1
      */
@@ -76,8 +76,8 @@ class source_text_limit {
      * Estimated token count for a piece of text.
      *
      * Counts Unicode characters via \core_text, not bytes: a Hungarian source text would otherwise
-     * be over-counted by every accented letter, and the number the user sees would not match the
-     * number the server compares.
+     * Be over-counted by every accented letter, and the number the user sees would not match the
+     * Number the server compares.
      *
      * @param string $text
      * @return int 0 for an empty string
@@ -92,10 +92,10 @@ class source_text_limit {
     }
 
     /**
- * The limit expressed in characters.
- *
- * @return int
- */
+     * The limit expressed in characters.
+     *
+     * @return int
+     */
     public static function character_limit(): int {
         return self::token_limit() * self::CHARS_PER_TOKEN;
     }
@@ -104,8 +104,8 @@ class source_text_limit {
      * Whether this text is over the limit.
      *
      * Text estimated at exactly the limit is accepted - the limit is a maximum, not a boundary to
-     * stay under, and an off-by-one here would reject a document the counter had just shown as
-     * being at the maximum.
+     * Stay under, and an off-by-one here would reject a document the counter had just shown as
+     * Being at the maximum.
      *
      * @param string $text
      * @return bool
@@ -118,7 +118,7 @@ class source_text_limit {
      * Everything a message about this text needs, in one call.
      *
      * The error the user sees names all four numbers, because "too long" without them leaves them
-     * guessing how much to cut.
+     * Guessing how much to cut.
      *
      * @param string $text
      * @return array{characters: int, estimatedtokens: int, tokenlimit: int, characterlimit: int, exceeded: bool}
@@ -140,11 +140,11 @@ class source_text_limit {
      * The localised "too long" message for a piece of text, with its numbers filled in.
      *
      * Provided here so the four call sites that refuse an oversized text - the form, the upload
-     * handler, the AJAX endpoint and the task - cannot each assemble a slightly different sentence
-     * from the same facts.
+     * Handler, the AJAX endpoint and the task - cannot each assemble a slightly different sentence
+     * From the same facts.
      *
      * The message names sizes only. It never quotes the text itself: an error is displayed, logged
-     * and sometimes mailed, and source material is exactly what should not travel that way.
+     * And sometimes mailed, and source material is exactly what should not travel that way.
      *
      * @param string $text
      * @return string

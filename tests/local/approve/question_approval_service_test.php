@@ -130,8 +130,8 @@ final class question_approval_service_test extends \advanced_testcase {
     }
 
     /**
- * a moved question is not deletable row-by-row, and its generation reports that it holds one.
- */
+     * A moved question is not deletable row-by-row, and its generation reports that it holds one.
+     */
     public function test_moved_questions_are_not_deletable_and_block_generation_deletion(): void {
         global $DB, $USER;
 

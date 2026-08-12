@@ -18,13 +18,13 @@
  * Uninstall cleanup for local_artqtml.
  *
  * Moodle's standard uninstall already drops every table defined in db/install.xml and every
- * config_plugins/capability row for this component automatically - no code is needed for that.
+ * Config_plugins/capability row for this component automatically - no code is needed for that.
  * This hook only handles the one thing Moodle can't infer on its own: every generation's draft
- * question bank category (and the real Moodle questions inside it) lives in core's own
- * question_categories/question tables, not this plugin's tables. Without deleting those first,
- * uninstalling the plugin would silently orphan that content in the site's real question bank -
- * dropped local_artqtml_generations rows would take the only record of which category belonged
- * to which generation with them.
+ * Question bank category (and the real Moodle questions inside it) lives in core's own
+ * Question_categories/question tables, not this plugin's tables. Without deleting those first,
+ * Uninstalling the plugin would silently orphan that content in the site's real question bank -
+ * Dropped local_artqtml_generations rows would take the only record of which category belonged
+ * To which generation with them.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

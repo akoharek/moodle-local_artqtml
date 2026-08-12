@@ -43,16 +43,16 @@ class model_list {
      * @var string[] id fragments that mark a Gemini model as not a text model.
      *
      * Gemini's catalogue is one list for every modality, and `supportedGenerationMethods` does not
-     * separate them: a speech or image model answers `generateContent` exactly like a text model
-     * does, so the method check alone lets all of them through. Anthropic's list needs no
-     * equivalent because it publishes `capabilities.structured_outputs` per model.
+     * Separate them: a speech or image model answers `generateContent` exactly like a text model
+     * Does, so the method check alone lets all of them through. Anthropic's list needs no
+     * Equivalent because it publishes `capabilities.structured_outputs` per model.
      *
      *
      * Matched as substrings against the bare model id, deliberately: Google's naming puts the
-     * modality in the id itself, and a new `gemini-4-flash-image` has to be excluded on the day it
-     * appears, without an edit here. The cost of that choice is that a text model whose name
-     * happens to contain one of these fragments would be excluded too - which is why the list is
-     * kept to modality words rather than anything that could occur incidentally.
+     * Modality in the id itself, and a new `gemini-4-flash-image` has to be excluded on the day it
+     * Appears, without an edit here. The cost of that choice is that a text model whose name
+     * Happens to contain one of these fragments would be excluded too - which is why the list is
+     * Kept to modality words rather than anything that could occur incidentally.
      */
     public const GEMINI_NON_TEXT_MARKERS = [
         'antigravity',
@@ -69,8 +69,8 @@ class model_list {
      * @var int page size requested from Anthropic.
      *
      * The endpoint defaults to 20 and caps at 1000. Raising the limit is not by itself enough -
-     * the annex is explicit that the list length is not guaranteed - so {@see self::fetch_claude()}
-     * follows the after_id cursor to the end regardless of this value.
+     * The annex is explicit that the list length is not guaranteed - so {@see self::fetch_claude()}
+     * Follows the after_id cursor to the end regardless of this value.
      */
     public const ANTHROPIC_PAGE_SIZE = 1000;
 
@@ -78,16 +78,16 @@ class model_list {
     protected const MAX_PAGES = 20;
 
     /**
- * The cached model list for a provider, or null if nothing usable is cached.
- *
- * The returned shape is {models: list<array{id, display_name, supports_structured_output}>,
- * fetchedat: int, error: string}. It is deliberately typed loosely: the value is json_decode'd
- * from stored config, so it is only that shape if nothing corrupted it, and the runtime guards
- * below - not the annotation - are what make a corrupt cache harmless on an admin page.
- *
- * @param string $provider one of self::PROVIDERS
- * @return array<string, mixed>|null
- */
+     * The cached model list for a provider, or null if nothing usable is cached.
+     *
+     * The returned shape is {models: list<array{id, display_name, supports_structured_output}>,
+     * Fetchedat: int, error: string}. It is deliberately typed loosely: the value is json_decode'd
+     * From stored config, so it is only that shape if nothing corrupted it, and the runtime guards
+     * Below - not the annotation - are what make a corrupt cache harmless on an admin page.
+     *
+     * @param string $provider one of self::PROVIDERS
+     * @return array<string, mixed>|null
+     */
     public static function get_cached(string $provider): ?array {
         $raw = get_config('local_artqtml', self::cache_key($provider));
         if ($raw === false || $raw === '') {
@@ -115,17 +115,17 @@ class model_list {
     }
 
     /**
- * Fetch from the provider and replace the cache.
- *
- * Only the "Refresh models" button and the scheduled model check call this.
- *
- * On failure the previous cache content is deliberately left in place (annex, "Hibakezelés":
- * "Ha a lekérés meghiúsul, a korábbi gyorsítótár-tartalom marad érvényben"), so a transient
- * provider outage does not empty the dropdown of an admin who is mid-configuration.
- *
- * @param string $provider one of self::PROVIDERS
- * @return array{success: bool, models: array, error: string}
- */
+     * Fetch from the provider and replace the cache.
+     *
+     * Only the "Refresh models" button and the scheduled model check call this.
+     *
+     * On failure the previous cache content is deliberately left in place (annex, "Hibakezelés":
+     * "Ha a lekérés meghiúsul, a korábbi gyorsítótár-tartalom marad érvényben"), so a transient
+     * Provider outage does not empty the dropdown of an admin who is mid-configuration.
+     *
+     * @param string $provider one of self::PROVIDERS
+     * @return array{success: bool, models: array, error: string}
+     */
     public static function refresh(string $provider): array {
         $apikey = api_key_store::get($provider === self::PROVIDER_CLAUDE ? 'claude' : 'gemini');
         if ($apikey === '') {
@@ -150,11 +150,11 @@ class model_list {
     }
 
     /**
- * The models a dropdown may offer: cached, and structured-output capable only.
- *
- * @param string $provider
- * @return array<string, string> model id => display label, ready for a select
- */
+     * The models a dropdown may offer: cached, and structured-output capable only.
+     *
+     * @param string $provider
+     * @return array<string, string> model id => display label, ready for a select
+     */
     public static function selectable_options(string $provider): array {
         $cached = self::get_cached($provider);
         if ($cached === null) {
@@ -182,12 +182,12 @@ class model_list {
     }
 
     /**
- * Whether a model id is present and selectable in the cached list.
- *
- * @param string $provider
- * @param string $modelid
- * @return bool
- */
+     * Whether a model id is present and selectable in the cached list.
+     *
+     * @param string $provider
+     * @param string $modelid
+     * @return bool
+     */
     public static function is_listed(string $provider, string $modelid): bool {
         return $modelid !== '' && array_key_exists($modelid, self::selectable_options($provider));
     }
@@ -256,7 +256,7 @@ class model_list {
      * Is this Gemini model id one of the non-text modalities?
      *
      * Public so the check is asserted directly rather than through a live API call - the filter it
-     * guards is the difference between a sweep that finishes and one that does not.
+     * Guards is the difference between a sweep that finishes and one that does not.
      *
      * @param string $id the bare model id, without the "models/" prefix
      * @return bool

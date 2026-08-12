@@ -48,34 +48,34 @@ class duplicate_detector {
     }
 
     /**
- * sha1 hash of the normalised text, used for exact-match detection.
- *
- * @param string $text
- * @return string
- */
+     * Sha1 hash of the normalised text, used for exact-match detection.
+     *
+     * @param string $text
+     * @return string
+     */
     public static function hash(string $text): string {
         return sha1(self::normalise($text));
     }
 
     /**
- * A file fingerprint independent of whatever text extraction produces from the file.
- *
- * @param string $bytes the file identity to fingerprint
- * @return string
- */
+     * A file fingerprint independent of whatever text extraction produces from the file.
+     *
+     * @param string $bytes the file identity to fingerprint
+     * @return string
+     */
     public static function hash_file_bytes(string $bytes): string {
         return sha1($bytes);
     }
 
     /**
- * Find an existing generation whose source text is an exact or near-duplicate match.
- *
- * @param string $text the newly submitted source text
- * @param int $excludeid a generation id to never match against (: editing an
- * existing "started" generation's own unchanged text must not flag itself as a dup)
- * @return \stdClass|null the matched generation record plus a 'similarity' (0-100) field,
- * or null if no match was found
- */
+     * Find an existing generation whose source text is an exact or near-duplicate match.
+     *
+     * @param string $text the newly submitted source text
+     * @param int $excludeid a generation id to never match against (: editing an
+     * Existing "started" generation's own unchanged text must not flag itself as a dup)
+     * @return \stdClass|null the matched generation record plus a 'similarity' (0-100) field,
+     * Or null if no match was found
+     */
     public static function find_match(string $text, int $excludeid = 0): ?\stdClass {
         global $DB;
 

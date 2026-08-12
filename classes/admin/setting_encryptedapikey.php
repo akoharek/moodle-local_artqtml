@@ -23,11 +23,11 @@ namespace local_artqtml\admin;
 
 /**
  * Transparently encrypts on write and decrypts on read, so the admin form/unmask toggle still
- * shows the real plaintext key, while `config_plugins` only ever holds ciphertext.
+ * Shows the real plaintext key, while `config_plugins` only ever holds ciphertext.
  *
  * A value that fails to decrypt is treated as missing: the field shows empty (never the raw
- * ciphertext) and runtime readers via {@see \local_artqtml\local\api_key_store} also get an empty
- * key until an administrator re-saves a valid key.
+ * Ciphertext) and runtime readers via {@see \local_artqtml\local\api_key_store} also get an empty
+ * Key until an administrator re-saves a valid key.
  */
 class setting_encryptedapikey extends \admin_setting_configpasswordunmask {
     /** @var bool whether a decrypt failure hint was already prepended to the description */

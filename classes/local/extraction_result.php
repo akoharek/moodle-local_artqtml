@@ -18,8 +18,8 @@
  * Outcome of reading text from an uploaded document.
  *
  * Distinguishes empty documents, unreadable files, oversize files, and hidden-text rejections
- * so the upload page can show the right message. Reason codes are a closed set mapped to
- * localised strings at display time; they never carry document contents.
+ * So the upload page can show the right message. Reason codes are a closed set mapped to
+ * Localised strings at display time; they never carry document contents.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -50,8 +50,8 @@ class extraction_result {
     public const REASON_RESOURCE_LIMIT = 'resourcelimit';
 
     /**
- * @var string the document was read successfully and holds no text this extractor can reach.
- */
+     * @var string the document was read successfully and holds no text this extractor can reach.
+     */
     public const REASON_NO_TEXT = 'notext';
 
     /**
@@ -74,7 +74,7 @@ class extraction_result {
      * A rejection.
      *
      * Takes no text parameter at all, so that a refused document's contents cannot reach a caller
-     * by accident - the shape of the function is the guarantee, not a rule somebody has to follow.
+     * By accident - the shape of the function is the guarantee, not a rule somebody has to follow.
      *
      * @param string $reason one of the REASON_* constants
      * @param array $metrics measured counters - numbers only

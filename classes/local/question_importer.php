@@ -19,10 +19,10 @@
  *
  * The implementation now lives in four focused classes under local_artqtml\local\question\*
  * (semantic validator / form builder / creator / multichoice fraction normalizer); this class
- * remains as the stable public facade its three callers keep using unchanged:
- * save_questions_task (create/validate) and observer.php
+ * Remains as the stable public facade its three callers keep using unchanged:
+ * Save_questions_task (create/validate) and observer.php
  * (recompute_multichoice_fractions). The three public method signatures below are the contract -
- * do not add new logic here: delegate to the appropriate question\* class instead.
+ * Do not add new logic here: delegate to the appropriate question\* class instead.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -39,30 +39,30 @@ use local_artqtml\local\question\multichoice_fraction_normalizer;
  */
 class question_importer {
     /**
- * semantic validation of AI-generated question data, run before it is ever imported.
- *
- * @param string $typecode IH/FE/SR
- * @param array $data decoded per-type fields from the AI response
- * @param array $typesettings this type's generation settings (only SR's sritemcount override
- * is read - v20 #7); optional to preserve the existing two-argument callers
- * @return string|null null if valid, otherwise a short human-readable reason it was rejected
- */
+     * Semantic validation of AI-generated question data, run before it is ever imported.
+     *
+     * @param string $typecode IH/FE/SR
+     * @param array $data decoded per-type fields from the AI response
+     * @param array $typesettings this type's generation settings (only SR's sritemcount override
+     * Is read -; optional to preserve the existing two-argument callers
+     * @return string|null null if valid, otherwise a short human-readable reason it was rejected
+     */
     public static function validate(string $typecode, array $data, array $typesettings = []): ?string {
         return question_semantic_validator::validate($typecode, $data, $typesettings);
     }
 
     /**
- * Create a new question in the given category from AI-generated data.
- *
- * @param string $typecode IH/FE/SR
- * @param array $data decoded per-type fields from the AI response
- * @param int $categoryid target question_categories.id (the generation's draft bank)
- * @param string $questioncode plugin-generated name, e.g. BIO1-IH-0001
- * @param array $typesettings this type's generation settings (feedback/retry/negation)
- * @param int $userid the generation's owner
- * @param int $generationid only used to attribute a truncation log entry
- * @return int the id of the newly created question table row
- */
+     * Create a new question in the given category from AI-generated data.
+     *
+     * @param string $typecode IH/FE/SR
+     * @param array $data decoded per-type fields from the AI response
+     * @param int $categoryid target question_categories.id (the generation's draft bank)
+     * @param string $questioncode plugin-generated name, e.g. BIO1-IH-0001
+     * @param array $typesettings this type's generation settings (feedback/retry/negation)
+     * @param int $userid the generation's owner
+     * @param int $generationid only used to attribute a truncation log entry
+     * @return int the id of the newly created question table row
+     */
     public static function create(
         string $typecode,
         array $data,
@@ -84,9 +84,9 @@ class question_importer {
     }
 
     /**
- * @param int $questionid the real question.id (local_artqtml_questions.questionbankid)
- * @return void
- */
+     * @param int $questionid the real question.id (local_artqtml_questions.questionbankid)
+     * @return void
+     */
     public static function recompute_multichoice_fractions(int $questionid): void {
         multichoice_fraction_normalizer::recompute($questionid);
     }

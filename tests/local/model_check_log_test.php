@@ -26,16 +26,16 @@ namespace local_artqtml\local;
  */
 final class model_check_log_test extends \advanced_testcase {
     /**
- * It is an addition, which the table's own comment separates from the breaking kind - that
- * comment names renaming and dropping. A report selecting named columns is unaffected; one
- * selecting `*` gains a column at the end.
- *
- * Why the column had to exist: a structural check failure takes a model out of the dropdown,
- * and that verdict has to be revocable by us. On the day this was added, two models failed the
- * check in the morning and passed in the afternoon, because the defect was in how the plugin
- * read the response. Scoping an exclusion to the plugin version that produced it means our own
- * fix reopens them; without the column the exclusion would have outlived its own cause.
- */
+     * It is an addition, which the table's own comment separates from the breaking kind - that
+     * Comment names renaming and dropping. A report selecting named columns is unaffected; one
+     * Selecting `*` gains a column at the end.
+     *
+     * Why the column had to exist: a structural check failure takes a model out of the dropdown,
+     * And that verdict has to be revocable by us. On the day this was added, two models failed the
+     * Check in the morning and passed in the afternoon, because the defect was in how the plugin
+     * Read the response. Scoping an exclusion to the plugin version that produced it means our own
+     * Fix reopens them; without the column the exclusion would have outlived its own cause.
+     */
     public function test_schema_matches_the_documented_interface(): void {
         global $DB;
         $this->resetAfterTest();
@@ -60,9 +60,9 @@ final class model_check_log_test extends \advanced_testcase {
 
     /**
      * The table must be readable with a plain, unquoted, portable SELECT - which is the entire
-     * point of naming the column triggertype rather than the annex's `trigger`. TRIGGER is a
-     * reserved word; an unquoted reference to it is a syntax error in MariaDB and PostgreSQL, and
-     * a quoted one is not portable between them.
+     * Point of naming the column triggertype rather than the annex's `trigger`. TRIGGER is a
+     * Reserved word; an unquoted reference to it is a syntax error in MariaDB and PostgreSQL, and
+     * A quoted one is not portable between them.
      */
     public function test_every_column_is_selectable_unquoted(): void {
         global $DB;
@@ -141,8 +141,8 @@ final class model_check_log_test extends \advanced_testcase {
     }
 
     /**
- * only a shortened detail is stored, never a raw provider response.
- */
+     * Only a shortened detail is stored, never a raw provider response.
+     */
     public function test_error_message_is_truncated(): void {
         global $DB;
         $this->resetAfterTest();
@@ -202,7 +202,7 @@ final class model_check_log_test extends \advanced_testcase {
 
     /**
      * An outage must not erase the failure underneath it, which is what would let a genuinely
-     * broken model back into the dropdown on the next busy night.
+     * Broken model back into the dropdown on the next busy night.
      */
     public function test_a_transient_row_does_not_overwrite_an_earlier_verdict(): void {
         $this->resetAfterTest();
@@ -231,7 +231,7 @@ final class model_check_log_test extends \advanced_testcase {
     }
 
     /**
-     * latest_for_provider() returns the newest entry for that provider and ignores the other.
+     * Latest_for_provider() returns the newest entry for that provider and ignores the other.
      */
     public function test_latest_for_provider(): void {
         $this->resetAfterTest();
@@ -273,8 +273,8 @@ final class model_check_log_test extends \advanced_testcase {
     }
 
     /**
- * no retention policy - nothing prunes the table.
- */
+     * No retention policy - nothing prunes the table.
+     */
     public function test_no_purge_mechanism_exists(): void {
         $root = realpath(__DIR__ . '/../..');
         $offenders = [];

@@ -20,9 +20,9 @@ namespace local_artqtml\local;
  * Unit tests for the provider model list cache and filtering.
  *
  * The fetch itself is not exercised here - it needs a live provider - but everything the settings
- * page depends on is: that the page reads the cache and only the cache, that the dropdown offers
- * structured-output models only, and that a saved-but-unlisted model is recognised as such rather
- * than silently dropped.
+ * Page depends on is: that the page reads the cache and only the cache, that the dropdown offers
+ * Structured-output models only, and that a saved-but-unlisted model is recognised as such rather
+ * Than silently dropped.
  *
  * @package    local_artqtml
  * @category   test
@@ -60,8 +60,8 @@ final class model_list_test extends \advanced_testcase {
     }
 
     /**
- * with nothing cached the settings page gets null - and must not fetch.
- */
+     * With nothing cached the settings page gets null - and must not fetch.
+     */
     public function test_empty_cache_returns_null(): void {
         $this->resetAfterTest();
 
@@ -71,8 +71,8 @@ final class model_list_test extends \advanced_testcase {
     }
 
     /**
- * 24-hour lifetime, measured from the fetch time.
- */
+     * 24-hour lifetime, measured from the fetch time.
+     */
     public function test_cache_freshness_window(): void {
         $this->resetAfterTest();
 
@@ -87,8 +87,8 @@ final class model_list_test extends \advanced_testcase {
     }
 
     /**
- * only structured-output models reach the dropdown.
- */
+     * Only structured-output models reach the dropdown.
+     */
     public function test_only_structured_output_models_are_selectable(): void {
         $this->resetAfterTest();
 
@@ -167,11 +167,11 @@ final class model_list_test extends \advanced_testcase {
 
     /**
      * The real catalogue, as the account returned it on 2026-08-03: 42 models, of which 21 are not
-     * text models at all. Asserted against the actual names rather than invented ones, because the
-     * filter's whole job is to survive what Google actually publishes.
+     * Text models at all. Asserted against the actual names rather than invented ones, because the
+     * Filter's whole job is to survive what Google actually publishes.
      *
      * Why it matters beyond tidiness: every one of these was probed with a real question-generation
-     * request, and that is what pushed the sweep past PHP's execution limit.
+     * Request, and that is what pushed the sweep past PHP's execution limit.
      *
      * @dataProvider gemini_model_provider
      */
@@ -211,7 +211,7 @@ final class model_list_test extends \advanced_testcase {
 
     /**
      * The count is the point: a filter that quietly stopped matching would still pass the cases
-     * above one by one, so the whole measured catalogue is run through it at once.
+     * Above one by one, so the whole measured catalogue is run through it at once.
      */
     public function test_the_measured_catalogue_halves(): void {
         $catalogue = array_map(

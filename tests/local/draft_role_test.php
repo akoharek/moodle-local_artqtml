@@ -20,8 +20,8 @@ namespace local_artqtml\local;
  * Unit tests for the draft-editing role.
  *
  * The point of this role is what it does NOT carry, so the assertions are mostly about absence:
- * the exact capability set, and no enrolment. A role that quietly grew a fourth capability would
- * pass a "the Edit link works" test and still be the failure this class was written to avoid.
+ * The exact capability set, and no enrolment. A role that quietly grew a fourth capability would
+ * Pass a "the Edit link works" test and still be the failure this class was written to avoid.
  *
  * @package    local_artqtml
  * @category   test
@@ -43,7 +43,7 @@ final class draft_role_test extends \advanced_testcase {
 
     /**
      * The role is created once and looked up thereafter - the install step, the upgrade step and
-     * every grant() all call ensure_role(), so a second call must not produce a second role.
+     * Every grant() all call ensure_role(), so a second call must not produce a second role.
      */
     public function test_ensure_role_is_idempotent(): void {
         global $DB;
@@ -60,8 +60,8 @@ final class draft_role_test extends \advanced_testcase {
 
     /**
      * The capability set is the whole point: three, and no more. The guard is against growth - a
-     * fourth capability added "just to make something work" is how a narrow role becomes a broad
-     * one, and it would pass every functional test.
+     * Fourth capability added "just to make something work" is how a narrow role becomes a broad
+     * One, and it would pass every functional test.
      */
     public function test_the_role_grants_exactly_three_capabilities(): void {
         global $DB;
@@ -91,7 +91,7 @@ final class draft_role_test extends \advanced_testcase {
 
     /**
      * A course context and nothing else: the role is only ever assigned on the draft course, and a
-     * role assignable at system level would be a different, much larger grant.
+     * Role assignable at system level would be a different, much larger grant.
      */
     public function test_the_role_is_assignable_on_courses_only(): void {
         $this->resetAfterTest();
@@ -126,7 +126,7 @@ final class draft_role_test extends \advanced_testcase {
 
     /**
      * Granting twice must not stack up role assignments - grant() runs on every generation, not
-     * just the first.
+     * Just the first.
      */
     public function test_grant_does_not_duplicate_the_assignment(): void {
         global $DB;
@@ -150,7 +150,7 @@ final class draft_role_test extends \advanced_testcase {
 
     /**
      * With no draft course configured there is nothing to assign against. Generation is blocked in
-     * that state anyway; the point is that grant() says so instead of throwing.
+     * That state anyway; the point is that grant() says so instead of throwing.
      */
     public function test_grant_is_a_no_op_without_a_draft_course(): void {
         global $DB;

@@ -18,7 +18,7 @@
  * Who may delete a generation.
  *
  * Shared by delete.php, generate.php's "Delete and exit" abort, and the list-page Delete control,
- * so the rule cannot drift between UI and server.
+ * So the rule cannot drift between UI and server.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -34,7 +34,7 @@ class generation_delete_policy {
      * Whether the given user may delete this generation.
      *
      * True only when the user has local/artqtml:use and owns the generation. :configure is
-     * deliberately ignored.
+     * Deliberately ignored.
      *
      * @param \stdClass $generation a local_artqtml_generations record (needs ->userid)
      * @param int|null $userid user to check; defaults to the current user

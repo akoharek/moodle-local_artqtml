@@ -26,8 +26,8 @@ namespace local_artqtml\local;
  */
 final class setting_backup_test extends \advanced_testcase {
     /**
- * the previous value is stored under <setting>_backup_<version> before the change.
- */
+     * The previous value is stored under <setting>_backup_<version> before the change.
+     */
     public function test_backup_stores_the_previous_value(): void {
         $this->resetAfterTest();
 
@@ -47,10 +47,10 @@ final class setting_backup_test extends \advanced_testcase {
      * Nothing set means nothing to lose - no backup key and no notice noise.
      *
      * Uses a setting with no shipped default on purpose: for one that HAS a default, get_config()
-     * returns that default even when the administrator never touched it, so the "no value" branch
-     * is unreachable through it. That is also the honest limitation of this helper - it cannot tell
-     * an untouched default from a deliberate choice, so it backs both up. Backing up a value that
-     * turns out to be the default is harmless; the reverse would not be.
+     * Returns that default even when the administrator never touched it, so the "no value" branch
+     * Is unreachable through it. That is also the honest limitation of this helper - it cannot tell
+     * An untouched default from a deliberate choice, so it backs both up. Backing up a value that
+     * Turns out to be the default is harmless; the reverse would not be.
      */
     public function test_no_backup_when_there_is_no_value(): void {
         $this->resetAfterTest();
@@ -65,7 +65,7 @@ final class setting_backup_test extends \advanced_testcase {
 
     /**
      * "A mentés nem íródik felül": a second backup at the same version keeps the first, which is
-     * the more original value, and takes a suffixed key instead.
+     * The more original value, and takes a suffixed key instead.
      */
     public function test_an_existing_backup_is_never_overwritten(): void {
         $this->resetAfterTest();
@@ -83,8 +83,8 @@ final class setting_backup_test extends \advanced_testcase {
     }
 
     /**
- * an encrypted setting's backup is encrypted too - a backup must not downgrade a secret to plaintext.
- */
+     * An encrypted setting's backup is encrypted too - a backup must not downgrade a secret to plaintext.
+     */
     public function test_encrypted_setting_is_backed_up_encrypted(): void {
         $this->resetAfterTest();
 
@@ -100,8 +100,8 @@ final class setting_backup_test extends \advanced_testcase {
     }
 
     /**
- * the administrator is told which setting changed and where the old value is.
- */
+     * The administrator is told which setting changed and where the old value is.
+     */
     public function test_notices_are_recorded_rendered_and_cleared(): void {
         $this->resetAfterTest();
 

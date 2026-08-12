@@ -18,10 +18,10 @@
  * Read-only AI validation panel injected into Moodle's native question editor.
  *
  * The plugin deliberately reuses Moodle's own /question/bank/editquestion/question.php rather
- * than shipping a custom editing form (: "A szerkesztő pontosan ugyanaz az oldal
- * amelyen a tanár bármely kérdésbanki kérdést szerkesztené"). Since that page belongs to core,
- * this panel is injected via the before_standard_top_of_body_html plugin callback (lib.php)
- * rather than by modifying the native edit form.
+ * Than shipping a custom editing form (: "A szerkesztő pontosan ugyanaz az oldal
+ * Amelyen a tanár bármely kérdésbanki kérdést szerkesztené"). Since that page belongs to core,
+ * This panel is injected via the before_standard_top_of_body_html plugin callback (lib.php)
+ * Rather than by modifying the native edit form.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -48,17 +48,17 @@ class validation_panel {
     }
 
     /**
- * Render the read-only panel HTML for one question row.
- *
- * Returned as a hidden <div> plus a small inline script that relocates it immediately
- * before the native form's "Question name" field (#id_name) once the DOM is ready - the
- * exact placement the spec calls for ("a kérdés neve előtt"). If that field can't be found
- * (a future Moodle version changes the form), the panel simply stays visible at the top of
- * the page instead of disappearing.
- *
- * @param \stdClass $row a local_artqtml_questions record
- * @return string
- */
+     * Render the read-only panel HTML for one question row.
+     *
+     * Returned as a hidden <div> plus a small inline script that relocates it immediately
+     * Before the native form's "Question name" field (#id_name) once the DOM is ready - the
+     * Exact placement the spec calls for ("a kérdés neve előtt"). If that field can't be found
+     * (a future Moodle version changes the form), the panel simply stays visible at the top of
+     * The page instead of disappearing.
+     *
+     * @param \stdClass $row a local_artqtml_questions record
+     * @return string
+     */
     public static function render(\stdClass $row): string {
         $panelid = 'artqtml-validation-panel';
 

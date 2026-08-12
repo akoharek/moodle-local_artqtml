@@ -2,17 +2,17 @@
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
+// It under the terms of the GNU General Public License as published by
+// The Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
 // Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// But WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// Along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Step 1 of the "New generation" flow: upload/paste source text.
@@ -69,7 +69,7 @@ if ($editid > 0) {
     }
 
     // Same one-shot surface as generate.php: recoverable pipeline rollback may leave a generic
-    // error on a started draft so the teacher knows to restart from the source step.
+    // Error on a started draft so the teacher knows to restart from the source step.
     if (!empty($editgeneration->error)) {
         \core\notification::error($editgeneration->error);
         $DB->set_field('local_artqtml_generations', 'error', null, ['id' => $editid]);
@@ -127,9 +127,9 @@ function local_artqtml_save_generation(
  * Turn a refused save into the canonical page for the generation's current status.
  *
  * The user did nothing wrong and has every permission this page requires - the generation simply
- * moved on while their form was open. What they get is the page that matches where it moved to,
- * and a sentence saying why nothing was saved. What they do not get is an exception screen: a
- * stack trace over a race the product itself allows would be a defect report about the user.
+ * Moved on while their form was open. What they get is the page that matches where it moved to,
+ * And a sentence saying why nothing was saved. What they do not get is an exception screen: a
+ * Stack trace over a race the product itself allows would be a defect report about the user.
  *
  * @param int $generationid the generation that was being edited
  * @param \moodle_url $fallback where to go if the record has since disappeared entirely
@@ -163,9 +163,9 @@ if ($confirmed) {
     $generationid = 0;
 
     // The session says which generation this confirmation was prepared for; it says nothing about
-    // what state that generation is in NOW. The pending data was already discarded above, so a
-    // refusal here leaves nothing behind to retry with - which is the correct outcome: the
-    // decision the user confirmed was about a draft that no longer exists in that form.
+    // What state that generation is in NOW. The pending data was already discarded above, so a
+    // Refusal here leaves nothing behind to retry with - which is the correct outcome: the
+    // Decision the user confirmed was about a draft that no longer exists in that form.
     try {
         $generationid = local_artqtml_save_generation(
             $pending['name'],
@@ -217,7 +217,7 @@ if ($mform->is_cancelled()) {
         }
     }
     // Sorted so the combined hash does not depend on the order the File API happened to return
-    // the files in.
+    // The files in.
     sort($contenthashes);
     $filehash = $contenthashes !== [] ? duplicate_detector::hash_file_bytes(implode('', $contenthashes)) : null;
 
@@ -262,10 +262,10 @@ if ($mform->is_cancelled()) {
             ['artqtmlconfirmdup' => 1] + ($editid ? ['id' => $editid] : [])
         );
         // D-5: the panel already knows the matched generation's status (it prints it above), so
-        // the button must land where that status is actually actionable - the approval page for a
-        // completed generation, not the settings page. generation_list::open_url() is where that
-        // status->destination rule already lives for the list page; reused here so the two cannot
-        // drift apart.
+        // The button must land where that status is actually actionable - the approval page for a
+        // Completed generation, not the settings page. generation_list::open_url() is where that
+        // Status->destination rule already lives for the list page; reused here so the two cannot
+        // Drift apart.
         $openurl = generation_list::open_url($match);
 
         echo html_writer::start_tag('form', ['method' => 'post', 'action' => $continueurl->out(false)]);
@@ -294,7 +294,7 @@ if ($mform->is_cancelled()) {
     } catch (\moodle_exception $e) {
         // Only the status refusal is handled here. Anything else is a real fault and goes to
         // Moodle's own error handling, where it belongs - swallowing exceptions by category is
-        // how a broken save comes to look like a successful one.
+        // How a broken save comes to look like a successful one.
         if ($e->errorcode !== 'cannoteditsourcenondraft') {
             throw $e;
         }
@@ -346,7 +346,7 @@ $PAGE->requires->js_call_amd('local_artqtml/uploadconflict', 'init', [
     ],
 ]);
 
-// the Continue button is only active once all three required fields are filled.
+// The Continue button is only active once all three required fields are filled.
 $PAGE->requires->js(new moodle_url('/local/artqtml/js/continuebutton.js'));
 echo html_writer::script(
     'document.addEventListener("DOMContentLoaded", function() {' .
@@ -355,7 +355,7 @@ echo html_writer::script(
     '}});'
 );
 
-// confirm before discarding entered data via the Cancel button.
+// Confirm before discarding entered data via the Cancel button.
 echo html_writer::script(
     'document.addEventListener("DOMContentLoaded", function() {' .
     'var cancelbtn = document.querySelector(\'input[name="cancel"], button[name="cancel"]\');' .

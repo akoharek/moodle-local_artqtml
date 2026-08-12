@@ -1,21 +1,21 @@
 <?php
 /**
  * Standalone dev/QA tool: prints the raw pipeline state of recent generations, so a generation
- * that is stuck can be told apart from one that is merely slow.
+ * That is stuck can be told apart from one that is merely slow.
  *
  * Why this exists. `process_pending_generations` selects on two columns at once - an in-progress
- * status AND `processingtoken IS NULL` - and the interface shows neither. A generation displaying
+ * Status AND `processingtoken IS NULL` - and the interface shows neither. A generation displaying
  * "Kérdések generálása" for an hour is therefore ambiguous from the screen alone: it may be
- * waiting for the next tick, or it may carry a claim token from a run that never released it, in
- * which case no future tick will ever pick it up. C-01 in that task installs a
- * register_shutdown_function() as a safety net, but that net does not run when the process is
- * killed outright rather than exiting.
+ * Waiting for the next tick, or it may carry a claim token from a run that never released it, in
+ * Which case no future tick will ever pick it up. C-01 in that task installs a
+ * Register_shutdown_function() as a safety net, but that net does not run when the process is
+ * Killed outright rather than exiting.
  *
  * Read-only: this script writes nothing. Use --release to clear a stuck claim (that one does
- * write, and says exactly what it changed).
+ * Write, and says exactly what it changed).
  *
  * NOT part of the shipped plugin - `tools/` is excluded from the deployment zip, from phpcs and
- * from phpstan.
+ * From phpstan.
  *
  * Usage, from the Moodle root inside the webserver container:
  *   php local/artqtml/tools/generation_state.php

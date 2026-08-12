@@ -31,7 +31,7 @@ class draft_bank {
      * The shared root category's idnumber - the plugin's stable handle on its own category.
      *
      * A category's name is a lang string and moves with the site's language; its idnumber does
-     * not. Everything that looks the root up looks it up by this.
+     * Not. Everything that looks the root up looks it up by this.
      */
     public const ROOT_IDNUMBER = 'artqtml_draft_root';
 
@@ -39,17 +39,17 @@ class draft_bank {
     protected static $rootcategoryid = null;
 
     /**
- * @return bool
- */
+     * @return bool
+     */
     public static function is_configured(): bool {
         return self::get_draft_courseid() !== null;
     }
 
     /**
- * The configured draft course's id, or null if unset or the course no longer exists.
- *
- * @return int|null
- */
+     * The configured draft course's id, or null if unset or the course no longer exists.
+     *
+     * @return int|null
+     */
     public static function get_draft_courseid(): ?int {
         global $DB;
 
@@ -63,7 +63,7 @@ class draft_bank {
 
     /**
      * Fully-qualified class name for Moodle 5.1+ question bank helper (string — not a hard
-     * dependency so PHPStan on Moodle 4.5 still analyses cleanly).
+     * Dependency so PHPStan on Moodle 4.5 still analyses cleanly).
      */
     private const QBANK_HELPER = 'core_question\\local\\bank\\question_bank_helper';
 
@@ -80,7 +80,7 @@ class draft_bank {
      * Course context of the configured draft course (roles / course:view).
      *
      * Distinct from {@see self::get_draft_context()}: on Moodle 5.1+ question categories live in
-     * a mod_qbank module context, but the draft-editing role is still assigned at course level.
+     * A mod_qbank module context, but the draft-editing role is still assigned at course level.
      *
      * @return \context_course|null
      */
@@ -94,16 +94,16 @@ class draft_bank {
     }
 
     /**
- * Context where draft question categories are stored.
- *
- * Moodle 4.5: the draft course context. Moodle 5.1+: the draft course's system-type
- * mod_qbank activity (created on first use).
- *
- * @return \context
- * @throws \moodle_exception if unset or the course no longer exists - callers are expected
- * to have already blocked starting a new generation in that case via
- * {@see self::is_configured()}, so reaching here means something raced past that check
- */
+     * Context where draft question categories are stored.
+     *
+     * Moodle 4.5: the draft course context. Moodle 5.1+: the draft course's system-type
+     * Mod_qbank activity (created on first use).
+     *
+     * @return \context
+     * @throws \moodle_exception if unset or the course no longer exists - callers are expected
+     * To have already blocked starting a new generation in that case via
+     * {@see self::is_configured()}, so reaching here means something raced past that check
+     */
     protected static function get_draft_context(): \context {
         $courseid = self::get_draft_courseid();
         if ($courseid === null) {
@@ -128,14 +128,14 @@ class draft_bank {
     }
 
     /**
- * Context id where draft question categories live.
- *
- * Public: {@see \local_artqtml\local\question_bank_list} needs this to recognise the draft
- * bank when enumerating move-target categories.
- *
- * @return int|null null if no draft course is configured - callers must check
- * {@see self::is_configured()} first
- */
+     * Context id where draft question categories live.
+     *
+     * Public: {@see \local_artqtml\local\question_bank_list} needs this to recognise the draft
+     * Bank when enumerating move-target categories.
+     *
+     * @return int|null null if no draft course is configured - callers must check
+     * {@see self::is_configured()} first
+     */
     public static function get_draft_context_id(): ?int {
         if (!self::is_configured()) {
             return null;
@@ -174,11 +174,11 @@ class draft_bank {
     }
 
     /**
- * Get (creating if needed) the shared "ArtQTML" category all per-generation draft
- * banks live under.
- *
- * @return int question_categories.id of the shared root category
- */
+     * Get (creating if needed) the shared "ArtQTML" category all per-generation draft
+     * Banks live under.
+     *
+     * @return int question_categories.id of the shared root category
+     */
     public static function get_root_category_id(): int {
         global $CFG, $DB;
 
@@ -265,10 +265,10 @@ class draft_bank {
     }
 
     /**
- * @param int $generationid
- * @param int $categoryid
- * @return void
- */
+     * @param int $generationid
+     * @param int $categoryid
+     * @return void
+     */
     public static function delete_if_empty(int $generationid, int $categoryid): void {
         global $DB;
 

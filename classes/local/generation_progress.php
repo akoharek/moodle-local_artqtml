@@ -31,7 +31,7 @@ class generation_progress {
      * Presentation per generation status.
      *
      * 'failed' is deliberately absent: its percentage is not a property of the status but of how
-     * far the generation actually got, which only {@see self::failed_percent()} can work out.
+     * Far the generation actually got, which only {@see self::failed_percent()} can work out.
      *
      * @var array<string, array{percent: int, color: string, striped: bool}>
      */
@@ -53,7 +53,7 @@ class generation_progress {
      * Every colour class the bar can carry, so a re-render can clear the previous one.
      *
      * Derived rather than re-listed, so adding a stage colour above cannot leave a stale class
-     * stuck on the element.
+     * Stuck on the element.
      *
      * @return string[]
      */
@@ -81,23 +81,23 @@ class generation_progress {
     }
 
     /**
- * How far through the generating stage the per-type loop has got, as a bar percentage.
- *
- * The generating stage is N API calls now, one per requested question type, and a bar that
- * sits at 25% through all of them tells the teacher nothing - six calls can take several
- * minutes, and the only honest thing the old bar said was "still working". The loop writes its
- * position into pendingdata before and after each type (nothing reads that column until
- * validating, so it is free to), and this turns it into a percentage between the generating
- * and validating marks: 25% before the first type finishes, 45% after the last. The pre-call
- * write is what names the type currently in flight; without it the label would only ever be
- * able to name the type that finished last.
- *
- * Falls back to the plain stage percentage when there is nothing to read - an older generation
- * mid-flight, or a single-type run that has not finished its one call.
- *
- * @param string|null $pendingdatajson the generation's raw pendingdata column
- * @return int
- */
+     * How far through the generating stage the per-type loop has got, as a bar percentage.
+     *
+     * The generating stage is N API calls now, one per requested question type, and a bar that
+     * Sits at 25% through all of them tells the teacher nothing - six calls can take several
+     * Minutes, and the only honest thing the old bar said was "still working". The loop writes its
+     * Position into pendingdata before and after each type (nothing reads that column until
+     * Validating, so it is free to), and this turns it into a percentage between the generating
+     * And validating marks: 25% before the first type finishes, 45% after the last. The pre-call
+     * Write is what names the type currently in flight; without it the label would only ever be
+     * Able to name the type that finished last.
+     *
+     * Falls back to the plain stage percentage when there is nothing to read - an older generation
+     * Mid-flight, or a single-type run that has not finished its one call.
+     *
+     * @param string|null $pendingdatajson the generation's raw pendingdata column
+     * @return int
+     */
     public static function generating_percent(?string $pendingdatajson): int {
         $start = self::STAGES[generation_status::GENERATING]['percent'];
         $end = self::STAGES[generation_status::VALIDATING]['percent'] - 5;
@@ -115,11 +115,11 @@ class generation_progress {
     }
 
     /**
- * Which question type the generating loop is on, for the bar's label.
- *
- * @param string|null $pendingdatajson
- * @return string empty when there is nothing in flight, or the generation predates the loop
- */
+     * Which question type the generating loop is on, for the bar's label.
+     *
+     * @param string|null $pendingdatajson
+     * @return string empty when there is nothing in flight, or the generation predates the loop
+     */
     public static function generating_type(?string $pendingdatajson): string {
         $pendingdata = json_decode((string) $pendingdatajson, true);
         $progress = is_array($pendingdata) ? ($pendingdata['generating'] ?? null) : null;
@@ -128,11 +128,11 @@ class generation_progress {
     }
 
     /**
- * How far a failed generation actually got, as a bar percentage.
- *
- * @param string|null $pendingdatajson the generation's raw pendingdata column
- * @return int
- */
+     * How far a failed generation actually got, as a bar percentage.
+     *
+     * @param string|null $pendingdatajson the generation's raw pendingdata column
+     * @return int
+     */
     public static function failed_percent(?string $pendingdatajson): int {
         $pendingdata = json_decode((string) $pendingdatajson, true);
 

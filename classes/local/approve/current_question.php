@@ -20,16 +20,16 @@ namespace local_artqtml\local\approve;
  * What the question says *now*, in the shape the approve page's detail panel already reads.
  *
  * The fix keeps the stored copy as what it is - the record of what the AI produced, which the
- * validator judged and the privacy export describes - and resolves what is displayed from Moodle at
- * read time. Derived, not stored twice, so the two cannot drift; the same rule the question grid
- * follows for its counts.
+ * Validator judged and the privacy export describes - and resolves what is displayed from Moodle at
+ * Read time. Derived, not stored twice, so the two cannot drift; the same rule the question grid
+ * Follows for its counts.
  *
  * **The reason the old code gave for reading the stored copy does not hold.** Its docblock said
- * this "still works for a not-yet-imported/rejected row too" - but a row only exists here once
+ * This "still works for a not-yet-imported/rejected row too" - but a row only exists here once
  * `question_importer::create()` has returned an id, and a semantically rejected question never gets
- * a row at all (`save_questions_task::save_all()` logs it and moves on). Every row has a Moodle
- * question. What can happen is the reverse: someone deletes the question in the bank afterwards,
- * which is why the stored copy stays as the fallback.
+ * A row at all (`save_questions_task::save_all()` logs it and moves on). Every row has a Moodle
+ * Question. What can happen is the reverse: someone deletes the question in the bank afterwards,
+ * Which is why the stored copy stays as the fallback.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -66,8 +66,8 @@ class current_question {
      * Map a loaded Moodle question definition into the stored JSON's shape.
      *
      * Only the keys the detail panel reads are produced; anything not mapped falls through to the
-     * stored copy at the call site, so an unmapped key degrades to the old behaviour rather than to
-     * a blank.
+     * Stored copy at the call site, so an unmapped key degrades to the old behaviour rather than to
+     * A blank.
      *
      * @param string $typecode IH/FE/SR
      * @param \question_definition $question

@@ -20,9 +20,9 @@ namespace local_artqtml\local\approve;
  * The approve page's detail panel must describe the question as it is now.
  *
  * Measured on 2026-08-02, before this class existed: a teacher rewrote an answer option in Moodle's
- * editor, and the panel went on listing the option they had replaced - because it rendered the JSON
- * the AI returned at generation time, which nothing ever updates. The panel is what a teacher reads
- * before pressing Approve, so it was describing one version and approving another.
+ * Editor, and the panel went on listing the option they had replaced - because it rendered the JSON
+ * The AI returned at generation time, which nothing ever updates. The panel is what a teacher reads
+ * Before pressing Approve, so it was describing one version and approving another.
  *
  * @package    local_artqtml
  * @category   test
@@ -48,7 +48,7 @@ final class current_question_test extends \advanced_testcase {
 
     /**
      * The stored copy, deliberately different from anything the live question could say, so a test
-     * that reads the wrong source cannot accidentally pass.
+     * That reads the wrong source cannot accidentally pass.
      *
      * @return array
      */
@@ -136,8 +136,8 @@ final class current_question_test extends \advanced_testcase {
      * A question that can no longer be loaded falls back to the stored copy.
      *
      * This is the only case the stored copy is still for: the row is created after the Moodle
-     * question exists, and a semantically rejected question never gets a row at all - so "not yet
-     * imported" cannot happen. Deleted afterwards can.
+     * Question exists, and a semantically rejected question never gets a row at all - so "not yet
+     * Imported" cannot happen. Deleted afterwards can.
      */
     public function test_a_deleted_question_falls_back_to_the_stored_copy(): void {
         $this->resetAfterTest();

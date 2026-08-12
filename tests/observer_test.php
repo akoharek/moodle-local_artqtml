@@ -21,14 +21,14 @@ namespace local_artqtml;
  *
  * The defect these were written for was not in the observer's body - that was correct all along.
  * It was in which event the plugin listened to. Moodle 4.x versions questions, so an editor save
- * is a *creation*: question_type::save_question() fires question_created every time, and the two
- * places core fires question_updated are the draft/ready switch and the bank list's inline rename.
- * db/events.php subscribed to question_updated alone, so this observer had never run on a real
- * edit - and nothing said so, because nothing tested the wiring.
+ * Is a *creation*: question_type::save_question() fires question_created every time, and the two
+ * Places core fires question_updated are the draft/ready switch and the bank list's inline rename.
+ * Db/events.php subscribed to question_updated alone, so this observer had never run on a real
+ * Edit - and nothing said so, because nothing tested the wiring.
  *
  * Measured cost of that gap on 2026-08-02: the stored question id was never re-pointed, so the
- * approve page's Edit link kept opening the pre-edit version, and saving from there built a new
- * current version out of stale text - losing the edit before it.
+ * Approve page's Edit link kept opening the pre-edit version, and saving from there built a new
+ * Current version out of stale text - losing the edit before it.
  *
  * @package    local_artqtml
  * @category   test
@@ -144,8 +144,8 @@ final class observer_test extends \advanced_testcase {
     }
 
     /**
- * The wiring itself: the plugin must listen to the event an editor save actually fires.
- */
+     * The wiring itself: the plugin must listen to the event an editor save actually fires.
+     */
     public function test_the_event_an_editor_save_fires_is_subscribed(): void {
         $observers = [];
         include(__DIR__ . '/../db/events.php');
@@ -210,10 +210,10 @@ final class observer_test extends \advanced_testcase {
     /**
      * The plugin's own generation-time creation must not be mistaken for a teacher's edit.
      *
-     * save_questions_task creates the Moodle question first and inserts the plugin row after, so
-     * at the moment the event fires there is nothing to find - but the whole save runs in one
-     * transaction and Moodle holds external observers back until it commits, by which time the row
-     * is there. The discriminator is the stored id: on our own creation it IS this question.
+     * Save_questions_task creates the Moodle question first and inserts the plugin row after, so
+     * At the moment the event fires there is nothing to find - but the whole save runs in one
+     * Transaction and Moodle holds external observers back until it commits, by which time the row
+     * Is there. The discriminator is the stored id: on our own creation it IS this question.
      */
     public function test_the_generation_time_creation_is_not_an_edit(): void {
         global $DB;

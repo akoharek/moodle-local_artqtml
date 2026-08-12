@@ -40,11 +40,11 @@ class validate_questions_task {
 
 
     /**
- * Run the Gemini validation call(s) for one generation's not-yet-evaluated questions.
- *
- * @param \stdClass $generation the local_artqtml_generations record to validate
- * @return void
- */
+     * Run the Gemini validation call(s) for one generation's not-yet-evaluated questions.
+     *
+     * @param \stdClass $generation the local_artqtml_generations record to validate
+     * @return void
+     */
     public function process(\stdClass $generation): void {
         global $DB;
 
@@ -125,8 +125,8 @@ class validate_questions_task {
     /**
      * Wrap each raw Claude question array in a pseudo-record carrying the fields
      * {@see self::build_batches()}/{@see self::build_prompt()}/{@see self::merge_results()}
-     * need, keyed by its index in the original Claude response (used as a temporary id for
-     * matching Gemini's evaluations, since no real question rows exist yet at this stage).
+     * Need, keyed by its index in the original Claude response (used as a temporary id for
+     * Matching Gemini's evaluations, since no real question rows exist yet at this stage).
      *
      * @param array $rawquestions raw question arrays as returned by Claude
      * @return array<int, \stdClass>
@@ -149,10 +149,10 @@ class validate_questions_task {
     }
 
     /**
- * @param \stdClass $generation
- * @param \stdClass[] $questions pseudo-question records keyed by pseudo-id
- * @return array<int, \stdClass[]> list of batches
- */
+     * @param \stdClass $generation
+     * @param \stdClass[] $questions pseudo-question records keyed by pseudo-id
+     * @return array<int, \stdClass[]> list of batches
+     */
     protected function build_batches(\stdClass $generation, array $questions): array {
         $contextwindow = (int) (get_config('local_artqtml', 'validatorcontextwindow') ?: 1000000);
         $budget = (int) ($contextwindow * 0.8);
@@ -304,28 +304,28 @@ class validate_questions_task {
     }
 
     /**
- * Record a non-blocking token-limit warning, including the affected question count.
- *
- * @param int $generationid
- * @param int $affectedcount
- * @param int|null $userid
- * @return void
- */
+     * Record a non-blocking token-limit warning, including the affected question count.
+     *
+     * @param int $generationid
+     * @param int $affectedcount
+     * @param int|null $userid
+     * @return void
+     */
     protected function store_token_limit_warning(int $generationid, int $affectedcount, ?int $userid = null): void {
         $this->log_event($generationid, 'token_limit_warning', ['stage' => 'validate', 'affected' => $affectedcount], $userid);
     }
 
     /**
- * Build the Gemini system instruction.
- *
- * Two of the substituted values are not text but data: the suggestion and problem_category
- * value lists come from the same constants the response schema is built from. An administrator
- * can rewrite the sentence around them - and can delete the placeholder, which is the accepted
- * cost of a prompt they can read - but cannot make the prompt name a value the schema does not
- * accept, which is the drift that put the two out of step once before.
- *
- * @return string
- */
+     * Build the Gemini system instruction.
+     *
+     * Two of the substituted values are not text but data: the suggestion and problem_category
+     * Value lists come from the same constants the response schema is built from. An administrator
+     * Can rewrite the sentence around them - and can delete the placeholder, which is the accepted
+     * Cost of a prompt they can read - but cannot make the prompt name a value the schema does not
+     * Accept, which is the drift that put the two out of step once before.
+     *
+     * @return string
+     */
     protected function build_system_instruction(\stdClass $generation): string {
         $template = (string) get_config('local_artqtml', 'validatorprompttemplate');
 
@@ -356,20 +356,20 @@ class validate_questions_task {
     }
 
     /**
- * Build the validation user-message prompt for a batch of questions (/: always includes the full source text).
- *
- *
- * In JSON a question's text is one string field: whatever it contains stays inside it and
- * cannot create a sibling key. `content_type` and `task` are fixed strings, never derived
- * from data - the instruction the validator follows is not something a question can rewrite.
- *
- * The question ids are cast to string deliberately: the validator matches its answers back by
- * exact string id, and that matching is what the surrounding code and its tests rely on.
- *
- * @param \stdClass $generation the generation record (used for source text context)
- * @param \stdClass[] $questions batch of local_artqtml_questions records
- * @return string a JSON object as the user message
- */
+     * Build the validation user-message prompt for a batch of questions (/: always includes the full source text).
+     *
+     *
+     * In JSON a question's text is one string field: whatever it contains stays inside it and
+     * Cannot create a sibling key. `content_type` and `task` are fixed strings, never derived
+     * From data - the instruction the validator follows is not something a question can rewrite.
+     *
+     * The question ids are cast to string deliberately: the validator matches its answers back by
+     * Exact string id, and that matching is what the surrounding code and its tests rely on.
+     *
+     * @param \stdClass $generation the generation record (used for source text context)
+     * @param \stdClass[] $questions batch of local_artqtml_questions records
+     * @return string a JSON object as the user message
+     */
     protected function build_prompt(\stdClass $generation, array $questions): string {
         $items = [];
         foreach ($questions as $question) {
@@ -402,7 +402,7 @@ class validate_questions_task {
      * Build the Gemini responseSchema for the validation results (4.3).
      *
      * Note: Gemini's response_schema uses upper-case type names (OBJECT/STRING/ARRAY/...),
-     * unlike the usual lower-case JSON Schema convention used for the Claude schema.
+     * Unlike the usual lower-case JSON Schema convention used for the Claude schema.
      *
      * @return array
      */
@@ -478,11 +478,11 @@ class validate_questions_task {
     }
 
     /**
- * @param array $evaluations the running map (pseudo-id => evaluation fields) to merge into
- * @param \stdClass[] $batch pseudo-question records keyed by pseudo-id
- * @param array $results list of evaluation arrays from the Gemini response
- * @return array the updated evaluations map
- */
+     * @param array $evaluations the running map (pseudo-id => evaluation fields) to merge into
+     * @param \stdClass[] $batch pseudo-question records keyed by pseudo-id
+     * @param array $results list of evaluation arrays from the Gemini response
+     * @return array the updated evaluations map
+     */
     protected function merge_results(array $evaluations, array $batch, array $results): array {
         foreach ($batch as $pseudoid => $question) {
             // Security: an exact string comparison, not an (int) cast - a cast would silently

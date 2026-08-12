@@ -45,7 +45,7 @@ final class validate_questions_problemcategory_test extends \advanced_testcase {
 
     /**
      * PROB-F004 / technikai_melleklet: the schema's enum is the SAME set (single source of truth),
-     * problem_category stays required, and no empty string leaked into the schema.
+     * Problem_category stays required, and no empty string leaked into the schema.
      */
     public function test_schema_enum_matches_single_source_and_is_required(): void {
         $task = new validate_questions_task();
@@ -76,7 +76,7 @@ final class validate_questions_problemcategory_test extends \advanced_testcase {
     }
 
     /**
-     * normalise() maps legacy/empty/hallucinated values to a valid key or the given default.
+     * Normalise() maps legacy/empty/hallucinated values to a valid key or the given default.
      */
     public function test_normalise_rejects_legacy_and_empty_values(): void {
         // Valid keys pass through.
@@ -110,8 +110,8 @@ final class validate_questions_problemcategory_test extends \advanced_testcase {
     }
 
     /**
- * @return \stdClass
- */
+     * @return \stdClass
+     */
     private function scale_generation(): \stdClass {
         $generation = new \stdClass();
         $generation->settings = json_encode([

@@ -46,8 +46,8 @@ final class text_extractor_test extends \advanced_testcase {
     }
 
     /**
- * A UT text file (accented Hungarian characters) passes through unchanged.
- */
+     * A UT text file (accented Hungarian characters) passes through unchanged.
+     */
     public function test_extract_txt_utf8_passthrough(): void {
         $this->resetAfterTest();
 
@@ -60,8 +60,8 @@ final class text_extractor_test extends \advanced_testcase {
     }
 
     /**
- * A legacy ISO-8859-2 (Latin-2) file is detected and converted to valid UT.
- */
+     * A legacy ISO-8859-2 (Latin-2) file is detected and converted to valid UT.
+     */
     public function test_extract_txt_latin2_converted_to_utf8(): void {
         $this->resetAfterTest();
 

@@ -2,17 +2,17 @@
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
+// It under the terms of the GNU General Public License as published by
+// The Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
 // Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// But WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// Along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Library functions and callbacks for local_artqtml.
@@ -75,9 +75,9 @@ function local_artqtml_validation_badge_class(string $status): string {
 
 /**
  * Deliberately kept out of settings.php: Moodle can include a plugin's settings.php more
- * than once per request while building/caching the admin tree, which would fatal-error on
- * a plain top-level function redeclaration. lib.php is loaded via include_once through the
- * component callback mechanism, so it does not have that problem.
+ * Than once per request while building/caching the admin tree, which would fatal-error on
+ * A plain top-level function redeclaration. lib.php is loaded via include_once through the
+ * Component callback mechanism, so it does not have that problem.
  *
  * @param string $provider 'claude' or 'gemini'
  * @return string
@@ -119,7 +119,7 @@ function local_artqtml_render_test_button(string $provider): string {
  * Render the model-list actions for one LLM tab: "Refresh models".
  *
  * Plain links with a sesskey rather than AJAX: the actions change server state and the page must
- * re-render from the refreshed cache anyway, so a round trip is the honest mechanism and needs no
+ * Re-render from the refreshed cache anyway, so a round trip is the honest mechanism and needs no
  * JavaScript to be testable.
  *
  * @param string $provider one of \local_artqtml\local\model_list::PROVIDERS
@@ -147,7 +147,7 @@ function local_artqtml_render_model_buttons(string $provider): string {
         'data-testid' => 'artqtml-admin-runmodelcheck-' . $provider,
     ]);
 
-    // say how old the cached list is, so "the dropdown looks wrong" has an obvious first thing to check.
+    // Say how old the cached list is, so "the dropdown looks wrong" has an obvious first thing to check.
     $cached = \local_artqtml\local\model_list::get_cached($provider);
     if ($cached !== null) {
         $html .= html_writer::span(
@@ -227,7 +227,7 @@ function local_artqtml_setting_backup_notice(): string {
 }
 
 /**
- * the model blocking warning bar, shown on every plugin surface.
+ * The model blocking warning bar, shown on every plugin surface.
  *
  * Returns '' when neither provider is blocked, so callers can render it unconditionally.
  *

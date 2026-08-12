@@ -48,18 +48,18 @@ final class retry_penalty_test extends \advanced_testcase {
 
     /**
      * Case 3 - retry off: Moodle's own default penalty reaches the bank (never applied without an
-     * interactive behaviour, but this is the field's stored value).
+     * Interactive behaviour, but this is the field's stored value).
      */
     public function test_retry_off_is_the_moodle_default(): void {
         $this->assertEqualsWithDelta(self::MOODLE_DEFAULT_PENALTY, $this->penalty_for('IH', []), 1e-9);
     }
 
     /**
- * Case 4 - the penalty follows the RETRY switch, not the HINT switch (the corrected ).
- *
- * A hint with retry off must NOT pull in the retry-on penalty, and retry on with no hint must
- * still apply it - proving the two switches are independent, which the old wording got wrong.
- */
+     * Case 4 - the penalty follows the RETRY switch, not the HINT switch (the corrected ).
+     *
+     * A hint with retry off must NOT pull in the retry-on penalty, and retry on with no hint must
+     * Still apply it - proving the two switches are independent, which the old wording got wrong.
+     */
     public function test_penalty_follows_retry_not_hint(): void {
         // Hint on, retry off -> the retry-off value, because the hint switch does not touch penalty.
         $this->assertEqualsWithDelta(

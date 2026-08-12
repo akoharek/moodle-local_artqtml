@@ -30,9 +30,9 @@ use local_artqtml\local\question_importer;
  */
 class observer {
     /**
- * @param \core\event\question_created|\core\event\question_updated $event
- * @return void
- */
+     * @param \core\event\question_created|\core\event\question_updated $event
+     * @return void
+     */
     public static function question_saved(\core\event\base $event): void {
         global $DB;
 

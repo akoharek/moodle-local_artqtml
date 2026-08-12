@@ -29,8 +29,8 @@ use local_artqtml\local\validation_suggestion;
  */
 final class validate_questions_suggestion_test extends \advanced_testcase {
     /**
- * exactly the three verdicts, in order, none empty, no duplicates.
- */
+     * Exactly the three verdicts, in order, none empty, no duplicates.
+     */
     public function test_enum_is_exactly_three_values(): void {
         $this->assertSame(
             ['accepted', 'needs_review', 'rejected'],
@@ -52,7 +52,7 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
 
     /**
      * The response schema's suggestion enum IS the constant - not a copy of it - and the field
-     * stays required.
+     * Stays required.
      */
     public function test_schema_enum_matches_single_source_and_is_required(): void {
         $task = new validate_questions_task();
@@ -77,7 +77,7 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
 
     /**
      * The assembled prompt names exactly the three values, and the values come from code rather
-     * than from the (admin-editable) template - so editing the template cannot desynchronise them.
+     * Than from the (admin-editable) template - so editing the template cannot desynchronise them.
      */
     public function test_assembled_prompt_contains_exactly_the_three_values(): void {
         global $CFG;
@@ -126,9 +126,9 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
     }
 
     /**
- * An admin who rewrites the template around the placeholder still gets all three values, and
- * never types one of them.
- */
+     * An admin who rewrites the template around the placeholder still gets all three values, and
+     * Never types one of them.
+     */
     public function test_values_survive_an_admin_template_override(): void {
         global $CFG;
 
@@ -159,8 +159,8 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
     }
 
     /**
- * every displayable value has a lang label; the raw key never reaches the UI.
- */
+     * Every displayable value has a lang label; the raw key never reaches the UI.
+     */
     public function test_every_value_has_a_lang_label(): void {
         $this->resetAfterTest();
 
@@ -184,7 +184,7 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
     }
 
     /**
-     * normalise() keeps the three and falls back for anything else.
+     * Normalise() keeps the three and falls back for anything else.
      */
     public function test_normalise(): void {
         foreach (validation_suggestion::VALUES as $value) {
@@ -200,8 +200,8 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
     }
 
     /**
- * no file outside the constant's own definition re-types the three-value list.
- */
+     * No file outside the constant's own definition re-types the three-value list.
+     */
     public function test_no_file_outside_the_constant_repeats_the_literal_list(): void {
         $root = realpath(__DIR__ . '/../..');
         $allowed = [
@@ -242,8 +242,8 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
     }
 
     /**
- * @return \stdClass
- */
+     * @return \stdClass
+     */
     private function scale_generation(): \stdClass {
         $generation = new \stdClass();
         $generation->settings = json_encode([

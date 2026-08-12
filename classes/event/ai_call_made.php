@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * ai_call_made event.
+ * Ai_call_made event.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,7 +27,7 @@ namespace local_artqtml\event;
  * Triggered for every successful Claude/Gemini API call.
  *
  * The `other` field carries: call_type (generate/validate), provider (claude/gemini),
- * http_status, tokens_input, tokens_output, json_attempt, is_retry_attempt, request_id.
+ * Http_status, tokens_input, tokens_output, json_attempt, is_retry_attempt, request_id.
  */
 class ai_call_made extends \core\event\base {
     /**

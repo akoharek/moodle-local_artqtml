@@ -17,17 +17,17 @@
 namespace local_artqtml\local\question;
 
 /**
- * what reaches the question bank from the model is wording, not appearance.
+ * What reaches the question bank from the model is wording, not appearance.
  *
  * These assert the contract at the only door AI text uses to become a real Moodle question -
- * question_form_builder::build(). The security half (script tags and friends) was already covered
- * by clean_param(PARAM_CLEANHTML); what was NOT covered, and is what this file is really about, is
- * that the purifier keeps benign formatting on purpose. A background colour is not an attack, so
- * the sanitiser passed it, and it arrived in the teacher's editor as real formatting.
+ * Question_form_builder::build(). The security half (script tags and friends) was already covered
+ * By clean_param(PARAM_CLEANHTML); what was NOT covered, and is what this file is really about, is
+ * That the purifier keeps benign formatting on purpose. A background colour is not an attack, so
+ * The sanitiser passed it, and it arrived in the teacher's editor as real formatting.
  *
  * The two cases most worth reading are test_a_stray_less_than_sign_does_not_eat_the_sentence()
- * and test_paragraphs_do_not_run_together(): both are text-loss defects that a naive strip_tags()
- * would have introduced while looking like it worked.
+ * And test_paragraphs_do_not_run_together(): both are text-loss defects that a naive strip_tags()
+ * Would have introduced while looking like it worked.
  *
  * @package    local_artqtml
  * @category   test
@@ -43,8 +43,8 @@ final class ai_text_cleaning_test extends \advanced_testcase {
     }
 
     /**
- * Sub and sup are meaning, not decoration - the one exception, -08-06.
- */
+     * Sub and sup are meaning, not decoration - the one exception, -08-06.
+     */
     public function test_sub_and_sup_survive(): void {
         $this->assertSame(
             'A H<sub>2</sub>O és az 5 m<sup>2</sup>.',
@@ -54,7 +54,7 @@ final class ai_text_cleaning_test extends \advanced_testcase {
 
     /**
      * Bold, italic and links are formatting, so they go - including the link's target, which is
-     * the part that could take a student somewhere the teacher never chose.
+     * The part that could take a student somewhere the teacher never chose.
      */
     public function test_ordinary_formatting_and_links_go(): void {
         $this->assertSame(
@@ -97,7 +97,7 @@ final class ai_text_cleaning_test extends \advanced_testcase {
 
     /**
      * Plain text is left exactly as it is - the overwhelmingly common case, and the one where a
-     * cleaner earns its keep by doing nothing visible.
+     * Cleaner earns its keep by doing nothing visible.
      */
     public function test_plain_text_is_untouched(): void {
         $plain = 'Az alma a rózsafélék családjába tartozik.';
@@ -107,7 +107,7 @@ final class ai_text_cleaning_test extends \advanced_testcase {
 
     /**
      * The cleaning is not limited to the question text: the answer options carry model output too,
-     * and an option is what the student clicks.
+     * And an option is what the student clicks.
      */
     public function test_answer_options_are_cleaned_as_well(): void {
         $this->resetAfterTest();

@@ -28,11 +28,11 @@ namespace local_artqtml\local;
  */
 class generation_list {
     /**
- * @var string default sort column - newest generation first ( v3 #8), not the
- * previous status-based default. Status remains available as an explicit, user-chosen sort
- * (see the "status"/"statusorder" SORTABLE entries and STATUS_ORDER below) - only the
- * implicit default view changed.
- */
+     * @var string default sort column - newest generation first ( v3 #8), not the
+     * Previous status-based default. Status remains available as an explicit, user-chosen sort
+     * (see the "status"/"statusorder" SORTABLE entries and STATUS_ORDER below) - only the
+     * Implicit default view changed.
+     */
     protected const DEFAULT_SORT = 'timecreated';
 
     /** @var string default sort direction - paired with DEFAULT_SORT above. */
@@ -41,9 +41,9 @@ class generation_list {
     /**
      * @var array<string,int> status -> sort weight for the status column's ordering.
      *
-     * the seven status values themselves come from
+     * The seven status values themselves come from
      * {@see \local_artqtml\local\generation_status}; only the weights are list-page-specific.
-     * generation_status_test asserts these keys are exactly that class's VALUES.
+     * Generation_status_test asserts these keys are exactly that class's VALUES.
      */
     protected const STATUS_ORDER = [
         generation_status::STARTED    => 0,
@@ -245,7 +245,7 @@ class generation_list {
      * Render the filter bar for one section (-013).
      *
      * Filters auto-submit on change via a small inline script, giving a "real time"
-     * feel without a full AJAX rewrite of the table.
+     * Feel without a full AJAX rewrite of the table.
      *
      * @param string $prefix
      * @param \moodle_url $baseurl
@@ -525,15 +525,15 @@ class generation_list {
     }
 
     /**
- * Return the open-URL for a generation, contextual to its current status.
- *
- * Public: upload.php's duplicate-warning panel ("Megnyitom a meglévőt") links to the same
- * generation and must land on the same page the list page would, so the status->destination
- * rule stays stated in exactly one place. Do not re-derive it at the call site.
- *
- * @param \stdClass $generation needs ->id and ->status
- * @return \moodle_url
- */
+     * Return the open-URL for a generation, contextual to its current status.
+     *
+     * Public: upload.php's duplicate-warning panel ("Megnyitom a meglévőt") links to the same
+     * Generation and must land on the same page the list page would, so the status->destination
+     * Rule stays stated in exactly one place. Do not re-derive it at the call site.
+     *
+     * @param \stdClass $generation needs ->id and ->status
+     * @return \moodle_url
+     */
     public static function open_url(\stdClass $generation): \moodle_url {
         // no re-listing of the seven statuses - completed goes to the approval page, the
         // in-progress trio plus failed and partial go to the status page, and anything else
@@ -556,9 +556,9 @@ class generation_list {
      * The same status->destination rule as {@see self::open_url()}, resolved from an id alone.
      *
      * Public: the event classes' get_url() only ever hold the generation's id (objectid), and a
-     * log entry is read long after the event fired - so the link must lead where the generation
-     * can be acted on now, not where it was relevant at the time. Keeping the lookup here means
-     * the rule itself still exists in exactly one place.
+     * Log entry is read long after the event fired - so the link must lead where the generation
+     * Can be acted on now, not where it was relevant at the time. Keeping the lookup here means
+     * The rule itself still exists in exactly one place.
      *
      * @param int $generationid
      * @return \moodle_url|null null if the generation has since been deleted; core's log report

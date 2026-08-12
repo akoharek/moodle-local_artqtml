@@ -18,11 +18,11 @@
  * Migration backup for admin-editable settings.
  *
  * The reason this exists at all: the validator prompt template is the administrator's own work - an
- * evaluation instruction tuned to their subject area - and a plugin upgrade must not destroy it
- * irrecoverably. It has already happened twice (the problem_category migration and the SUGGESTIONS
- * one, upgrade step 2026072600), both of which rewrote the stored template in place with no backup.
+ * Evaluation instruction tuned to their subject area - and a plugin upgrade must not destroy it
+ * Irrecoverably. It has already happened twice (the problem_category migration and the SUGGESTIONS
+ * One, upgrade step 2026072600), both of which rewrote the stored template in place with no backup.
  * Those steps have already run and cannot be fixed retroactively; this rule binds every migration
- * written from here on.
+ * Written from here on.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -41,7 +41,7 @@ class setting_backup {
      * Back up a setting's current value before a migration changes it.
      *
      * Call this BEFORE writing the new value. Returns the key the previous value was stored under,
-     * or null if there was nothing to back up.
+     * Or null if there was nothing to back up.
      *
      * @param string $setting the plugin setting name, e.g. 'validatorprompttemplate'
      * @param int $version the plugin version of the migration doing the change
@@ -99,12 +99,12 @@ class setting_backup {
     }
 
     /**
- * Record that a setting was backed up, for the post-upgrade administrator notice.
- *
- * @param string $setting
- * @param string $key
- * @return void
- */
+     * Record that a setting was backed up, for the post-upgrade administrator notice.
+     *
+     * @param string $setting
+     * @param string $key
+     * @return void
+     */
     protected static function add_notice(string $setting, string $key): void {
         $notices = self::pending_notices();
         $notices[$setting] = $key;
@@ -137,10 +137,10 @@ class setting_backup {
     }
 
     /**
- * the notice text telling the administrator and where the old value is.
- *
- * @return string[] one rendered message per backed-up setting
- */
+     * The notice text telling the administrator and where the old value is.
+     *
+     * @return string[] one rendered message per backed-up setting
+     */
     public static function notice_messages(): array {
         $messages = [];
         foreach (self::pending_notices() as $setting => $key) {

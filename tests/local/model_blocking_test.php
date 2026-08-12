@@ -67,8 +67,8 @@ final class model_blocking_test extends \advanced_testcase {
     }
 
     /**
- * a blocked provider names the model and carries the traceable code.
- */
+     * A blocked provider names the model and carries the traceable code.
+     */
     public function test_block_records_reason_model_and_code(): void {
         $this->resetAfterTest();
         $this->configure_models();
@@ -96,8 +96,8 @@ final class model_blocking_test extends \advanced_testcase {
     }
 
     /**
- * a successful check clears it again.
- */
+     * A successful check clears it again.
+     */
     public function test_clear_unblocks(): void {
         $this->resetAfterTest();
         $this->configure_models();
@@ -116,9 +116,9 @@ final class model_blocking_test extends \advanced_testcase {
     }
 
     /**
- * A static scan, because the rule is about who may call block()/clear() - the generation and
- * validation tasks must not, no matter what HTTP status they see.
- */
+     * A static scan, because the rule is about who may call block()/clear() - the generation and
+     * Validation tasks must not, no matter what HTTP status they see.
+     */
     public function test_only_the_model_checker_writes_the_blocking_state(): void {
         $root = realpath(__DIR__ . '/../..');
         $allowed = [

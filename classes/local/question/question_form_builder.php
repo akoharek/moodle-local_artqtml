@@ -16,7 +16,7 @@
 
 /**
  * Builds the form object Moodle's qtype save_question() API expects from AI-generated question
- * data - the common skeleton, the per-type fields, hints, and the associated text helpers
+ * Data - the common skeleton, the per-type fields, hints, and the associated text helpers
  * (split out of question_importer - ).
  *
  * @package    local_artqtml
@@ -113,38 +113,38 @@ class question_form_builder {
     }
 
     /**
- * reduce AI-generated text to plain text, keeping only <sub> and <sup>.
- *
- * The steps are ordered, and the order is the point:
- *
- * 1. Purify first. Beyond the security filtering, this is what makes step 3 safe: a stray
- * "<" in ordinary prose ("igaz-e, hogy x < 5") comes out of the purifier as "&lt;", so
- * strip_tags() can no longer swallow the rest of the sentence as if it were a tag. Doing
- * it the other way round loses text, silently.
- * 2. Turn block boundaries into newlines BEFORE the tags go, or "<p>Első</p><p>Második</p>"
- * comes out as "ElsőMásodik" - the same words-run-together defect fixed when block tags
- * were stripped without inserting separators.
- * 3. Strip everything except the two kept tags.
- * 4. Normalise the whitespace this leaves behind.
- *
- * Known consequence, recorded rather than discovered later: paragraph breaks become plain
- * newlines, and the field is still FORMAT_HTML, so a multi-paragraph explanation renders as
- * one paragraph. The words are all there; the paragraph structure is not.
- *
- * @param mixed $text expected string, but AI JSON output is trusted to have the right shape
- * @return string
- */
+     * Reduce AI-generated text to plain text, keeping only <sub> and <sup>.
+     *
+     * The steps are ordered, and the order is the point:
+     *
+     * 1. Purify first. Beyond the security filtering, this is what makes step 3 safe: a stray
+     * "<" in ordinary prose ("igaz-e, hogy x < 5") comes out of the purifier as "&lt;", so
+     * Strip_tags() can no longer swallow the rest of the sentence as if it were a tag. Doing
+     * It the other way round loses text, silently.
+     * 2. Turn block boundaries into newlines BEFORE the tags go, or "<p>Első</p><p>Második</p>"
+     * Comes out as "ElsőMásodik" - the same words-run-together defect fixed when block tags
+     * Were stripped without inserting separators.
+     * 3. Strip everything except the two kept tags.
+     * 4. Normalise the whitespace this leaves behind.
+     *
+     * Known consequence, recorded rather than discovered later: paragraph breaks become plain
+     * Newlines, and the field is still FORMAT_HTML, so a multi-paragraph explanation renders as
+     * One paragraph. The words are all there; the paragraph structure is not.
+     *
+     * @param mixed $text expected string, but AI JSON output is trusted to have the right shape
+     * @return string
+     */
     protected static function clean_ai_text($text): string {
         return ai_text_cleaner::clean($text);
     }
 
     /**
- * @param string $text
- * @param string $questioncode for the log entry, e.g. BIO1-IH-0001
- * @param int $generationid 0 to skip logging (no generation context available)
- * @param int $userid the generation's owner, for the log entry
- * @return string
- */
+     * @param string $text
+     * @param string $questioncode for the log entry, e.g. BIO1-IH-0001
+     * @param int $generationid 0 to skip logging (no generation context available)
+     * @param int $userid the generation's owner, for the log entry
+     * @return string
+     */
     protected static function truncate_feedback(string $text, string $questioncode, int $generationid, int $userid): string {
         if (\core_text::strlen($text) <= 250) {
             return $text;
@@ -263,7 +263,7 @@ class question_form_builder {
      *
      * Field names/defaults verified against Moodle 4.5 core source
      * (question/type/ordering/questiontype.php, question.php); qtype_ordering is bundled in
-     * core as of this version. save_question_options() recomputes 'fraction' internally.
+     * Core as of this version. save_question_options() recomputes 'fraction' internally.
      *
      * @param \stdClass $form
      * @param array $data expects 'items' => [{text: string}, ...] in correct order
@@ -294,12 +294,12 @@ class question_form_builder {
     }
 
     /**
- * Fetch the admin-configured feedback template for a type/correctness.
- *
- * @param string $typecode
- * @param bool $correct
- * @return string
- */
+     * Fetch the admin-configured feedback template for a type/correctness.
+     *
+     * @param string $typecode
+     * @param bool $correct
+     * @return string
+     */
     protected static function feedback_template(string $typecode, bool $correct): string {
         $setting = 'feedback_' . strtolower($typecode) . '_' . ($correct ? 'correct' : 'incorrect');
         return (string) (get_config('local_artqtml', $setting) ?: '');

@@ -27,10 +27,10 @@ namespace local_artqtml\local;
  * Renames DB tables and Moodle registry rows left behind by the frankenstyle rename.
  *
  * When the plugin directory/component changed from aiquizgen to artqtml, an existing site still
- * has local_aiquizgen_* tables and config_plugins / capability / task rows under the old name.
+ * Has local_aiquizgen_* tables and config_plugins / capability / task rows under the old name.
  * Moodle then installs local_artqtml as "new" (install.xml creates empty artqtml tables). This class
- * drops those empty tables, renames the populated aiquizgen tables, and rewrites the registry so
- * settings, caps and scheduled tasks keep working.
+ * Drops those empty tables, renames the populated aiquizgen tables, and rewrites the registry so
+ * Settings, caps and scheduled tasks keep working.
  */
 class component_rename {
     /** @var string Previous frankenstyle component. */

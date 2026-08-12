@@ -31,9 +31,9 @@ class missing_types {
      * How many questions of each type the generation asked for and did not get.
      *
      * Read from countdiscrepancy, which save_questions_task::store_save_discrepancy() writes at
-     * the only point where the answer is final - what actually reached the draft bank, not what
-     * the model returned. A surplus is ignored here: it is a discrepancy worth showing, but there
-     * is nothing to re-run.
+     * The only point where the answer is final - what actually reached the draft bank, not what
+     * The model returned. A surplus is ignored here: it is a discrepancy worth showing, but there
+     * Is nothing to re-run.
      *
      * @param \stdClass $generation
      * @return array<string, int> type code => number of questions still missing, largest first
@@ -65,16 +65,16 @@ class missing_types {
      * The original settings, narrowed to the types that fell short.
      *
      * Every other type's row of the grid is zeroed, so the new generation's settings page opens
-     * asking only for what is missing. Note what this deliberately does not do: it does not
-     * decide, for a type that delivered some of its questions, WHICH difficulty level went
-     * missing. That cannot be measured - local_artqtml_questions.difficultylabel is free text
-     * written by the model, not the level key the teacher picked - and guessing it would be the
-     * system making the teacher's decision again, which is the whole reason the grid exists.
+     * Asking only for what is missing. Note what this deliberately does not do: it does not
+     * Decide, for a type that delivered some of its questions, WHICH difficulty level went
+     * Missing. That cannot be measured - local_artqtml_questions.difficultylabel is free text
+     * Written by the model, not the level key the teacher picked - and guessing it would be the
+     * System making the teacher's decision again, which is the whole reason the grid exists.
      *
      * So the rule is: where the type asked for one level only, the shortfall unambiguously
-     * belongs to that level and the number is reduced to it. Where it spans several levels, the
-     * original row comes back unchanged and the teacher adjusts it on the settings page - which is
-     * a page they are being shown anyway, precisely so they can.
+     * Belongs to that level and the number is reduced to it. Where it spans several levels, the
+     * Original row comes back unchanged and the teacher adjusts it on the settings page - which is
+     * A page they are being shown anyway, precisely so they can.
      *
      * @param array $settings the original generation's decoded settings
      * @param array<string, int> $shortfall from {@see self::shortfall()}

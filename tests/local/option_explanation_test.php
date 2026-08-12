@@ -67,7 +67,7 @@ final class option_explanation_test extends \advanced_testcase {
 
     /**
      * With it on, the field is declared AND required - Structured Outputs will not fill an
-     * optional one.
+     * Optional one.
      */
     public function test_the_option_carries_a_required_explanation_when_the_switch_is_on(): void {
         $branch = $this->question_branch($this->settings('FE', true));

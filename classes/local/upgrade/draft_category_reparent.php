@@ -19,19 +19,19 @@ namespace local_artqtml\local\upgrade;
 /**
  * One-off repair for draft categories left at parent = 0 by earlier versions (D-3).
  *
- * parent = 0 is Moodle's own marker for a context's single hidden "top" category. Earlier
- * versions of this plugin created each generation's draft category that way, so on any context
- * where that happened there are now two parent = 0 rows, and question_get_top_category()'s
- * get_record() throws "found more than one record" on any question bank page that walks it. That
- * is what broke the target course's question bank on the demo site after a question was moved.
+ * Parent = 0 is Moodle's own marker for a context's single hidden "top" category. Earlier
+ * Versions of this plugin created each generation's draft category that way, so on any context
+ * Where that happened there are now two parent = 0 rows, and question_get_top_category()'s
+ * Get_record() throws "found more than one record" on any question bank page that walks it. That
+ * Is what broke the target course's question bank on the demo site after a question was moved.
  *
  * Current code never writes parent = 0 (see \local_artqtml\local\draft_bank), so this repairs
- * history only.
+ * History only.
  *
  * Frozen: this class is called from exactly one upgrade step (2026072800) and its behaviour must
- * not change - an install upgrading from an older version years from now has to get the same
- * repair. If a further repair is ever needed, add a new class and a new step; do not edit this
- * one. It lives here rather than inline in db/upgrade.php purely so it can be unit-tested.
+ * Not change - an install upgrading from an older version years from now has to get the same
+ * Repair. If a further repair is ever needed, add a new class and a new step; do not edit this
+ * One. It lives here rather than inline in db/upgrade.php purely so it can be unit-tested.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -41,8 +41,8 @@ class draft_category_reparent {
      * Re-parent every draft category still sitting at parent = 0 under its context's real top.
      *
      * Deliberately re-parents and never deletes: the questions inside are real, and an upgrade
-     * step is the wrong place to destroy content. Getting rid of a draft bank on purpose is what
-     * the plugin's own approval UI is for.
+     * Step is the wrong place to destroy content. Getting rid of a draft bank on purpose is what
+     * The plugin's own approval UI is for.
      *
      * @return int how many categories were repaired
      */
@@ -78,10 +78,10 @@ class draft_category_reparent {
 
     /**
      * The context's genuine top: a parent = 0 row that is not itself one of the draft categories
-     * being repaired.
+     * Being repaired.
      *
-     * question_get_top_category() cannot be used here - it is precisely the function that throws
-     * while the duplicate still exists.
+     * Question_get_top_category() cannot be used here - it is precisely the function that throws
+     * While the duplicate still exists.
      *
      * @param int $contextid
      * @param int $orphanid the draft category being repaired

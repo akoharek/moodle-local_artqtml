@@ -56,44 +56,44 @@ class question_types {
     }
 
     /**
- * Whether the "multiple attempts" toggle applies to this type.
- *
- * IH only has two possible answers, so retries are not meaningful.
- *
- * @param string $code one of self::CODES
- * @return bool
- */
+     * Whether the "multiple attempts" toggle applies to this type.
+     *
+     * IH only has two possible answers, so retries are not meaningful.
+     *
+     * @param string $code one of self::CODES
+     * @return bool
+     */
     public static function supports_retry(string $code): bool {
         return $code !== 'IH';
     }
 
     /**
- * @param string $code one of self::CODES
- * @return bool
- */
+     * @param string $code one of self::CODES
+     * @return bool
+     */
     public static function supports_hints(string $code): bool {
         return in_array($code, ['FE', 'SR'], true);
     }
 
     /**
- * Whether a per-answer explanation can be stored for this type at all.
- *
- * - FE is qtype_multichoice, which keeps one feedback per answer.
- * - IH is qtype_truefalse, whose two answers have feedbacktrue and feedbackfalse.
- * - SR is qtype_ordering, which has combined feedback only - a sequence item has no
- * feedback field, so an explanation generated for one would have nowhere to go.
- *
- * @param string $code
- * @return bool
- */
+     * Whether a per-answer explanation can be stored for this type at all.
+     *
+     * - FE is qtype_multichoice, which keeps one feedback per answer.
+     * - IH is qtype_truefalse, whose two answers have feedbacktrue and feedbackfalse.
+     * - SR is qtype_ordering, which has combined feedback only - a sequence item has no
+     * Feedback field, so an explanation generated for one would have nowhere to go.
+     *
+     * @param string $code
+     * @return bool
+     */
     public static function supports_option_explanation(string $code): bool {
         return in_array($code, ['IH', 'FE'], true);
     }
 
     /**
- * @param array $discrepancies list of ['type' => code, 'requested' => int, 'received' => int]
- * @return string empty string if $discrepancies is empty
- */
+     * @param array $discrepancies list of ['type' => code, 'requested' => int, 'received' => int]
+     * @return string empty string if $discrepancies is empty
+     */
     public static function format_count_discrepancy(array $discrepancies): string {
         if (empty($discrepancies)) {
             return '';

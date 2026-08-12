@@ -35,7 +35,7 @@ class generation_edit_policy {
      * Whether the source text and identifiers of this generation may still be changed.
      *
      * "Source" covers the whole of what the upload page owns: name, short name, source text and
-     * the two hashes derived from them.
+     * The two hashes derived from them.
      *
      * @param \stdClass $generation a local_artqtml_generations record
      * @return bool
@@ -48,9 +48,9 @@ class generation_edit_policy {
      * Throw unless this generation's source may still be edited.
      *
      * Used immediately before a write, on a record read in the same breath - not on whatever the
-     * page loaded when it was opened. The gap between those two is the whole point: a form opened
-     * on a draft and submitted a minute later may be submitted against a generation that has since
-     * started running.
+     * Page loaded when it was opened. The gap between those two is the whole point: a form opened
+     * On a draft and submitted a minute later may be submitted against a generation that has since
+     * Started running.
      *
      * @param \stdClass $generation a freshly read local_artqtml_generations record
      * @return void

@@ -17,6 +17,8 @@
 namespace local_artqtml\form;
 
 /**
+ * Unit tests.
+ *
  * @package    local_artqtml
  * @category   test
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -54,7 +56,7 @@ final class upload_form_test extends \advanced_testcase {
 
     /**
      * A shortname longer than 8 characters fails the same format rule server-side, independent of
-     * the client maxlength attribute.
+     * The client maxlength attribute.
      */
     public function test_overlong_shortname_rejected(): void {
         $this->resetAfterTest();
@@ -95,8 +97,8 @@ final class upload_form_test extends \advanced_testcase {
     }
 
     /**
- * Accented letters are not ASCII a-z/A-Z, so they must be rejected.
- */
+     * Accented letters are not ASCII a-z/A-Z, so they must be rejected.
+     */
     public function test_accented_shortname_rejected(): void {
         $this->resetAfterTest();
 
@@ -185,7 +187,7 @@ final class upload_form_test extends \advanced_testcase {
      * The "source text is required" rule still fires, and is not replaced by the size message.
      *
      * An empty textarea is empty, not oversized - the two rules share a field and a mistake here
-     * would show the wrong reason.
+     * Would show the wrong reason.
      */
     public function test_an_empty_source_text_still_reports_the_required_error(): void {
         $this->resetAfterTest();

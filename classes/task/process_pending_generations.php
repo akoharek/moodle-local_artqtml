@@ -16,10 +16,10 @@
 
 /**
  * Scheduled task that drives the AI generation/validation pipeline in the background
- * runs every 5 minutes by default via cron, and can also be run
- * on demand - `admin/cli/scheduled_task.php --execute='\local_artqtml\task\process_pending_generations'`
+ * Runs every 5 minutes by default via cron, and can also be run
+ * On demand - `admin/cli/scheduled_task.php --execute='\local_artqtml\task\process_pending_generations'`
  * - which is the supported way to get near-instant processing during manual testing instead of
- * waiting for the next scheduled tick.
+ * Waiting for the next scheduled tick.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -102,8 +102,8 @@ class process_pending_generations extends \core\task\scheduled_task {
 
     /**
      * Atomically claim a generation for processing by this run: only succeeds if the row is
-     * still unclaimed (processingtoken IS NULL) at the moment the UPDATE executes, so two
-     * concurrent runs racing on the same row can never both win (C-02).
+     * Still unclaimed (processingtoken IS NULL) at the moment the UPDATE executes, so two
+     * Concurrent runs racing on the same row can never both win (C-02).
      *
      * @param int $generationid
      * @return \stdClass|null the freshly claimed record, or null if another run claimed it first
@@ -126,7 +126,7 @@ class process_pending_generations extends \core\task\scheduled_task {
 
     /**
      * Release a generation's processing claim once this run is done with it (whatever the
-     * outcome), so a future tick can claim it again if it somehow needs another pass.
+     * Outcome), so a future tick can claim it again if it somehow needs another pass.
      *
      * @param int $generationid
      * @return void
@@ -138,9 +138,9 @@ class process_pending_generations extends \core\task\scheduled_task {
     }
 
     /**
- * @param \stdClass $generation
- * @return void
- */
+     * @param \stdClass $generation
+     * @return void
+     */
     protected function process_one(\stdClass $generation): void {
         global $DB;
 

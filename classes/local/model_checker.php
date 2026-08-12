@@ -43,12 +43,12 @@ class model_checker {
     }
 
     /**
- * Run both checks for one provider and set or clear its blocking state.
- *
- * @param string $provider one of model_list::PROVIDERS
- * @param string $trigger model_check_log::TRIGGER_*
- * @return array{success: bool, messages: string[]}
- */
+     * Run both checks for one provider and set or clear its blocking state.
+     *
+     * @param string $provider one of model_list::PROVIDERS
+     * @param string $trigger model_check_log::TRIGGER_*
+     * @return array{success: bool, messages: string[]}
+     */
     public static function check_provider(string $provider, string $trigger): array {
         $model = (string) get_config(
             'local_artqtml',
@@ -121,26 +121,26 @@ class model_checker {
     }
 
     /**
- * Probe every listed model that this plugin version has not already ruled out, and record each.
- *
- * Already-excluded models are skipped rather than retried, because within one plugin version
- * the answer cannot have changed: the verdict says this build cannot read that model. A version
- * bump clears the exclusions by construction (see model_check_log::excluded_models), so our own
- * fixes reopen them without anyone having to remember.
- *
- * THE COST IS REAL AND WAS ACCEPTED. One paid call per model, sequentially, each bounded by the
- * API timeout - a dozen models make this a click that runs for minutes and costs a fraction of
- * a cent. The judgement was that an edge case which surfaces about once a year is worth that,
- * and the alternative is what happened on the day this was written: a button that reported
- * success for models on which every generation would fail.
- *
- * Recording each result is not incidental - it is how the dropdown learns. Without the log
- * entry the exclusion never happens and this loop is a slow no-op.
- *
- * @param string $provider one of model_list::PROVIDERS
- * @return array{checked: int, skipped: int, failed: string[]} failed holds the model ids that
- * did not return a readable question, and are now out of the dropdown
- */
+     * Probe every listed model that this plugin version has not already ruled out, and record each.
+     *
+     * Already-excluded models are skipped rather than retried, because within one plugin version
+     * The answer cannot have changed: the verdict says this build cannot read that model. A version
+     * Bump clears the exclusions by construction (see model_check_log::excluded_models), so our own
+     * Fixes reopen them without anyone having to remember.
+     *
+     * THE COST IS REAL AND WAS ACCEPTED. One paid call per model, sequentially, each bounded by the
+     * API timeout - a dozen models make this a click that runs for minutes and costs a fraction of
+     * A cent. The judgement was that an edge case which surfaces about once a year is worth that,
+     * And the alternative is what happened on the day this was written: a button that reported
+     * Success for models on which every generation would fail.
+     *
+     * Recording each result is not incidental - it is how the dropdown learns. Without the log
+     * Entry the exclusion never happens and this loop is a slow no-op.
+     *
+     * @param string $provider one of model_list::PROVIDERS
+     * @return array{checked: int, skipped: int, failed: string[]} failed holds the model ids that
+     * Did not return a readable question, and are now out of the dropdown
+     */
     public static function check_listed_models(string $provider): array {
         $cached = model_list::get_cached($provider);
         $models = $cached['models'] ?? [];
@@ -191,21 +191,21 @@ class model_checker {
     }
 
     /**
- * The minimal structured-output probe.
- *
- * The request is built by {@see ai_request}, the same class the generation and validation
- * tasks use, so the probe cannot test a shape production does not send. It previously built
- * its own - omitting the beta header the generator sent and hand-writing a schema without
- * additionalProperties:false - and the resulting 400 blocked generation site-wide on a
- * configuration that worked. A probe that does not reproduce the production request can only
- * produce false positives.
- *
- * @param string $provider
- * @param string $model
- * @return array{success: bool, transient?: bool, error: string} `transient` is present and true
- * only when the call failed because the provider was busy or unreachable, which is not a
- * verdict about the model - see model_check_log::RESULT_TRANSIENT
- */
+     * The minimal structured-output probe.
+     *
+     * The request is built by {@see ai_request}, the same class the generation and validation
+     * Tasks use, so the probe cannot test a shape production does not send. It previously built
+     * Its own - omitting the beta header the generator sent and hand-writing a schema without
+     * AdditionalProperties:false - and the resulting 400 blocked generation site-wide on a
+     * Configuration that worked. A probe that does not reproduce the production request can only
+     * Produce false positives.
+     *
+     * @param string $provider
+     * @param string $model
+     * @return array{success: bool, transient?: bool, error: string} `transient` is present and true
+     * Only when the call failed because the provider was busy or unreachable, which is not a
+     * Verdict about the model - see model_check_log::RESULT_TRANSIENT
+     */
     protected static function probe(string $provider, string $model): array {
         $apikey = api_key_store::get($provider);
         if ($apikey === '') {
@@ -283,7 +283,7 @@ class model_checker {
      * The provider name as stored in the diagnostic log.
      *
      * The log records the vendor (anthropic/gemini) per the annex schema, while the settings use
-     * claude/gemini as the key - so the two are mapped rather than assumed equal.
+     * Claude/gemini as the key - so the two are mapped rather than assumed equal.
      *
      * @param string $provider
      * @return string

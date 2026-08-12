@@ -16,12 +16,12 @@
 
 /**
  * PHPStan bootstrap: boot Moodle so its classes/constants are available to static analysis,
- * and pull in the core libraries the plugin builds on (admin settings, question engine, forms,
- * upgrade helpers). Referenced from phpstan.neon's bootstrapFiles.
+ * And pull in the core libraries the plugin builds on (admin settings, question engine, forms,
+ * Upgrade helpers). Referenced from phpstan.neon's bootstrapFiles.
  *
  * The plugin always lives at <moodleroot>/local/artqtml, so the Moodle root config.php is two
- * directories up - this works both in the local Docker checkout and in CI (where moodle-plugin-ci
- * installs the plugin into a full Moodle tree).
+ * Directories up - this works both in the local Docker checkout and in CI (where moodle-plugin-ci
+ * Installs the plugin into a full Moodle tree).
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

@@ -18,8 +18,8 @@
  * Shared HTTP-level exponential backoff for Claude/Gemini adhoc tasks.
  *
  * The HTTP-level retry (max 3 attempts: immediate, 2s, 4s + 0-20% jitter) and the JSON-fallback
- * retry (max 2 attempts, independent counter) are separate mechanisms — this trait only
- * implements the former. Callers loop the JSON-fallback themselves around a call to
+ * Retry (max 2 attempts, independent counter) are separate mechanisms — this trait only
+ * Implements the former. Callers loop the JSON-fallback themselves around a call to
  * {@see self::http_with_backoff()}.
  *
  * @package    local_artqtml
@@ -36,7 +36,7 @@ trait retry_trait {
      * @var int[] HTTP status codes considered retryable (Claude 429/500/504/529, Gemini 429/500/503/504).
      *
      * Shared with {@see \local_artqtml\local\ai_request::TRANSIENT_HTTP} so "provider busy"
-     * is not recorded as "this model cannot be used".
+     * Is not recorded as "this model cannot be used".
      */
     protected const RETRYABLE_HTTP = \local_artqtml\local\ai_request::TRANSIENT_HTTP;
 
@@ -48,20 +48,20 @@ trait retry_trait {
      *
      * Annex 2.4: 2 s before attempt 2 and 4 s before attempt 3, each with up to 20% jitter, so
      * 2 x 1.2 + 4 x 1.2. Public so process_pending_generations can size its time limit from the
-     * same numbers {@see self::backoff_sleep()} actually sleeps for, rather than a copy.
+     * Same numbers {@see self::backoff_sleep()} actually sleeps for, rather than a copy.
      */
     public const MAX_BACKOFF_SECONDS = 7.2;
 
     /**
- * Run an HTTP request callable with exponential backoff on retryable status codes.
- *
- * @param callable $requestfn () => array{httpcode:int, body:string, curlerror:string}
- * @param int $generationid
- * @param string $calltype 'generate' or 'validate'
- * @param string $provider 'claude' or 'gemini'
- * @param int|null $userid
- * @return array{httpcode:int, body:string, curlerror:string, attempts:int} the last attempt's result
- */
+     * Run an HTTP request callable with exponential backoff on retryable status codes.
+     *
+     * @param callable $requestfn () => array{httpcode:int, body:string, curlerror:string}
+     * @param int $generationid
+     * @param string $calltype 'generate' or 'validate'
+     * @param string $provider 'claude' or 'gemini'
+     * @param int|null $userid
+     * @return array{httpcode:int, body:string, curlerror:string, attempts:int} the last attempt's result
+     */
     protected function http_with_backoff(
         callable $requestfn,
         int $generationid,
@@ -97,7 +97,7 @@ trait retry_trait {
 
     /**
      * Extract the technical error.message from a Claude/Gemini error response body - both
-     * providers use the same {"error": {"message": "..."}} shape.
+     * Providers use the same {"error": {"message": "..."}} shape.
      *
      * @param string $body
      * @return string
@@ -133,9 +133,9 @@ trait retry_trait {
     }
 
     /**
- * @param int $httpcode
- * @return bool
- */
+     * @param int $httpcode
+     * @return bool
+     */
     protected function is_nonretryable_client_error(int $httpcode): bool {
         return $httpcode >= 400 && $httpcode < 500 && $httpcode !== 429;
     }

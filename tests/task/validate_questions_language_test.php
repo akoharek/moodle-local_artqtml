@@ -23,7 +23,7 @@ use local_artqtml\local\problem_category;
  * Unit tests for the validator prompt's output-language clause.
  *
  * The justification Gemini returns is stored text, written once at validation time - it cannot
- * follow the interface language afterwards, so the language has to be settled in the prompt.
+ * Follow the interface language afterwards, so the language has to be settled in the prompt.
  * Neither shipped template stated one, which is why a Hungarian site got English justifications.
  *
  * @package    local_artqtml
@@ -49,7 +49,7 @@ final class validate_questions_language_test extends \advanced_testcase {
      * With the shipped default template, the assembled prompt states an output language.
      *
      * Compared against the lang string itself, not a re-typed sentence: the wording is allowed to
-     * change, its presence is not.
+     * Change, its presence is not.
      *
      * @return void
      */
@@ -69,10 +69,10 @@ final class validate_questions_language_test extends \advanced_testcase {
     }
 
     /**
- * An administrator keeps the placeholder, and their own wording keeps the clause.
- *
- * @return void
- */
+     * An administrator keeps the placeholder, and their own wording keeps the clause.
+     *
+     * @return void
+     */
     public function test_a_custom_template_keeps_the_clause_through_its_placeholder(): void {
         global $CFG;
 
@@ -96,8 +96,8 @@ final class validate_questions_language_test extends \advanced_testcase {
 
     /**
      * Asking for a language is the instruction most likely to make a model localise the enum
-     * values and break the response schema, so the clause has to keep saying they are exempt -
-     * and the enum values themselves must still be listed in the prompt.
+     * Values and break the response schema, so the clause has to keep saying they are exempt -
+     * And the enum values themselves must still be listed in the prompt.
      *
      * @return void
      */
@@ -125,8 +125,8 @@ final class validate_questions_language_test extends \advanced_testcase {
     }
 
     /**
- * @return \stdClass
- */
+     * @return \stdClass
+     */
     private function scale_generation(): \stdClass {
         $generation = new \stdClass();
         $generation->settings = json_encode([

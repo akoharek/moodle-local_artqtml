@@ -2,17 +2,17 @@
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
+// It under the terms of the GNU General Public License as published by
+// The Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
 // Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// But WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// Along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Step 3 of the "New generation" flow: poll and display generation status.
@@ -105,7 +105,6 @@ if (optional_param('retry', 0, PARAM_BOOL)) {
         $generation->error = null;
         $generation->timemodified = time();
         $DB->update_record('local_artqtml_generations', $generation);
-
     }
     redirect(new moodle_url('/local/artqtml/status.php', ['generationid' => $generationid]));
 }
@@ -158,8 +157,8 @@ echo html_writer::div(
 
 if ($generation->status === generation_status::PARTIAL) {
     // The button is inside the notice, not down with Retry/Back, because it is the answer to the
-    // sentence directly above it - and because Retry means something else here: it restarts this
-    // generation from zero and throws away the questions it did produce. This one keeps them.
+    // Sentence directly above it - and because Retry means something else here: it restarts this
+    // Generation from zero and throws away the questions it did produce. This one keeps them.
     $shortfall = \local_artqtml\local\missing_types::shortfall($generation);
     $retrytypeslink = '';
     if ($shortfall !== []) {
@@ -212,7 +211,7 @@ $barstriped = $stage['striped'];
 switch ($generation->status) {
     case generation_status::GENERATING:
         $barlabel = get_string('stagegenerating', 'local_artqtml');
-        // name the type being generated, so six calls do not look like one stuck one.
+        // Name the type being generated, so six calls do not look like one stuck one.
         $intype = \local_artqtml\local\generation_progress::generating_type($generation->pendingdata);
         if ($intype !== '') {
             $barlabel .= ' - ' . \local_artqtml\local\question_types::label($intype);

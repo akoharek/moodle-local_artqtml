@@ -2,24 +2,24 @@
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
+// It under the terms of the GNU General Public License as published by
+// The Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
 // Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// But WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// Along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Kérdésbank - Draft jóváhagyó oldal.
  *
  * Thin controller: bootstrap -> capability -> parameter parsing -> service call + notification +
- * redirect (POST actions), or data gathering + renderer calls (GET). The business logic lives in
- * local_artqtml\local\approve\* (approval / move / deletion services, page data, renderer).
+ * Redirect (POST actions), or data gathering + renderer calls (GET). The business logic lives in
+ * Local_artqtml\local\approve\* (approval / move / deletion services, page data, renderer).
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -59,7 +59,7 @@ $PAGE->set_heading(get_string('approveheading', 'local_artqtml'));
 $categoryoptions = question_bank_list::options_for_user((int) $USER->id, (int) $generation->draftcategoryid);
 
 // Soronkénti jóváhagyás: a human approval step, independent of the AI's validationsuggestion -
-// a question must be approved before it can be moved into a real question bank.
+// A question must be approved before it can be moved into a real question bank.
 $approveid = optional_param('approvequestion', 0, PARAM_INT);
 if ($approveid) {
     require_sesskey();
@@ -136,14 +136,14 @@ if (in_array($bulkaction, ['allaccepted', 'delete'], true)) {
         $count = question_approval_service::approve_accepted_bulk($generationid, (int) $USER->id, $context);
         \core\notification::success(get_string('bulkapprovesuccess', 'local_artqtml', $count));
     } catch (\Throwable $e) {
-        // log the full detail, show only a generic translated message.
+        // Log the full detail, show only a generic translated message.
         debugging('local_artqtml bulk approve failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
         \core\notification::error(get_string('errorbulkactionfailed', 'local_artqtml'));
     }
     redirect($pageurl);
 }
 
-// sortable columns and pagination, matching the list page's pattern.
+// Sortable columns and pagination, matching the list page's pattern.
 $sort = optional_param('qsort', 'id', PARAM_ALPHA);
 $dir = strtoupper(optional_param('qdir', 'ASC', PARAM_ALPHA)) === 'DESC' ? 'DESC' : 'ASC';
 $page = optional_param('qpage', 0, PARAM_INT);
@@ -191,12 +191,12 @@ $questions = approve_page_data::questions($generationid, $sort, $dir, $page, $pe
 $creator = core_user::get_user($generation->userid);
 
 // C9: the Edit and Preview actions both open the native Moodle question bank UI for a draft
-// question, which requires moodle/question:editall in the draft course context (there is no
+// Question, which requires moodle/question:editall in the draft course context (there is no
 // "moodle/question:edit" capability - using it made has_capability() emit a "capability not
-// found" debug warning and always return false, so the actions never rendered). A user can hold
-// local/artqtml:use (enough to view/approve/move here) without being enrolled as an
-// editingteacher in the draft course, in which case those links would only lead to a permission
-// error - so compute the capability once here and show them only when the user actually has it.
+// Found" debug warning and always return false, so the actions never rendered). A user can hold
+// Local/artqtml:use (enough to view/approve/move here) without being enrolled as an
+// Editingteacher in the draft course, in which case those links would only lead to a permission
+// Error - so compute the capability once here and show them only when the user actually has it.
 $candrafteditquestions = false;
 if (draft_bank::is_configured()) {
     $draftcontextid = draft_bank::get_draft_context_id();

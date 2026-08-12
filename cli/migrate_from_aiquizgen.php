@@ -18,8 +18,8 @@
  * CLI: migrate a site from local_aiquizgen tables/registry to local_artqtml.
  *
  * Safe to re-run. Prefer running this after the plugin directory has been renamed to artqtml
- * and before or after admin/cli/upgrade.php - install.php / upgrade.php also call the same
- * migrator, so this is mainly for explicit ops and Docker smoke.
+ * And before or after admin/cli/upgrade.php - install.php / upgrade.php also call the same
+ * Migrator, so this is mainly for explicit ops and Docker smoke.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

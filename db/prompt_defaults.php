@@ -16,8 +16,8 @@
 
 /**
  * This file is a SEED, not a source. It is read once, by install.php and by the upgrade step that
- * introduces these settings, and written into `config_plugins`. From that moment the database is
- * the only place the prompt lives.
+ * Introduces these settings, and written into `config_plugins`. From that moment the database is
+ * The only place the prompt lives.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

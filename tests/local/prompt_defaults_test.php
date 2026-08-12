@@ -138,8 +138,8 @@ final class prompt_defaults_test extends \advanced_testcase {
     }
 
     /**
- * the template instructs the model about the language of the questions.
- */
+     * The template instructs the model about the language of the questions.
+     */
     public function test_the_template_states_the_output_language_rule(): void {
         $this->assertStringContainsString(
             'language of the source text',
@@ -172,8 +172,8 @@ final class prompt_defaults_test extends \advanced_testcase {
     }
 
     /**
- * no prompt text is left in the code or the lang packs.
- */
+     * No prompt text is left in the code or the lang packs.
+     */
     public function test_the_generator_holds_no_prompt_text(): void {
         global $CFG;
 

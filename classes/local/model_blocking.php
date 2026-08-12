@@ -34,14 +34,14 @@ class model_blocking {
     public const REASON_UNUSABLE = 'unusable';
 
     /**
- * Record that a provider's model check failed.
- *
- * @param string $provider
- * @param string $model the model that failed, for the message
- * @param string $checktype model_check_log::CHECK_*
- * @param string $errorcode the AIQ-YYYYMMDD-XXXX code from the log entry
- * @return void
- */
+     * Record that a provider's model check failed.
+     *
+     * @param string $provider
+     * @param string $model the model that failed, for the message
+     * @param string $checktype model_check_log::CHECK_*
+     * @param string $errorcode the AIQ-YYYYMMDD-XXXX code from the log entry
+     * @return void
+     */
     public static function block(string $provider, string $model, string $checktype, string $errorcode): void {
         set_config(self::key($provider), json_encode([
             'reason'    => self::REASON_UNUSABLE,
@@ -53,11 +53,11 @@ class model_blocking {
     }
 
     /**
- * Clear a provider's blocking state after a successful check.
- *
- * @param string $provider
- * @return void
- */
+     * Clear a provider's blocking state after a successful check.
+     *
+     * @param string $provider
+     * @return void
+     */
     public static function clear(string $provider): void {
         unset_config(self::key($provider), 'local_artqtml');
     }
@@ -66,7 +66,7 @@ class model_blocking {
      * The blocking state for one provider, or null when it is not blocked.
      *
      * The "no model configured" case is derived rather than stored: it is a fact about the setting,
-     * so deriving it means it cannot go stale against the setting the way a stored copy would.
+     * So deriving it means it cannot go stale against the setting the way a stored copy would.
      *
      * @param string $provider
      * @return array{reason: string, model: string, checktype: string, errorcode: string, since: int}|null
@@ -109,10 +109,10 @@ class model_blocking {
     }
 
     /**
- * The warning messages to show, one per blocked provider.
- *
- * @return string[]
- */
+     * The warning messages to show, one per blocked provider.
+     *
+     * @return string[]
+     */
     public static function messages(): array {
         $messages = [];
 

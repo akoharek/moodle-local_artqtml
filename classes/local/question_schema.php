@@ -31,8 +31,8 @@ class question_schema {
     /**
      * Fields present on every question type regardless of settings.
      *
-     * hint1/hint2/generalfeedback are added per-type by {@see self::apply_hint_feedback()}
-     * only when actually enabled for that type in this generation's settings.
+     * Hint1/hint2/generalfeedback are added per-type by {@see self::apply_hint_feedback()}
+     * Only when actually enabled for that type in this generation's settings.
      *
      * @param string $typecode IH/FE/SR
      * @return array
@@ -47,12 +47,12 @@ class question_schema {
     }
 
     /**
- * Build the full output_config.format.schema object sent to the Claude API (3.3.8).
- *
- * @param array $settings this generation's decoded settings (settings['types'][$typecode]
- * ['hintenabled'|'feedbackenabled'])
- * @return array
- */
+     * Build the full output_config.format.schema object sent to the Claude API (3.3.8).
+     *
+     * @param array $settings this generation's decoded settings (settings['types'][$typecode]
+     * ['hintenabled'|'feedbackenabled'])
+     * @return array
+     */
     public static function build(array $settings): array {
         $builders = [
             'IH' => fn(): array => self::ih_schema($settings),
@@ -158,10 +158,10 @@ class question_schema {
     }
 
     /**
- * two progressive hints.
- *
- * @return array
- */
+     * Two progressive hints.
+     *
+     * @return array
+     */
     protected static function hint_property(): array {
         return [
             'hint1' => [
@@ -179,10 +179,10 @@ class question_schema {
     }
 
     /**
- * shown to the student regardless of which answer they picked.
- *
- * @return array
- */
+     * Shown to the student regardless of which answer they picked.
+     *
+     * @return array
+     */
     protected static function feedback_property(): array {
         return [
             'generalfeedback' => [
@@ -196,10 +196,10 @@ class question_schema {
     }
 
     /**
- * The per-option explanation for a true/false question.
- *
- * @return array
- */
+     * The per-option explanation for a true/false question.
+     *
+     * @return array
+     */
     protected static function ih_explanation_property(): array {
         return [
             'explanationtrue' => [

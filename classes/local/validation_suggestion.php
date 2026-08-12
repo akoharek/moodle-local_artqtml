@@ -18,9 +18,9 @@
  * The single source of truth for the validator's suggestion enum.
  *
  * The three machine keys the validator may return live here and nowhere else: the Gemini response
- * schema ({@see \local_artqtml\task\validate_questions_task::build_schema()}), the validator
- * prompt assembly and every UI display path all read {@see self::VALUES} / {@see self::label()}
- * from this class, so the schema's value set and the prompt's value set are guaranteed identical.
+ * Schema ({@see \local_artqtml\task\validate_questions_task::build_schema()}), the validator
+ * Prompt assembly and every UI display path all read {@see self::VALUES} / {@see self::label()}
+ * From this class, so the schema's value set and the prompt's value set are guaranteed identical.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -42,34 +42,34 @@ class validation_suggestion {
     public const REJECTED = 'rejected';
 
     /**
- * @var string the plugin's own "no verdict yet" marker (/ "Nem értékelt").
- */
+     * @var string the plugin's own "no verdict yet" marker (/ "Nem értékelt").
+     */
     public const NOT_EVALUATED = 'not_evaluated';
 
     /**
- * @var string display-only marker for an edited question .
- *
- * Never stored in validationsuggestion; the approve page renders it in place of the AI verdict
- * when the `edited` flag is set.
- */
+     * @var string display-only marker for an edited question .
+     *
+     * Never stored in validationsuggestion; the approve page renders it in place of the AI verdict
+     * When the `edited` flag is set.
+     */
     public const EDITED = 'edited';
 
     /**
- * The three suggestion values the validator may return, in canonical order.
- *
- * Exactly three members, and this is the set the Gemini response schema enum is built from.
- * Do not add a fourth or reorder without a spec change: validate_questions_suggestion_test
- * asserts this set verbatim and checks the assembled prompt names exactly these.
- *
- * @var string[]
- */
+     * The three suggestion values the validator may return, in canonical order.
+     *
+     * Exactly three members, and this is the set the Gemini response schema enum is built from.
+     * Do not add a fourth or reorder without a spec change: validate_questions_suggestion_test
+     * Asserts this set verbatim and checks the assembled prompt names exactly these.
+     *
+     * @var string[]
+     */
     public const VALUES = [self::ACCEPTED, self::NEEDS_REVIEW, self::REJECTED];
 
     /**
- * Every value that can appear in the UI: the three AI verdicts plus the two plugin-side markers.
- *
- * @var string[]
- */
+     * Every value that can appear in the UI: the three AI verdicts plus the two plugin-side markers.
+     *
+     * @var string[]
+     */
     public const DISPLAY = [self::ACCEPTED, self::NEEDS_REVIEW, self::REJECTED, self::NOT_EVALUATED];
 
     /**
@@ -84,19 +84,19 @@ class validation_suggestion {
     }
 
     /**
- * @param string $value one of {@see self::DISPLAY}, or self::EDITED
- * @return string
- */
+     * @param string $value one of {@see self::DISPLAY}, or self::EDITED
+     * @return string
+     */
     public static function label(string $value): string {
         return get_string('validationstatus_' . $value, 'local_artqtml');
     }
 
     /**
- * Suggestion -> Bootstrap badge CSS class (: green/amber/red/grey).
- *
- * @param string $value one of {@see self::DISPLAY}, or self::EDITED
- * @return string
- */
+     * Suggestion -> Bootstrap badge CSS class (: green/amber/red/grey).
+     *
+     * @param string $value one of {@see self::DISPLAY}, or self::EDITED
+     * @return string
+     */
     public static function badge_class(string $value): string {
         $map = [
             self::ACCEPTED      => 'badge-success',

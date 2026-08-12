@@ -20,8 +20,8 @@ namespace local_artqtml\local;
  * Unit tests for "one running generation per person".
  *
  * The column this rule counts on, `userid`, is written by the start path to the user who pressed
- * the button, so "whose runs" and "who pressed Start" are the same person by construction. That
- * write lives in generate.php and is not exercised from here.
+ * The button, so "whose runs" and "who pressed Start" are the same person by construction. That
+ * Write lives in generate.php and is not exercised from here.
  *
  * @package    local_artqtml
  * @category   test
@@ -90,8 +90,8 @@ final class generation_start_policy_test extends \advanced_testcase {
      * The three in-progress statuses asserted above are exactly the shared IN_PROGRESS constant.
      *
      * Written as its own assertion rather than by looping the constant in the test above: the
-     * statuses are named there so a change to the constant fails as a decision to be made, not as
-     * a test that quietly re-derives itself from whatever the constant now says.
+     * Statuses are named there so a change to the constant fails as a decision to be made, not as
+     * A test that quietly re-derives itself from whatever the constant now says.
      *
      * @return void
      */
@@ -110,8 +110,8 @@ final class generation_start_policy_test extends \advanced_testcase {
      * 'started' does not block: a teacher may keep as many drafts as they like.
      *
      * This is the half of the rule that is easiest to get wrong in the other direction, and the
-     * one that decides whether the plugin is still usable: a draft costs nothing until it is
-     * started, so limiting drafts would take away the way people work without buying anything.
+     * One that decides whether the plugin is still usable: a draft costs nothing until it is
+     * Started, so limiting drafts would take away the way people work without buying anything.
      *
      * @return void
      */
@@ -142,10 +142,10 @@ final class generation_start_policy_test extends \advanced_testcase {
     }
 
     /**
- * The allowance is per person: a colleague's running generation does not block mine.
- *
- * @return void
- */
+     * The allowance is per person: a colleague's running generation does not block mine.
+     *
+     * @return void
+     */
     public function test_a_colleagues_running_generation_does_not_block(): void {
         $this->resetAfterTest();
 
@@ -161,8 +161,8 @@ final class generation_start_policy_test extends \advanced_testcase {
      * A generation is not blocked by itself.
      *
      * Belt and braces on the start path (only a 'started' generation ever reaches the check there),
-     * but the rule is also readable on its own, and "my own row stops me" would be a trap for the
-     * next caller.
+     * But the rule is also readable on its own, and "my own row stops me" would be a trap for the
+     * Next caller.
      *
      * @return void
      */

@@ -47,10 +47,10 @@ trait generation_status_trait {
 
     /**
      * Re-check that a generation still exists and is still in the expected in-progress status
-     * before committing further work (C-03). A long-running Claude/Gemini HTTP call can take
-     * tens of seconds; in that window the user could have aborted (status reset to "started"
-     * after a rollback) or deleted the generation entirely via the UI, and results from a call
-     * started before that must never be silently saved afterwards.
+     * Before committing further work (C-03). A long-running Claude/Gemini HTTP call can take
+     * Tens of seconds; in that window the user could have aborted (status reset to "started"
+     * After a rollback) or deleted the generation entirely via the UI, and results from a call
+     * Started before that must never be silently saved afterwards.
      *
      * @param int $generationid
      * @param string $expectedstatus the status the generation must still be in (e.g. "generating")
@@ -69,14 +69,14 @@ trait generation_status_trait {
     }
 
     /**
- * Insert a plain lifecycle row into local_artqtml_log (e.g. processing_started).
- *
- * @param int $generationid the owning generation id
- * @param string $event event identifier
- * @param array $data extra event data
- * @param int|null $userid the user who initiated the generation, null if unknown
- * @return void
- */
+     * Insert a plain lifecycle row into local_artqtml_log (e.g. processing_started).
+     *
+     * @param int $generationid the owning generation id
+     * @param string $event event identifier
+     * @param array $data extra event data
+     * @param int|null $userid the user who initiated the generation, null if unknown
+     * @return void
+     */
     protected function log_event(int $generationid, string $event, array $data = [], ?int $userid = null): void {
         global $DB;
 
@@ -91,16 +91,16 @@ trait generation_status_trait {
     }
 
     /**
- * Record one AI API call attempt and trigger the matching Moodle event.
- *
- * @param int $generationid
- * @param string $calltype 'generate' or 'validate'
- * @param string $provider 'claude' or 'gemini'
- * @param array $details httpstatus, tokensinput, tokensoutput, jsonattempt, isretry,
- * requestid, result ('success'|'error'), errormessage
- * @param int|null $userid the user who initiated the generation, null if unknown
- * @return void
- */
+     * Record one AI API call attempt and trigger the matching Moodle event.
+     *
+     * @param int $generationid
+     * @param string $calltype 'generate' or 'validate'
+     * @param string $provider 'claude' or 'gemini'
+     * @param array $details httpstatus, tokensinput, tokensoutput, jsonattempt, isretry,
+     * Requestid, result ('success'|'error'), errormessage
+     * @param int|null $userid the user who initiated the generation, null if unknown
+     * @return void
+     */
     protected function log_ai_call(
         int $generationid,
         string $calltype,

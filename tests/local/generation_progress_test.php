@@ -27,7 +27,7 @@ namespace local_artqtml\local;
 final class generation_progress_test extends \advanced_testcase {
     /**
      * Every in-progress and completed status has a stage; the mapping is the 25/50/75/100 ladder
-     * the specification describes, and it covers exactly the statuses that can show a bar.
+     * The specification describes, and it covers exactly the statuses that can show a bar.
      */
     public function test_stage_table_matches_the_status_constant(): void {
         $this->assertSame(
@@ -58,8 +58,8 @@ final class generation_progress_test extends \advanced_testcase {
     }
 
     /**
- * the generating stage is subdivided by how many question types are done.
- */
+     * The generating stage is subdivided by how many question types are done.
+     */
     public function test_generating_percent_and_type_follow_the_loop(): void {
         // Nothing written yet (an older generation, or the first call still in flight).
         $this->assertSame(25, generation_progress::generating_percent(null));
@@ -91,7 +91,7 @@ final class generation_progress_test extends \advanced_testcase {
     }
 
     /**
-     * for_status() resolves every status, including the two without a fixed stage.
+     * For_status() resolves every status, including the two without a fixed stage.
      */
     public function test_for_status_covers_every_status(): void {
         foreach (generation_status::VALUES as $status) {
@@ -109,8 +109,8 @@ final class generation_progress_test extends \advanced_testcase {
     }
 
     /**
- * a failed generation's percentage comes from pendingdata's shape, not a question count.
- */
+     * A failed generation's percentage comes from pendingdata's shape, not a question count.
+     */
     public function test_failed_percent_reads_pendingdata_shape(): void {
         $this->assertSame(25, generation_progress::failed_percent(null));
         $this->assertSame(25, generation_progress::failed_percent(''));
@@ -123,8 +123,8 @@ final class generation_progress_test extends \advanced_testcase {
     }
 
     /**
-     * color_classes() covers every colour the bar can carry, so a re-render always clears the
-     * previous one - a colour present in a stage but missing here would stick on the element.
+     * Color_classes() covers every colour the bar can carry, so a re-render always clears the
+     * Previous one - a colour present in a stage but missing here would stick on the element.
      */
     public function test_color_classes_cover_every_stage(): void {
         $classes = generation_progress::color_classes();
@@ -139,7 +139,7 @@ final class generation_progress_test extends \advanced_testcase {
 
     /**
      * The payload handed to amd/src/status.js carries everything the JS needs, so it can own no
-     * copy of any of it.
+     * Copy of any of it.
      */
     public function test_config_json_carries_everything_the_js_needs(): void {
         $config = json_decode(generation_progress::config_json(), true);
@@ -159,8 +159,8 @@ final class generation_progress_test extends \advanced_testcase {
     }
 
     /**
- * amd/src/status.js must not re-acquire its own copy of the stage mapping.
- */
+     * Amd/src/status.js must not re-acquire its own copy of the stage mapping.
+     */
     public function test_status_js_holds_no_copy_of_the_stage_mapping(): void {
         $js = file_get_contents(__DIR__ . '/../../amd/src/status.js');
 
@@ -180,8 +180,8 @@ final class generation_progress_test extends \advanced_testcase {
     }
 
     /**
- * the terminal status list likewise appears only in the PHP constant.
- */
+     * The terminal status list likewise appears only in the PHP constant.
+     */
     public function test_status_js_holds_no_copy_of_the_terminal_statuses(): void {
         $js = file_get_contents(__DIR__ . '/../../amd/src/status.js');
 

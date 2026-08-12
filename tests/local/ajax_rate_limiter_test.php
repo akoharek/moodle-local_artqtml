@@ -103,7 +103,7 @@ final class ajax_rate_limiter_test extends \advanced_testcase {
     }
 
     /**
-     * require_* throws moodle_exception once the configured cap is hit.
+     * Require_* throws moodle_exception once the configured cap is hit.
      */
     public function test_require_extract_text_throws(): void {
         $this->setAdminUser();

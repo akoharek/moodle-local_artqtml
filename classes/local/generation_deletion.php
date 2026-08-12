@@ -18,9 +18,9 @@
  * Deletes a generation, its draft question bank and its draft questions - but never its log rows.
  *
  * The single production path for destroying a generation, shared by delete.php (the list page) and
- * generate.php's "delete and exit" abort. Having one path means the diagnostic-log retention rule
- * lives in exactly one place, and a PHPUnit test can pin it against the real deletion code instead
- * of a hand-rolled copy.
+ * Generate.php's "delete and exit" abort. Having one path means the diagnostic-log retention rule
+ * Lives in exactly one place, and a PHPUnit test can pin it against the real deletion code instead
+ * Of a hand-rolled copy.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -33,11 +33,11 @@ namespace local_artqtml\local;
  */
 class generation_deletion {
     /**
- * Delete a generation, its draft question bank and its draft questions.
- *
- * @param int $generationid
- * @return void
- */
+     * Delete a generation, its draft question bank and its draft questions.
+     *
+     * @param int $generationid
+     * @return void
+     */
     public static function purge(int $generationid): void {
         global $DB;
 

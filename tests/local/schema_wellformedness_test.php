@@ -21,12 +21,12 @@ use local_artqtml\task\validate_questions_task;
 
 /**
  * Provider-agnostic well-formedness checks over EVERY enum in EVERY request schema the plugin
- * sends - the Gemini validation response schema and the Claude generation Structured Outputs
- * schema.
+ * Sends - the Gemini validation response schema and the Claude generation Structured Outputs
+ * Schema.
  *
  * Why this exists: the problem_category outage was a single illegal enum member (an empty string,
- * which Gemini rejects at schema level) that no test ever looked at. It cost nine days and was
- * only found the first time anything made a real Gemini validation call. This assertion needs no
+ * Which Gemini rejects at schema level) that no test ever looked at. It cost nine days and was
+ * Only found the first time anything made a real Gemini validation call. This assertion needs no
  * API key, costs nothing, and would have caught it on the day it was written.
  *
  * Deliberately written as a recursive walk rather than a list of known enum paths, so a schema
@@ -44,8 +44,8 @@ final class schema_wellformedness_test extends \advanced_testcase {
      * Every request schema the plugin builds, keyed by a human-readable name.
      *
      * Add a schema here when a new provider/call is introduced; the assertions themselves need no
-     * change. The Claude schema is built for several settings shapes because its per-type hint and
-     * feedback fragments are conditional - the "all on" variant exercises the widest schema.
+     * Change. The Claude schema is built for several settings shapes because its per-type hint and
+     * Feedback fragments are conditional - the "all on" variant exercises the widest schema.
      *
      * @return array<string, array>
      */
@@ -75,7 +75,7 @@ final class schema_wellformedness_test extends \advanced_testcase {
 
     /**
      * Recursively collect every 'enum' found anywhere in a schema, keyed by its JSON path so a
-     * failure names the exact offending node.
+     * Failure names the exact offending node.
      *
      * @param mixed $node
      * @param string $path
@@ -100,12 +100,12 @@ final class schema_wellformedness_test extends \advanced_testcase {
     }
 
     /**
- * no enum member anywhere may be an empty string, and no enum may be empty.
- *
- * An empty-string member is what made every Gemini validation call fail schema validation with
- * "problem_category.enum[0]: cannot be empty"; an empty enum is unsatisfiable and would reject
- * every response.
- */
+     * No enum member anywhere may be an empty string, and no enum may be empty.
+     *
+     * An empty-string member is what made every Gemini validation call fail schema validation with
+     * "problem_category.enum[0]: cannot be empty"; an empty enum is unsatisfiable and would reject
+     * Every response.
+     */
     public function test_no_schema_enum_contains_an_empty_string_or_is_empty(): void {
         $totalenums = 0;
 
@@ -155,7 +155,7 @@ final class schema_wellformedness_test extends \advanced_testcase {
      * Every enum in every schema is drawn from a single-source constant, not an inline literal.
      *
      * Keeps the two known enums honest by identity (not just well-formedness): whatever the schema
-     * says must be exactly what the corresponding constant says.
+     * Says must be exactly what the corresponding constant says.
      */
     public function test_known_enums_come_from_their_single_source_constants(): void {
         $validator = new validate_questions_task();

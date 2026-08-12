@@ -20,9 +20,9 @@ namespace local_artqtml\local;
  * The English and Hungarian language packs must hold the same keys.
  *
  * Moodle silently falls back to English for a missing Hungarian key, so a pack that drifts never
- * fails loudly - a missing translation looks like one nobody got around to, indefinitely. Nothing
- * else in the suite would notice, so this is the guard: the same defect class the plugin has closed
- * repeatedly in its PHP value sets - one set maintained in two places with nothing checking them.
+ * Fails loudly - a missing translation looks like one nobody got around to, indefinitely. Nothing
+ * Else in the suite would notice, so this is the guard: the same defect class the plugin has closed
+ * Repeatedly in its PHP value sets - one set maintained in two places with nothing checking them.
  *
  * @package    local_artqtml
  * @category   test
@@ -31,8 +31,8 @@ namespace local_artqtml\local;
  */
 final class lang_parity_test extends \advanced_testcase {
     /**
- * neither pack may hold a key the other lacks, in either direction.
- */
+     * Neither pack may hold a key the other lacks, in either direction.
+     */
     public function test_both_packs_hold_the_same_keys(): void {
         $en = self::keys_of('en');
         $hu = self::keys_of('hu');
@@ -63,8 +63,8 @@ final class lang_parity_test extends \advanced_testcase {
     }
 
     /**
- * deliberately separate from: each pack's keys must stay C-sorted.
- */
+     * Deliberately separate from: each pack's keys must stay C-sorted.
+     */
     public function test_each_pack_is_c_sorted(): void {
         foreach (['en', 'hu'] as $lang) {
             $keys = self::keys_of($lang, false);
@@ -84,10 +84,10 @@ final class lang_parity_test extends \advanced_testcase {
      *
      * Including these files is wrong twice over (the prompt's requirement 2): they assign into
      * $string[...], so including both in one process would have the second overwrite the first, and
-     * including either pollutes the test's own scope. token_get_all() parses the PHP without
-     * executing it - and, unlike a regex, it cannot be fooled by the text "$string[" appearing
-     * inside a translated value, because a value is a single string token, not a variable followed
-     * by a bracket. It is also the mechanism ai_request_test already uses for static source checks.
+     * Including either pollutes the test's own scope. token_get_all() parses the PHP without
+     * Executing it - and, unlike a regex, it cannot be fooled by the text "$string[" appearing
+     * Inside a translated value, because a value is a single string token, not a variable followed
+     * By a bracket. It is also the mechanism ai_request_test already uses for static source checks.
      *
      * @param string $lang 'en' or 'hu'
      * @param bool $unique return the unique key set (for parity) or every key in file order (sort)

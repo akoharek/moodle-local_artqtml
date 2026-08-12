@@ -20,11 +20,11 @@ namespace local_artqtml\local;
  * Static check: every entry script sets up $PAGE.
  *
  * D-6: delete.php and modelaction.php act and redirect without rendering a page of their own, and
- * that is exactly why both had skipped $PAGE->set_context()/set_url(). It does not exempt them -
- * format_string() reads the context, redirect() and the exception pages read the URL - and Moodle
- * answers the omission with developer warnings, refusing even to redirect once it has printed
- * them. A browser test covers the delete path; this one covers the shape, so the next
- * act-and-redirect script cannot reintroduce it unnoticed.
+ * That is exactly why both had skipped $PAGE->set_context()/set_url(). It does not exempt them -
+ * Format_string() reads the context, redirect() and the exception pages read the URL - and Moodle
+ * Answers the omission with developer warnings, refusing even to redirect once it has printed
+ * Them. A browser test covers the delete path; this one covers the shape, so the next
+ * Act-and-redirect script cannot reintroduce it unnoticed.
  *
  * @package    local_artqtml
  * @category   test
@@ -34,7 +34,7 @@ namespace local_artqtml\local;
 final class entry_script_page_setup_test extends \advanced_testcase {
     /**
      * A script that pulls in Moodle's config.php is reachable by URL: that is the definition of an
-     * entry script used here, so a newly added one is picked up without editing a list.
+     * Entry script used here, so a newly added one is picked up without editing a list.
      *
      * @return string[] absolute paths, keyed by filename
      */
@@ -64,7 +64,7 @@ final class entry_script_page_setup_test extends \advanced_testcase {
 
     /**
      * Guard for the guard: if the discovery above ever stops finding scripts, the real assertions
-     * would pass vacuously over an empty list.
+     * Would pass vacuously over an empty list.
      *
      * @return void
      */
@@ -116,7 +116,7 @@ final class entry_script_page_setup_test extends \advanced_testcase {
     }
 
     /**
-     * approve.php must expose a GET navigation control back to the site-wide list page.
+     * Approve.php must expose a GET navigation control back to the site-wide list page.
      *
      * @return void
      */

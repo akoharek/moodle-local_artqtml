@@ -24,19 +24,19 @@
 namespace local_artqtml\local\question;
 
 /**
- * the model supplies wording, not appearance - and it does so BEFORE validation.
+ * The model supplies wording, not appearance - and it does so BEFORE validation.
  *
  * So the cleaning moved to the parse step, where the model's answer first becomes data
  * (generate_questions_task). Everything downstream - the validator, the stored questiondata JSON,
- * the approval screen, the question bank - now sees the same text, and it is the text the teacher
- * will see. question_form_builder still calls clean() on every field: cleaning is idempotent, and
- * a second pass at the last door costs nothing while covering any path that does not come through
- * the parse step (legacy pendingdata written before this change, above all).
+ * The approval screen, the question bank - now sees the same text, and it is the text the teacher
+ * Will see. question_form_builder still calls clean() on every field: cleaning is idempotent, and
+ * A second pass at the last door costs nothing while covering any path that does not come through
+ * The parse step (legacy pendingdata written before this change, above all).
  */
 class ai_text_cleaner {
     /**
      * The AI-authored plain-string fields of a question, whatever its type. Absent keys are
-     * skipped, so one list serves all six types rather than six lists that can drift apart.
+     * Skipped, so one list serves all six types rather than six lists that can drift apart.
      */
     private const TEXT_FIELDS = [
         'questiontext',
@@ -50,31 +50,31 @@ class ai_text_cleaner {
     ];
 
     /**
- * Reduce one AI-generated string to plain text, keeping only <sub> and <sup>.
- *
- * The steps are ordered, and the order is the point:
- *
- * 1. Purify first. Beyond the security filtering this is what makes step 3 safe: a stray "<"
- * in ordinary prose ("igaz-e, hogy x < 5") comes out of the purifier as "&lt;", so
- * strip_tags() can no longer swallow the rest of the sentence as if it were a tag. Doing it
- * the other way round loses text, silently.
- * 2. Turn block boundaries into newlines BEFORE the tags go, or "<p>Első</p><p>Második</p>"
- * comes out as "ElsőMásodik" - the same words-run-together defect fixed when block tags
- * were stripped without inserting separators.
- * 3. Strip everything except the two kept tags.
- * 4. Normalise the whitespace this leaves behind.
- *
- * Idempotent by construction, and it has to be: it now runs at the parse step AND again at the
- * save step. After one pass the only tags left are <sub>/<sup> and the only "<" characters are
- * entities, so a second pass has nothing left to do.
- *
- * Known consequence, recorded rather than discovered later: paragraph breaks become plain
- * newlines, and the field is still FORMAT_HTML, so a multi-paragraph explanation renders as
- * one paragraph. The words are all there; the paragraph structure is not.
- *
- * @param mixed $text expected string, but AI JSON output is trusted to have the right shape
- * @return string
- */
+     * Reduce one AI-generated string to plain text, keeping only <sub> and <sup>.
+     *
+     * The steps are ordered, and the order is the point:
+     *
+     * 1. Purify first. Beyond the security filtering this is what makes step 3 safe: a stray "<"
+     * In ordinary prose ("igaz-e, hogy x < 5") comes out of the purifier as "&lt;", so
+     * Strip_tags() can no longer swallow the rest of the sentence as if it were a tag. Doing it
+     * The other way round loses text, silently.
+     * 2. Turn block boundaries into newlines BEFORE the tags go, or "<p>Első</p><p>Második</p>"
+     * Comes out as "ElsőMásodik" - the same words-run-together defect fixed when block tags
+     * Were stripped without inserting separators.
+     * 3. Strip everything except the two kept tags.
+     * 4. Normalise the whitespace this leaves behind.
+     *
+     * Idempotent by construction, and it has to be: it now runs at the parse step AND again at the
+     * Save step. After one pass the only tags left are <sub>/<sup> and the only "<" characters are
+     * Entities, so a second pass has nothing left to do.
+     *
+     * Known consequence, recorded rather than discovered later: paragraph breaks become plain
+     * Newlines, and the field is still FORMAT_HTML, so a multi-paragraph explanation renders as
+     * One paragraph. The words are all there; the paragraph structure is not.
+     *
+     * @param mixed $text expected string, but AI JSON output is trusted to have the right shape
+     * @return string
+     */
     public static function clean($text): string {
         $clean = clean_param((string) $text, PARAM_CLEANHTML);
 
@@ -105,9 +105,9 @@ class ai_text_cleaner {
      *
      * Deliberately conservative: only the known text fields are touched, and everything else -
      * `correct`, `correctanswer`, `difficulty_label`, `source_reference`, `type` - is passed
-     * through untouched. A blanket walk over every string in the array would have run the
-     * cleaner over machine values that are not prose, which is how a cleaner starts corrupting
-     * the very data it was added to protect.
+     * Through untouched. A blanket walk over every string in the array would have run the
+     * Cleaner over machine values that are not prose, which is how a cleaner starts corrupting
+     * The very data it was added to protect.
      *
      * @param array $question one decoded question, in the shape question_schema.php asks for
      * @return array the same question with its text fields cleaned

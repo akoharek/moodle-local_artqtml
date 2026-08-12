@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * security_filter re-runs at generate/validate before any provider call.
+ * Security_filter re-runs at generate/validate before any provider call.
  *
  * @package    local_artqtml
  * @category   test
@@ -28,7 +28,7 @@ use local_artqtml\local\generation_status;
 use local_artqtml\local\security_filter;
 
 /**
- * security_filter re-runs at generate/validate before any provider call.
+ * Security_filter re-runs at generate/validate before any provider call.
  *
  * @covers \local_artqtml\task\generate_questions_task
  * @covers \local_artqtml\task\validate_questions_task

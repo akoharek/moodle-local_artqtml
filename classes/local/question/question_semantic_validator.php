@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * semantic validation of AI-generated question data (split out of question_importer - ).
+ * Semantic validation of AI-generated question data (split out of question_importer - ).
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -28,13 +28,13 @@ namespace local_artqtml\local\question;
  */
 class question_semantic_validator {
     /**
- * @param string $typecode IH/FE/SR
- * @param array $data decoded per-type fields from the AI response
- * @param array $typesettings this type's generation settings - only SR's per-generation
- * 'sritemcount' override is read, to enforce the exact item count (v20 #7)
- * @return string|null null if valid, otherwise a short human-readable reason it was rejected
- * (logged as a question_rejected event, never shown to a user - kept in English)
- */
+     * @param string $typecode IH/FE/SR
+     * @param array $data decoded per-type fields from the AI response
+     * @param array $typesettings this type's generation settings - only SR's per-generation
+     * 'sritemcount' override is read, to enforce the exact item count
+     * @return string|null null if valid, otherwise a short human-readable reason it was rejected
+     * (logged as a question_rejected event, never shown to a user - kept in English)
+     */
     public static function validate(string $typecode, array $data, array $typesettings = []): ?string {
         if (trim((string) ($data['questiontext'] ?? '')) === '') {
             return $typecode . ': empty questiontext';

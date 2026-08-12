@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * generation_aborted event.
+ * Generation_aborted event.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -61,8 +61,8 @@ class generation_aborted extends \core\event\base {
      * Return the URL to view the generation, contextual to its CURRENT status.
      *
      * Deliberately not the page that was relevant when this event fired: a log entry is read
-     * later, and the useful destination is wherever the generation can be acted on now. The
-     * status->destination rule is stated once, in generation_list::open_url().
+     * Later, and the useful destination is wherever the generation can be acted on now. The
+     * Status->destination rule is stated once, in generation_list::open_url().
      *
      * @return \moodle_url|null null if the generation has since been deleted
      */

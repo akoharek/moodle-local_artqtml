@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * question_approval_revoked event.
+ * Question_approval_revoked event.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -25,7 +25,7 @@ namespace local_artqtml\event;
 
 /**
  * Triggered when a teacher takes back their own approval of a draft question, before it has been
- * moved into a real question bank.
+ * Moved into a real question bank.
  */
 class question_approval_revoked extends \core\event\base {
     /**

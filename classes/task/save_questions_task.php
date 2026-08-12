@@ -17,8 +17,8 @@
 /**
  * Invoked from {@see process_pending_generations} once {@see generate_questions_task} and
  * {@see validate_questions_task} have both finished - see those classes for why the pipeline is
- * split this way (generating/validating hold everything in $generation->pendingdata; nothing
- * touches local_artqtml_questions or creates a real Moodle question until this stage runs).
+ * Split this way (generating/validating hold everything in $generation->pendingdata; nothing
+ * Touches local_artqtml_questions or creates a real Moodle question until this stage runs).
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -99,18 +99,18 @@ class save_questions_task {
     }
 
     /**
- * @param \stdClass $generation
- * @param array $settings decoded settings JSON
- * @param array $rawquestions raw question arrays as returned by Claude, keyed by pseudo-id
- * @param array $evaluations pseudo-id => evaluation fields map from validate_questions_task
- * @return int number of questions actually saved
- */
+     * @param \stdClass $generation
+     * @param array $settings decoded settings JSON
+     * @param array $rawquestions raw question arrays as returned by Claude, keyed by pseudo-id
+     * @param array $evaluations pseudo-id => evaluation fields map from validate_questions_task
+     * @return int number of questions actually saved
+     */
     /**
- * @param \stdClass $generation the generation, already reloaded inside the save transaction
- * @param array $settings decoded settings, holding the requested per-type counts
- * @param int $userid
- * @return bool true if fewer questions were saved than requested, for any type
- */
+     * @param \stdClass $generation the generation, already reloaded inside the save transaction
+     * @param array $settings decoded settings, holding the requested per-type counts
+     * @param int $userid
+     * @return bool true if fewer questions were saved than requested, for any type
+     */
     protected function store_save_discrepancy(\stdClass $generation, array $settings, int $userid): bool {
         global $DB;
 
@@ -234,10 +234,10 @@ class save_questions_task {
 
     /**
      * Full rollback on unrecoverable failure: delete any real questions already committed (there
-     * won't be any - the transaction in {@see self::process()} rolls those back itself - this is
-     * defensive, matching the same cleanup {@see generate_questions_task::rollback()} and
+     * Won't be any - the transaction in {@see self::process()} rolls those back itself - this is
+     * Defensive, matching the same cleanup {@see generate_questions_task::rollback()} and
      * {@see validate_questions_task::process()}'s failure path use), delete the draft category,
-     * and return the generation to a retryable failed state.
+     * And return the generation to a retryable failed state.
      *
      * @param int $generationid
      * @param string $errormessage

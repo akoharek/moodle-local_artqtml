@@ -19,7 +19,7 @@
  *
  * - the teacher presses the button; the system never re-runs anything by itself;
  * - the duplicate check stays, because the teacher may come back to this days later, and being
- * told what already exists for this text is the entire point of that screen.
+ * Told what already exists for this text is the entire point of that screen.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -83,8 +83,8 @@ if (!is_array($settings)) {
  * Create the follow-up generation and send the teacher to its settings page.
  *
  * Status stays "started": nothing is queued, no API call is made. The new row carries the narrowed
- * settings, which is what generate.php's existing set_data() branch reads to fill the grid in -
- * the same path a resumed generation uses, rather than a second prefill mechanism beside it.
+ * Settings, which is what generate.php's existing set_data() branch reads to fill the grid in -
+ * The same path a resumed generation uses, rather than a second prefill mechanism beside it.
  *
  * @param stdClass $source the partly successful generation being followed up
  * @param array $settings its decoded settings

@@ -18,8 +18,8 @@
  * Admin "Test connection" button and dynamic model list.
  *
  * Uses the currently saved API key (the admin must Save changes on the settings form before
- * testing/fetching models - avoiding the complexity of round-tripping an unsaved secret
- * through an AJAX call).
+ * Testing/fetching models - avoiding the complexity of round-tripping an unsaved secret
+ * Through an AJAX call).
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -156,21 +156,21 @@ class test_connection extends external_api {
     }
 
     /**
- * Probe the listed models and fold the verdict into the key test's message.
- *
- * That gap had a price. Claude Sonnet 5 and Opus 5 open their reply with a thinking block, the
- * plugin read the wrong part of the envelope, and nine calls that were HTTP 200 carrying six
- * usable questions each were thrown away - $0.228 for zero questions. Every one of those calls
- * would have passed this button.
- *
- * A structural failure does not make the key test fail. The key IS valid, and saying otherwise
- * would send the administrator to the wrong setting. It is reported as its own sentence, and
- * the failing models drop out of the dropdown on the next page load.
- *
- * @param string $provider 'claude' or 'gemini'
- * @param string[] $models the model ids the key test listed
- * @return array
- */
+     * Probe the listed models and fold the verdict into the key test's message.
+     *
+     * That gap had a price. Claude Sonnet 5 and Opus 5 open their reply with a thinking block, the
+     * Plugin read the wrong part of the envelope, and nine calls that were HTTP 200 carrying six
+     * Usable questions each were thrown away - $0.228 for zero questions. Every one of those calls
+     * Would have passed this button.
+     *
+     * A structural failure does not make the key test fail. The key IS valid, and saying otherwise
+     * Would send the administrator to the wrong setting. It is reported as its own sentence, and
+     * The failing models drop out of the dropdown on the next page load.
+     *
+     * @param string $provider 'claude' or 'gemini'
+     * @param string[] $models the model ids the key test listed
+     * @return array
+     */
     protected static function with_structure_check(string $provider, array $models): array {
         $summary = \local_artqtml\local\model_checker::check_listed_models($provider);
 

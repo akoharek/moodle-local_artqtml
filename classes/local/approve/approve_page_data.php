@@ -16,8 +16,8 @@
 
 /**
  * Read-only data gathering for the draft approval page - split out of the
- * approve.php controller. Counters, the paginated/sorted question query and the category
- * resolution; no HTML, no mutation.
+ * Approve.php controller. Counters, the paginated/sorted question query and the category
+ * Resolution; no HTML, no mutation.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -32,8 +32,8 @@ use local_artqtml\local\draft_bank;
  */
 class approve_page_data {
     /**
- * @return array<string,string>
- */
+     * @return array<string,string>
+     */
     public static function sortable_columns(): array {
         return [
             'name'         => 'q.questioncode',
@@ -59,9 +59,9 @@ class approve_page_data {
     }
 
     /**
- * @param int $generationid
- * @return array<string,int>
- */
+     * @param int $generationid
+     * @return array<string,int>
+     */
     public static function status_counts(int $generationid): array {
         global $DB;
 
@@ -83,9 +83,9 @@ class approve_page_data {
     }
 
     /**
- * @param int $generationid
- * @return int
- */
+     * @param int $generationid
+     * @return int
+     */
     public static function eligible_for_approval(int $generationid): int {
         global $DB;
 
@@ -134,11 +134,11 @@ class approve_page_data {
      * Resolve "categoryid,contextid" for a real Moodle question.id.
      *
      * Moodle's own native question bank always includes a "category" GET param on its edit links;
-     * without it, edit_question_form.php is built with no hidden "category" field at all, and
-     * validation() unconditionally reads $fromform['category'] on save, throwing a PHP notice/
-     * warning in core. The category can't be assumed to be this generation's own draft category
+     * Without it, edit_question_form.php is built with no hidden "category" field at all, and
+     * Validation() unconditionally reads $fromform['category'] on save, throwing a PHP notice/
+     * Warning in core. The category can't be assumed to be this generation's own draft category
      * (system context) either, since an already-moved question now lives in whatever real course
-     * category the teacher picked - so this is resolved fresh from the question's current version.
+     * Category the teacher picked - so this is resolved fresh from the question's current version.
      *
      * @param int $questionid
      * @return string|null null if the question/category can't be resolved
@@ -185,7 +185,7 @@ class approve_page_data {
      * Resolve the mod_qbank (or other bank activity) cmid for editing a question on Moodle 5.1+.
      *
      * Prefers the question's current category module context (works after move); falls back to
-     * the configured draft course's system-type qbank.
+     * The configured draft course's system-type qbank.
      *
      * @param int $questionid
      * @return int|null

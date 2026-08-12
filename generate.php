@@ -2,21 +2,21 @@
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
+// It under the terms of the GNU General Public License as published by
+// The Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
 // Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// But WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// Along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Step 2 of the "New generation" flow: question counts, difficulty mode, detailed
- * per-type options.
+ * Per-type options.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -290,10 +290,10 @@ $mform->display();
 
 $candeleteown = \local_artqtml\local\generation_delete_policy::can_delete($generation, null, $context);
 // The "Generálás indítása", "Vissza" and "Megszakít" buttons all need the currently-typed field
-// values, so
-// all three live outside generate_form's own <form> as plain (type=button) elements in this one
-// row, and amd/src/generatesettings.js submits the real form on their behalf via requestSubmit() -
-// see that file for why a native form="..." cross-reference isn't used here.
+// Values, so
+// All three live outside generate_form's own <form> as plain (type=button) elements in this one
+// Row, and amd/src/generatesettings.js submits the real form on their behalf via requestSubmit() -
+// See that file for why a native form="..." cross-reference isn't used here.
 echo html_writer::start_div('mt-3');
 echo html_writer::tag('button', get_string('startgeneration', 'local_artqtml'), [
     'type'  => 'button',
