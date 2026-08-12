@@ -23,6 +23,7 @@ rsync -a \
   --exclude '.cursor/' \
   --exclude '.agents/' \
   --exclude '.claude/' \
+  --exclude '.devtools/' \
   --exclude 'node_modules/' \
   --exclude 'screens/' \
   --exclude 'assets/' \
