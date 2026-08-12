@@ -38,4 +38,4 @@ Please use the issue templates (Bug report, Feature request, or Other / code iss
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to report issues and propose changes.
 
-Maintainers: optional Teams/email alerts on new issues — see [SUPPORT.md](SUPPORT.md).
+Maintainers: optional Teams/email alerts on issue events — see [SUPPORT.md](SUPPORT.md).

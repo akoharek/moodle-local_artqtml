@@ -1,10 +1,26 @@
-# Notify maintainers when a public tracker issue is opened.
+# Notify maintainers on public tracker issue lifecycle events.
 # Soft-fail: missing Teams / SMTP secrets skip with a warning; they must not fail CI.
-name: Notify new issue
+# Skips `deleted` — issue payload is unreliable after deletion.
+name: Notify issue
 
 on:
   issues:
-    types: [opened]
+    types:
+      - opened
+      - edited
+      - closed
+      - reopened
+      - labeled
+      - unlabeled
+      - assigned
+      - unassigned
+      - locked
+      - unlocked
+      - milestoned
+      - demilestoned
+      - transferred
+      - pinned
+      - unpinned
 
 permissions:
   contents: read
@@ -35,9 +51,11 @@ jobs:
         env:
           TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_WEBHOOK_URL }}
           MS_TEAMS_WEBHOOK_URL: ${{ secrets.MS_TEAMS_WEBHOOK_URL }}
+          ISSUE_ACTION: ${{ github.event.action }}
           ISSUE_TITLE: ${{ github.event.issue.title }}
           ISSUE_URL: ${{ github.event.issue.html_url }}
           ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+          ISSUE_ACTOR: ${{ github.actor }}
           ISSUE_BODY: ${{ github.event.issue.body }}
           ISSUE_LABELS: ${{ join(github.event.issue.labels.*.name, ', ') }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
@@ -45,15 +63,37 @@ jobs:
         run: |
           set -euo pipefail
           WEBHOOK="${TEAMS_WEBHOOK_URL:-$MS_TEAMS_WEBHOOK_URL}"
+          # Map github.event.action → human-readable headline for Teams.
+          case "$ISSUE_ACTION" in
+            opened) ACTION_LABEL="Issue opened" ;;
+            edited) ACTION_LABEL="Issue edited" ;;
+            closed) ACTION_LABEL="Issue closed" ;;
+            reopened) ACTION_LABEL="Issue reopened" ;;
+            labeled) ACTION_LABEL="Label added" ;;
+            unlabeled) ACTION_LABEL="Label removed" ;;
+            assigned) ACTION_LABEL="Issue assigned" ;;
+            unassigned) ACTION_LABEL="Issue unassigned" ;;
+            locked) ACTION_LABEL="Issue locked" ;;
+            unlocked) ACTION_LABEL="Issue unlocked" ;;
+            milestoned) ACTION_LABEL="Milestone set" ;;
+            demilestoned) ACTION_LABEL="Milestone cleared" ;;
+            transferred) ACTION_LABEL="Issue transferred" ;;
+            pinned) ACTION_LABEL="Issue pinned" ;;
+            unpinned) ACTION_LABEL="Issue unpinned" ;;
+            *) ACTION_LABEL="Issue ${ISSUE_ACTION}" ;;
+          esac
           BODY_EXCERPT="$(printf '%s' "${ISSUE_BODY:-}" | head -c 500)"
           if [ "${#ISSUE_BODY}" -gt 500 ]; then
             BODY_EXCERPT="${BODY_EXCERPT}…"
           fi
           LABELS="${ISSUE_LABELS:-*(none)*}"
           PAYLOAD="$(jq -n \
+            --arg action "$ACTION_LABEL" \
+            --arg raw_action "$ISSUE_ACTION" \
             --arg title "$ISSUE_TITLE" \
             --arg url "$ISSUE_URL" \
             --arg author "$ISSUE_AUTHOR" \
+            --arg actor "$ISSUE_ACTOR" \
             --arg labels "$LABELS" \
             --arg body "$BODY_EXCERPT" \
             --arg number "$ISSUE_NUMBER" \
@@ -62,11 +102,13 @@ jobs:
               "@type": "MessageCard",
               "@context": "https://schema.org/extensions",
               "themeColor": "0078D4",
-              "summary": ("[ArtQTML] New issue #" + $number + ": " + $title),
+              "summary": ("[ArtQTML] " + $action + " #" + $number + ": " + $title),
               "sections": [{
-                "activityTitle": ("New issue on " + $repo),
+                "activityTitle": ($action + " on " + $repo),
                 "activitySubtitle": ("#" + $number + " — " + $title),
                 "facts": [
+                  {"name": "Action", "value": ($action + " (" + $raw_action + ")")},
+                  {"name": "Actor", "value": $actor},
                   {"name": "Author", "value": $author},
                   {"name": "Labels", "value": $labels},
                   {"name": "URL", "value": $url}
@@ -89,7 +131,7 @@ jobs:
             cat /tmp/teams-response.txt || true
             exit 1
           fi
-          echo "Teams notification sent (HTTP $HTTP_CODE)."
+          echo "Teams notification sent for action=$ISSUE_ACTION (HTTP $HTTP_CODE)."
 
   notify-email:
     name: Email
@@ -118,6 +160,31 @@ jobs:
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
         run: echo "port=${SMTP_PORT:-587}" >> "$GITHUB_OUTPUT"
 
+      - name: Resolve action label
+        if: steps.gate.outputs.skip != 'true'
+        id: action
+        env:
+          ISSUE_ACTION: ${{ github.event.action }}
+        run: |
+          case "$ISSUE_ACTION" in
+            opened) echo "label=Issue opened" >> "$GITHUB_OUTPUT" ;;
+            edited) echo "label=Issue edited" >> "$GITHUB_OUTPUT" ;;
+            closed) echo "label=Issue closed" >> "$GITHUB_OUTPUT" ;;
+            reopened) echo "label=Issue reopened" >> "$GITHUB_OUTPUT" ;;
+            labeled) echo "label=Label added" >> "$GITHUB_OUTPUT" ;;
+            unlabeled) echo "label=Label removed" >> "$GITHUB_OUTPUT" ;;
+            assigned) echo "label=Issue assigned" >> "$GITHUB_OUTPUT" ;;
+            unassigned) echo "label=Issue unassigned" >> "$GITHUB_OUTPUT" ;;
+            locked) echo "label=Issue locked" >> "$GITHUB_OUTPUT" ;;
+            unlocked) echo "label=Issue unlocked" >> "$GITHUB_OUTPUT" ;;
+            milestoned) echo "label=Milestone set" >> "$GITHUB_OUTPUT" ;;
+            demilestoned) echo "label=Milestone cleared" >> "$GITHUB_OUTPUT" ;;
+            transferred) echo "label=Issue transferred" >> "$GITHUB_OUTPUT" ;;
+            pinned) echo "label=Issue pinned" >> "$GITHUB_OUTPUT" ;;
+            unpinned) echo "label=Issue unpinned" >> "$GITHUB_OUTPUT" ;;
+            *) echo "label=Issue ${ISSUE_ACTION}" >> "$GITHUB_OUTPUT" ;;
+          esac
+
       - name: Send email
         if: steps.gate.outputs.skip != 'true'
         uses: dawidd6/action-send-mail@v3
@@ -129,14 +196,16 @@ jobs:
           secure: false
           username: ${{ secrets.SMTP_USER }}
           password: ${{ secrets.SMTP_PASSWORD }}
-          subject: '[ArtQTML] New issue: ${{ github.event.issue.title }}'
+          subject: '[ArtQTML] ${{ steps.action.outputs.label }}: ${{ github.event.issue.title }}'
           to: koharek.andras@artudasmenedzsment.hu
           from: ${{ secrets.SMTP_FROM }}
           body: |
-            A new issue was opened on ${{ github.repository }}.
+            ${{ steps.action.outputs.label }} on ${{ github.repository }}.
 
+            Action: ${{ github.event.action }}
             Title: ${{ github.event.issue.title }}
             Number: #${{ github.event.issue.number }}
+            Actor: ${{ github.actor }}
             Author: ${{ github.event.issue.user.login }}
             Labels: ${{ join(github.event.issue.labels.*.name, ', ') }}
             URL: ${{ github.event.issue.html_url }}
