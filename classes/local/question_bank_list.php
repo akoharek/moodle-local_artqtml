@@ -48,7 +48,8 @@ class question_bank_list {
                 }
             }
 
-            $banks = \core_question\local\bank\question_bank_helper::get_activity_instances_with_shareable_questions(
+            $banks = call_user_func(
+                ['core_question\\local\\bank\\question_bank_helper', 'get_activity_instances_with_shareable_questions'],
                 [],
                 $notincourseids
             );

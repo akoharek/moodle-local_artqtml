@@ -84,16 +84,18 @@ class draft_bank {
     }
 
     /**
+     * Fully-qualified class name for Moodle 5.1+ question bank helper (string — not a hard
+     * dependency so PHPStan on Moodle 4.5 still analyses cleanly).
+     */
+    private const QBANK_HELPER = 'core_question\\local\\bank\\question_bank_helper';
+
+    /**
      * Whether this Moodle build stores question banks in mod_qbank module contexts (5.1+).
      *
      * @return bool
      */
     public static function uses_module_question_banks(): bool {
-        return class_exists(\core_question\local\bank\question_bank_helper::class)
-            && method_exists(
-                \core_question\local\bank\question_bank_helper::class,
-                'get_default_open_instance_system_type'
-            );
+        return is_callable([self::QBANK_HELPER, 'get_default_open_instance_system_type']);
     }
 
     /**
@@ -132,7 +134,8 @@ class draft_bank {
 
         if (self::uses_module_question_banks()) {
             $course = get_course($courseid);
-            $cm = \core_question\local\bank\question_bank_helper::get_default_open_instance_system_type(
+            $cm = call_user_func(
+                [self::QBANK_HELPER, 'get_default_open_instance_system_type'],
                 $course,
                 true
             );
