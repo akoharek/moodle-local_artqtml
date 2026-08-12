@@ -82,7 +82,7 @@ jobs:
 
     steps:
       - name: Check out plugin
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           path: plugin
 
@@ -266,7 +266,7 @@ jobs:
 
     steps:
       - name: Check out plugin
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           path: plugin
 
