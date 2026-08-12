@@ -2,9 +2,11 @@
 
 Public tracker: https://github.com/akoharek/moodle-local_artqtml/issues
 
-When someone opens a new issue, GitHub Actions can notify maintainers via **Microsoft Teams** (preferred) and optionally **email**. Alerts run only on this public Light repo. Missing secrets skip with a warning and do not fail other CI.
+When someone opens, edits, closes, labels, or otherwise changes an issue, GitHub Actions can notify maintainers via **Microsoft Teams** (preferred) and optionally **email**. Alerts run only on this public Light repo. Missing secrets skip with a warning and do not fail other CI.
 
-Workflow: [`.github/workflows/notify-new-issue.yml`](.github/workflows/notify-new-issue.yml)
+Workflow: [`.github/workflows/notify-issue.yml`](.github/workflows/notify-issue.yml)
+
+Covered issue events: `opened`, `edited`, `closed`, `reopened`, `labeled`, `unlabeled`, `assigned`, `unassigned`, `locked`, `unlocked`, `milestoned`, `demilestoned`, `transferred`, `pinned`, `unpinned` (`deleted` is skipped).
 
 ## Microsoft Teams (Incoming Webhook)
 
@@ -17,7 +19,7 @@ Workflow: [`.github/workflows/notify-new-issue.yml`](.github/workflows/notify-ne
 6. Name: `TEAMS_WEBHOOK_URL` (alternate accepted name: `MS_TEAMS_WEBHOOK_URL`).
 7. Value: paste the webhook URL → **Add secret**.
 
-After that, opening a test issue should post a MessageCard (title, URL, author, labels, body excerpt).
+After that, any covered issue action should post a MessageCard (action, title, URL, actor, labels, body excerpt).
 
 ## Email (optional)
 
