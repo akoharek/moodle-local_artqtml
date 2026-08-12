@@ -10,8 +10,10 @@ easy / medium / hard; thin admin.
 
 **HQ review docs: positive scope only**
 
-- README and SUPPORT describe what ships (paste/TXT, IH/FE/SR, BYOK, tracker) with
-  no absence lists or dual-product wording.
+- README describes what ships (paste/TXT, IH/FE/SR, BYOK, tracker + reviewer smoke)
+  with no absence lists or dual-product wording.
+- Delete redundant `SUPPORT.md` (tracker/BYOK live in README; Teams/SMTP setup is
+  maintainer-only and not required for Marketplace).
 - Delete in-repo `BACKLOG.md` and `CLAUDE.md` (dev clutter).
 - `COPYRIGHT.txt` title simplified to `ArtQTML (local_artqtml)`.
 - Neutralize remaining product-variant hints in comments, lang strings, and tests.
@@ -41,7 +43,7 @@ easy / medium / hard; thin admin.
 - User-facing EN/HU strings and reviewer docs aligned with paste + `.txt` and
   IH/FE/SR only.
 - Dead unused language keys removed from the lang packs shipped in the repo.
-- README / SUPPORT clarify BYOK smoke path for Moodle.org review.
+- README clarifies BYOK smoke path for Moodle.org review.
 
 ## 2026-08-12 — `2026081200` (1.0.0)
 
