@@ -124,8 +124,8 @@ class draft_role {
     public static function grant(int $userid): bool {
         global $DB;
 
-        $contextid = draft_bank::get_draft_context_id();
-        if ($contextid === null) {
+        $coursecontext = draft_bank::get_draft_course_context();
+        if ($coursecontext === null) {
             return false;
         }
 
@@ -134,11 +134,11 @@ class draft_role {
         $exists = $DB->record_exists('role_assignments', [
             'roleid'    => $roleid,
             'userid'    => $userid,
-            'contextid' => $contextid,
+            'contextid' => $coursecontext->id,
         ]);
 
         if (!$exists) {
-            role_assign($roleid, $userid, $contextid);
+            role_assign($roleid, $userid, $coursecontext->id);
         }
 
         return true;

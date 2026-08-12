@@ -36,13 +36,43 @@ class question_bank_list {
      * @return array<string,string> "categoryid,contextid" => display label
      */
     public static function options_for_user(int $userid, int $excludecategoryid = 0): array {
-        global $DB;
-
         $options = [];
+
+        if (draft_bank::uses_module_question_banks()) {
+            // Moodle 5.1+: categories live in mod_qbank (and other shareable bank) module contexts.
+            $notincourseids = [];
+            if (draft_bank::is_configured()) {
+                $draftcourseid = draft_bank::get_draft_courseid();
+                if ($draftcourseid !== null) {
+                    $notincourseids[] = $draftcourseid;
+                }
+            }
+
+            $banks = call_user_func(
+                ['core_question\\local\\bank\\question_bank_helper', 'get_activity_instances_with_shareable_questions'],
+                [],
+                $notincourseids
+            );
+            foreach ($banks as $bank) {
+                $modcontext = \context_module::instance($bank->cminfo->id);
+                if (!has_capability('moodle/question:add', $modcontext, $userid)) {
+                    continue;
+                }
+                $grouplabel = format_string($bank->cminfo->get_course()->fullname);
+                self::append_categories($options, $modcontext, $excludecategoryid, $grouplabel);
+            }
+
+            return $options;
+        }
 
         $systemcontext = \context_system::instance();
         if (has_capability('moodle/question:add', $systemcontext, $userid)) {
-            self::append_categories($options, $systemcontext, $excludecategoryid, \context_helper::get_level_name(CONTEXT_SYSTEM));
+            self::append_categories(
+                $options,
+                $systemcontext,
+                $excludecategoryid,
+                \context_helper::get_level_name(CONTEXT_SYSTEM)
+            );
         }
 
         // Core's enrol_get_users_courses() only returns courses the user is enrolled in, which misses
@@ -81,8 +111,18 @@ class question_bank_list {
         // (aiquizgen_draft_*, artqtm_draft_*) that share the same course. Skipping the whole
         // context is stronger than filtering one root's children, which previously leaked
         // hundreds of legacy draft categories into the approve-page dropdown.
-        if (draft_bank::is_configured() && $context->id === draft_bank::get_draft_context_id()) {
-            return;
+        if (draft_bank::is_configured()) {
+            $draftcourseid = draft_bank::get_draft_courseid();
+            if (
+                $draftcourseid !== null
+                && (int) $context->contextlevel === CONTEXT_COURSE
+                && (int) $context->instanceid === (int) $draftcourseid
+            ) {
+                return;
+            }
+            if ($context->id === draft_bank::get_draft_context_id()) {
+                return;
+            }
         }
 
         $categories = $DB->get_records('question_categories', ['contextid' => $context->id], 'sortorder, name');

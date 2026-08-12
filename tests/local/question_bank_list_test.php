@@ -46,25 +46,24 @@ final class question_bank_list_test extends \advanced_testcase {
         $this->getDataGenerator()->enrol_user($teacher->id, $draftcourse->id, 'editingteacher');
         $this->getDataGenerator()->enrol_user($teacher->id, $realcourse->id, 'editingteacher');
 
-        $draftcontext = \context_course::instance($draftcourse->id);
-        $realcontext = \context_course::instance($realcourse->id);
-
         require_once($CFG->libdir . '/questionlib.php');
 
         // Light's own draft root + a legacy sibling root (as Full / aiquizgen leave behind).
         $lightroot = draft_bank::get_root_category_id();
+        $draftqcontextid = (int) draft_bank::get_draft_context_id();
         $lightdraft = draft_bank::create((object) [
             'id' => 99,
             'name' => 'Light draft gen',
             'shortname' => 'LGD1',
         ]);
 
-        $top = question_get_top_category($draftcontext->id, true);
+        $top = question_get_top_category($draftqcontextid, true);
+        $this->assertNotFalse($top);
         $topcategoryid = (int) $top->id;
 
         $legacyroot = (object) [
             'name' => 'AI Quiz Generator',
-            'contextid' => $draftcontext->id,
+            'contextid' => $draftqcontextid,
             'info' => '',
             'infoformat' => FORMAT_HTML,
             'stamp' => make_unique_id_code(),
@@ -75,7 +74,7 @@ final class question_bank_list_test extends \advanced_testcase {
         $legacyrootid = (int) $DB->insert_record('question_categories', $legacyroot);
         $legacydraft = (object) [
             'name' => 'AI draft: Legacy leftover',
-            'contextid' => $draftcontext->id,
+            'contextid' => $draftqcontextid,
             'info' => '',
             'infoformat' => FORMAT_HTML,
             'stamp' => make_unique_id_code(),
@@ -87,22 +86,23 @@ final class question_bank_list_test extends \advanced_testcase {
 
         /** @var \core_question_generator $questiongenerator */
         $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
+        // Pass course context; on Moodle 5.1+ the generator remaps into a mod_qbank module context.
         $realtarget = $questiongenerator->create_question_category([
-            'contextid' => $realcontext->id,
+            'contextid' => \context_course::instance($realcourse->id)->id,
             'name' => 'Course default',
         ]);
 
         $options = question_bank_list::options_for_user((int) $teacher->id, $lightdraft);
 
         $this->assertArrayHasKey(
-            $realtarget->id . ',' . $realcontext->id,
+            $realtarget->id . ',' . $realtarget->contextid,
             $options,
             'real course categories must remain selectable move targets'
         );
-        $this->assertArrayNotHasKey($lightroot . ',' . $draftcontext->id, $options);
-        $this->assertArrayNotHasKey($lightdraft . ',' . $draftcontext->id, $options);
-        $this->assertArrayNotHasKey($legacyrootid . ',' . $draftcontext->id, $options);
-        $this->assertArrayNotHasKey($legacydraftid . ',' . $draftcontext->id, $options);
+        $this->assertArrayNotHasKey($lightroot . ',' . $draftqcontextid, $options);
+        $this->assertArrayNotHasKey($lightdraft . ',' . $draftqcontextid, $options);
+        $this->assertArrayNotHasKey($legacyrootid . ',' . $draftqcontextid, $options);
+        $this->assertArrayNotHasKey($legacydraftid . ',' . $draftqcontextid, $options);
 
         foreach ($options as $label) {
             $this->assertStringNotContainsString(

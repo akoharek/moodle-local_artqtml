@@ -24,13 +24,11 @@
  * contents directly via the qtype API rather than the slower "move to recycle bin" flow real
  * question bank deletions use.
  *
- * Jov-023: draft categories live in the admin-configured draft course's own context, not
- * context_system - a course context is what actually keeps unreviewed AI content away from
- * ordinary question bank browsing (any user with question-bank capabilities *anywhere* at
- * system level, which on some sites is broader than just admins/managers, could browse system
- * context; a dedicated, unenrolled course's context is only reachable by admins/managers by
- * construction, same as before, but now for an architecturally real reason instead of an
- * incidental default-capability one).
+ * Jov-023: draft categories live under the admin-configured draft course, not context_system —
+ * that keeps unreviewed AI content away from ordinary question bank browsing. On Moodle 4.5
+ * that means the course context; on Moodle 5.1+ core only allows question categories in
+ * CONTEXT_MODULE (mod_qbank), so we create/reuse the course's system-type qbank activity and
+ * store drafts there instead.
  *
  * @package    local_artqtml
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -86,28 +84,76 @@ class draft_bank {
     }
 
     /**
-     * The admin-configured draft course's context (Jov-023).
-     *
-     * @return \context_course
-     * @throws \moodle_exception if unset or the course no longer exists - callers are expected
-     *      to have already blocked starting a new generation in that case via
-     *      {@see self::is_configured()}, so reaching here means something raced past that check
+     * Fully-qualified class name for Moodle 5.1+ question bank helper (string — not a hard
+     * dependency so PHPStan on Moodle 4.5 still analyses cleanly).
      */
-    protected static function get_draft_context(): \context_course {
+    private const QBANK_HELPER = 'core_question\\local\\bank\\question_bank_helper';
+
+    /**
+     * Whether this Moodle build stores question banks in mod_qbank module contexts (5.1+).
+     *
+     * @return bool
+     */
+    public static function uses_module_question_banks(): bool {
+        return is_callable([self::QBANK_HELPER, 'get_default_open_instance_system_type']);
+    }
+
+    /**
+     * Course context of the configured draft course (roles / course:view).
+     *
+     * Distinct from {@see self::get_draft_context()}: on Moodle 5.1+ question categories live in
+     * a mod_qbank module context, but the draft-editing role is still assigned at course level.
+     *
+     * @return \context_course|null
+     */
+    public static function get_draft_course_context(): ?\context_course {
         $courseid = self::get_draft_courseid();
         if ($courseid === null) {
-            throw new \moodle_exception('errordraftcoursenotconfigured', 'local_artqtml');
+            return null;
         }
 
         return \context_course::instance($courseid);
     }
 
     /**
-     * The admin-configured draft course's context id (Jov-023).
+     * Context where draft question categories are stored (Jov-023).
+     *
+     * Moodle 4.5: the draft course context. Moodle 5.1+: the draft course's system-type
+     * mod_qbank activity (created on first use).
+     *
+     * @return \context
+     * @throws \moodle_exception if unset or the course no longer exists - callers are expected
+     *      to have already blocked starting a new generation in that case via
+     *      {@see self::is_configured()}, so reaching here means something raced past that check
+     */
+    protected static function get_draft_context(): \context {
+        $courseid = self::get_draft_courseid();
+        if ($courseid === null) {
+            throw new \moodle_exception('errordraftcoursenotconfigured', 'local_artqtml');
+        }
+
+        if (self::uses_module_question_banks()) {
+            $course = get_course($courseid);
+            $cm = call_user_func(
+                [self::QBANK_HELPER, 'get_default_open_instance_system_type'],
+                $course,
+                true
+            );
+            if ($cm === null) {
+                throw new \moodle_exception('errordraftcoursenotconfigured', 'local_artqtml');
+            }
+
+            return \context_module::instance($cm->id);
+        }
+
+        return \context_course::instance($courseid);
+    }
+
+    /**
+     * Context id where draft question categories live (Jov-023).
      *
      * Public: {@see \local_artqtml\local\question_bank_list} needs this to recognise the draft
-     * course's context when enumerating a user's move-target categories, so it can exclude the
-     * whole draft-bank subtree from that list regardless of which context it's currently walking.
+     * bank when enumerating move-target categories.
      *
      * @return int|null null if no draft course is configured - callers must check
      *      {@see self::is_configured()} first
@@ -185,6 +231,9 @@ class draft_bank {
 
         $draftcontext = self::get_draft_context();
         $top = question_get_top_category($draftcontext->id, true);
+        if (!$top) {
+            throw new \moodle_exception('errordraftcoursenotconfigured', 'local_artqtml');
+        }
 
         // Looked up by idnumber, never by name. The name is a lang string, so it changes with the
         // site's interface language - and the lookup then fails to find a category this plugin
@@ -197,7 +246,7 @@ class draft_bank {
         // idnumber was already there, already fixed, already the stable identifier - it just was
         // not what the code searched on.
         $existing = $DB->get_record('question_categories', [
-            'contextid' => $top->contextid,
+            'contextid' => $draftcontext->id,
             'idnumber'  => self::ROOT_IDNUMBER,
         ]);
 
@@ -206,7 +255,7 @@ class draft_bank {
             // written in whatever language was active that day. Adopt it and stamp the idnumber on,
             // rather than creating a second root beside it.
             $existing = $DB->get_record('question_categories', [
-                'contextid' => $top->contextid,
+                'contextid' => $draftcontext->id,
                 'parent'    => $top->id,
                 'name'      => get_string('draftrootcategoryname', 'local_artqtml'),
             ]);
@@ -222,7 +271,7 @@ class draft_bank {
 
         $record = new \stdClass();
         $record->name = get_string('draftrootcategoryname', 'local_artqtml');
-        $record->contextid = $top->contextid;
+        $record->contextid = $draftcontext->id;
         $record->info = get_string('draftcategoryinfo', 'local_artqtml');
         $record->infoformat = FORMAT_HTML;
         $record->stamp = make_unique_id_code();
