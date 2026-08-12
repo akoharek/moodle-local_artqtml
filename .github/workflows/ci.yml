@@ -125,9 +125,28 @@ jobs:
 
       # BL-36: AMD source and build must stay in step. Node version comes from Moodle's
       # .nvmrc via moodle-plugin-ci — not a second pin in this file.
+      #
+      # Moodle 5.1+ installs plugins under public/ (MDL-83424); 4.5 keeps local/. Resolve
+      # the path once so grunt/phpstan work on every matrix cell.
       - name: AMD build is in step with its source
         working-directory: ${{ github.workspace }}/moodle
         run: |
+          PLUGIN_DIR=""
+          for cand in local/artqtml public/local/artqtml; do
+            if [ -d "$cand" ]; then
+              PLUGIN_DIR="$cand"
+              break
+            fi
+          done
+          if [ -z "$PLUGIN_DIR" ]; then
+            echo "::error::Plugin directory not found (tried local/artqtml and public/local/artqtml)."
+            ls -la local 2>/dev/null || true
+            ls -la public/local 2>/dev/null || true
+            exit 1
+          fi
+          echo "PLUGIN_DIR=$PLUGIN_DIR" >> "$GITHUB_ENV"
+          echo "Using plugin path: $PLUGIN_DIR"
+
           node_version="$(node --version)"
           echo "node: $node_version (Moodle .nvmrc: $(cat .nvmrc 2>/dev/null || echo 'missing'))"
           case "$node_version" in
@@ -136,17 +155,17 @@ jobs:
                     "The .nvmrc says $(cat .nvmrc 2>/dev/null || echo 'missing') - the toolchain install did not honour it."
                exit 1 ;;
           esac
-          npx grunt amd --root=local/artqtml
+          npx grunt amd --root="$PLUGIN_DIR"
           # Copy the freshly built files back over the checkout before comparing. Where
           # moodle-plugin-ci symlinked the plugin this is a no-op; where it copied, it is what makes
           # the comparison mean anything at all.
-          cp -R local/artqtml/amd/build/. "${{ github.workspace }}/plugin/amd/build/"
+          cp -R "$PLUGIN_DIR/amd/build/." "${{ github.workspace }}/plugin/amd/build/"
       - name: Fail if the committed AMD build is stale
         working-directory: ${{ github.workspace }}/plugin
         run: |
           if ! git diff --exit-code -- amd/build; then
             echo "::error::amd/build does not match amd/src." \
-                 "Run: cd \$MOODLE_ROOT/local/artqtml && ../../node_modules/.bin/grunt amd" \
+                 "Run grunt amd against the plugin under Moodle (local/ or public/local/ on 5.1+)" \
                  "and commit the result."
             exit 1
           fi
@@ -173,15 +192,28 @@ jobs:
         env:
           PHPSTAN_VERSION: 2.2.5
         run: |
+          PLUGIN_DIR="${PLUGIN_DIR:-}"
+          if [ -z "$PLUGIN_DIR" ]; then
+            for cand in local/artqtml public/local/artqtml; do
+              if [ -d "$cand" ]; then
+                PLUGIN_DIR="$cand"
+                break
+              fi
+            done
+          fi
+          if [ -z "$PLUGIN_DIR" ] || [ ! -d "$PLUGIN_DIR" ]; then
+            echo "::error::Plugin directory not found for PHPStan."
+            exit 1
+          fi
           DEVTOOLS_BIN="${{ github.workspace }}/plugin/tools/devtools/vendor/bin/phpstan"
-          if [ ! -d local/artqtml/tools/devtools/vendor ]; then
-            mkdir -p local/artqtml/tools/devtools
+          if [ ! -d "$PLUGIN_DIR/tools/devtools/vendor" ]; then
+            mkdir -p "$PLUGIN_DIR/tools/devtools"
             cp -a "${{ github.workspace }}/plugin/tools/devtools/vendor" \
-              local/artqtml/tools/devtools/
+              "$PLUGIN_DIR/tools/devtools/"
           fi
           php "$DEVTOOLS_BIN" --version
           php -d memory_limit=2G "$DEVTOOLS_BIN" analyse \
-            --configuration=local/artqtml/phpstan.neon --no-progress
+            --configuration="$PLUGIN_DIR/phpstan.neon" --no-progress
 
   # ---------------------------------------------------------------------------
   # PHPUnit: full Moodle install, then the plugin's test suite.
