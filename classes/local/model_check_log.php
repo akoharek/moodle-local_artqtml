@@ -105,8 +105,11 @@ class model_check_log {
             // Reserved word and would be unusable from the Configurable Reports queries this table
             // Exists to serve.
             'triggertype'  => $trigger,
-            'pluginversion' => (int) get_config('local_artqtml', 'version'),
         ];
+
+        if (self::has_pluginversion_column()) {
+            $record->pluginversion = (int) get_config('local_artqtml', 'version');
+        }
 
         $id = (int) $DB->insert_record(self::TABLE, $record);
 
@@ -153,19 +156,7 @@ class model_check_log {
      * @return array{checked: int, failed: int, timecreated: int}|null null if never checked
      */
     public static function latest_sweep(string $provider): ?array {
-        global $DB;
-
-        $rows = $DB->get_records_select(
-            self::TABLE,
-            'provider = :provider AND checktype = :checktype AND pluginversion = :version',
-            [
-                'provider'  => self::stored_provider($provider),
-                'checktype' => self::CHECK_STRUCTURE,
-                'version'   => (int) get_config('local_artqtml', 'version'),
-            ],
-            'timecreated DESC, id DESC',
-            'id, model, result, timecreated'
-        );
+        $rows = self::structure_rows_for_current_version($provider, 'timecreated DESC, id DESC');
         if (!$rows) {
             return null;
         }
@@ -210,19 +201,7 @@ class model_check_log {
      * @return string[] model ids, empty when nothing has been excluded
      */
     public static function excluded_models(string $provider): array {
-        global $DB;
-
-        $rows = $DB->get_records_select(
-            self::TABLE,
-            'provider = :provider AND checktype = :checktype AND pluginversion = :version',
-            [
-                'provider'  => self::stored_provider($provider),
-                'checktype' => self::CHECK_STRUCTURE,
-                'version'   => (int) get_config('local_artqtml', 'version'),
-            ],
-            'timecreated ASC, id ASC',
-            'id, model, result, timecreated'
-        );
+        $rows = self::structure_rows_for_current_version($provider, 'timecreated ASC, id ASC');
 
         $latest = [];
         foreach ($rows as $row) {
@@ -240,6 +219,50 @@ class model_check_log {
         }
 
         return $excluded;
+    }
+
+    /**
+     * Whether local_artqtml_modelcheck.pluginversion is present.
+     *
+     * Existing sites can be missing the column until upgrade 2026081300. The settings page must
+     * Not query it until then.
+     *
+     * @return bool
+     */
+    private static function has_pluginversion_column(): bool {
+        global $DB;
+
+        return $DB->get_manager()->field_exists(self::TABLE, 'pluginversion');
+    }
+
+    /**
+     * Structure-check rows for the installed plugin version.
+     *
+     * Returns no rows when the version column is missing, so the settings page treats the
+     * Sweep as not-yet-run rather than failing on a pending upgrade.
+     *
+     * @param string $provider one of model_list::PROVIDERS
+     * @param string $sort
+     * @return \stdClass[]
+     */
+    private static function structure_rows_for_current_version(string $provider, string $sort): array {
+        global $DB;
+
+        if (!self::has_pluginversion_column()) {
+            return [];
+        }
+
+        return $DB->get_records_select(
+            self::TABLE,
+            'provider = :provider AND checktype = :checktype AND pluginversion = :version',
+            [
+                'provider'  => self::stored_provider($provider),
+                'checktype' => self::CHECK_STRUCTURE,
+                'version'   => (int) get_config('local_artqtml', 'version'),
+            ],
+            $sort,
+            'id, model, result, timecreated'
+        );
     }
 
     /**

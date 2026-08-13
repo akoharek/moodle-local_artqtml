@@ -17,11 +17,8 @@
 /**
  * Upgrade steps for local_artqtml.
  *
- * New plugin identity: no prior migration history to carry forward.
- * Schema is created from install.xml only.
- *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /**
@@ -31,5 +28,22 @@
  * @return bool always true
  */
 function xmldb_local_artqtml_upgrade($oldversion) {
+    global $DB;
+
+    $dbman = $DB->get_manager();
+
+    if ($oldversion < 2026081300) {
+        // Pluginversion scopes a model-check exclusion to the plugin version that produced it.
+        // Fresh installs get it from install.xml; existing sites (and aiquizgen renames that
+        // restore a table without the column) need this add-field.
+        $table = new xmldb_table('local_artqtml_modelcheck');
+        $field = new xmldb_field('pluginversion', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'triggertype');
+        if ($dbman->table_exists($table) && !$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026081300, 'local', 'artqtml');
+    }
+
     return true;
 }

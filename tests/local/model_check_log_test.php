@@ -294,4 +294,36 @@ final class model_check_log_test extends \advanced_testcase {
 
         $this->assertSame([], $offenders, 'forbids automatic purging of the diagnostic log');
     }
+
+    /**
+     * Existing sites skip install.xml. A savepoint must add pluginversion or the settings page
+     * Fails after a ZIP upgrade.
+     */
+    public function test_upgrade_adds_pluginversion(): void {
+        $upgrade = file_get_contents(__DIR__ . '/../../db/upgrade.php');
+
+        $this->assertMatchesRegularExpression(
+            '/if\s*\(\s*\$oldversion\s*<\s*2026081300\s*\).*pluginversion.*upgrade_plugin_savepoint\s*\(\s*true\s*,\s*2026081300/s',
+            $upgrade,
+            'db/upgrade.php must add pluginversion at savepoint 2026081300'
+        );
+    }
+
+    /**
+     * The aiquizgen rename drops the install.xml table (which has the column) and restores the
+     * Old one. Install must add the field afterwards.
+     */
+    public function test_install_adds_pluginversion_after_rename(): void {
+        $install = file_get_contents(__DIR__ . '/../../db/install.php');
+
+        $this->assertStringContainsString(
+            'migrate_if_needed()',
+            $install
+        );
+        $this->assertMatchesRegularExpression(
+            '/migrate_if_needed\(\).*pluginversion.*add_field/s',
+            $install,
+            'db/install.php must add pluginversion after the aiquizgen table rename'
+        );
+    }
 }
