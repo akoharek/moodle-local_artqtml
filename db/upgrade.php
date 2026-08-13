@@ -45,5 +45,16 @@ function xmldb_local_artqtml_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026081300, 'local', 'artqtml');
     }
 
+    if ($oldversion < 2026081301) {
+        // API keys were stored as plaintext until encryption-at-rest was added. Leftover
+        // values have no sodium:/openssl- prefix, so decrypt() throws encryption_wrongmethod
+        // and the admin UI showed empty — the key looked lost. Re-encrypt in place so the
+        // value survives the upgrade. Ciphertext that fails integrity cannot be recovered;
+        // encrypted_config records a one-time admin notice to re-enter those keys.
+        \local_artqtml\local\encrypted_config::migrate_plaintext_on_upgrade();
+
+        upgrade_plugin_savepoint(true, 2026081301, 'local', 'artqtml');
+    }
+
     return true;
 }

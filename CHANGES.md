@@ -3,6 +3,41 @@
 Newest release first. Version numbers match `version.php` `$plugin->version`;
 the number in parentheses is `$plugin->release`.
 
+## 2026-08-13 — `2026081303` (1.0.0)
+
+**Admin API-key Save: empty password field no longer wipes the stored key**
+
+- Saving plugin settings with a blank Claude/Gemini key field (password inputs POST empty when
+  the administrator does not retype the value, and after decrypt failure the UI already shows
+  empty) left the stored ciphertext unchanged. Previously `write_setting('')` wrote an empty
+  config row and deleted a still-valid or leftover key.
+- Entering a new key still encrypts and replaces the stored value. There is no separate
+  'clear key' control.
+
+## 2026-08-13 — `2026081302` (1.0.0)
+
+**Admin API-key notice + status Retry/Back layout**
+
+- Missing or unreadable Claude/Gemini keys now show a persistent red banner to
+  `local/artqtml:configure` / site admins on plugin pages, not only as a debugging() line or a
+  one-shot session flash on settings.
+- Generation start and status Retry refuse immediately when a key is empty or cannot be decrypted,
+  so the teacher is not left waiting on cron.
+- Status failed-actions: Retry and Back sit in `.artqtml-buttonrow` (flex + gap) instead of
+  overlapping.
+
+## 2026-08-13 — `2026081301` (1.0.0)
+
+**Upgrade: migrate leftover plaintext API keys; stop dropping unreadable ciphertext silently**
+
+- Stored Claude/Gemini keys with no Moodle encryption prefix (`sodium:` / `openssl-aes-256-ctr:`)
+  are re-encrypted in place on upgrade and on read, so introducing encryption-at-rest does not
+  empty the admin field.
+- Ciphertext that fails integrity (site sodium key changed) cannot be recovered by anyone,
+  including Moodle. The UI stays empty, `debugging()` runs once per setting (not on every
+  `/admin/index.php` load), and a persistent admin notice asks for the keys to be re-entered
+  from the Anthropic / Google dashboards.
+
 ## 2026-08-13 — `2026081300` (1.0.0)
 
 **Model-check schema: add `pluginversion` on upgrade**
