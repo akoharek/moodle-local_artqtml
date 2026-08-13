@@ -47,9 +47,10 @@ class encrypted_config {
      * @return bool
      */
     public static function is_encrypted_value(string $value): bool {
-        $methods = preg_quote(\core\encryption::METHOD_OPENSSL, '~') . '|' .
-            preg_quote(\core\encryption::METHOD_SODIUM, '~');
-        return (bool) preg_match('~^(' . $methods . '):~', $value);
+        // String prefixes: METHOD_OPENSSL was removed in Moodle 5.1, but leftover
+        // openssl-aes-256-ctr: rows can still exist. Do not reference the constant.
+        return str_starts_with($value, 'sodium:')
+            || str_starts_with($value, 'openssl-aes-256-ctr:');
     }
 
     /**
