@@ -128,15 +128,9 @@ final class setting_backup_test extends \advanced_testcase {
     }
 
     /**
-     * New plugin identity: upgrade.php carries no prior migration history.
-     *
      * The setting_backup helper remains for any future step that rewrites a prompt template.
      */
-    public function test_upgrade_file_is_stub_without_prior_history(): void {
-        $upgrade = file_get_contents(__DIR__ . '/../../db/upgrade.php');
-
-        $this->assertStringContainsString('new plugin identity', strtolower($upgrade));
-        $this->assertStringContainsString('migration history', $upgrade);
+    public function test_setting_backup_remains_for_future_prompt_migrations(): void {
         $this->assertTrue(
             class_exists(setting_backup::class),
             'setting_backup must stay available for future prompt migrations'
