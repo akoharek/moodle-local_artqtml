@@ -158,6 +158,7 @@ $eligibleforapproval = approve_page_data::eligible_for_approval($generationid);
 
 echo $OUTPUT->header();
 echo local_artqtml_model_warning_banner();
+echo local_artqtml_apikey_decrypt_notice();
 echo local_artqtml_owner_warning_banner($generation);
 echo html_writer::tag('p', format_string($generation->name), [
     'data-testid' => 'artqtml-approve-generationname',

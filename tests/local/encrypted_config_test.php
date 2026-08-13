@@ -157,6 +157,28 @@ final class encrypted_config_test extends \advanced_testcase {
     }
 
     /**
+     * Missing keys and unreadable ciphertext both count as unusable.
+     */
+    public function test_any_unusable_detects_empty_and_unreadable(): void {
+        $this->resetAfterTest();
+
+        unset_config('claudeapikey', 'local_artqtml');
+        unset_config('geminiapikey', 'local_artqtml');
+        $this->assertTrue(encrypted_config::any_unusable());
+        $this->assertDebuggingNotCalled();
+
+        set_config('claudeapikey', \core\encryption::encrypt('sk-ant-ok'), 'local_artqtml');
+        set_config('geminiapikey', \core\encryption::encrypt('gemini-ok'), 'local_artqtml');
+        $this->assertFalse(encrypted_config::any_unusable());
+        $this->assertDebuggingNotCalled();
+
+        $bogus = 'sodium:' . base64_encode(random_bytes(SODIUM_CRYPTO_SECRETBOX_NONCEBYTES + 32));
+        set_config('geminiapikey', $bogus, 'local_artqtml');
+        $this->assertTrue(encrypted_config::any_unusable());
+        $this->assertDebuggingCalled();
+    }
+
+    /**
      * Sites at 2026081300 still need the plaintext-key migration savepoint.
      */
     public function test_upgrade_migrates_api_keys_at_2026081301(): void {

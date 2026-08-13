@@ -231,19 +231,26 @@ function local_artqtml_setting_backup_notice(): string {
 }
 
 /**
- * Persistent notice when stored API keys cannot be decrypted (site encryption key mismatch).
+ * Persistent notice when Claude/Gemini API keys are missing or cannot be decrypted.
  *
- * Unlike the setting-backup notice this is not cleared on display: it stays until the
- * administrator re-saves a valid key. Shown only to users who can configure the plugin.
+ * A red banner, not a one-shot session flash, and not debugging()-only. Shown only to users
+ * who can fix it (local/artqtml:configure or moodle/site:config). Teachers on the generation
+ * list do not see it.
  *
- * @return string HTML, or '' when every stored key is readable or empty
+ * Not cleared on display: it stays until both keys decrypt to a non-empty value.
+ *
+ * @return string HTML, or '' when both stored keys are readable
  */
 function local_artqtml_apikey_decrypt_notice(): string {
-    if (!has_capability('local/artqtml:configure', context_system::instance())) {
+    $sysctx = context_system::instance();
+    if (
+        !has_capability('local/artqtml:configure', $sysctx)
+        && !has_capability('moodle/site:config', $sysctx)
+    ) {
         return '';
     }
 
-    if (empty(\local_artqtml\local\encrypted_config::failed_names())) {
+    if (!\local_artqtml\local\encrypted_config::any_unusable()) {
         return '';
     }
 
@@ -252,6 +259,25 @@ function local_artqtml_apikey_decrypt_notice(): string {
         'alert alert-danger',
         ['data-testid' => 'artqtml-apikey-decrypt-notice']
     );
+}
+
+/**
+ * Error shown when generation is refused because an API key is missing or unreadable.
+ *
+ * Administrators get the re-enter banner copy; teachers get the generic contact-admin string.
+ *
+ * @return string
+ */
+function local_artqtml_apikey_start_error(): string {
+    $sysctx = context_system::instance();
+    if (
+        has_capability('local/artqtml:configure', $sysctx)
+        || has_capability('moodle/site:config', $sysctx)
+    ) {
+        return get_string('apikeyupgradeunrecoverable', 'local_artqtml');
+    }
+
+    return get_string('errormissingapikey', 'local_artqtml');
 }
 
 /**

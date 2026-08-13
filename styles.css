@@ -76,6 +76,22 @@ so it never breaks a word that would have fitted on a line of its own.
     max-width: 100%;
 }
 
+/*
+ * Status failed-actions: Moodle's .singlebutton wraps a block-level <form>. Pairing that with
+ * an adjacent .btn and leftover d-inline / mr-2 classes made Retry and Back overlap. Flex + gap
+ * keeps them side by side, wrapping on narrow viewports.
+ */
+.path-local-artqtml .artqtml-buttonrow .singlebutton,
+.path-local-artqtml .artqtml-buttonrow .singlebutton form,
+.path-local-artqtml .artqtml-buttonrow .singlebutton div {
+    display: flex;
+    margin: 0;
+}
+
+.path-local-artqtml [data-region="error"] .artqtml-buttonrow {
+    align-items: center;
+}
+
 .artqtml-bulkmove {
     align-items: center;
     padding-top: 0.75rem;

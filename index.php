@@ -39,6 +39,7 @@ $PAGE->set_heading(get_string('pageheading', 'local_artqtml'));
 
 echo $OUTPUT->header();
 echo local_artqtml_model_warning_banner();
+echo local_artqtml_apikey_decrypt_notice();
 // Shown once after an upgrade backed up an admin-editable setting.
 echo local_artqtml_setting_backup_notice();
 echo html_writer::tag('p', get_string('pageintro', 'local_artqtml'));
