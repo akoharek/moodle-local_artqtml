@@ -31,8 +31,9 @@ use local_artqtml\local\validation_panel;
  */
 class hook_callbacks {
     /**
-     * Only ever adds HTML on /question/bank/editquestion/question.php for a question that has
-     * A matching local_artqtml_questions row - a cheap no-op everywhere else.
+     * Only ever adds HTML on /question/bank/editquestion/question.php for a still-in-draft
+     * question that has a matching local_artqtml_questions row. Moved questions open the core
+     * editor with no plugin extras. Cheap no-op everywhere else.
      *
      * @param before_standard_top_of_body_html_generation $hook
      * @return void

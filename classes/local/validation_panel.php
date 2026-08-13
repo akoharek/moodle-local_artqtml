@@ -43,8 +43,13 @@ class validation_panel {
         global $DB;
 
         $row = $DB->get_record('local_artqtml_questions', ['questionbankid' => $questionbankid], '*', IGNORE_MISSING);
+        if (!$row || !empty($row->movedout)) {
+            // After move the question belongs to Moodle's bank. Core question.php must not
+            // carry the plugin validation overlay.
+            return null;
+        }
 
-        return $row ?: null;
+        return $row;
     }
 
     /**

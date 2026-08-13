@@ -191,40 +191,52 @@ class approve_renderer {
 
             $actions = [];
             if (!empty($question->questionbankid) && $candrafteditquestions) {
-                // Moodle 4.5: courseid (draft course). Moodle 5.1+: required cmid for mod_qbank.
-                $editparams = approve_page_data::question_edit_url_params(
-                    (int) $question->questionbankid,
-                    $pageurl
-                );
-                $editurl = new \moodle_url('/question/bank/editquestion/question.php', $editparams);
-                if ((int) $creator->id === (int) $USER->id) {
-                    $actions[] = \html_writer::link($editurl, get_string('actionedit', 'local_artqtml'), [
-                        'data-testid' => 'artqtml-approve-edit-link',
-                    ]);
+                if ($question->movedout) {
+                    // After move: Open the destination question-bank listing. No Edit, no Preview.
+                    $bankurl = approve_page_data::question_bank_url((int) $question->questionbankid);
+                    if ($bankurl) {
+                        $actions[] = \html_writer::link(
+                            $bankurl,
+                            get_string('actionopenquestion', 'local_artqtml'),
+                            ['data-testid' => 'artqtml-approve-open-link']
+                        );
+                    }
                 } else {
-                    $actions[] = $output->action_link(
-                        $editurl,
-                        get_string('actionedit', 'local_artqtml'),
-                        new \confirm_action(
-                            get_string('confirmeditothersquestion', 'local_artqtml', fullname($creator))
-                        ),
-                        ['data-testid' => 'artqtml-approve-edit-link']
+                    // Moodle 4.5: courseid (draft course). Moodle 5.1+: required cmid for mod_qbank.
+                    $editparams = approve_page_data::question_edit_url_params(
+                        (int) $question->questionbankid,
+                        $pageurl
                     );
-                }
+                    $editurl = new \moodle_url('/question/bank/editquestion/question.php', $editparams);
+                    if ((int) $creator->id === (int) $USER->id) {
+                        $actions[] = \html_writer::link($editurl, get_string('actionedit', 'local_artqtml'), [
+                            'data-testid' => 'artqtml-approve-edit-link',
+                        ]);
+                    } else {
+                        $actions[] = $output->action_link(
+                            $editurl,
+                            get_string('actionedit', 'local_artqtml'),
+                            new \confirm_action(
+                                get_string('confirmeditothersquestion', 'local_artqtml', fullname($creator))
+                            ),
+                            ['data-testid' => 'artqtml-approve-edit-link']
+                        );
+                    }
 
-                $previewurl = \qbank_previewquestion\helper::question_preview_url(
-                    $question->questionbankid,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    $pageurl
-                );
-                $actions[] = \html_writer::link($previewurl, get_string('actionpreview', 'local_artqtml'), [
-                    'target'      => '_blank',
-                    'data-testid' => 'artqtml-approve-preview-link',
-                ]);
+                    $previewurl = \qbank_previewquestion\helper::question_preview_url(
+                        $question->questionbankid,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        $pageurl
+                    );
+                    $actions[] = \html_writer::link($previewurl, get_string('actionpreview', 'local_artqtml'), [
+                        'target'      => '_blank',
+                        'data-testid' => 'artqtml-approve-preview-link',
+                    ]);
+                }
             }
 
             if ($question->movedout) {

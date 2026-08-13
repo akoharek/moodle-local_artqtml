@@ -34,6 +34,7 @@ $string['actionapprove'] = 'Approve';
 $string['actiondelete'] = 'Delete';
 $string['actionedit'] = 'Edit';
 $string['actionopen'] = 'Open';
+$string['actionopenquestion'] = 'Open';
 $string['actionpreview'] = 'Preview';
 $string['actionsheading'] = 'Generation';
 $string['admintesttesting'] = '...';
