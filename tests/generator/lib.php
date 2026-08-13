@@ -22,8 +22,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 use local_artqtml\local\draft_bank;
 use local_artqtml\local\draft_role;
 use local_artqtml\local\duplicate_detector;
@@ -41,7 +39,6 @@ use local_artqtml\local\validation_suggestion;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class local_artqtml_generator extends component_generator_base {
-
     /**
      * Enable the plugin, point it at a draft course, and store dummy models/keys.
      *

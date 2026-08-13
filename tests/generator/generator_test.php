@@ -25,7 +25,9 @@ namespace local_artqtml;
  * @covers     \local_artqtml_generator
  */
 final class generator_test extends \advanced_testcase {
-
+    /**
+     * A completed generation seed creates a real Moodle question in the draft bank.
+     */
     public function test_setup_and_completed_question_land_in_the_draft_bank(): void {
         $this->resetAfterTest();
         $this->setAdminUser();

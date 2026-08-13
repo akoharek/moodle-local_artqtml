@@ -40,7 +40,6 @@ use Behat\Mink\Exception\ExpectationException;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class behat_local_artqtml extends behat_base {
-
     /**
      * Enable the plugin with a draft course, models and dummy API keys.
      *
@@ -52,6 +51,8 @@ class behat_local_artqtml extends behat_base {
     }
 
     /**
+     * Open the plugin generation list.
+     *
      * @When I visit the ArtQTML list page
      */
     public function i_visit_the_list_page(): void {
@@ -59,6 +60,8 @@ class behat_local_artqtml extends behat_base {
     }
 
     /**
+     * Open the plugin General admin settings page.
+     *
      * @When I visit the ArtQTML general settings page
      */
     public function i_visit_the_general_settings_page(): void {

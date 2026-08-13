@@ -22,8 +22,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Behat data generator for local_artqtml.
  *
@@ -32,7 +30,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class behat_local_artqtml_generator extends behat_generator_base {
-
     /**
      * Entities this plugin can create from Gherkin tables.
      *
@@ -66,7 +63,7 @@ class behat_local_artqtml_generator extends behat_generator_base {
 
         $id = $DB->get_field('local_artqtml_generations', 'id', ['name' => $name]);
         if (!$id) {
-            throw new Exception('There is no ArtQTML generation named "' . $name . '"');
+            throw new \Exception('There is no ArtQTML generation named "' . $name . '"');
         }
 
         return (int) $id;
