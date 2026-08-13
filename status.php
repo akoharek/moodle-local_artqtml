@@ -86,6 +86,13 @@ if (optional_param('retry', 0, PARAM_BOOL)) {
         \core\notification::error(get_string('errordraftcoursenotconfigured', 'local_artqtml'));
         redirect(new moodle_url('/local/artqtml/generate.php', ['id' => $generationid]));
     }
+    if (
+        $generation->status === generation_status::FAILED
+        && \local_artqtml\local\encrypted_config::any_unusable()
+    ) {
+        \core\notification::error(local_artqtml_apikey_start_error());
+        redirect(new moodle_url('/local/artqtml/status.php', ['generationid' => $generationid]));
+    }
     if ($generation->status === generation_status::FAILED) {
         $running = \local_artqtml\local\generation_start_policy::find_running((int) $USER->id, $generationid);
         if ($running !== null) {
@@ -127,6 +134,7 @@ $aborturl = new moodle_url('/local/artqtml/status.php', ['generationid' => $gene
 
 echo $OUTPUT->header();
 echo local_artqtml_model_warning_banner();
+echo local_artqtml_apikey_decrypt_notice();
 echo local_artqtml_owner_warning_banner($generation);
 echo html_writer::tag('p', format_string($generation->name));
 
@@ -294,11 +302,17 @@ $retrybutton = new single_button(
     'post',
     single_button::BUTTON_PRIMARY
 );
-$retrybutton->class = 'singlebutton d-inline mr-2';
+$retrybutton->class = 'singlebutton';
 $retrybutton->add_confirm_action(get_string('retryconfirm', 'local_artqtml', format_string($generation->name)));
 $retrylink = $OUTPUT->render($retrybutton);
 
 $technicalerror = has_capability('local/artqtml:configure', $context) ? s($generation->error ?? '') : '';
+
+$failedactions = html_writer::div(
+    $retrylink .
+        html_writer::link($backurl, get_string('backtosettingsshort', 'local_artqtml'), ['class' => 'btn btn-secondary']),
+    'artqtml-buttonrow'
+);
 
 echo html_writer::div(
     html_writer::tag('p', get_string('generationfailed', 'local_artqtml'), ['class' => 'text-danger']) .
@@ -312,8 +326,7 @@ echo html_writer::div(
             $technicalerror,
             ['class' => 'text-muted small' . ($technicalerror === '' ? ' d-none' : ''), 'data-region' => 'error-technical']
         ) .
-        $retrylink .
-        html_writer::link($backurl, get_string('backtosettingsshort', 'local_artqtml'), ['class' => 'btn btn-secondary']),
+        $failedactions,
     'd-none',
     ['data-region' => 'error']
 );

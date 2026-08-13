@@ -3,7 +3,7 @@
 Newest release first. Version numbers match `version.php` `$plugin->version`;
 the number in parentheses is `$plugin->release`.
 
-## 2026-08-13 — `2026081302` (1.0.0)
+## 2026-08-13 — `2026081303` (1.0.0)
 
 **Admin API-key Save: empty password field no longer wipes the stored key**
 
@@ -13,6 +13,18 @@ the number in parentheses is `$plugin->release`.
   config row and deleted a still-valid or leftover key.
 - Entering a new key still encrypts and replaces the stored value. There is no separate
   'clear key' control.
+
+## 2026-08-13 — `2026081302` (1.0.0)
+
+**Admin API-key notice + status Retry/Back layout**
+
+- Missing or unreadable Claude/Gemini keys now show a persistent red banner to
+  `local/artqtml:configure` / site admins on plugin pages, not only as a debugging() line or a
+  one-shot session flash on settings.
+- Generation start and status Retry refuse immediately when a key is empty or cannot be decrypted,
+  so the teacher is not left waiting on cron.
+- Status failed-actions: Retry and Back sit in `.artqtml-buttonrow` (flex + gap) instead of
+  overlapping.
 
 ## 2026-08-13 — `2026081301` (1.0.0)
 

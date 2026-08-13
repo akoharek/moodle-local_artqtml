@@ -127,6 +127,24 @@ class encrypted_config {
     }
 
     /**
+     * Whether Claude or Gemini is missing or stored as unreadable ciphertext.
+     *
+     * Probes decrypt so a page load by an administrator records the failure flag even if
+     * generation has not run yet.
+     *
+     * @return bool
+     */
+    public static function any_unusable(): bool {
+        foreach (self::SETTING_NAMES as $name) {
+            if (self::get($name) === '') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Drop the unrecoverable flag for one setting after a successful re-save.
      *
      * @param string $name
