@@ -34,7 +34,8 @@
 # Machine-local Claude Code permissions (shared .claude/skills/ stay tracked).
 /.claude/settings.local.json
 
-# Built Marketplace ZIPs.
+# Built Marketplace ZIPs (current local_artqtml-<version>.zip in dist/ root;
+# previous in dist/old/). No unprefixed artqtml.zip alias.
 /dist/
 
 # Local one-off audit helpers (not shipped, not for public review).

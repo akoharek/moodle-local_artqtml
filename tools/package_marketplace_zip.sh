@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # Build a Moodle Marketplace ZIP for ArtQTML: top-level folder artqtml/, lang/en only.
+# Output: dist/local_artqtml-<version>.zip only. No unprefixed artqtml.zip alias.
+# Previous versioned zips are moved to dist/old/.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -93,7 +95,7 @@ for f in forbidden_prefixes:
 print("OK", "$ZIPPATH", "files", len(names))
 PY
 
-# dist/ root = current versioned zip + artqtml.zip alias; previous versioned zips → dist/old/.
+# dist/ root = current local_artqtml-<version>.zip only; previous versioned zips → dist/old/.
 mkdir -p "$OUTDIR/old"
 for prev in "$OUTDIR"/local_artqtml-*.zip; do
   [[ -f "$prev" ]] || continue
@@ -101,8 +103,6 @@ for prev in "$OUTDIR"/local_artqtml-*.zip; do
     mv "$prev" "$OUTDIR/old/"
   fi
 done
+rm -f "$OUTDIR/artqtml.zip"
 
-# Convenience copy name
-cp "$ZIPPATH" "$OUTDIR/artqtml.zip"
 echo "Wrote $ZIPPATH"
-echo "Wrote $OUTDIR/artqtml.zip"
