@@ -93,6 +93,15 @@ for f in forbidden_prefixes:
 print("OK", "$ZIPPATH", "files", len(names))
 PY
 
+# dist/ root = current versioned zip + artqtml.zip alias; previous versioned zips → dist/old/.
+mkdir -p "$OUTDIR/old"
+for prev in "$OUTDIR"/local_artqtml-*.zip; do
+  [[ -f "$prev" ]] || continue
+  if [[ "$(basename "$prev")" != "$ZIPNAME" ]]; then
+    mv "$prev" "$OUTDIR/old/"
+  fi
+done
+
 # Convenience copy name
 cp "$ZIPPATH" "$OUTDIR/artqtml.zip"
 echo "Wrote $ZIPPATH"
