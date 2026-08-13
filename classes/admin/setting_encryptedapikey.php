@@ -15,21 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Helper.
+ * Password field for the Claude/Gemini API keys, encrypted at rest via \core\encryption.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\admin;
 
+use local_artqtml\local\encrypted_config;
+
 /**
  * Transparently encrypts on write and decrypts on read, so the admin form/unmask toggle still
- * Shows the real plaintext key, while `config_plugins` only ever holds ciphertext.
+ * shows the real plaintext key, while `config_plugins` only ever holds ciphertext.
  *
- * A value that fails to decrypt is treated as missing: the field shows empty (never the raw
- * Ciphertext) and runtime readers via {@see \local_artqtml\local\api_key_store} also get an empty
- * Key until an administrator re-saves a valid key.
+ * Leftover plaintext (no Moodle encryption prefix) is re-encrypted in place on read so an
+ * upgrade that introduced encryption does not drop the key. Ciphertext that fails integrity
+ * cannot be recovered: the field shows empty (never the raw ciphertext) and a one-time admin
+ * notice asks for the key to be re-entered from the provider dashboard.
  */
 class setting_encryptedapikey extends \admin_setting_configpasswordunmask {
     /** @var bool whether a decrypt failure hint was already prepended to the description */
@@ -46,22 +49,11 @@ class setting_encryptedapikey extends \admin_setting_configpasswordunmask {
             return $stored;
         }
 
-        try {
-            return \core\encryption::decrypt($stored);
-        } catch (\Throwable $e) {
-            // Do not echo corrupted ciphertext into the password field.
-            debugging(
-                'local_artqtml: cannot decrypt admin setting ' . $this->name .
-                    '; showing empty — re-save the API key. ' . $e->getMessage(),
-                DEBUG_NORMAL
-            );
-            if (!$this->decryptfailhintshown) {
-                $this->description = get_string('apikeymustresave', 'local_artqtml') .
-                    '<br>' . $this->description;
-                $this->decryptfailhintshown = true;
-            }
-            return '';
+        $plain = encrypted_config::get($this->name);
+        if ($plain === '' && in_array($this->name, encrypted_config::failed_names(), true)) {
+            $this->prepend_decrypt_hint();
         }
+        return $plain;
     }
 
     /**
@@ -73,10 +65,31 @@ class setting_encryptedapikey extends \admin_setting_configpasswordunmask {
     public function write_setting($data) {
         $data = trim((string) $data);
         if ($data === '') {
+            encrypted_config::clear_failure($this->name);
             return ($this->config_write($this->name, '') ? '' : get_string('errorsetting', 'admin'));
         }
 
-        $encrypted = \core\encryption::encrypt($data);
+        try {
+            $encrypted = \core\encryption::encrypt($data);
+        } catch (\Throwable $e) {
+            return get_string('errorsetting', 'admin');
+        }
+
+        encrypted_config::clear_failure($this->name);
         return ($this->config_write($this->name, $encrypted) ? '' : get_string('errorsetting', 'admin'));
+    }
+
+    /**
+     * Prepend the field-level "re-enter the key" hint once per instance.
+     *
+     * @return void
+     */
+    private function prepend_decrypt_hint(): void {
+        if ($this->decryptfailhintshown) {
+            return;
+        }
+        $this->description = get_string('apikeymustresave', 'local_artqtml') .
+            '<br>' . $this->description;
+        $this->decryptfailhintshown = true;
     }
 }

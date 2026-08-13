@@ -19,11 +19,11 @@
  *
  * `get_config()` reads `config_plugins` directly, bypassing
  * {@see \local_artqtml\admin\setting_encryptedapikey}'s own decrypt-on-display logic - every
- * Place that actually needs to use the key for a real API call (not just display it in the
- * Settings form) must go through this helper instead of a plain `get_config()` call.
+ * place that actually needs to use the key for a real API call (not just display it in the
+ * settings form) must go through this helper instead of a plain `get_config()` call.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -35,29 +35,14 @@ class api_key_store {
     /**
      * Get the decrypted API key for one provider.
      *
-     * Decrypt failure is treated as a missing key (empty string). The stored ciphertext is never
-     * Returned for API calls — admins must re-save the key in plugin settings.
+     * Leftover plaintext is re-encrypted in place. Unreadable ciphertext is treated as a
+     * missing key (empty string) and is never sent as a "plaintext" API key.
      *
      * @param string $provider 'claude' or 'gemini'
      * @return string empty string if none configured or decrypt fails
      */
     public static function get(string $provider): string {
         $configname = $provider === 'claude' ? 'claudeapikey' : 'geminiapikey';
-        $stored = (string) get_config('local_artqtml', $configname);
-        if ($stored === '') {
-            return '';
-        }
-
-        try {
-            return \core\encryption::decrypt($stored);
-        } catch (\Throwable $e) {
-            // Corrupt / wrong-key ciphertext must not be sent as a "plaintext" API key.
-            debugging(
-                'local_artqtml: failed to decrypt ' . $configname .
-                    '; treating as unset. Re-save the API key in plugin settings. ' . $e->getMessage(),
-                DEBUG_NORMAL
-            );
-            return '';
-        }
+        return encrypted_config::get($configname);
     }
 }

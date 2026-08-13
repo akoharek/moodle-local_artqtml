@@ -40,6 +40,7 @@ $string['admintesttesting'] = '...';
 $string['aiinstruction'] = 'AI instrukció';
 $string['aiinstructionnote'] = 'Amit ide írsz, a saját preferenciádként megy el az AI-nak ehhez a generáláshoz, tehát közvetlenül befolyásolja a kérdéseket. Tartalomként kerül át, nem rendszerszintű utasításként: az adminisztrátor által beállított webhelyszintű szabályokat nem írhatja felül.';
 $string['apikeymustresave'] = 'A tárolt API kulcsot nem sikerült visszafejteni. Add meg újra a kulcsot, majd mentsd el.';
+$string['apikeyupgradeunrecoverable'] = 'Az API kulcsokat a frissítés után újra meg kell adni. A tárolt értékek olyan webhelykulccsal vannak titkosítva, amely már nem egyezik, ezért erről az oldalról nem állíthatók helyre — másolj új kulcsot az Anthropic és a Google irányítópultról.';
 $string['approveallaccepted'] = 'Összes elfogadható jóváhagyása ({$a})';
 $string['approvedbylabel'] = 'Jóváhagyta: {$a}';
 $string['approvedlabel'] = 'Jóváhagyva';

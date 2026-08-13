@@ -40,6 +40,7 @@ if ($hassiteconfig || has_capability('local/artqtml:configure', context_system::
     $ADMIN->add('localplugins', new admin_category('local_artqtml_category', get_string('pluginname', 'local_artqtml')));
 
     $draftcoursebanner = local_artqtml_draftcourse_warning_banner();
+    $apikeybanner = local_artqtml_apikey_decrypt_notice();
 
     // ------------------------------------------------------------------
     // General.
@@ -51,6 +52,9 @@ if ($hassiteconfig || has_capability('local/artqtml:configure', context_system::
 
     if ($draftcoursebanner !== '') {
         $general->add(new admin_setting_description('local_artqtml/draftcoursebanner_general', '', $draftcoursebanner));
+    }
+    if ($apikeybanner !== '') {
+        $general->add(new admin_setting_description('local_artqtml/apikeybanner_general', '', $apikeybanner));
     }
 
     $general->add(new admin_setting_configcheckbox(
@@ -103,6 +107,9 @@ if ($hassiteconfig || has_capability('local/artqtml:configure', context_system::
     if ($draftcoursebanner !== '') {
         $generator->add(new admin_setting_description('local_artqtml/draftcoursebanner_generator', '', $draftcoursebanner));
     }
+    if ($apikeybanner !== '') {
+        $generator->add(new admin_setting_description('local_artqtml/apikeybanner_generator', '', $apikeybanner));
+    }
 
     $generator->add(new \local_artqtml\admin\setting_encryptedapikey(
         'local_artqtml/claudeapikey',
@@ -147,6 +154,9 @@ if ($hassiteconfig || has_capability('local/artqtml:configure', context_system::
     if ($draftcoursebanner !== '') {
         $validator->add(new admin_setting_description('local_artqtml/draftcoursebanner_validator', '', $draftcoursebanner));
     }
+    if ($apikeybanner !== '') {
+        $validator->add(new admin_setting_description('local_artqtml/apikeybanner_validator', '', $apikeybanner));
+    }
 
     $validator->add(new \local_artqtml\admin\setting_encryptedapikey(
         'local_artqtml/geminiapikey',
@@ -190,6 +200,9 @@ if ($hassiteconfig || has_capability('local/artqtml:configure', context_system::
 
     if ($draftcoursebanner !== '') {
         $qtypes->add(new admin_setting_description('local_artqtml/draftcoursebanner_qtypes', '', $draftcoursebanner));
+    }
+    if ($apikeybanner !== '') {
+        $qtypes->add(new admin_setting_description('local_artqtml/apikeybanner_qtypes', '', $apikeybanner));
     }
 
     foreach (['IH', 'FE', 'SR'] as $code) {
@@ -303,6 +316,9 @@ if ($hassiteconfig || has_capability('local/artqtml:configure', context_system::
 
     if ($draftcoursebanner !== '') {
         $security->add(new admin_setting_description('local_artqtml/draftcoursebanner_security', '', $draftcoursebanner));
+    }
+    if ($apikeybanner !== '') {
+        $security->add(new admin_setting_description('local_artqtml/apikeybanner_security', '', $apikeybanner));
     }
 
     $security->add(new admin_setting_configtextarea(
