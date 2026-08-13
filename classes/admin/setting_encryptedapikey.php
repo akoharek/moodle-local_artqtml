@@ -33,6 +33,9 @@ use local_artqtml\local\encrypted_config;
  * upgrade that introduced encryption does not drop the key. Ciphertext that fails integrity
  * cannot be recovered: the field shows empty (never the raw ciphertext) and a one-time admin
  * notice asks for the key to be re-entered from the provider dashboard.
+ *
+ * An empty submitted value does not overwrite config: password fields POST empty when the
+ * administrator does not retype the key, including after a decrypt-failure display.
  */
 class setting_encryptedapikey extends \admin_setting_configpasswordunmask {
     /** @var bool whether a decrypt failure hint was already prepended to the description */
@@ -57,7 +60,7 @@ class setting_encryptedapikey extends \admin_setting_configpasswordunmask {
     }
 
     /**
-     * Encrypt and store the submitted value.
+     * Encrypt and store the submitted value. Empty input leaves the stored value unchanged.
      *
      * @param string $data
      * @return string empty string on success, an error message otherwise
@@ -65,8 +68,9 @@ class setting_encryptedapikey extends \admin_setting_configpasswordunmask {
     public function write_setting($data) {
         $data = trim((string) $data);
         if ($data === '') {
-            encrypted_config::clear_failure($this->name);
-            return ($this->config_write($this->name, '') ? '' : get_string('errorsetting', 'admin'));
+            // Leave the stored ciphertext (or leftover plaintext) unchanged. An empty POST is
+            // how password fields submit when the administrator does not retype the key.
+            return '';
         }
 
         try {

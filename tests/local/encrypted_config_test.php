@@ -147,6 +147,65 @@ final class encrypted_config_test extends \advanced_testcase {
     }
 
     /**
+     * Empty password POST must not delete a stored encrypted key.
+     */
+    public function test_write_setting_empty_does_not_wipe_stored_key(): void {
+        global $CFG;
+        $this->resetAfterTest();
+        require_once($CFG->libdir . '/adminlib.php');
+
+        $encrypted = \core\encryption::encrypt('sk-ant-keep-me');
+        set_config('claudeapikey', $encrypted, 'local_artqtml');
+
+        $setting = new \local_artqtml\admin\setting_encryptedapikey(
+            'local_artqtml/claudeapikey',
+            'Claude',
+            'desc',
+            ''
+        );
+        $this->assertSame('', $setting->write_setting(''));
+        $this->assertSame('', $setting->write_setting('   '));
+        $this->assertSame($encrypted, get_config('local_artqtml', 'claudeapikey'));
+        $this->assertSame('sk-ant-keep-me', $setting->get_setting());
+        $this->assertDebuggingNotCalled();
+    }
+
+    /**
+     * Empty password POST must not delete leftover plaintext or unreadable ciphertext.
+     */
+    public function test_write_setting_empty_does_not_wipe_plaintext_or_unreadable(): void {
+        global $CFG;
+        $this->resetAfterTest();
+        require_once($CFG->libdir . '/adminlib.php');
+
+        set_config('claudeapikey', 'sk-ant-plain-keep', 'local_artqtml');
+        $bogus = 'sodium:' . base64_encode(random_bytes(SODIUM_CRYPTO_SECRETBOX_NONCEBYTES + 32));
+        set_config('geminiapikey', $bogus, 'local_artqtml');
+        encrypted_config::get('geminiapikey');
+        $this->assertDebuggingCalled();
+        $this->assertSame(['geminiapikey'], encrypted_config::failed_names());
+
+        $claude = new \local_artqtml\admin\setting_encryptedapikey(
+            'local_artqtml/claudeapikey',
+            'Claude',
+            'desc',
+            ''
+        );
+        $gemini = new \local_artqtml\admin\setting_encryptedapikey(
+            'local_artqtml/geminiapikey',
+            'Gemini',
+            'desc',
+            ''
+        );
+        $this->assertSame('', $claude->write_setting(''));
+        $this->assertSame('', $gemini->write_setting(''));
+
+        $this->assertSame('sk-ant-plain-keep', get_config('local_artqtml', 'claudeapikey'));
+        $this->assertSame($bogus, get_config('local_artqtml', 'geminiapikey'));
+        $this->assertSame(['geminiapikey'], encrypted_config::failed_names());
+    }
+
+    /**
      * A value without a Moodle encryption prefix is leftover plaintext, not ciphertext.
      */
     public function test_is_encrypted_value_detects_moodle_envelope(): void {

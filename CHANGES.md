@@ -3,6 +3,17 @@
 Newest release first. Version numbers match `version.php` `$plugin->version`;
 the number in parentheses is `$plugin->release`.
 
+## 2026-08-13 — `2026081302` (1.0.0)
+
+**Admin API-key Save: empty password field no longer wipes the stored key**
+
+- Saving plugin settings with a blank Claude/Gemini key field (password inputs POST empty when
+  the administrator does not retype the value, and after decrypt failure the UI already shows
+  empty) left the stored ciphertext unchanged. Previously `write_setting('')` wrote an empty
+  config row and deleted a still-valid or leftover key.
+- Entering a new key still encrypts and replaces the stored value. There is no separate
+  'clear key' control.
+
 ## 2026-08-13 — `2026081301` (1.0.0)
 
 **Upgrade: migrate leftover plaintext API keys; stop dropping unreadable ciphertext silently**
