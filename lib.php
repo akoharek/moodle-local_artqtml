@@ -231,6 +231,30 @@ function local_artqtml_setting_backup_notice(): string {
 }
 
 /**
+ * Persistent notice when stored API keys cannot be decrypted (site encryption key mismatch).
+ *
+ * Unlike the setting-backup notice this is not cleared on display: it stays until the
+ * administrator re-saves a valid key. Shown only to users who can configure the plugin.
+ *
+ * @return string HTML, or '' when every stored key is readable or empty
+ */
+function local_artqtml_apikey_decrypt_notice(): string {
+    if (!has_capability('local/artqtml:configure', context_system::instance())) {
+        return '';
+    }
+
+    if (empty(\local_artqtml\local\encrypted_config::failed_names())) {
+        return '';
+    }
+
+    return html_writer::div(
+        get_string('apikeyupgradeunrecoverable', 'local_artqtml'),
+        'alert alert-danger',
+        ['data-testid' => 'artqtml-apikey-decrypt-notice']
+    );
+}
+
+/**
  * The model blocking warning bar, shown on every plugin surface.
  *
  * Returns '' when neither provider is blocked, so callers can render it unconditionally.

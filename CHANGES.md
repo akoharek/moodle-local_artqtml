@@ -3,6 +3,18 @@
 Newest release first. Version numbers match `version.php` `$plugin->version`;
 the number in parentheses is `$plugin->release`.
 
+## 2026-08-13 — `2026081301` (1.0.0)
+
+**Upgrade: migrate leftover plaintext API keys; stop dropping unreadable ciphertext silently**
+
+- Stored Claude/Gemini keys with no Moodle encryption prefix (`sodium:` / `openssl-aes-256-ctr:`)
+  are re-encrypted in place on upgrade and on read, so introducing encryption-at-rest does not
+  empty the admin field.
+- Ciphertext that fails integrity (site sodium key changed) cannot be recovered by anyone,
+  including Moodle. The UI stays empty, `debugging()` runs once per setting (not on every
+  `/admin/index.php` load), and a persistent admin notice asks for the keys to be re-entered
+  from the Anthropic / Google dashboards.
+
 ## 2026-08-13 — `2026081300` (1.0.0)
 
 **Model-check schema: add `pluginversion` on upgrade**
