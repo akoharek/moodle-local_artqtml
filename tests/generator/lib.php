@@ -123,6 +123,25 @@ class local_artqtml_generator extends component_generator_base {
     }
 
     /**
+     * Create a course question category the approve page can offer as a move target.
+     *
+     * Uses core's generator so Moodle 5.1+ remaps the course context into a mod_qbank module.
+     *
+     * @param int $courseid
+     * @param string $name
+     * @return \stdClass
+     */
+    public function create_move_target_category(int $courseid, string $name = 'Biology questions'): \stdClass {
+        /** @var \core_question_generator $questiongenerator */
+        $questiongenerator = $this->datagenerator->get_plugin_generator('core_question');
+
+        return $questiongenerator->create_question_category([
+            'contextid' => \context_course::instance($courseid)->id,
+            'name'      => $name,
+        ]);
+    }
+
+    /**
      * Insert a plugin question, optionally as a real Moodle question in the draft bank.
      *
      * @param array $record

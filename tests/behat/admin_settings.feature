@@ -9,8 +9,10 @@ Feature: ArtQTML admin settings
     When I visit the ArtQTML general settings page
     Then I should see "Enable plugin"
     And I should see "The Claude and Gemini API keys are missing or could not be decrypted"
-    When I press "Save changes"
-    Then I should see "Changes saved"
+    When I set the field "Enable plugin" to "0"
+    And I press "Save changes"
+    And I visit the ArtQTML general settings page
+    Then the field "Enable plugin" matches value "0"
 
   Scenario: Administrator sees the missing API key notice on the list
     Given I log in as "admin"

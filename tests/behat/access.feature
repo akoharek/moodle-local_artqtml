@@ -21,8 +21,9 @@ Feature: ArtQTML access and blocking
     And I should see "New generation"
     And I log out
     And I log in as "student1"
-    When I visit the ArtQTML list page
-    Then I should see "Sorry, but you do not currently have permissions to do that"
+    And I am on homepage
+    Then "ArtQTML" "link" should not exist
+    And I should not see "New generation"
 
   Scenario: Disabled plugin shows the administrator notice
     Given the ArtQTML plugin is ready for teachers

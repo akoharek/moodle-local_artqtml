@@ -15,6 +15,7 @@ Feature: Reviewing generated ArtQTML questions
     And the following "course enrolments" exist:
       | user     | course  | role           |
       | teacher1 | BIOBANK | editingteacher |
+    And the course "BIOBANK" has an ArtQTML move-target question category
     And the following "system role assigns" exist:
       | user     | role           |
       | teacher1 | editingteacher |
@@ -31,8 +32,11 @@ Feature: Reviewing generated ArtQTML questions
     When I visit the ArtQTML list page
     And I click on "Open" "link" in the "Review pack" "table_row"
     Then I should see "Review and approve questions"
-    And I should see "Water is required for photosynthesis."
+    And I should see "REV1-IH-0001"
     And I should see "Accepted"
+    When I click on "REV1-IH-0001" "link" in the "REV1-IH-0001" "table_row"
+    Then I should see "Correct answer:"
+    And I should see "True"
     When I click on "Approve" "button" in the "REV1-IH-0001" "table_row"
     Then I should see "Approved"
     And I should see "Revoke"

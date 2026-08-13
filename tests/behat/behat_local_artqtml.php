@@ -83,6 +83,20 @@ class behat_local_artqtml extends behat_base {
     }
 
     /**
+     * Seed a move-target question category in a course the teacher can add questions to.
+     *
+     * @Given the course :shortname has an ArtQTML move-target question category
+     * @param string $shortname
+     */
+    public function the_course_has_a_move_target_category(string $shortname): void {
+        global $DB;
+
+        $courseid = (int) $DB->get_field('course', 'id', ['shortname' => $shortname], MUST_EXIST);
+        $generator = testing_util::get_data_generator()->get_plugin_generator('local_artqtml');
+        $generator->create_move_target_category($courseid);
+    }
+
+    /**
      * Pick the first non-empty option in the approve-page category select.
      *
      * @When I choose the first ArtQTML move target category
