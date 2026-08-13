@@ -197,7 +197,15 @@ class approve_renderer {
                     $pageurl
                 );
                 $editurl = new \moodle_url('/question/bank/editquestion/question.php', $editparams);
-                if ((int) $creator->id === (int) $USER->id) {
+                if ($question->movedout) {
+                    // After move the plugin is not the editor. Open launches Moodle's core
+                    // question.php without the plugin validation panel.
+                    $actions[] = \html_writer::link(
+                        $editurl,
+                        get_string('actionopenquestion', 'local_artqtml'),
+                        ['data-testid' => 'artqtml-approve-open-link']
+                    );
+                } else if ((int) $creator->id === (int) $USER->id) {
                     $actions[] = \html_writer::link($editurl, get_string('actionedit', 'local_artqtml'), [
                         'data-testid' => 'artqtml-approve-edit-link',
                     ]);

@@ -3,6 +3,17 @@
 Newest release first. Version numbers match `version.php` `$plugin->version`;
 the number in parentheses is `$plugin->release`.
 
+## 2026-08-13 — `2026081304` (1.0.0)
+
+**Approve page: Open after move, not Edit**
+
+- A moved (`movedout`) question row shows **Open** instead of **Edit**.
+  The link is Moodle's native question editor (`/question/bank/editquestion/question.php`);
+  the plugin validation panel and other plugin extras are not shown.
+- Before move, Edit behaviour is unchanged (plugin-aware editor, AI validation).
+- Other post-move locks are unchanged: no checkbox, delete, approve/unapprove, or second move.
+  Preview remains.
+
 ## 2026-08-13 — `2026081303` (1.0.0)
 
 **Admin API-key Save: empty password field no longer wipes the stored key**
