@@ -203,7 +203,7 @@ class encrypted_config {
             DEBUG_NORMAL
         );
 
-        if (!CLI_SCRIPT) {
+        if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
             \core\notification::add(
                 get_string('apikeyupgradeunrecoverable', self::component()),
                 \core\output\notification::NOTIFY_ERROR
