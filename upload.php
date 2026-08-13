@@ -305,6 +305,7 @@ if ($mform->is_cancelled()) {
 
 echo $OUTPUT->header();
 echo local_artqtml_model_warning_banner();
+echo local_artqtml_apikey_decrypt_notice();
 if ($editgeneration) {
     echo local_artqtml_owner_warning_banner($editgeneration);
 }

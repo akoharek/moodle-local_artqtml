@@ -173,6 +173,10 @@ if ($mform->is_cancelled()) {
         \core\notification::error(get_string('errordraftcoursenotconfigured', 'local_artqtml'));
         redirect($indexurl);
     }
+    if (\local_artqtml\local\encrypted_config::any_unusable()) {
+        \core\notification::error(local_artqtml_apikey_start_error());
+        redirect(new moodle_url('/local/artqtml/generate.php', ['id' => $generationid]));
+    }
 
     if (\local_artqtml\local\source_text_limit::is_exceeded((string) $generation->sourcetext)) {
         \core\notification::error(
@@ -284,6 +288,7 @@ if (!empty($generation->settings)) {
 
 echo $OUTPUT->header();
 echo local_artqtml_model_warning_banner();
+echo local_artqtml_apikey_decrypt_notice();
 echo local_artqtml_owner_warning_banner($generation);
 $mform->display();
 
