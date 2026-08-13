@@ -45,21 +45,30 @@ final class approve_renderer_test extends \advanced_testcase {
 
         $this->assertStringContainsString('artqtml-approve-edit-link', $html);
         $this->assertStringContainsString(get_string('actionedit', 'local_artqtml'), $html);
+        $this->assertStringContainsString('artqtml-approve-preview-link', $html);
         $this->assertStringNotContainsString('artqtml-approve-open-link', $html);
         $this->assertStringContainsString('/question/bank/editquestion/question.php', $html);
         $this->assertStringContainsString('id=' . (int) $question->questionbankid, $html);
     }
 
     /**
-     * A moved question replaces Edit with Open, still pointing at core question.php.
+     * A moved question shows Open to the destination bank listing, not Edit or Preview.
      */
     public function test_moved_question_shows_open_not_edit(): void {
         [$output, $creator, $pageurl] = $this->setup_page();
+
+        $destcourse = $this->getDataGenerator()->create_course();
+        $destctx = \context_course::instance($destcourse->id);
+        $qgen = $this->getDataGenerator()->get_plugin_generator('core_question');
+        $category = $qgen->create_question_category([
+            'contextid' => $destctx->id,
+            'name'      => 'Destination bank',
+        ]);
         $question = $this->seed_question([
             'movedout'     => 1,
             'approved'     => 1,
             'questioncode' => 'OPEN-IH-0002',
-        ]);
+        ], $category);
 
         $html = approve_renderer::questions_table(
             $output,
@@ -75,9 +84,11 @@ final class approve_renderer_test extends \advanced_testcase {
         $this->assertStringContainsString('artqtml-approve-open-link', $html);
         $this->assertStringContainsString(get_string('actionopenquestion', 'local_artqtml'), $html);
         $this->assertStringNotContainsString('artqtml-approve-edit-link', $html);
-        $this->assertStringContainsString('/question/bank/editquestion/question.php', $html);
-        $this->assertStringContainsString('id=' . (int) $question->questionbankid, $html);
-        $this->assertStringContainsString('artqtml-approve-preview-link', $html);
+        $this->assertStringNotContainsString('artqtml-approve-preview-link', $html);
+        $this->assertStringNotContainsString('/question/bank/editquestion/question.php', $html);
+        $this->assertStringContainsString('/question/edit.php', $html);
+        $this->assertStringContainsString('courseid=' . (int) $destcourse->id, $html);
+        $this->assertStringContainsString('cat=' . $category->id . '%2C' . $destctx->id, $html);
         $this->assertStringNotContainsString('artqtml-approve-delete-link', $html);
         $this->assertStringNotContainsString('artqtml-approve-approve-button', $html);
         $this->assertStringNotContainsString('artqtml-approve-revoke-link', $html);
@@ -111,13 +122,16 @@ final class approve_renderer_test extends \advanced_testcase {
      * Insert one generation plus one plugin question pointing at a real Moodle question.
      *
      * @param array<string,mixed> $overrides
+     * @param \stdClass|null $category optional destination/draft category
      * @return \stdClass the plugin question row
      */
-    private function seed_question(array $overrides = []): \stdClass {
+    private function seed_question(array $overrides = [], ?\stdClass $category = null): \stdClass {
         global $DB, $USER;
 
         $qgen = $this->getDataGenerator()->get_plugin_generator('core_question');
-        $category = $qgen->create_question_category();
+        if ($category === null) {
+            $category = $qgen->create_question_category();
+        }
         $moodleq = $qgen->create_question('truefalse', null, [
             'category' => $category->id,
             'name'     => $overrides['questioncode'] ?? 'OPEN-IH-0001',

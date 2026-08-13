@@ -3,6 +3,17 @@
 Newest release first. Version numbers match `version.php` `$plugin->version`;
 the number in parentheses is `$plugin->release`.
 
+## 2026-08-13 — `2026081305` (1.0.0)
+
+**Approve page: after move, Open goes to the destination question bank (no Preview)**
+
+- A moved (`movedout`) question row **Open** link opens the **destination question bank**
+  listing (`/question/edit.php?courseid=…&cat=category,context` on Moodle 4.5; `cmid` for
+  `mod_qbank` on 5.1+), not the question editor (`question.php`).
+- Moved rows have **no Preview** and **no Edit**.
+- Before move, Edit + Preview behaviour is unchanged (plugin-aware editor).
+- Other post-move locks are unchanged: no checkbox, delete, approve/unapprove, or second move.
+
 ## 2026-08-13 — `2026081304` (1.0.0)
 
 **Approve page: Open after move, not Edit**

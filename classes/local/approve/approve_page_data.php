@@ -156,6 +156,45 @@ class approve_page_data {
     }
 
     /**
+     * Question-bank listing URL for the category the question currently lives in.
+     *
+     * After a move, Open goes to this destination bank page, not the question editor.
+     * Moodle 4.5 uses courseid; Moodle 5.1+ module banks use cmid.
+     *
+     * @param int $questionbankid question.id
+     * @return \moodle_url|null null if the category/context cannot be resolved
+     */
+    public static function question_bank_url(int $questionbankid): ?\moodle_url {
+        $category = self::question_category_record($questionbankid);
+        if (!$category) {
+            return null;
+        }
+        $context = \context::instance_by_id((int) $category->contextid, IGNORE_MISSING);
+        if (!$context) {
+            return null;
+        }
+
+        $params = [
+            'cat' => $category->id . ',' . $category->contextid,
+        ];
+        switch ((int) $context->contextlevel) {
+            case CONTEXT_MODULE:
+                $params['cmid'] = (int) $context->instanceid;
+                break;
+            case CONTEXT_COURSE:
+                $params['courseid'] = (int) $context->instanceid;
+                break;
+            case CONTEXT_SYSTEM:
+                $params['courseid'] = SITEID;
+                break;
+            default:
+                return null;
+        }
+
+        return new \moodle_url('/question/edit.php', $params);
+    }
+
+    /**
      * Build URL params for Moodle's native question editor from an approve-row question.
      *
      * Moodle 4.5 accepts courseid; Moodle 5.1+ requires cmid (module question banks).

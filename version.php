@@ -24,7 +24,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_artqtml';
-$plugin->version   = 2026081304;
+$plugin->version   = 2026081305;
 $plugin->requires  = 2024100700; // Moodle 4.5.1.
 $plugin->release   = '1.0.0';
 $plugin->maturity  = MATURITY_STABLE;
