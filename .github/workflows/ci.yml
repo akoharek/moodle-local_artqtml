@@ -98,14 +98,14 @@ jobs:
       # before, so neither can turn a run red. Keyed on moodle-branch because that decides
       # composer constraints and node version (moodle-plugin-ci reads Moodle's .nvmrc).
       - name: Cache composer downloads
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/composer
           key: composer-${{ runner.os }}-${{ matrix.php }}-${{ matrix.moodle-branch }}
           restore-keys: composer-${{ runner.os }}-${{ matrix.php }}-
 
       - name: Cache node (nvm)
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.nvm/versions/node
           key: nvm-${{ runner.os }}-${{ matrix.moodle-branch }}
@@ -279,14 +279,14 @@ jobs:
           coverage: none
 
       - name: Cache composer downloads
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/composer
           key: composer-${{ runner.os }}-${{ matrix.php }}-${{ matrix.moodle-branch }}
           restore-keys: composer-${{ runner.os }}-${{ matrix.php }}-
 
       - name: Cache node (nvm)
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.nvm/versions/node
           key: nvm-${{ runner.os }}-${{ matrix.moodle-branch }}
@@ -359,7 +359,7 @@ jobs:
           coverage: none
 
       - name: Cache composer downloads
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/composer
           key: composer-${{ runner.os }}-${{ matrix.php }}-${{ matrix.moodle-branch }}
