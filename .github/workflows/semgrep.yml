@@ -17,6 +17,6 @@ jobs:
       image: semgrep/semgrep
     if: (github.actor != 'dependabot[bot]')
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Semgrep PHP rules
         run: semgrep scan --config p/php --error --metrics=off
