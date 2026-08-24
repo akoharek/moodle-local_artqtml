@@ -306,3 +306,77 @@ jobs:
 
       - name: PHPUnit (local_artqtml_testsuite)
         run: moodle-plugin-ci phpunit
+
+  # ---------------------------------------------------------------------------
+  # Behat: browser acceptance tests. One cell per supported major (4.5 LTS + 5.2).
+  # Selenium is required for @javascript (approve confirm, status.js, question editor).
+  # ---------------------------------------------------------------------------
+  behat:
+    name: Behat (${{ matrix.moodle-branch }})
+    needs: static-checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - moodle-branch: v4.5.12
+            php: '8.3'
+            database: mariadb
+          - moodle-branch: v5.2.2
+            php: '8.3'
+            database: mariadb
+
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+          MYSQL_CHARACTER_SET_SERVER: "utf8mb4"
+          MYSQL_COLLATION_SERVER: "utf8mb4_bin"
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s --health-timeout=5s --health-retries=8
+      selenium:
+        image: selenium/standalone-chromium:4.36.0-20251001
+        volumes:
+          - /dev/shm:/dev/shm
+
+    steps:
+      - name: Check out plugin
+        uses: actions/checkout@v5
+        with:
+          path: plugin
+
+      - name: Setup PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, pgsql, mysqli, gd, zip, curl, xml, openssl, ctype, iconv, intl, soap
+          ini-values: max_input_vars=5000
+          coverage: none
+
+      - name: Cache composer downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ runner.os }}-${{ matrix.php }}-${{ matrix.moodle-branch }}
+          restore-keys: composer-${{ runner.os }}-${{ matrix.php }}-
+
+      - name: Initialise moodle-plugin-ci
+        run: |
+          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^4
+          echo "$(cd ci/bin; pwd)" >> "$GITHUB_PATH"
+          echo "$(cd ci/vendor/bin; pwd)" >> "$GITHUB_PATH"
+          sudo locale-gen en_AU.UTF-8
+
+      - name: Install Moodle + plugin
+        run: moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1
+        env:
+          DB: ${{ matrix.database }}
+          MOODLE_BRANCH: ${{ matrix.moodle-branch }}
+
+      - name: Behat (@local_artqtml)
+        run: moodle-plugin-ci behat --profile chrome --tags @local_artqtml

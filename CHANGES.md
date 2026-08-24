@@ -3,6 +3,17 @@
 Newest release first. Version numbers match `version.php` `$plugin->version`;
 the number in parentheses is `$plugin->release`.
 
+## 2026-08-24 — `2026081306` (1.0.0)
+
+**Behat regression suite (internal, no live LLM)**
+
+- Cherry-picked acceptance features from `test/behat-acceptance`: access, admin settings,
+  approve/review, delete, new generation, status.
+- Added `approve_page_actions.feature`: unmoved row (Edit + Preview, no Open) and moved row
+  (Open, no Edit/Preview) using DB fixtures only.
+- Test data generator extended for moved questions (`movecourse` + `movedout`).
+- CI: `behat` job on Moodle 4.5.12 and 5.2.2 with Selenium (tags `@local_artqtml`).
+
 ## 2026-08-13 — `2026081305` (1.0.0)
 
 **Approve page: after move, Open goes to the destination question bank (no Preview)**
