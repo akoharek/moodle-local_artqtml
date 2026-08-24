@@ -34,6 +34,7 @@ $string['actionapprove'] = 'Jóváhagyás';
 $string['actiondelete'] = 'Töröl';
 $string['actionedit'] = 'Szerkesztés';
 $string['actionopen'] = 'Megnyit';
+$string['actionopenquestion'] = 'Megnyitás';
 $string['actionpreview'] = 'Előnézet';
 $string['actionsheading'] = 'Generálás';
 $string['admintesttesting'] = '...';
