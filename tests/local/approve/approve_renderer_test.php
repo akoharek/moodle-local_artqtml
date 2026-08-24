@@ -16,6 +16,8 @@
 
 namespace local_artqtml\local\approve;
 
+use local_artqtml\local\draft_bank;
+
 /**
  * After a question is moved to the Moodle bank, the approve row shows Open, not Edit.
  *
@@ -87,8 +89,12 @@ final class approve_renderer_test extends \advanced_testcase {
         $this->assertStringNotContainsString('artqtml-approve-preview-link', $html);
         $this->assertStringNotContainsString('/question/bank/editquestion/question.php', $html);
         $this->assertStringContainsString('/question/edit.php', $html);
-        $this->assertStringContainsString('courseid=' . (int) $destcourse->id, $html);
         $this->assertStringContainsString('cat=' . $category->id . '%2C' . $destctx->id, $html);
+        if (draft_bank::uses_module_question_banks()) {
+            $this->assertMatchesRegularExpression('/cmid=\d+/', $html);
+        } else {
+            $this->assertStringContainsString('courseid=' . (int) $destcourse->id, $html);
+        }
         $this->assertStringNotContainsString('artqtml-approve-delete-link', $html);
         $this->assertStringNotContainsString('artqtml-approve-approve-button', $html);
         $this->assertStringNotContainsString('artqtml-approve-revoke-link', $html);
