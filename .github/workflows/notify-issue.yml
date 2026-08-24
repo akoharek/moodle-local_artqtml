@@ -187,7 +187,7 @@ jobs:
 
       - name: Send email
         if: steps.gate.outputs.skip != 'true'
-        uses: dawidd6/action-send-mail@v3
+        uses: dawidd6/action-send-mail@v18
         with:
           # Default 587 + secure false = STARTTLS (typical for Microsoft 365).
           # For SMTPS on 465, set secret SMTP_PORT=465 and change secure below to true.
