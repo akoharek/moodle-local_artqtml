@@ -89,7 +89,7 @@ final class approve_renderer_test extends \advanced_testcase {
         $this->assertStringNotContainsString('artqtml-approve-preview-link', $html);
         $this->assertStringNotContainsString('/question/bank/editquestion/question.php', $html);
         $this->assertStringContainsString('/question/edit.php', $html);
-        $this->assertStringContainsString('cat=' . $category->id . '%2C' . $destctx->id, $html);
+        $this->assertStringContainsString('cat=' . $category->id . '%2C' . $category->contextid, $html);
         if (draft_bank::uses_module_question_banks()) {
             $this->assertMatchesRegularExpression('/cmid=\d+/', $html);
         } else {
