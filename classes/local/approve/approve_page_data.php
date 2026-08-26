@@ -20,12 +20,15 @@
  * Resolution; no HTML, no mutation.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local\approve;
 
 use local_artqtml\local\draft_bank;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Supplies the approve page's display data.
@@ -100,6 +103,7 @@ class approve_page_data {
             'validationsuggestion' => \local_artqtml\local\validation_suggestion::ACCEPTED,
             'movedout'             => 0,
             'approved'             => 0,
+            'externallyedited'     => 0,
         ]);
     }
 

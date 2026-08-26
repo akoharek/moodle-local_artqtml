@@ -54,6 +54,7 @@
         <FIELD NAME="movedout" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 once the question has been moved out of the draft category into a real target bank"/>
         <FIELD NAME="approved" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 once a teacher has explicitly approved this question; required before it can be moved to a real bank"/>
         <FIELD NAME="edited" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Column"/>
+        <FIELD NAME="externallyedited" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 when edited via Moodle native editor while still in draft; locks plugin mutate paths"/>
         <FIELD NAME="lasteditedby" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="userid of whoever last edited this question in the native question editor, null if never edited"/>
         <FIELD NAME="lasteditedat" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Column"/>
         <FIELD NAME="approvedby" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="userid of whoever approved this question, null if not yet approved"/>

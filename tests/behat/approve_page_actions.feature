@@ -23,14 +23,14 @@ Feature: Approve page row actions before and after move
       | teacher1 | Action pack | ACT1      | completed |
     And I log in as "teacher1"
 
-  Scenario: Unmoved draft row shows Edit and Preview, not Open
+  Scenario: Unmoved draft row shows Preview only, not Edit or Open
     Given the following "local_artqtml > questions" exist:
       | generation  | questioncode  | questiontext                       | validationsuggestion | movedout |
       | Action pack | ACT1-IH-0001  | Plants need sunlight to grow.      | accepted             | 0        |
     When I open the ArtQTML generation named "Action pack"
     Then I should see "ACT1-IH-0001"
-    And "Edit" "link" should exist in the "ACT1-IH-0001" "table_row"
     And "Preview" "link" should exist in the "ACT1-IH-0001" "table_row"
+    And "Edit" "link" should not exist in the "ACT1-IH-0001" "table_row"
     And "Open" "link" should not exist in the "ACT1-IH-0001" "table_row"
 
   Scenario: Moved row shows Open, not Edit or Preview

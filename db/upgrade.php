@@ -18,8 +18,11 @@
  * Upgrade steps for local_artqtml.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Execute local_artqtml upgrade steps between two given versions.
@@ -54,6 +57,34 @@ function xmldb_local_artqtml_upgrade($oldversion) {
         \local_artqtml\local\encrypted_config::migrate_plaintext_on_upgrade();
 
         upgrade_plugin_savepoint(true, 2026081301, 'local', 'artqtml');
+    }
+
+    if ($oldversion < 2026082602) {
+        // Draft course is a holding area only: drop native edit cap from the draft role and
+        // track external Moodle edits as locked rows.
+        $table = new xmldb_table('local_artqtml_questions');
+        $field = new xmldb_field(
+            'externallyedited',
+            XMLDB_TYPE_INTEGER,
+            '1',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'edited'
+        );
+        if ($dbman->table_exists($table) && !$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        \local_artqtml\local\draft_role::ensure_role();
+        $roleid = (int) $DB->get_field('role', 'id', ['shortname' => \local_artqtml\local\draft_role::SHORTNAME]);
+        if ($roleid) {
+            $systemcontext = \context_system::instance();
+            unassign_capability('moodle/question:editall', $roleid, $systemcontext->id);
+        }
+
+        upgrade_plugin_savepoint(true, 2026082602, 'local', 'artqtml');
     }
 
     return true;

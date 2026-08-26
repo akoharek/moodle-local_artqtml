@@ -16,6 +16,8 @@
 
 namespace local_artqtml\local;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Unit tests for the draft-editing role.
  *
@@ -24,8 +26,9 @@ namespace local_artqtml\local;
  * Pass a "the Edit link works" test and still be the failure this class was written to avoid.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\draft_role
  */
 final class draft_role_test extends \advanced_testcase {

@@ -16,6 +16,8 @@
 
 namespace local_artqtml;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Unit tests for the question-save observer.
  *
@@ -31,8 +33,9 @@ namespace local_artqtml;
  * Current version out of stale text - losing the edit before it.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\observer::question_saved
  */
 final class observer_test extends \advanced_testcase {
@@ -196,6 +199,7 @@ final class observer_test extends \advanced_testcase {
         $this->assertSame(0, (int) $row->approved, 'an edit revokes the approval');
         $this->assertNull($row->approvedby);
         $this->assertSame(1, (int) $row->edited);
+        $this->assertSame(1, (int) $row->externallyedited);
         $this->assertNotEmpty($row->lasteditedat);
 
         $this->assertTrue(

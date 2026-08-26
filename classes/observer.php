@@ -18,12 +18,15 @@
  * Moodle event observers for local_artqtml (db/events.php).
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml;
 
 use local_artqtml\local\question_importer;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Reacts to core question bank events for questions this plugin created.
@@ -80,10 +83,12 @@ class observer {
             'validationdata'       => null,
             'approved'             => 0,
             // An edit invalidates any prior approval, so the record of who approved it must be
-            // Cleared along with the flag itself - otherwise a stale approvedby would keep
-            // Pointing at someone who approved a now-superseded version of the question.
+            // cleared along with the flag itself - otherwise a stale approvedby would keep
+            // pointing at someone who approved a now-superseded version of the question.
             'approvedby'           => null,
             'edited'               => 1,
+            // External Moodle edit while still in draft: lock plugin mutate paths on this row.
+            'externallyedited'     => 1,
             // Who, and (for the list page's "Modified by" column) when.
             'lasteditedby'         => $event->userid,
             'lasteditedat'         => time(),
