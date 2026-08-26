@@ -3,6 +3,41 @@
 Newest release first. Version numbers match `version.php` `$plugin->version`;
 the number in parentheses is `$plugin->release`.
 
+## 2026-08-26 — `2026082602` (1.0.0)
+
+**Draft course: no native edit + external-edit lock (S-01 redesign)**
+
+- Draft course is a **holding area only**: the plugin draft role grants `course:view` and
+  `question:useall` (preview) — **not** `question:editall`.
+- Approve page: **Preview** only for unmoved questions; **Edit** link removed.
+- External edit via Moodle native `question.php` while still in draft sets
+  `externallyedited=1`, shows **Locked** badge, blocks approve/move/checkbox on that row.
+- **Generation delete** with locked questions: allowed for owner + `:use` or `:manageall`
+  (unchanged policy; only moved-out questions still block whole-generation delete).
+- Upgrade `2026082602`: adds `externallyedited` column; removes `editall` from existing draft role.
+- PHPUnit: `draft_question_lock_test`; observer test extended; Behat approve actions updated.
+
+## 2026-08-26 — `2026082601` (1.0.0)
+
+**C-02: per-file `@copyright` for moodle.org PHPCS**
+
+- Added `@copyright  2026 AR Tudásmenedzsment Kft.` to all shipped PHP file docblocks
+  (Marketplace CI uses the stock `moodle` ruleset; the local `CopyrightTagMissing` exclude
+  does not travel with the ZIP).
+- Removed `CopyrightTagMissing` exclude from `phpcs.xml`.
+- Mass fix: `@license` URL `Www.gnu.org` → `www.gnu.org` (C-09, same compliance pass).
+
+**S-02 / S-08: owner-scoped mutation + `local/artqtml:manageall`**
+
+- New capability **`local/artqtml:manageall`**: mutate any user's generation (default: manager
+  archetype).
+- **`local/artqtml:use`**: still opens/views any generation for collaboration; **mutation** is
+  limited to own generations unless the user has `:manageall`.
+- Central helper `generation_access_policy::can_mutate()` / `require_can_mutate()` on approve,
+  source edit, abort/retry, delete, and `retrytypes.php`.
+- UI hides mutate controls when the user lacks permission.
+- PHPUnit: `generation_access_policy_test`; updated delete/source tests.
+
 ## 2026-08-24 — `2026081306` (1.0.0)
 
 **Behat regression suite (internal, no live LLM)**

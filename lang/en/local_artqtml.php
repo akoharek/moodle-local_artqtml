@@ -18,7 +18,8 @@
  * English language strings for local_artqtml.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -47,7 +48,9 @@ $string['approvedbylabel'] = 'Approved by {$a}';
 $string['approvedlabel'] = 'Approved';
 $string['approveheading'] = 'Review and approve questions';
 $string['artqtml:configure'] = 'Configure ArtQTML admin settings (not generation usage)';
-$string['artqtml:use'] = 'Use ArtQTML generations (not admin settings)';
+$string['artqtml:configure'] = 'Configure ArtQTML admin settings (not generation usage)';
+$string['artqtml:manageall'] = 'Manage all ArtQTML generations (change any user\'s generations)';
+$string['artqtml:use'] = 'Use ArtQTML: view any generation; create and change your own';
 $string['backtolist'] = 'Back to list';
 $string['backtosettings'] = 'Back to settings';
 $string['backtosettingsshort'] = 'Back to settings';
@@ -61,6 +64,7 @@ $string['cannotdeleteothers'] = 'You can only delete your own generations.';
 $string['cannoteditsettingscompleted'] = 'The question settings can only be changed before a generation is started. This one has already finished, so its settings are locked and you have been taken to its questions.';
 $string['cannoteditsettingsstarted'] = 'The question settings can only be changed before a generation is started. This one has already been started, so its settings are locked and you have been taken to its status page.';
 $string['cannoteditsourcenondraft'] = 'The source text and identifiers can only be edited while the generation is a draft. This generation has already started processing or has finished, so no changes were saved.';
+$string['cannotmutateothers'] = 'You can only change your own generations. To work on a colleague\'s generation, ask a site manager with manage-all permission.';
 $string['claudeapikey'] = 'Claude API key';
 $string['claudeapikey_desc'] = 'API key used to authenticate with the Claude (Anthropic) API for question generation.';
 $string['claudemodel'] = 'Claude model';
@@ -107,8 +111,8 @@ $string['difficultymode_scale'] = 'Easy / Medium / Hard';
 $string['draftbankname'] = 'AI draft: {$a->name} ({$a->shortname})';
 $string['draftcategoryinfo'] = 'Unreviewed AI-generated draft content (local_artqtml). Do not use these questions directly - review and approve them via the plugin\'s own workflow first.';
 $string['draftcoursewarningbanner'] = 'The draft course is not configured or no longer exists. New generations are blocked until an administrator sets a valid draft course in the General settings.';
-$string['draftroledescription'] = 'Lets a user edit and preview AI-generated draft questions in Moodle\'s native question editor, inside the configured draft course. Granted automatically when a generation starts. Any generation is included, not only the user\'s own: this is a site-wide tool, so a reviewer must be able to correct a colleague\'s question, not only approve it - the approval page asks for confirmation, naming the owner, before opening someone else\'s. The role carries three capabilities and nothing else: view the course, edit questions, preview questions. It is deliberately not an enrolment - the draft course has no participants, which is what keeps unreviewed AI content out of ordinary question bank browsing.';
-$string['draftrolename'] = 'AI draft question editing';
+$string['draftroledescription'] = 'Lets a user preview AI-generated draft questions in the configured draft course. Granted automatically when a generation starts. The role carries two capabilities only: view the course and preview questions. It deliberately does not grant question editing — the draft course is a holding area until questions are moved to a real bank. If someone edits a draft question through Moodle\'s native editor anyway, the plugin locks that question on the approve page.';
+$string['draftrolename'] = 'AI draft question preview';
 $string['draftrootcategoryname'] = 'ArtQTML';
 $string['duplicatecontinue'] = 'Continue anyway';
 $string['duplicatefound'] = 'Similar content already uploaded';
@@ -119,9 +123,12 @@ $string['errorajaxratelimit'] = 'Too many requests in a short time. Please wait 
 $string['errorajaxunknown'] = 'Unknown AJAX error';
 $string['errorapirequest'] = 'The Claude API request failed: {$a}';
 $string['errorapiresponse'] = 'The Claude API returned an unexpected response.';
+$string['errorapikeyrequired'] = 'This API key is required. Enter the key from your provider dashboard and save.';
 $string['errorbulkactionfailed'] = 'The operation could not be completed. Please try again, or contact your site administrator if the problem continues.';
 $string['errorcounttotalmismatch'] = 'The step 1 difficulty total ({$a->step1}) does not match the step 2 question type total ({$a->step2}). Adjust one of them so the totals match.';
 $string['errordraftcoursenotconfigured'] = 'The draft course is not configured or no longer exists. Ask a site administrator to set it in the ArtQTML\'s General settings before starting a new generation.';
+$string['errordraftcoursemissing'] = 'No course with ID {$a} exists. Enter the numeric ID of a dedicated hidden course.';
+$string['errordraftcourserequired'] = 'Draft course ID is required. Enter the numeric ID of a dedicated hidden course.';
 $string['errorextractfailed'] = 'Could not extract text from the file.';
 $string['errorfileextractionfailed'] = 'The text could not be extracted from this file. Paste the text you want to use into the source-text field.';
 $string['errorfileinvalidstructure'] = 'The file could not be read. It may be damaged, or it may not be the format its name suggests.';
@@ -140,9 +147,10 @@ $string['errormaxlessthanmin'] = 'Maximum must not be less than the configured m
 $string['errorminmorethanmax'] = 'Minimum must not be more than the configured maximum.';
 $string['errormissingapikey'] = 'The Claude API key or model is not configured. Please contact your site administrator.';
 $string['errormissinggeminikey'] = 'The Gemini API key or model is not configured. Please contact your site administrator.';
+$string['errormodelrequired'] = 'Choose a model before saving. Run a successful connection test first if the list is empty.';
 $string['errormissingsettings'] = 'No question generation settings were found for this generation.';
 $string['errornametoolong'] = 'The generation name may be at most 100 characters.';
-$string['errornocategory'] = 'Select a question bank category first.';
+$string['errorquestionlocked'] = 'This question was edited outside the plugin and is locked. Approve and move are not available; delete the question or delete the whole generation if you need to discard it.';
 $string['errornoquestions'] = 'Enter at least one question for at least one question type.';
 $string['errornoselection'] = 'Select at least one question first.';
 $string['errorpercentagerange'] = 'Value must be between 0 and 100.';
@@ -292,7 +300,8 @@ $string['privacy:metadata:local_artqtml_questions:validationsuggestion'] = 'The 
 $string['problemcategory_ambiguous_wording'] = 'Ambiguous wording';
 $string['problemcategory_factual_error'] = 'Factual error';
 $string['problemcategory_ok'] = 'No issue';
-$string['problemcategory_other'] = 'Other';
+$string['questionlockedbadge'] = 'Locked';
+$string['questionlockedreason'] = 'Edited outside the plugin in Moodle\'s question bank. Approve and move are blocked on this row.';
 $string['qtype_fe'] = 'Single choice';
 $string['qtype_ih'] = 'True/False';
 $string['qtype_sr'] = 'Ordering';
@@ -325,7 +334,7 @@ $string['settingdefaultdifficultymode'] = 'Default difficulty mode';
 $string['settingdiagnosticretentiondays'] = 'Diagnostic payload retention (days)';
 $string['settingdiagnosticretentiondays_desc'] = 'How many days the FULL diagnostic payload - the system prompt, the response schema and the raw provider response - is kept on a log entry. Default 30. After this the payload is removed by a daily task, and the log entry itself and all of its technical fields (provider, HTTP status, token counts, request id, result) are kept permanently. A GDPR deletion request removes the payload immediately, regardless of this setting. The value cannot be 0 and there is no unlimited option: this data stops being useful long before it stops being sensitive.';
 $string['settingdraftcourseid'] = 'Draft course ID';
-$string['settingdraftcourseid_desc'] = 'The numeric course ID whose context AI-generated draft questions are created in until approved. Use a dedicated, hidden course with no students enrolled - draft categories are no longer created at the site-wide system context, so this course\'s own context is what actually keeps unreviewed AI content away from ordinary question bank browsing. New generations are blocked until this is set to a course that exists.';
+$string['settingdraftcourseid_desc'] = 'Required. The numeric course ID whose context AI-generated draft questions are created in until approved. Use a dedicated, hidden course with no students enrolled - draft categories are no longer created at the site-wide system context, so this course\'s own context is what actually keeps unreviewed AI content away from ordinary question bank browsing. New generations are blocked until this is set to a course that exists.';
 $string['settingenabled'] = 'Enable plugin';
 $string['settingenabled_desc'] = 'When disabled, no ArtQTML pages are accessible and the "New generation" button is hidden.';
 $string['settingexplanationdefault'] = 'Explain each answer option by default';
@@ -381,6 +390,12 @@ $string['startgeneration'] = 'Start generation';
 $string['statlabelapproved'] = 'Approved questions';
 $string['statlabelpending'] = 'Pending questions';
 $string['statlabelrejected'] = 'Rejected questions';
+$string['setupincomplete_heading'] = 'Complete these required settings before teachers can start new generations:';
+$string['setupmissing_claudeapikey'] = 'Generator LLM tab: Claude API key';
+$string['setupmissing_claudemodel'] = 'Generator LLM tab: Claude model';
+$string['setupmissing_draftcourse'] = 'General tab: Draft course ID';
+$string['setupmissing_geminiapikey'] = 'Validator LLM tab: Gemini API key';
+$string['setupmissing_geminimodel'] = 'Validator LLM tab: Gemini model';
 $string['statlabeltotal'] = 'Total generations';
 $string['status_completed'] = 'Completed';
 $string['status_failed'] = 'Failed';
@@ -422,6 +437,7 @@ $string['validationjustificationlabel'] = 'Justification';
 $string['validationpanelheading'] = 'AI validation (read-only)';
 $string['validationstatus_accepted'] = 'Accepted';
 $string['validationstatus_edited'] = 'Edited';
+$string['validationstatus_locked'] = 'Locked';
 $string['validationstatus_needs_review'] = 'Needs review';
 $string['validationstatus_not_evaluated'] = 'Not evaluated';
 $string['validationstatus_rejected'] = 'Rejected';

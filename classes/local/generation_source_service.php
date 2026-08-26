@@ -17,16 +17,25 @@
 /**
  * Creates a generation, or updates the source of one that is still a draft.
  *
+ * WHY THIS IS A CLASS AND NOT A FUNCTION IN upload.php. It used to be
+ * `local_artqtml_save_generation()`, declared at file scope in a controller that starts a
+ * session, reads request parameters and redirects. Nothing could call it in a test, which meant
+ * the one behaviour that actually needed proving here - that a form submitted after the
+ * generation's status changed writes nothing - could not be proven at all.
+ *
  * The division of labour is deliberate: this decides whether a write may happen and performs it;
- * The controller decides what the user is then shown. It never redirects, never renders and never
- * Touches capabilities - the capability check belongs to the page, and has already happened by the
- * Time anything gets here.
+ * the controller decides what the user is then shown. It never redirects, never renders and never
+ * touches capabilities - the capability check belongs to the page, and has already happened by the
+ * time anything gets here.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * The write path for a generation's source text and identifiers.
@@ -36,26 +45,26 @@ class generation_source_service {
      * Create a generation, or update the source of an existing draft.
      *
      * THE STATUS IS READ AGAIN HERE, from the database, in the same breath as the write. The page
-     * Checked it too, when it opened - and that check is worth nothing by the time a form comes
-     * Back. The sequence this guards against needs no attacker:
+     * checked it too, when it opened - and that check is worth nothing by the time a form comes
+     * back. The sequence this guards against needs no attacker:
      *
      *   1. a teacher opens a draft's source page;
      *   2. in another tab - or another teacher, the tool is site-wide - the generation is started;
      *   3. the first tab's form is submitted.
      *
      * Without the re-read, step 3 rewrites the source text of a generation that is at that moment
-     * Being read by Claude, and will shortly be read again by Gemini.
+     * being read by Claude, and will shortly be read again by Gemini.
      *
      * THE TRANSACTION IS SHORT ON PURPOSE. It wraps the re-read and the update and nothing else -
-     * File extraction, the security screen, duplicate detection and the whole of the page's
-     * Rendering happen outside it. A transaction held across those would be a long-lived lock on a
-     * User-facing path.
+     * file extraction, the security screen, duplicate detection and the whole of the page's
+     * rendering happen outside it. A transaction held across those would be a long-lived lock on a
+     * user-facing path.
      *
      * WHAT IT STILL DOES NOT CLOSE, stated rather than glossed over: this is a read-then-write
-     * Inside one transaction, not a database-level compare-and-swap. Two saves landing in the same
-     * Instant on the same draft can still interleave. That was not worth a non-portable
+     * inside one transaction, not a database-level compare-and-swap. Two saves landing in the same
+     * instant on the same draft can still interleave. That was not worth a non-portable
      * `SELECT ... FOR UPDATE` across every database Moodle supports, and the case it would fix -
-     * Two people editing the same draft in the same second - is not the case this change is about.
+     * two people editing the same draft in the same second - is not the case this change is about.
      *
      * @param string $name the generation's display name
      * @param string $shortname the short identifier
@@ -77,6 +86,11 @@ class generation_source_service {
         global $DB;
 
         if ($editingid > 0) {
+            // The lock, not the transaction, is what makes the three lines below one decision. The
+            // transaction gives atomicity; it issues no row-level SELECT ... FOR UPDATE, so without
+            // this another request could start the generation between the status check and the
+            // write, and the source text would be replaced under a model already reading it
+            // (2026-08-05, BL-51). The lock is released whether this returns or throws.
             return (int) generation_lock::run(
                 $editingid,
                 static fn(): int => self::update_draft_source($editingid, $name, $shortname, $sourcetext, $filehash)
@@ -101,7 +115,7 @@ class generation_source_service {
      * Re-read the status and write the source columns, with the generation already locked.
      *
      * Split out of {@see self::save()} only so that the locked section is a named thing rather than
-     * A closure body - the sequence, not the layout, is what matters.
+     * a closure body - the sequence, not the layout, is what matters.
      *
      * @param int $editingid the generation being edited
      * @param string $name the generation's display name
@@ -124,8 +138,15 @@ class generation_source_service {
 
         $record = $DB->get_record('local_artqtml_generations', ['id' => $editingid], '*', MUST_EXIST);
 
+        generation_access_policy::require_can_mutate($record, \context_system::instance());
         generation_edit_policy::require_source_editable($record);
 
+        // ONLY THIS PAGE'S OWN COLUMNS ARE WRITTEN, and that is the point of the object below
+        // rather than the record that was just read. Moodle's update_record() writes every
+        // property it is given, so handing back the whole loaded record wrote every column -
+        // including `status`. A generation started in another tab between the read above and the
+        // write here therefore had its status pushed back from `generating` to `started` by a form
+        // that never meant to touch it (2026-08-05, BL-51).
         $DB->update_record('local_artqtml_generations', (object) [
             'id'             => $editingid,
             'name'           => $name,

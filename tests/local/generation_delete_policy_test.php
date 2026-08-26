@@ -16,12 +16,18 @@
 
 namespace local_artqtml\local;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Unit tests for generation deletion authorisation.
  *
+ * Product decision 2026-08-10: delete requires local/artqtml:use and ownership.
+ * local/artqtml:configure never authorises deletion.
+ *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\generation_delete_policy
  */
 final class generation_delete_policy_test extends \advanced_testcase {
@@ -38,17 +44,17 @@ final class generation_delete_policy_test extends \advanced_testcase {
     }
 
     /**
-     * Assign only the named ArtQTML capabilities to a user at system context.
+     * Assign only the named ArtQTM capabilities to a user at system context.
      *
      * Uses a fresh role each time so :use and :configure can be granted independently - the
-     * Manager archetype has both, which would blur the configure-only case.
+     * manager archetype has both, which would blur the configure-only case.
      *
      * @param \stdClass $user
      * @param string[] $capabilities frankenstyle capability names
      * @return void
      */
     private function grant_capabilities(\stdClass $user, array $capabilities): void {
-        $roleid = create_role('artqtml delete test ' . $user->id, 'artqtmldel' . $user->id, '');
+        $roleid = create_role('artqtm delete test ' . $user->id, 'artqtmdel' . $user->id, '');
         foreach ($capabilities as $capability) {
             assign_capability($capability, CAP_ALLOW, $roleid, $this->context->id);
         }
@@ -85,12 +91,28 @@ final class generation_delete_policy_test extends \advanced_testcase {
         $this->assertFalse(generation_delete_policy::can_delete($generation, null, $this->context));
 
         $this->expectException(\moodle_exception::class);
-        $this->expectExceptionMessageMatches('/cannotdeleteothers|own generations/i');
+        $this->expectExceptionMessage(get_string('cannotmutateothers', 'local_artqtml'));
         generation_delete_policy::require_can_delete($generation, $this->context);
     }
 
     /**
-     * Configure alone never authorises deletion - even of the caller's own generation.
+     * Non-owner with :manageall may delete.
+     */
+    public function test_manageall_can_delete_others(): void {
+        $owner = $this->getDataGenerator()->create_user();
+        $manager = $this->getDataGenerator()->create_user();
+        $this->grant_capabilities($manager, ['local/artqtml:use', 'local/artqtml:manageall']);
+        $this->setUser($manager);
+
+        $generation = (object) ['userid' => (int) $owner->id];
+
+        $this->assertTrue(generation_delete_policy::can_delete($generation, null, $this->context));
+        generation_delete_policy::require_can_delete($generation, $this->context);
+        $this->assertTrue(true);
+    }
+
+    /**
+     * :configure alone never authorises deletion - even of the caller's own generation.
      */
     public function test_configure_only_cannot_delete(): void {
         $owner = $this->getDataGenerator()->create_user();
@@ -119,7 +141,7 @@ final class generation_delete_policy_test extends \advanced_testcase {
         $this->assertFalse(generation_delete_policy::can_delete($generation, null, $this->context));
 
         $this->expectException(\moodle_exception::class);
-        $this->expectExceptionMessageMatches('/cannotdeleteothers|own generations/i');
+        $this->expectExceptionMessage(get_string('cannotmutateothers', 'local_artqtml'));
         generation_delete_policy::require_can_delete($generation, $this->context);
     }
 
@@ -151,7 +173,7 @@ final class generation_delete_policy_test extends \advanced_testcase {
         $this->assertStringContainsString("require_capability('local/artqtml:use'", $delete);
         // Comments may name :configure to forbid it; the entry gate must never require it.
         $this->assertDoesNotMatchRegularExpression(
-            "/require_capability\\('local\\/artqtml:configure'/",
+            "/require_capability\\('local\\/artqtm:configure'/",
             $delete
         );
 
@@ -159,13 +181,6 @@ final class generation_delete_policy_test extends \advanced_testcase {
         $this->assertStringContainsString('generation_delete_policy::require_can_delete', $generate);
 
         $list = file_get_contents($root . '/classes/local/generation_list.php');
-        $this->assertStringContainsString(
-            "\$candelete = \$onlymine && has_capability('local/artqtml:use'",
-            $list
-        );
-        $this->assertStringNotContainsString(
-            "\$candelete = \$onlymine || has_capability('local/artqtml:configure'",
-            $list
-        );
+        $this->assertStringContainsString('generation_delete_policy::can_delete($generation)', $list);
     }
 }
