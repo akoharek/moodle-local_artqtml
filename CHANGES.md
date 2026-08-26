@@ -3,6 +3,18 @@
 Newest release first. Version numbers match `version.php` `$plugin->version`;
 the number in parentheses is `$plugin->release`.
 
+## 2026-08-26 — `2026082604` (1.0.0)
+
+**F-07: mandatory admin setup after install (no auto-create draft course)**
+
+- Fresh install sets a one-shot redirect: configure-capable users land on **General** admin
+  settings (`local_artqtml_general`).
+- **Required fields** with save-time validation: draft course ID (must exist), Claude/Gemini
+  API keys (on first save), Claude/Gemini model (non-empty).
+- Setup checklist banner on **General**, **Generator LLM**, and **Validator LLM** tabs.
+- Teachers remain blocked from new generations until setup is complete (existing behaviour).
+- Light: remove accidental Full-only `token_budget` / `license_checker` references from entry scripts.
+
 ## 2026-08-26 — `2026082602` (1.0.0)
 
 **Draft course: no native edit + external-edit lock (S-01 redesign)**
@@ -17,15 +29,17 @@ the number in parentheses is `$plugin->release`.
 - Upgrade `2026082602`: adds `externallyedited` column; removes `editall` from existing draft role.
 - PHPUnit: `draft_question_lock_test`; observer test extended; Behat approve actions updated.
 
+## 2026-08-26 — `2026082603` (1.0.0)
+
+**C-01 / C-02: MOODLE_INTERNAL guards + per-file @copyright (Marketplace PHPCS)**
+
+- Added `defined('MOODLE_INTERNAL') || die();` to all shipped PHP files (Behat/phpstan bootstrap
+  excluded by design).
+- Added `@copyright  2026 AR Tudásmenedzsment Kft.` to every PHP file docblock; removed
+  `CopyrightTagMissing` exclude from `phpcs.xml`.
+- Mass fix: `@license` URL `Www.gnu.org` → `www.gnu.org` (C-09).
+
 ## 2026-08-26 — `2026082601` (1.0.0)
-
-**C-02: per-file `@copyright` for moodle.org PHPCS**
-
-- Added `@copyright  2026 AR Tudásmenedzsment Kft.` to all shipped PHP file docblocks
-  (Marketplace CI uses the stock `moodle` ruleset; the local `CopyrightTagMissing` exclude
-  does not travel with the ZIP).
-- Removed `CopyrightTagMissing` exclude from `phpcs.xml`.
-- Mass fix: `@license` URL `Www.gnu.org` → `www.gnu.org` (C-09, same compliance pass).
 
 **S-02 / S-08: owner-scoped mutation + `local/artqtml:manageall`**
 

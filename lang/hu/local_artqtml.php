@@ -18,7 +18,8 @@
  * Magyar nyelvi fájl a local_artqtml pluginhoz.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -47,7 +48,8 @@ $string['approvedbylabel'] = 'Jóváhagyta: {$a}';
 $string['approvedlabel'] = 'Jóváhagyva';
 $string['approveheading'] = 'Kérdések áttekintése és jóváhagyása';
 $string['artqtml:configure'] = 'ArtQTML admin beállításainak szerkesztése (nem generálási használat)';
-$string['artqtml:use'] = 'ArtQTML generálások használata (nem admin beállítások)';
+$string['artqtml:manageall'] = 'Az ArtQTML összes generálásának kezelése (bárki generálásának módosítása)';
+$string['artqtml:use'] = 'ArtQTML: bármely generálás megtekintése; saját generálások létrehozása és módosítása';
 $string['backtolist'] = 'Vissza a listához';
 $string['backtosettings'] = 'Vissza a beállításokhoz';
 $string['backtosettingsshort'] = 'Vissza a beállításokhoz';
@@ -58,6 +60,7 @@ $string['bulkdelete'] = 'Kijelöltek törlése';
 $string['bulkdeletesuccess'] = '{$a} kérdés törölve.';
 $string['cannotdeletemoved'] = 'A generálás nem törölhető, mert tartalmaz a kérdésbankba áthelyezett kérdést.';
 $string['cannotdeleteothers'] = 'Csak a saját generálásaidat törölheted.';
+$string['cannotmutateothers'] = 'Csak a saját generálásaidat módosíthatod. Kollégája generálásához kérjen site managert `:manageall` joggal.';
 $string['cannoteditsettingscompleted'] = 'A kérdés beállítások csak a generálás elindítása előtt módosíthatók. Ez a generálás már elkészült, ezért a beállításai zárolva vannak, és a kérdéseihez irányítottuk.';
 $string['cannoteditsettingsstarted'] = 'A kérdés beállítások csak a generálás elindítása előtt módosíthatók. Ez a generálás már el lett indítva, ezért a beállításai zárolva vannak, és az állapotoldalára irányítottuk.';
 $string['cannoteditsourcenondraft'] = 'A forrásszöveg és az azonosítók csak piszkozat állapotban szerkeszthetők. Ez a generálás már feldolgozás alatt áll vagy befejeződött, ezért a rendszer nem mentett módosítást.';
@@ -107,8 +110,8 @@ $string['difficultymode_scale'] = 'Könnyű / Közepes / Nehéz';
 $string['draftbankname'] = 'AI draft: {$a->name} ({$a->shortname})';
 $string['draftcategoryinfo'] = 'Nem ellenőrzött, AI által generált piszkozat tartalom (local_artqtml). Ezeket a kérdéseket ne használd közvetlenül - előbb ellenőrizd és hagyd jóvá a plugin saját munkafolyamatán keresztül.';
 $string['draftcoursewarningbanner'] = 'A piszkozat kurzus nincs beállítva vagy már nem létezik. Az új generálások le vannak tiltva, amíg egy rendszergazda érvényes piszkozat kurzust nem állít be az Általános beállításokban.';
-$string['draftroledescription'] = 'Lehetővé teszi, hogy a felhasználó az AI által generált piszkozat kérdéseket a Moodle natív kérdésszerkesztőjében szerkessze és megtekintse, a beállított piszkozat kurzuson belül. A generálás indításakor automatikusan megkapja. Nem csak a sajátját: a plugin webhely szintű eszköz, ezért a bírálónak javítania is tudnia kell a kollégája kérdését, nem csak jóváhagynia - a jóváhagyó oldal más generálásánál megerősítést kér, és megnevezi a tulajdonost. A szerepkör pontosan három jogosultságot ad és semmi mást: kurzus megtekintése, kérdések szerkesztése, kérdések előnézete. Szándékosan nem beiratkozás - a piszkozat kurzusnak nincsenek résztvevői, és éppen ez tartja távol az át nem nézett AI tartalmat a rendes kérdésbank böngészésétől.';
-$string['draftrolename'] = 'AI piszkozat kérdésszerkesztés';
+$string['draftroledescription'] = 'Lehetővé teszi, hogy a felhasználó az AI által generált piszkozat kérdéseket előnézetben megtekintse a beállított piszkozat kurzuson. A generálás indításakor automatikusan megkapja. A szerepkör két jogosultságot ad: kurzus megtekintése és kérdések előnézete. Kérdésszerkesztést szándékosan nem ad — a piszkozat kurzus csak tároló, amíg a kérdések át nem kerülnek a cél bankba. Ha valaki mégis a Moodle natív szerkesztőjében módosítja a piszkozat kérdést, a plugin zárolja azt a jóváhagyó oldalon.';
+$string['draftrolename'] = 'AI piszkozat kérdés előnézet';
 $string['draftrootcategoryname'] = 'ArtQTML';
 $string['duplicatecontinue'] = 'Folytatom';
 $string['duplicatefound'] = 'Hasonló tartalom már fel lett töltve';
@@ -119,9 +122,12 @@ $string['errorajaxratelimit'] = 'Túl sok kérés rövid időn belül. Várj egy
 $string['errorajaxunknown'] = 'Ismeretlen AJAX hiba';
 $string['errorapirequest'] = 'A Claude API kérés sikertelen volt: {$a}';
 $string['errorapiresponse'] = 'A Claude API váratlan választ adott.';
+$string['errorapikeyrequired'] = 'Az API kulcs kötelező. Add meg a szolgáltatói irányítópult kulcsát, majd mentsd.';
 $string['errorbulkactionfailed'] = 'A művelet nem fejeződött be. Próbáld újra, vagy fordulj a rendszergazdához, ha a probléma továbbra is fennáll.';
 $string['errorcounttotalmismatch'] = 'Az 1. lépésben megadott nehézségi összeg ({$a->step1}) nem egyezik a 2. lépésben megadott kérdéstípus-összeggel ({$a->step2}). Igazítsa az egyiket, hogy megegyezzenek.';
 $string['errordraftcoursenotconfigured'] = 'A piszkozat kurzus nincs beállítva vagy már nem létezik. Kérj meg egy rendszergazdát, hogy állítsa be az ArtQTML Általános beállításaiban, mielőtt új generálást indítanál.';
+$string['errordraftcoursemissing'] = 'Nincs {$a} azonosítójú kurzus. Adj meg egy dedikált rejtett kurzus numerikus azonosítóját.';
+$string['errordraftcourserequired'] = 'A piszkozat kurzus azonosítója kötelező. Adj meg egy dedikált rejtett kurzus numerikus azonosítóját.';
 $string['errorextractfailed'] = 'A fájlból nem sikerült szöveget kinyerni.';
 $string['errorfileextractionfailed'] = 'A fájlból nem sikerült szöveget kinyerni. Másold be a használni kívánt szöveget a forrásszöveg mezőbe.';
 $string['errorfileinvalidstructure'] = 'A fájl nem olvasható. Lehet, hogy sérült, vagy nem az a formátum, amit a neve mutat.';
@@ -135,6 +141,7 @@ $string['errorgenerationbusy'] = 'Valaki más éppen ezen a generáláson dolgoz
 $string['errorgenerationunexpected'] = 'Váratlan hiba történt. Indítsd újra a generálást.';
 $string['errorinvalidaction'] = 'Ismeretlen művelet.';
 $string['errorinvalidprovider'] = 'Érvénytelen szolgáltató.';
+$string['errorquestionlocked'] = 'Ezt a kérdést a pluginen kívül szerkesztették, ezért zárolt. Jóváhagyás és áthelyezés nem érhető el; töröld a kérdést vagy az egész generálást, ha el kell vetned.';
 $string['errormaxfilesizeexceeded'] = 'A max fájlméret nem haladhatja meg a Moodle rendszerszintű feltöltési korlátját ({$a}).';
 $string['errormaxlessthanmin'] = 'A maximum nem lehet kisebb a beállított minimumnál.';
 $string['errorminmorethanmax'] = 'A minimum nem lehet nagyobb a beállított maximumnál.';
@@ -293,6 +300,8 @@ $string['problemcategory_ambiguous_wording'] = 'Félreérthető megfogalmazás';
 $string['problemcategory_factual_error'] = 'Tárgyi tévedés';
 $string['problemcategory_ok'] = 'Nincs probléma';
 $string['problemcategory_other'] = 'Egyéb';
+$string['questionlockedbadge'] = 'Zárolt';
+$string['questionlockedreason'] = 'A Moodle kérdésbankjában, a pluginen kívül lett szerkesztve. Jóváhagyás és áthelyezés tiltott ezen a soron.';
 $string['qtype_fe'] = 'Feleletválasztós (egyszeres)';
 $string['qtype_ih'] = 'Igaz/Hamis';
 $string['qtype_sr'] = 'Sorba rendezés';
@@ -325,7 +334,7 @@ $string['settingdefaultdifficultymode'] = 'Alapértelmezett nehézségi mód';
 $string['settingdiagnosticretentiondays'] = 'Diagnosztikai tartalom megőrzési ideje (nap)';
 $string['settingdiagnosticretentiondays_desc'] = 'Hány napig marad meg a TELJES diagnosztikai tartalom — a system prompt, a válaszséma és a nyers AI-válasz — egy naplóbejegyzésen. Alapértelmezés: 30. Ezután egy napi ütemezett feladat eltávolítja, maga a naplóbejegyzés és annak minden technikai mezője (szolgáltató, HTTP-státusz, tokenszámok, kérésazonosító, eredmény) viszont véglegesen megmarad. GDPR-törlési kérés a beállítástól függetlenül azonnal eltávolítja a tartalmat. Az érték nem lehet 0, és nincs korlátlan lehetőség: ez az adat jóval hamarabb veszíti el a hasznosságát, mint az érzékenységét.';
 $string['settingdraftcourseid'] = 'Piszkozat kurzus azonosítója';
-$string['settingdraftcourseid_desc'] = 'Az a numerikus kurzusazonosító, amelynek kontextusában az AI által generált piszkozat kérdések létrejönnek jóváhagyásig. Használj egy dedikált, rejtett kurzust hallgatók nélkül - a piszkozat kategóriák többé nem a webhely szintű rendszerkontextusban jönnek létre, így ennek a kurzusnak a saját kontextusa tartja távol a nem ellenőrzött AI tartalmat a szokásos kérdésbank böngészéstől. Az új generálások le vannak tiltva, amíg ez egy létező kurzusra nincs beállítva.';
+$string['settingdraftcourseid_desc'] = 'Kötelező. Az a numerikus kurzusazonosító, amelynek kontextusában az AI által generált piszkozat kérdések létrejönnek jóváhagyásig. Használj egy dedikált, rejtett kurzust hallgatók nélkül - a piszkozat kategóriák többé nem a webhely szintű rendszerkontextusban jönnek létre, így ennek a kurzusnak a saját kontextusa tartja távol a nem ellenőrzött AI tartalmat a szokásos kérdésbank böngészéstől. Az új generálások le vannak tiltva, amíg ez egy létező kurzusra nincs beállítva.';
 $string['settingenabled'] = 'Plugin engedélyezése';
 $string['settingenabled_desc'] = 'Kikapcsolt állapotban a plugin oldalai nem érhetők el, és az Új generálás indítása gomb sem jelenik meg.';
 $string['settingexplanationdefault'] = 'Válaszlehetőségek megmagyarázása alapértelmezetten';
@@ -381,6 +390,12 @@ $string['startgeneration'] = 'Generálás indítása';
 $string['statlabelapproved'] = 'Jóváhagyott kérdések';
 $string['statlabelpending'] = 'Függőben lévő kérdések';
 $string['statlabelrejected'] = 'Elutasított kérdések';
+$string['setupincomplete_heading'] = 'Az alábbi kötelező beállításokat töltsd ki, mielőtt tanárok új generálást indíthatnának:';
+$string['setupmissing_claudeapikey'] = 'Generáló LLM fül: Claude API kulcs';
+$string['setupmissing_claudemodel'] = 'Generáló LLM fül: Claude modell';
+$string['setupmissing_draftcourse'] = 'Általános fül: Piszkozat kurzus azonosítója';
+$string['setupmissing_geminiapikey'] = 'Validáló LLM fül: Gemini API kulcs';
+$string['setupmissing_geminimodel'] = 'Validáló LLM fül: Gemini modell';
 $string['statlabeltotal'] = 'Összes generálás';
 $string['status_completed'] = 'Befejezett';
 $string['status_failed'] = 'Hiba';
@@ -422,6 +437,7 @@ $string['validationjustificationlabel'] = 'Indoklás';
 $string['validationpanelheading'] = 'AI validáció (csak olvasható)';
 $string['validationstatus_accepted'] = 'Elfogadható';
 $string['validationstatus_edited'] = 'Szerkesztve';
+$string['validationstatus_locked'] = 'Zárolt';
 $string['validationstatus_needs_review'] = 'Módosítandó';
 $string['validationstatus_not_evaluated'] = 'Nem értékelt';
 $string['validationstatus_rejected'] = 'Törlendő';

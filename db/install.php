@@ -18,8 +18,11 @@
  * Install-time setup for local_artqtml.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Create the draft-editing role, seed the system prompt, migrate from local_aiquizgen if present.
@@ -45,6 +48,8 @@ function xmldb_local_artqtml_install(): bool {
     \local_artqtml\local\draft_role::ensure_role();
 
     \local_artqtml\local\prompt_seed::apply();
+
+    \local_artqtml\local\plugin_setup::flag_post_install_redirect();
 
     return true;
 }

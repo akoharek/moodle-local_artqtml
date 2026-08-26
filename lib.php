@@ -18,8 +18,11 @@
  * Library functions and callbacks for local_artqtml.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Add a link to the ArtQTML into the primary/global navigation.
@@ -302,5 +305,31 @@ function local_artqtml_model_warning_banner(): string {
         html_writer::tag('ul', $items, ['class' => 'mb-0']),
         'alert alert-danger',
         ['data-testid' => 'artqtml-modelblocked-banner']
+    );
+}
+
+/**
+ * Setup checklist banner for admin settings when mandatory fields are still empty.
+ *
+ * @return string HTML, or '' when setup is complete
+ */
+function local_artqtml_setup_incomplete_banner(): string {
+    if (!\local_artqtml\local\plugin_setup::user_can_configure()) {
+        return '';
+    }
+    if (\local_artqtml\local\plugin_setup::is_complete()) {
+        return '';
+    }
+
+    $items = '';
+    foreach (\local_artqtml\local\plugin_setup::missing_labels() as $label) {
+        $items .= html_writer::tag('li', s($label));
+    }
+
+    return html_writer::div(
+        html_writer::tag('p', get_string('setupincomplete_heading', 'local_artqtml'), ['class' => 'mb-2']) .
+        html_writer::tag('ul', $items, ['class' => 'mb-0']),
+        'alert alert-warning',
+        ['data-testid' => 'artqtml-setup-incomplete-banner']
     );
 }

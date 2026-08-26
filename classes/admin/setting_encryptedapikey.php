@@ -18,12 +18,15 @@
  * Password field for the Claude/Gemini API keys, encrypted at rest via \core\encryption.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\admin;
 
 use local_artqtml\local\encrypted_config;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Transparently encrypts on write and decrypts on read, so the admin form/unmask toggle still
@@ -81,6 +84,26 @@ class setting_encryptedapikey extends \admin_setting_configpasswordunmask {
 
         encrypted_config::clear_failure($this->name);
         return ($this->config_write($this->name, $encrypted) ? '' : get_string('errorsetting', 'admin'));
+    }
+
+    /**
+     * Require a key on first save; empty resubmit is allowed when a value is already stored.
+     *
+     * @param string $data
+     * @return true|string
+     */
+    public function validate($data) {
+        $data = trim((string) $data);
+        if ($data !== '') {
+            return true;
+        }
+
+        $stored = $this->config_read($this->name);
+        if ($stored === null || $stored === '') {
+            return get_string('errorapikeyrequired', 'local_artqtml');
+        }
+
+        return true;
     }
 
     /**

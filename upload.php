@@ -43,19 +43,6 @@ if (!get_config('local_artqtml', 'enabled')) {
     redirect(new moodle_url('/local/artqtml/index.php'));
 }
 
-if (\local_artqtml\local\token_budget::is_exceeded('claude') || \local_artqtml\local\token_budget::is_exceeded('gemini')) {
-    \core\notification::error(get_string('errortokenbudgetexceeded', 'local_artqtml'));
-    redirect(new moodle_url('/local/artqtml/index.php'));
-}
-
-// Lic-009: missing/invalid/expired/exhausted license blocks starting a new generation.
-if (\local_artqtml\local\license_checker::is_blocked()) {
-    \core\notification::error(get_string('errorlicenseblocked', 'local_artqtml'));
-    redirect(new moodle_url('/local/artqtml/index.php'));
-}
-
-// Jov-023: an unconfigured/invalid draft course blocks starting a new generation too - there is
-// nowhere safe to create the draft question bank otherwise.
 if (!\local_artqtml\local\draft_bank::is_configured()) {
     \core\notification::error(get_string('errordraftcoursenotconfigured', 'local_artqtml'));
     redirect(new moodle_url('/local/artqtml/index.php'));

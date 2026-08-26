@@ -18,12 +18,17 @@
  * Hooks API listener registrations for local_artqtml.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $callbacks = [
+    [
+        'hook'     => \core\hook\after_config::class,
+        'callback' => [\local_artqtml\hook_callbacks::class, 'after_config'],
+    ],
     [
         'hook'     => \core\hook\output\before_standard_top_of_body_html_generation::class,
         'callback' => \local_artqtml\hook_callbacks::class . '::before_standard_top_of_body_html',

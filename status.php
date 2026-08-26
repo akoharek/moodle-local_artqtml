@@ -27,7 +27,6 @@ require(__DIR__ . '/../../config.php');
 use local_artqtml\local\draft_bank;
 use local_artqtml\local\generation_status;
 use local_artqtml\local\generation_access_policy;
-use local_artqtml\local\token_budget;
 use local_artqtml\local\question_types;
 
 require_login();
@@ -165,7 +164,8 @@ $PAGE->set_heading(get_string('statusheading', 'local_artqtml'));
 $PAGE->requires->js_call_amd('local_artqtml/status', 'init');
 
 $questioncount = $DB->count_records('local_artqtml_questions', ['generationid' => $generationid]);
-$tokenwarningmessage = token_budget::warning_message($generationid);
+// Light edition: no monthly token-budget UI (Full-only Admin-030-033).
+$tokenwarningmessage = '';
 
 $approveurl = new moodle_url('/local/artqtml/approve.php', ['generationid' => $generationid]);
 $backurl = new moodle_url('/local/artqtml/generate.php', ['id' => $generationid]);

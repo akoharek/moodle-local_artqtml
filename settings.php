@@ -25,7 +25,8 @@
  * They are not editable from this page.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -41,6 +42,7 @@ if ($hassiteconfig || has_capability('local/artqtml:configure', context_system::
 
     $draftcoursebanner = local_artqtml_draftcourse_warning_banner();
     $apikeybanner = local_artqtml_apikey_decrypt_notice();
+    $setupbanner = local_artqtml_setup_incomplete_banner();
 
     // ------------------------------------------------------------------
     // General.
@@ -55,6 +57,10 @@ if ($hassiteconfig || has_capability('local/artqtml:configure', context_system::
     }
     if ($apikeybanner !== '') {
         $general->add(new admin_setting_description('local_artqtml/apikeybanner_general', '', $apikeybanner));
+    }
+
+    if ($setupbanner !== '') {
+        $general->add(new admin_setting_description('local_artqtml/setupbanner_general', '', $setupbanner));
     }
 
     $general->add(new admin_setting_configcheckbox(
@@ -86,12 +92,10 @@ if ($hassiteconfig || has_capability('local/artqtml:configure', context_system::
         1
     ));
     // Draft categories live in this course's context - see classes/local/draft_bank.php.
-    $general->add(new admin_setting_configtext(
+    $general->add(new \local_artqtml\admin\setting_configtext_courseid(
         'local_artqtml/draftcourseid',
         get_string('settingdraftcourseid', 'local_artqtml'),
-        get_string('settingdraftcourseid_desc', 'local_artqtml'),
-        0,
-        PARAM_INT
+        get_string('settingdraftcourseid_desc', 'local_artqtml')
     ));
 
     $ADMIN->add('local_artqtml_category', $general);
@@ -109,6 +113,9 @@ if ($hassiteconfig || has_capability('local/artqtml:configure', context_system::
     }
     if ($apikeybanner !== '') {
         $generator->add(new admin_setting_description('local_artqtml/apikeybanner_generator', '', $apikeybanner));
+    }
+    if ($setupbanner !== '') {
+        $generator->add(new admin_setting_description('local_artqtml/setupbanner_generator', '', $setupbanner));
     }
 
     $generator->add(new \local_artqtml\admin\setting_encryptedapikey(
@@ -156,6 +163,9 @@ if ($hassiteconfig || has_capability('local/artqtml:configure', context_system::
     }
     if ($apikeybanner !== '') {
         $validator->add(new admin_setting_description('local_artqtml/apikeybanner_validator', '', $apikeybanner));
+    }
+    if ($setupbanner !== '') {
+        $validator->add(new admin_setting_description('local_artqtml/setupbanner_validator', '', $setupbanner));
     }
 
     $validator->add(new \local_artqtml\admin\setting_encryptedapikey(

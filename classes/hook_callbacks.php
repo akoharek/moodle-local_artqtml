@@ -18,18 +18,63 @@
  * Hooks API listeners for local_artqtml (db/hooks.php).
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml;
 
+use core\hook\after_config;
 use core\hook\output\before_standard_top_of_body_html_generation;
+use local_artqtml\local\plugin_setup;
 use local_artqtml\local\validation_panel;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Listeners for core output hooks.
  */
 class hook_callbacks {
+    /**
+     * After install, send configure-capable users to plugin settings once.
+     *
+     * @param after_config $hook
+     * @return void
+     */
+    public static function after_config(after_config $hook): void {
+        global $CFG;
+
+        if (during_install()) {
+            return;
+        }
+        if (defined('CLI_SCRIPT') && CLI_SCRIPT) {
+            return;
+        }
+        if (defined('WS_SERVER') && WS_SERVER) {
+            return;
+        }
+        if (defined('AJAX_SCRIPT') && AJAX_SCRIPT) {
+            return;
+        }
+        if (!plugin_setup::user_can_configure()) {
+            return;
+        }
+        if (plugin_setup::is_on_plugin_settings_page()) {
+            plugin_setup::acknowledge_settings_visit();
+            return;
+        }
+        if (!plugin_setup::should_redirect_to_settings()) {
+            return;
+        }
+
+        $script = basename($CFG->script ?? $_SERVER['SCRIPT_NAME'] ?? '');
+        if (in_array($script, ['upgrade.php', 'upgradesettings.php', 'install.php'], true)) {
+            return;
+        }
+
+        redirect(new \moodle_url('/admin/settings.php', ['section' => 'local_artqtml_general']));
+    }
+
     /**
      * Only ever adds HTML on /question/bank/editquestion/question.php for a still-in-draft
      * question that has a matching local_artqtml_questions row. Moved questions open the core
