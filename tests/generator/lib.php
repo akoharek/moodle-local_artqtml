@@ -18,6 +18,7 @@
  * Test data generator for local_artqtml.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -30,6 +31,8 @@ use local_artqtml\local\generation_status;
 use local_artqtml\local\question\question_creator;
 use local_artqtml\local\question_types;
 use local_artqtml\local\validation_suggestion;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Creates generations and draft questions without calling an LLM.

@@ -16,6 +16,8 @@
 
 namespace local_artqtml\local;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Unit tests for the content screens.
  *
@@ -29,8 +31,9 @@ namespace local_artqtml\local;
  * Phrase.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\security_filter
  */
 final class security_filter_test extends \advanced_testcase {

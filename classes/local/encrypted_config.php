@@ -23,10 +23,13 @@
  * be recovered — not by this plugin and not by Moodle — and must be re-entered.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Decrypts encrypted plugin config, migrating pre-encryption plaintext.

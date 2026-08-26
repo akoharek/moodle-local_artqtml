@@ -16,6 +16,8 @@
 
 namespace local_artqtml\local\upgrade;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * One-off repair for draft categories left at parent = 0 by earlier versions (D-3).
  *
@@ -34,7 +36,8 @@ namespace local_artqtml\local\upgrade;
  * One. It lives here rather than inline in db/upgrade.php purely so it can be unit-tested.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class draft_category_reparent {
     /**

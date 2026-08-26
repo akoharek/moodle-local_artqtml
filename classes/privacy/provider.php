@@ -20,7 +20,8 @@
  * The plugin is site-wide: generations are not tied to a course, so all personal data lives at the system context.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\privacy;
@@ -33,6 +34,8 @@ use core_privacy\local\request\core_userlist_provider;
 use core_privacy\local\request\transform;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Privacy provider for the local_artqtml plugin.

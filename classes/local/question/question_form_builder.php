@@ -20,12 +20,15 @@
  * (split out of question_importer - ).
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local\question;
 
 use local_artqtml\local\question_types;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Maps AI-generated per-type question data onto the shape save_question() consumes.

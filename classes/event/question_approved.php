@@ -18,10 +18,13 @@
  * Question_approved event.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\event;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Triggered when a teacher explicitly approves a draft question - a distinct step from moving

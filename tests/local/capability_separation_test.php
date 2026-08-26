@@ -16,12 +16,15 @@
 
 namespace local_artqtml\local;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Pins the mutual exclusion of local/artqtml:use and local/artqtml:configure.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversNothing
  */
 final class capability_separation_test extends \advanced_testcase {

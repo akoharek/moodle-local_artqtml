@@ -16,6 +16,8 @@
 
 namespace local_artqtml\local;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Tests for the aiquizgen → artqtml component migration helper.
  *
@@ -23,8 +25,9 @@ namespace local_artqtml\local;
  * Schema snapshot). This test covers the registry merge that install/upgrade also run.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\component_rename
  */
 final class component_rename_test extends \advanced_testcase {

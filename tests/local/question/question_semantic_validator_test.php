@@ -18,12 +18,15 @@ namespace local_artqtml\local\question;
 
 use local_artqtml\local\question_types;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Unit tests.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\question\question_semantic_validator
  */
 final class question_semantic_validator_test extends \advanced_testcase {

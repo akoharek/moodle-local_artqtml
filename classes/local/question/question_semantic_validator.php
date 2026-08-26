@@ -18,10 +18,13 @@
  * Semantic validation of AI-generated question data (split out of question_importer - ).
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local\question;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Checks that schema-valid AI JSON is also semantically usable before it is ever imported.

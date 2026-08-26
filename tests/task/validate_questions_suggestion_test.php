@@ -18,12 +18,15 @@ namespace local_artqtml\task;
 
 use local_artqtml\local\validation_suggestion;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Unit tests for the validator's suggestion enum as a single source of truth.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\validation_suggestion
  * @covers     \local_artqtml\task\validate_questions_task
  */

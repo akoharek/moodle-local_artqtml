@@ -16,6 +16,8 @@
 
 namespace local_artqtml\local\upgrade;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Unit tests for the D-3 repair: draft categories left at parent = 0 by earlier versions.
  *
@@ -24,8 +26,9 @@ namespace local_artqtml\local\upgrade;
  * Is what broke the demo site's question bank.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\upgrade\draft_category_reparent
  */
 final class draft_category_reparent_test extends \advanced_testcase {

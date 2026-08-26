@@ -16,6 +16,8 @@
 
 namespace local_artqtml\local;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Unit tests for the provider model list cache and filtering.
  *
@@ -25,8 +27,9 @@ namespace local_artqtml\local;
  * Than silently dropped.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\model_list
  */
 final class model_list_test extends \advanced_testcase {

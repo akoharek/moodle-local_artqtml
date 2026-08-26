@@ -16,6 +16,8 @@
 
 namespace local_artqtml\local\question;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * The whole question is cleaned at the parse step, so the validator judges what the teacher will see.
  *
@@ -25,8 +27,9 @@ namespace local_artqtml\local\question;
  * Field of every type, and that running the cleaner twice changes nothing.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\question\ai_text_cleaner
  */
 final class ai_text_cleaner_test extends \advanced_testcase {

@@ -18,10 +18,13 @@
  * Daily model check.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\task;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Runs the availability and structure checks for both providers once a day.

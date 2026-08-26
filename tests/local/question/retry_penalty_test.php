@@ -16,12 +16,15 @@
 
 namespace local_artqtml\local\question;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Pins the retry penalty that question_form_builder writes onto the real Moodle question.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\question\question_form_builder
  */
 final class retry_penalty_test extends \advanced_testcase {

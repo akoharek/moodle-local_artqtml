@@ -20,12 +20,15 @@ use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\userlist;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Unit tests for the privacy provider (L-6).
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\privacy\provider
  */
 final class provider_test extends \advanced_testcase {

@@ -18,10 +18,13 @@
  * Helper.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\admin;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Adds a minimum-value cross-check on top of the normal PARAM_INT text setting.

@@ -21,10 +21,13 @@
  * The status page's 3s poll (~20/min) plus a few tabs, while capping extract_text bursts.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Counts AJAX calls per user per action and rejects bursts above the configured caps.

@@ -22,7 +22,8 @@
  * Through an AJAX call).
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\external;
@@ -32,6 +33,8 @@ use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Tests the saved Claude/Gemini API key and lists available models.

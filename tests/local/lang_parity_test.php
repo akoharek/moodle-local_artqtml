@@ -16,6 +16,8 @@
 
 namespace local_artqtml\local;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * The English and Hungarian language packs must hold the same keys.
  *
@@ -25,8 +27,9 @@ namespace local_artqtml\local;
  * Repeatedly in its PHP value sets - one set maintained in two places with nothing checking them.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversNothing
  */
 final class lang_parity_test extends \advanced_testcase {

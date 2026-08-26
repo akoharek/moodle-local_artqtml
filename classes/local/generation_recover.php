@@ -18,10 +18,13 @@
  * Roll an in-flight generation back to a draft the teacher can reopen.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Shared "back to Megkezdett" cleanup used by the status-page Abort button and by pipeline

@@ -22,12 +22,15 @@
  * Migrator, so this is mainly for explicit ops and Docker smoke.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 define('CLI_SCRIPT', true);
 
 require(__DIR__ . '/../../../config.php');
+
+defined('MOODLE_INTERNAL') || die();
 
 if (in_array('--help', $argv, true) || in_array('-h', $argv, true)) {
     fwrite(STDOUT, "Migrate local_aiquizgen DB tables and Moodle registry rows to local_artqtml.\n\n"

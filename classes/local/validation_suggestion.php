@@ -23,10 +23,13 @@
  * From this class, so the schema's value set and the prompt's value set are guaranteed identical.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Canonical list + display helper for the validator's suggestion values.
@@ -54,9 +57,18 @@ class validation_suggestion {
      * @var string display-only marker for an edited question .
      *
      * Never stored in validationsuggestion; the approve page renders it in place of the AI verdict
-     * When the `edited` flag is set.
+     * when the `edited` flag is set and the row is not externally locked.
      */
     public const EDITED = 'edited';
+
+    /**
+     * Helper.
+     *
+     * @var string display-only marker for a question locked after an external Moodle edit.
+     *
+     * Never stored in validationsuggestion; rendered when `externallyedited` is set.
+     */
+    public const LOCKED = 'locked';
 
     /**
      * The three suggestion values the validator may return, in canonical order.
@@ -90,7 +102,7 @@ class validation_suggestion {
     /**
      * label.
      *
-     * @param string $value one of {@see self::DISPLAY}, or self::EDITED
+     * @param string $value one of {@see self::DISPLAY}, or self::EDITED or self::LOCKED
      * @return string
      */
     public static function label(string $value): string {
@@ -100,7 +112,7 @@ class validation_suggestion {
     /**
      * Suggestion -> Bootstrap badge CSS class (: green/amber/red/grey).
      *
-     * @param string $value one of {@see self::DISPLAY}, or self::EDITED
+     * @param string $value one of {@see self::DISPLAY}, or self::EDITED or self::LOCKED
      * @return string
      */
     public static function badge_class(string $value): string {
@@ -110,6 +122,7 @@ class validation_suggestion {
             self::REJECTED      => 'badge-danger',
             self::NOT_EVALUATED => 'badge-secondary',
             self::EDITED        => 'badge-info',
+            self::LOCKED        => 'badge-dark',
         ];
 
         return $map[$value] ?? 'badge-secondary';

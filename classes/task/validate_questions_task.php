@@ -18,7 +18,8 @@
  * Calls the Gemini API to validate AI-generated quiz questions.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\task;
@@ -27,6 +28,8 @@ use local_artqtml\local\ai_request;
 use local_artqtml\local\generation_recover;
 use local_artqtml\local\model_list;
 use local_artqtml\local\security_filter;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Validates the not-yet-evaluated questions of a single generation via Gemini.

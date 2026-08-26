@@ -16,6 +16,8 @@
 
 namespace local_artqtml\local;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Static check: every entry script sets up $PAGE.
  *
@@ -27,8 +29,9 @@ namespace local_artqtml\local;
  * Act-and-redirect script cannot reintroduce it unnoticed.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversNothing
  */
 final class entry_script_page_setup_test extends \advanced_testcase {

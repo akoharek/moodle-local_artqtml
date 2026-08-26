@@ -19,12 +19,15 @@
  * Moodle's own question edit forms and import formats use.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local\question;
 
 use local_artqtml\local\question_types;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Loads the category, resolves the qtype, builds the form and saves the real question.

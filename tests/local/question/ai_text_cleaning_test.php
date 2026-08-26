@@ -16,6 +16,8 @@
 
 namespace local_artqtml\local\question;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * What reaches the question bank from the model is wording, not appearance.
  *
@@ -30,8 +32,9 @@ namespace local_artqtml\local\question;
  * Would have introduced while looking like it worked.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\question\question_form_builder
  */
 final class ai_text_cleaning_test extends \advanced_testcase {

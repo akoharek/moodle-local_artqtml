@@ -18,12 +18,15 @@ namespace local_artqtml\task;
 
 use local_artqtml\local\problem_category;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Unit tests for the validation problem_category enum (//, PROB-F004).
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\problem_category
  * @covers     \local_artqtml\task\validate_questions_task
  */

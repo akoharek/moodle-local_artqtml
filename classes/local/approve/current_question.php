@@ -16,6 +16,8 @@
 
 namespace local_artqtml\local\approve;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * What the question says *now*, in the shape the approve page's detail panel already reads.
  *
@@ -32,7 +34,8 @@ namespace local_artqtml\local\approve;
  * Which is why the stored copy stays as the fallback.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class current_question {
     /**

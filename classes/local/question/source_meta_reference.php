@@ -18,10 +18,13 @@
  * Detects and strips unprofessional "according to the text / szöveg szerint" meta-references.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local\question;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Quiz stems must not point at the source document ("szöveg szerint", "according to the text").

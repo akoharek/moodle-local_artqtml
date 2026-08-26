@@ -16,6 +16,8 @@
 
 namespace local_artqtml\local;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * The draft root category must survive a change of interface language.
  *
@@ -35,7 +37,8 @@ namespace local_artqtml\local;
  * Category exists - which for a customer is a normal Thursday, not an edge case.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\draft_bank
  */
 final class draft_bank_language_test extends \advanced_testcase {

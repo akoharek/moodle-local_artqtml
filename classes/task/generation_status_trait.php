@@ -18,10 +18,13 @@
  * Shared status/log helpers for local_artqtml adhoc tasks (7, 8).
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\task;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Common helpers for updating a generation's status and recording log/event entries.

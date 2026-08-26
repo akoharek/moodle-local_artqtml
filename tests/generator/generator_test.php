@@ -16,10 +16,13 @@
 
 namespace local_artqtml;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Tests for the plugin data generator used by Behat.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml_generator

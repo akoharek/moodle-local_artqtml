@@ -24,7 +24,8 @@
  * Be unit-tested and invoked directly without going through Moodle's task runner.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\task;
@@ -37,6 +38,8 @@ use local_artqtml\local\question_types;
 use local_artqtml\local\question_schema;
 use local_artqtml\local\security_filter;
 use local_artqtml\local\source_text_limit;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Generates AI quiz questions for a single local_artqtml_generations record.

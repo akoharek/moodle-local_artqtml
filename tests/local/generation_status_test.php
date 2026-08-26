@@ -16,6 +16,8 @@
 
 namespace local_artqtml\local;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Unit tests for the seven generation status values.
  *
@@ -24,8 +26,9 @@ namespace local_artqtml\local;
  * Greps the whole plugin for a re-typed list, so a future re-inlining fails the build.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\generation_status
  */
 final class generation_status_test extends \advanced_testcase {

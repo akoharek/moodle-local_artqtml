@@ -19,6 +19,8 @@ namespace local_artqtml\task;
 use local_artqtml\local\validation_suggestion;
 use local_artqtml\local\problem_category;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Unit tests for the validator prompt's output-language clause.
  *
@@ -27,8 +29,9 @@ use local_artqtml\local\problem_category;
  * Neither shipped template stated one, which is why a Hungarian site got English justifications.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\task\validate_questions_task
  */
 final class validate_questions_language_test extends \advanced_testcase {

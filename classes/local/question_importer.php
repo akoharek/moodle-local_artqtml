@@ -25,7 +25,8 @@
  * Do not add new logic here: delegate to the appropriate question\* class instead.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -33,6 +34,8 @@ namespace local_artqtml\local;
 use local_artqtml\local\question\question_semantic_validator;
 use local_artqtml\local\question\question_creator;
 use local_artqtml\local\question\multichoice_fraction_normalizer;
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Stable public facade for AI-question semantic validation, creation and post-edit normalisation.

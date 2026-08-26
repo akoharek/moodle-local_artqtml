@@ -16,6 +16,8 @@
 
 namespace local_artqtml\local;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Unit tests for the status->destination rule and its call sites.
  *
@@ -26,8 +28,9 @@ namespace local_artqtml\local;
  * Reflecting the generation's status *now* rather than at the moment the event fired.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\generation_list::open_url
  * @covers     \local_artqtml\local\generation_list::open_url_by_id
  */

@@ -19,6 +19,8 @@ namespace local_artqtml\local;
 use local_artqtml\local\question_schema;
 use local_artqtml\task\validate_questions_task;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Provider-agnostic well-formedness checks over EVERY enum in EVERY request schema the plugin
  * Sends - the Gemini validation response schema and the Claude generation Structured Outputs
@@ -34,8 +36,9 @@ use local_artqtml\task\validate_questions_task;
  * If it finds no enums at all it fails, so the walk silently going blind is itself a failure.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\question_schema
  * @covers     \local_artqtml\task\validate_questions_task
  */
