@@ -7,7 +7,7 @@ Scope (GPLv3+):
 - Source: paste/type or **`.txt`** upload
 - Types: true/false (IH), single-choice (FE), ordering (SR — requires `qtype_ordering`)
 - Difficulty: easy / medium / hard
-- Review: edit, approve, delete, **single-question** move to the bank
+- Review: edit, approve, delete, move to the bank (single row or **bulk** selected)
 - Admin: API keys (BYOK — Claude + Gemini), models, connection test, draft course, thin type defaults
 
 ## Requirements
@@ -38,7 +38,7 @@ Minimal path a Moodle.org reviewer (or site admin) can use after install:
 3. Paste a short paragraph of source text (or upload a `.txt` file) → Continue.
 4. Request a few **IH / FE / SR** questions (easy/medium/hard counts) → start generation.
 5. Wait for Claude generation + Gemini validation to finish on the status page.
-6. Open **Approve**, review a question, **Approve**, then move it into a question-bank category.
+6. Open **Approve**, review questions, **Approve**, then move one or more into a question-bank category (single row or bulk **Move selected**).
 
 ## License
 
