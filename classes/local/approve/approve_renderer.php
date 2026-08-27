@@ -28,6 +28,7 @@ namespace local_artqtml\local\approve;
 
 use local_artqtml\local\question_types;
 use local_artqtml\local\draft_bank;
+use local_artqtml\local\difficulty_label;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -380,7 +381,7 @@ class approve_renderer {
             // widths, so element-count assertions must be able to target the real cells only.
             $collapsedparts = [
                 \html_writer::span($typelabel),
-                \html_writer::span(s($question->difficultylabel)),
+                \html_writer::span(s(difficulty_label::label($question->difficultylabel))),
                 \html_writer::span(
                     get_string('colcreatedby', 'local_artqtml') . ': ' . fullname($creator)
                 ),
@@ -405,7 +406,7 @@ class approve_renderer {
                 self::cell('typecell', $typeicon . \html_writer::span($typelabel, '', [
                     'data-testid' => 'artqtm-approve-typelabel',
                 ])),
-                self::cell('difficultycell', s($question->difficultylabel)),
+                self::cell('difficultycell', s(difficulty_label::label($question->difficultylabel))),
                 self::cell('validationcell', $statuscell),
                 self::cell('creatorcell', fullname($creator)),
                 self::cell('lasteditedbycell', $lasteditorname),

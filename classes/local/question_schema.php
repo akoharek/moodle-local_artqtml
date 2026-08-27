@@ -44,7 +44,7 @@ class question_schema {
         return [
             'type'             => ['const' => $typecode],
             'questiontext'     => ['type' => 'string'],
-            'difficulty_label' => ['type' => 'string'],
+            'difficulty_label' => ['type' => 'string', 'enum' => difficulty_label::VALUES],
             'source_reference' => ['type' => 'string'],
         ];
     }
