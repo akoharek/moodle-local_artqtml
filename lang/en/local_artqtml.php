@@ -48,7 +48,6 @@ $string['approvedbylabel'] = 'Approved by {$a}';
 $string['approvedlabel'] = 'Approved';
 $string['approveheading'] = 'Review and approve questions';
 $string['artqtml:configure'] = 'Configure ArtQTML admin settings (not generation usage)';
-$string['artqtml:configure'] = 'Configure ArtQTML admin settings (not generation usage)';
 $string['artqtml:manageall'] = 'Manage all ArtQTML generations (change any user\'s generations)';
 $string['artqtml:use'] = 'Use ArtQTML: view any generation; create and change your own';
 $string['backtolist'] = 'Back to list';

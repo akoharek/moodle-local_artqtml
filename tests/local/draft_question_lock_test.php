@@ -25,6 +25,7 @@ defined('MOODLE_INTERNAL') || die();
  * Locked draft question behaviour.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\draft_question_lock

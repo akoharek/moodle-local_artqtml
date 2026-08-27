@@ -101,7 +101,7 @@ class approve_renderer {
         // kérdéstípus (Moodle natív ikon és a típus neve), nehézségi mód, validációs javaslat,
         // létrehozó, utoljára szerkesztette, dátum, műveletek. Konfidencia oszlop a táblázatban nem
         // jelenik meg - a konfidencia % a kérdésszerkesztő csak olvasható validációs szekciójába
-        //  Exactly nine columns; a tenth (Confidence) is a defect.
+        // Exactly nine columns; a tenth (Confidence) is a defect.
         $table->head = [
             self::header_cell(
                 'selectall',
@@ -297,7 +297,7 @@ class approve_renderer {
                     ]);
                 }
             } else if ($canmutate && !$islocked) {
-                //  a gomb (button), and the field table types it as one,
+                // A gomb (button), and the field table types it as one,
                 // so it is a real submit button in the surrounding form rather than the state-changing
                 // GET link it used to be. The form already carries the sesskey and the generationid.
                 // That much is not negotiable: approving over a GET link means a browser prefetcher
@@ -527,7 +527,7 @@ class approve_renderer {
         // "A célkérdésbank kategória választó vizuálisan a »Kijelöltek áthelyezése« és
         // »Kijelöltek törlése« gombokkal egy blokkban helyezkedik el; az »Összes elfogadható
         // jóváhagyása« gomb ettől vizuálisan elkülönül, mivel ahhoz célkérdésbank megadása nem
-        //  Two containers, separated by a rule - not one flat button row.
+        // Two containers, separated by a rule - not one flat button row.
         //
         // "Összes elfogadható jóváhagyása" only sets the approval flag, so it needs no target bank
         // and is not gated on $categoryoptions the way "Kijelöltek áthelyezése" is. it is

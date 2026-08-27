@@ -20,8 +20,7 @@
  * The four fixed machine keys live here and nowhere else: the Gemini response schema
  * ({@see \local_artqtml\task\validate_questions_task::build_schema()}), the validator prompt
  * Assembly, and every UI display path all read {@see self::VALUES} / {@see self::label()} from
- * This class, so the schema's value set and the prompt's value set are guaranteed identical
- *.
+ * This class, so the schema's value set and the prompt's value set are guaranteed identical.
  *
  * @package    local_artqtml
  * @copyright  2026 AR Tudásmenedzsment Kft.

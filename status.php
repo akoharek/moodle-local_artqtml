@@ -341,7 +341,7 @@ echo html_writer::end_div();
 // "Minden szakasznál szöveges visszajelzés is megjelenik a progress bar alatt".
 // S-4: this used to be written inside the bar, where at 25% the bar was narrower than its own
 // label and Bootstrap's overflow: hidden clipped the text away - content made unreachable by
-//  was worked around in CSS; below the bar it needs no
+// was worked around in CSS; below the bar it needs no
 // workaround at all.
 echo html_writer::tag(
     'p',

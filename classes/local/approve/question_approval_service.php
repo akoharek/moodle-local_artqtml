@@ -154,8 +154,8 @@ class question_approval_service {
     }
 
     /**
-     * Bulk-approve every "accepted", not-yet-approved, not-yet-moved question in one transaction
-     *. Approval only - moving to a real bank is a separate step, so no target bank here.
+     * Bulk-approve every "accepted", not-yet-approved, not-yet-moved question in one transaction.
+     * Approval only - moving to a real bank is a separate step, so no target bank here.
      *
      * @param int $generationid
      * @param int $userid the approving user

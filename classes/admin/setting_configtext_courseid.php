@@ -59,8 +59,10 @@ class setting_configtext_courseid extends \admin_setting_configtext {
         $courseid = (int) $data;
         if ($courseid <= 0) {
             // Moodle applies plugin defaults during install/upgrade; unset is valid then.
-            if (\during_initial_install() || !empty($CFG->upgraderunning)
-                || (defined('CLI_SCRIPT') && CLI_SCRIPT)) {
+            if (
+                \during_initial_install() || !empty($CFG->upgraderunning)
+                || (defined('CLI_SCRIPT') && CLI_SCRIPT)
+            ) {
                 return true;
             }
             return get_string('errordraftcourserequired', 'local_artqtml');
