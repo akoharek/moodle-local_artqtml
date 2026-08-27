@@ -1,7 +1,7 @@
 # local_artqtml Marketplace code review — unified triage
 
 **Scope:** `local/artqtml` (Light / Marketplace)  
-**Updated:** 2026-08-27 (C-19 fixed; C-18 fixed; C-17 fixed; C-16 fixed; C-15 fixed; C-14 fixed; C-11/C-12/C-13 fixed; C-10 fixed; C-09 fixed in tracker)  
+**Updated:** 2026-08-27 (F-02 false positive / by design; C-19 fixed; C-18 fixed; C-17 fixed; C-16 fixed; C-15 fixed; C-14 fixed; C-11/C-12/C-13 fixed; C-10 fixed; C-09 fixed in tracker)  
 **Passes merged:** Security (Sonnet `a2368d28`), Compliance (Sonnet `7072ded4`), Functional (Gemini `1db629c4`); prior tracker retained for stable IDs  
 **Status:** Triage only — no product code changed in this pass
 
@@ -15,7 +15,7 @@ Severity: **P0** Marketplace blocker · **P1** fix before submit · **P2** backl
 |----------|------:|------|
 | **P0** | **5** | Marketplace blockers |
 | **P1** | **9** | Fix before HQ / Marketplace submit |
-| **P2** | **7** | Backlog after submit-critical work |
+| **P2** | **6** | Backlog after submit-critical work |
 | **Nit** | **9** | Optional polish |
 
 **Marketplace blockers (P0):** (1) ~~missing object-level ownership~~ **S-02 fixed**, (2) ~~permanent draft-course editall/useall~~ **S-01 fixed (2026082602)**, (3) missing `@copyright` / phpcs exclude vs moodle.org CI, (4) missing `MOODLE_INTERNAL` guards, (5) fresh install blocked until admin sets hidden draft course (`draftcourseid=0` / `is_configured()`).
@@ -66,7 +66,7 @@ Severity: **P0** Marketplace blocker · **P1** fix before submit · **P2** backl
 | C-13 | P2 | Compliance | **fixed** | approve/generate comments | Hungarian inline comments in shipped PHP | Prior C-13 | English comments (PHPCS capitalization) |
 | C-14 | P2 | Compliance | **fixed** | `settings.php` | Dual-edition / stripped-Full wording | Prior C-14 | Removed Full-edition prompt-template note from file docblock (2026-08-27) |
 | C-18 | P2 | Compliance | **fixed** | `prompt_defaults.php` | Comment claims upgrade seeds prompts; upgrade does not | Prior C-18; fixed 2026-08-27 | File docblock corrected: install-only seed via `prompt_seed::apply()`; empty values only |
-| F-02 | P2 | Functional | open | approve_renderer / approve.php | “Move selected” label but moves only one row | Functional (re-verified); prior F-02 | Rename label or implement bulk move |
+| F-02 | P2 | Functional | **false positive** (by design) | approve_renderer / approve.php | Historical claim: “Move selected” label but moves only one row. **Verified:** Light supports bulk move via checkbox + “Move selected”; `move_selected()` handles multiple approved rows; EN label correct (`selected` = one or many). Prior finding misread single-row-only behaviour. | Functional re-check 2026-08-27; prior F-02 | **Do not treat as bug.** Bulk move by design; no product fix |
 | F-03 | P2 | Functional | open | generate_form / question_form_builder | IH hints UI present but hints not persisted | Functional (re-verified); prior F-03 | Persist hints or remove IH hint UI |
 | F-04 | P2 | Functional | open | question_schema / save_questions_task | `difficulty_label` unconstrained from AI | Functional (re-verified); prior F-04 | Canonicalize to easy/medium/hard |
 | F-05 | P2 | Functional | open | status.php / generate.php | Retry does not rewrite userid / re-apply draft role like start | Functional (re-verified); prior F-05 | Owner-only retry; grant draft role as on start |
@@ -102,8 +102,9 @@ Severity: **P0** Marketplace blocker · **P1** fix before submit · **P2** backl
 | **C-16** | Prior C-16; **fixed 2026-08-27** — deleted unused `setting_configtext_percentage` class + `errorpercentagerange` lang keys |
 | **C-17** | Prior C-17; **fixed 2026-08-27** — removed `migrate_from_aiquizgen` CLI, `component_rename`, install hook, and PHPUnit test |
 | **C-14** | Prior C-14; **fixed 2026-08-27** — removed Full-edition prompt-template wording from `settings.php` file docblock |
+| **F-02** | Prior F-02; **false positive / by design 2026-08-27** — bulk move via checkbox + “Move selected”; `move_selected()` handles multiple approved rows; EN label correct |
 | **S-08**, **S-N1**, **C-N6** | New from Security / Compliance nits |
-| Unchanged open from prior tracker | C-01–C-08 as listed; F-02–F-06, F-N1 re-verified still open (**F-01 false positive / retracted**; **F-08 fixed** 2026-08-26; **S-07 wontfix** 2026-08-27; **C-09 fixed** 2026-08-27; **C-10 fixed** 2026-08-27; **C-11 fixed** 2026-08-27; **C-12 fixed** 2026-08-27; **C-13 fixed** 2026-08-27; **C-14 fixed** 2026-08-27; **C-15 fixed** 2026-08-27; **C-16 fixed** 2026-08-27; **C-17 fixed** 2026-08-27; **C-18 fixed** 2026-08-27; **C-19 fixed** 2026-08-27) |
+| Unchanged open from prior tracker | C-01–C-08 as listed; F-03–F-06, F-N1 re-verified still open (**F-01 false positive / retracted**; **F-02 false positive / by design** 2026-08-27; **F-08 fixed** 2026-08-26; **S-07 wontfix** 2026-08-27; **C-09 fixed** 2026-08-27; **C-10 fixed** 2026-08-27; **C-11 fixed** 2026-08-27; **C-12 fixed** 2026-08-27; **C-13 fixed** 2026-08-27; **C-14 fixed** 2026-08-27; **C-15 fixed** 2026-08-27; **C-16 fixed** 2026-08-27; **C-17 fixed** 2026-08-27; **C-18 fixed** 2026-08-27; **C-19 fixed** 2026-08-27) |
 
 Prior note: REVIEW-FINDINGS tracked **C-01, C-02, C-05, C-07, C-08** as still open — confirmed retained above (**C-10 fixed** 2026-08-27; **C-16 fixed** 2026-08-27; **C-17 fixed** 2026-08-27; **C-19 fixed** 2026-08-27).
 
