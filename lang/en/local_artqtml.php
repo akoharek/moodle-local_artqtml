@@ -298,6 +298,7 @@ $string['privacy:metadata:local_artqtml_questions:validationsuggestion'] = 'The 
 $string['problemcategory_ambiguous_wording'] = 'Ambiguous wording';
 $string['problemcategory_factual_error'] = 'Factual error';
 $string['problemcategory_ok'] = 'No issue';
+$string['problemcategory_other'] = 'Other';
 $string['questionlockedbadge'] = 'Locked';
 $string['questionlockedreason'] = 'Edited outside the plugin in Moodle\'s question bank. Approve and move are blocked on this row.';
 $string['qtype_fe'] = 'Single choice';
