@@ -14,24 +14,25 @@ Felhasználók: `teacher1` (manageall / manager), `teacher2` (editingteacher, ma
 | Kör | Tartalom | Mikor |
 |-----|----------|--------|
 | **Alap** | Lista, approve, revoke, approve-all, delete, move, más user gen. | Minden nagyobb változás után |
-| **A — Edit mentés** | Külső szerkesztés + lock + **questioncode** a listán | Minden approve/UI változás után |
+| **A — Külső edit** | Moodle natív bank/szerkesztő + lock + **questioncode** a listán | Minden approve/UI változás után |
 | **B — Unhappy path** | Move kategória/sor nélkül, moved/locked sorok, hiányzó param | Release előtt / edge-case javítás után |
 | **C — Jogosultság** | editingteacher manageall nélkül | S-02 / capability változás után |
 
 ---
 
-## A — Edit mentés és külső zárolás (TC-CLICK-A-002)
+## A — Külső edit és zárolás (TC-CLICK-A-002)
 
 **Kapcsolódó spec:** Jov-047, Jov-048 · **Behat:** `review_questions.feature` — „External edit locks row but list keeps questioncode”
 
-**Előfeltétel:** Befejezett generálás, legalább egy **még nem áthelyezett** draft sor (pl. `0827-IH-0003`).
+**Előfeltétel:** Befejezett generálás, legalább egy **még nem áthelyezett** draft sor (pl. `0827-IH-0003`). A piszkozat kérdés elérhető a **Moodle natív kérdésbank/szerkesztő** felületén (admin/manager felügyeleti út vagy megfelelő bank-jog). A plugin approve táblázatában **Szerkesztés link nincs** (2026082704 / S2-02).
 
 **Lépések**
 
 1. Jóváhagyó oldal megnyitása (`/local/artqtml/approve.php?generationid=…`).
-2. Egy sor **Szerkesztés** → Moodle kérdésszerkesztő (`question.php`).
-3. **Question name** mező módosítása (pl. suffix: ` [EDIT-TEST]`) → **Mentés**.
-4. Vissza a jóváhagyó oldalra (Tovább / vissza link / approve URL).
+2. Ellenőrzés: **nincs** Szerkesztés link a soron; **Előnézet** elérhető (nem zárolt soron).
+3. A piszkozat kérdés megnyitása a **Moodle natív `question.php` szerkesztőben** (nem approve táblázatból).
+4. **Question name** mező módosítása (pl. suffix: ` [EDIT-TEST]`) → **Mentés**.
+5. Vissza a jóváhagyó oldalra (Tovább / vissza link / approve URL).
 
 **PASS (mind kötelező)**
 
@@ -47,18 +48,20 @@ Felhasználók: `teacher1` (manageall / manager), `teacher2` (editingteacher, ma
 **FAIL jelek (gyakori téves elvárás)**
 
 - A `[EDIT-TEST]` vagy átírt bank-név megjelenik az approve listán → **teszt hiba**, nem plugin bug.
-- Locked badge hiányzik mentés után → **plugin bug** (S-01 / observer).
+- Locked badge hiányzik mentés után → **plugin bug** (Jov-047 / observer).
+- Szerkesztés link megjelenik az approve táblázatban → **plugin bug** (S2-02 regresszió).
 
 **Implementációs hivatkozás:** a lista címke a plugin `questioncode` mezője (`approve_renderer.php`), nem a Moodle `question.name` szinkronja.
 
 ---
 
-## A — Edit megnyitás (TC-CLICK-A-001)
+## A — Preview-only approve (TC-CLICK-A-001)
 
-Rövid ellenőrzés (Behat: „Teacher edits a draft question”):
+Rövid ellenőrzés (Behat: unmoved row shows preview not edit):
 
-1. **Szerkesztés** → editor megnyílik.
-2. **Question name** mező értéke = **`questioncode`** (pl. `REV1-IH-0001`), nem tetszőleges szabad szöveg.
+1. Nem zárolt, nem áthelyezett soron **Előnézet** → preview megnyílik.
+2. Ugyanazon a soron **Szerkesztés link nincs**.
+3. **Előnézet** után a kérdés szövege diák-szerűen látszik (nem szerkesztő űrlap).
 
 ---
 
@@ -91,8 +94,8 @@ Részletes eredmény: [Editingteacher no-manageall test](e7d40358-743b-4195-8eab
 - [ ] Lista + szűrők (nincs `[[kulcs]]`)
 - [ ] Új generálás (paste; AI opcionális — internet kell)
 - [ ] Approve / Revoke / Approve all accepted
-- [ ] Preview
+- [ ] Preview (Szerkesztés link **nincs**)
 - [ ] Delete draft (+ confirm)
 - [ ] Move selected → Moved + Megnyitás (cél bank)
 - [ ] Más user generáció: olvasás vs. mutálás (manageall függő)
-- [ ] **A-002:** Edit mentés → Locked + questioncode a listán
+- [ ] **A-002:** Külső edit → Locked + questioncode a listán

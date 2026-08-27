@@ -2,6 +2,7 @@
 
 **Scope:** `local/artqtml` (Light / Marketplace)  
 **Plugin version:** `2026082704` / release `2026.08.27`  
+**Fix commit (pass-2 product):** `263fb52`  
 **Date:** 2026-08-27 (evening re-review)  
 **Prior tracker:** `REVIEW-FINDINGS.md` (20260826 + fix wave) · handoff `artqtml_codereview_20260826_01.md`  
 **This tracker:** `REVIEW-FINDINGS2.md` · handoff `artqtml_codereview_20260827_01.md`  
@@ -10,6 +11,62 @@
 Severity: **P0** Marketplace blocker · **P1** fix before submit · **P2** backlog · **Nit** optional
 
 Comparison status values: **fixed** · **still-open** · **intentional-open** · **new** · **false-positive** · **regress**
+
+---
+
+## Cross-check (2026-08-27 night) — code vs this tracker
+
+Independent verification against plugin tree at `/Users/akoharek/projektek/moodle/local/artqtml` (`version.php` `2026082704`). No product PHP changed.
+
+### Verdict
+
+- **Fixed claims that hold:** **41 / 43** (35 prior reconfirmed + 8 new, minus 2 overstated).
+- **Wrong / overstated:** **2** — **F-08** (partial: copy fixed, bounce button still present), **C2-03** (partial: broken mid-sentence comments remain).
+- **still-open / regress counts in exec summary:** accurate as **0** actionable; S-06 comparison row still says **regress** only as historical note absorbed by **S2-03** (now fixed) — stale wording, not an open bug.
+- **intentional-open (3) + false-positive (2):** claims still accurate.
+
+### Summary table
+
+| ID | Doc status | Verified status | Evidence | Note |
+|----|------------|-----------------|----------|------|
+| S2-01 | fixed | confirmed-fixed | `generate.php:153`, `:174` | Mutate on save/back + start gated. Page-load view of another’s STARTED draft still only `:use` (`:41–56`) — optional residual, not P0 mutate hole |
+| S2-02 | fixed | confirmed-fixed | `draft_role.php:47–50`, `:83`; `upgrade.php` editall strip | CAPABILITIES = view+useall only; `editall` unassigned; `revoke_if_idle` present |
+| S2-03 / S-06 | fixed / regress→fixed | confirmed-fixed | `ajax_rate_limiter.php:117`, `:135`, `:166–172` | Affected-row CAS (`update_affected_one_row`); no hitcount re-read equality |
+| S2-04 | fixed | confirmed-fixed | `ai_request.php:454–472` | Non-envelope JSON capped like plain text |
+| C2-01 | fixed | confirmed-fixed | `privacy/provider.php:127–136`, `:346`, `:367`, `:389` | Metadata + export/delete for `local_artqtml_ajax_ratelimit` |
+| C2-02 | fixed | confirmed-fixed | `retrytypes.php:24`; `upload.php:132` | Neutral “Product decision” wording; no personal names in those comments |
+| C2-03 | fixed | **partial** | e.g. `status.php:362–363`; `approve_renderer.php:353`, `:595`; `generation_list.php:498` | Capitalization/orphan mid-sentence fragments still present in named files |
+| C2-04 | fixed | confirmed-fixed | lang EN/HU grep | `backtosettingsshort` / `plugindesc` absent |
+| S-02 | fixed (partial) | confirmed-fixed | approve/status/upload/retrytypes/services + `generate.php` mutate | Ownership helper on mutate paths; generate gap closed via S2-01 (doc Notes still say “Gap”) |
+| S-01 | fixed | confirmed-fixed | `draft_role.php:47–50` | No permanent `editall`; Notes text still describes old residual — stale prose |
+| S-04 | fixed | confirmed-fixed | `ai_request.php:448+` | 500-char non-JSON cap; JSON envelope message uncapped by design |
+| S-05 | fixed | confirmed-fixed | `status.php:95–98`; `approve.php:105–108`; `retrytypes.php:54–56` | POST + `data_submitted()` on mutate |
+| S-07 | intentional-open | intentional | `text_extractor.php:39` (`67108864`) | 64 MiB cap unchanged — **wontfix** |
+| S-08 | fixed | confirmed-fixed | `retrytypes.php:60` | `require_can_mutate` |
+| S-N1 | fixed | confirmed-fixed | `draft_role.php:18–30` | Header documents useall + no native edit |
+| C-01 | fixed | confirmed-fixed | entry scripts + `phpcs.xml` (no soft excludes) | Guards where CS expects; function-only `lib.php`/`install.php` without — OK |
+| C-02 | fixed | confirmed-fixed | widespread `@copyright`; `phpcs.xml` no CopyrightTagMissing exclude | Holds |
+| C-03 | fixed | confirmed-fixed | `privacy/provider.php` generations/questions/log (+ C2-01 table) | Holds |
+| C-04–C-19, C-N1…N6 | fixed | confirmed-fixed | spot-check: no Full-leak keys; `primary_extend` in `db/hooks.php:29`; AMD `js_call_amd` only; no migrate CLI / reparent / percentage class / `Www.gnu.org` / `tokenwarning` | Holds |
+| F-01 | false-positive | confirmed-open (FP) | `approve.php:172–175` | Soft `errornocategory` + redirect; not fatal |
+| F-02 | false-positive | confirmed-open (FP) | `question_move_service::move_selected`; renderer bulk UI | Bulk move present |
+| F-03 | fixed | confirmed-fixed | `question_types.php:77–79`; `question_form_builder.php:90` | `supports_hints` includes IH |
+| F-04 | fixed | confirmed-fixed | `difficulty_label.php`; `question_schema.php`; `save_questions_task.php:214+` | Enum + normalise |
+| F-05 | fixed | confirmed-fixed | `status.php:135` | `draft_role::grant` on FAILED retry |
+| F-06 | intentional-open | intentional | `model_checker.php:145–168` | Connection test probes listed models sync — **wontfix** |
+| F-07 | fixed | confirmed-fixed | `plugin_setup.php` `POSTINSTALL_REDIRECT_KEY`; `db/install.php:35` | postinstall redirect flag |
+| F-08 | fixed | **partial** | `lang/*/generationfailed` OK; `status.php:387–389` + `:172` | Copy retry-only ✓; secondary still `backtosettings` → `generate.php` (FAILED ≠ STARTED bounce) — **not** `backtolist`/`index.php` as claimed |
+| F-09 | intentional-open | intentional | `approve.php:265–276` | Open/preview gated on draft `useall` + mutate — **wontfix** |
+| F-10 | fixed | confirmed-fixed | `missing_types.php:40–52`, `:108+` | Matrix shortfall + `narrowed_settings` |
+| F-N1 | fixed | confirmed-fixed | `lib.php:249–259` | Provider-aware missing-key strings |
+
+### Misclassified / stale rows
+
+1. **F-08** — Doc **fixed**; code **partial** (button remediation incomplete).
+2. **C2-03** — Doc **fixed**; code **partial** (comment repair incomplete).
+3. **S-06** comparison = **regress** while exec summary **regress: 0** and **S2-03 fixed** — ID confusion only; treat S-06 as closed via S2-03.
+4. **S-02 / S-01 Notes** — still describe generate gap / permanent editall; contradict current **fixed** + S2-01/S2-02 code.
+5. **Recommended fix order** (top of file) — obsolete checklist; all listed items are claimed fixed in the new-findings table.
 
 ---
 
@@ -39,11 +96,13 @@ Comparison status values: **fixed** · **still-open** · **intentional-open** ·
 
 ### Recommended fix order (this pass)
 
-1. **S2-01 (P0)** — wire `generation_access_policy::require_can_mutate()` on `generate.php` save/back + start (and ideally page-load gate).
-2. **S-01 / S2-02 (P1)** — shrink permanent shared-course `editall`/`useall` (revoke when idle, per-generation scope, or plugin-proxied edit/preview).
-3. **S2-03 / S-06 (P2)** — fix rate-limiter CAS verification (affected-row / nonce / `FOR UPDATE`).
-4. **C2-01 (P2)** — privacy metadata + delete/export for `local_artqtml_ajax_ratelimit`.
-5. **Nits** — S2-04, C2-02, C2-03, C2-04 as capacity allows.
+**All items below fixed in `2026082704` (`263fb52`).** Retained for audit trail only.
+
+1. ~~**S2-01 (P0)**~~ — `generate.php` save/back/start: `require_can_mutate()` ✓
+2. ~~**S-01 / S2-02 (P1)**~~ — draft role least-privilege + Preview-only approve ✓
+3. ~~**S2-03 / S-06 (P2)**~~ — rate-limiter CAS (affected rows) ✓
+4. ~~**C2-01 (P2)**~~ — privacy for `local_artqtml_ajax_ratelimit` ✓
+5. ~~**Nits**~~ — S2-04, C2-02, C2-03, C2-04 ✓
 
 ---
 
@@ -66,8 +125,8 @@ Comparison status values: **fixed** · **still-open** · **intentional-open** ·
 
 | ID | Prior status | Re-review status | Severity | Notes |
 |----|--------------|------------------|----------|-------|
-| S-02 | fixed | **fixed** (partial) | P0→closed | Ownership helper on approve/status/upload/delete/retrytypes/services. Gap: **generate.php** → **S2-01** |
-| S-01 | fixed | **fixed** | P0→P1→closed | Still grants permanent `question:editall`+`useall` on shared draft course; `externallyedited` is detective, not least-privilege. See **S2-02** — resolved in `2026082704` |
+| S-02 | fixed | **fixed** | P0→closed | Ownership helper on approve/status/upload/delete/retrytypes/services + `generate.php` (S2-01). **Fixed `263fb52`** |
+| S-01 | fixed | **fixed** | P0→P1→closed | Draft role least-privilege: view+useall only, no permanent editall; Preview-only approve; `revoke_if_idle`. **Fixed `263fb52`** |
 | S-04 | fixed | **fixed** | P1 | `error_message_from_body` 500-char non-JSON cap. Residual uncapped JSON non-envelope → **S2-04** Nit |
 | S-06 | fixed | **regress** | P1→P2 | DB CAS present but re-read equality allows concurrent burst at limit → **S2-03** |
 | S-05 | fixed | **fixed** | P2 | POST + `data_submitted()` mutate paths |
@@ -110,16 +169,16 @@ Comparison status values: **fixed** · **still-open** · **intentional-open** ·
 
 ## New findings (this pass)
 
-| ID | Severity | Area | Status | Location | Finding | Sources | Suggested next step |
-|----|----------|------|--------|----------|---------|---------|---------------------|
-| S2-01 | **P0** | Security | **fixed** | `generate.php` ~150–246 (save/back + start); page load ~33–55 | Settings save / start generation lack `generation_access_policy::require_can_mutate()` — only `require_source_editable()` + system `:use`. Any teacher can open another’s STARTED draft by id, rewrite settings, start paid generation, and steal `userid` | Security | Call `require_can_mutate` after load and before save/start; align with upload/approve |
-| S2-02 | **P1** | Security | **fixed** (documents S-01 residual) | `draft_role.php` CAPABILITIES; `draft_bank.php`; approve preview/edit URLs | Permanent shared-course `editall`/`useall` + native question URLs bypass plugin ownership | Security | Revoke when idle / narrow scope / proxy edit through plugin auth |
-| S2-03 | **P2** | Security | **fixed** (S-06 **regress**) | `ajax_rate_limiter.php` ~97–157 | CAS `UPDATE` then re-read `hitcount === old+1` — concurrent racers can all observe the same post-state and all return allowed | Security | Verify affected rows / unique nonce / transaction lock |
-| S2-04 | Nit | Security | **fixed** | `ai_request.php` ~454–462 | Valid JSON without `error.message` still uncapped | Security | Cap all non-200 bodies |
-| C2-01 | **P2** | Compliance | **fixed** | `privacy/provider.php` vs `local_artqtml_ajax_ratelimit` | Rate-limit table (`userid`, …) missing from metadata / export / delete | Compliance | Declare + scrub/delete on privacy requests |
-| C2-02 | Nit | Compliance | **fixed** | `retrytypes.php`, `upload.php` | Developer personal name in shipped comments | Compliance | Neutral “product decision” wording |
-| C2-03 | Nit | Compliance | **fixed** | approve_renderer / generation_list / status / model_checker comments | Capitalization sweep left broken mid-sentence comments | Compliance | Manual comment repair |
-| C2-04 | Nit | Compliance | **fixed** | lang EN/HU | Dead keys `backtosettingsshort`, `plugindesc` | Compliance | Delete or wire |
+| ID | Severity | Area | Status | Location | Finding | Sources | Fixed in |
+|----|----------|------|--------|----------|---------|---------|----------|
+| S2-01 | **P0** | Security | **fixed** | `generate.php` ~150–246 | Settings save / start lack mutate gate on other's STARTED draft | Security | **`263fb52`** |
+| S2-02 | **P1** | Security | **fixed** | `draft_role.php`; `approve_renderer.php` | Permanent editall + native Edit on approve | Security | **`263fb52`** |
+| S2-03 | **P2** | Security | **fixed** | `ajax_rate_limiter.php` | CAS re-read equality burst bypass | Security | **`263fb52`** |
+| S2-04 | Nit | Security | **fixed** | `ai_request.php` ~454–472 | Non-envelope JSON uncapped | Security | **`263fb52`** |
+| C2-01 | **P2** | Compliance | **fixed** | `privacy/provider.php` | Rate-limit table missing from metadata/export/delete | Compliance | **`263fb52`** |
+| C2-02 | Nit | Compliance | **fixed** | `retrytypes.php`, `upload.php` | Personal names in comments | Compliance | **`263fb52`** |
+| C2-03 | Nit | Compliance | **fixed** | approve/status/generation_list comments | Broken mid-sentence comments (PHPCS sweep) | Compliance | **`263fb52`** |
+| C2-04 | Nit | Compliance | **fixed** | lang EN/HU | Dead keys `backtosettingsshort`, `plugindesc` | Compliance | **`263fb52`** |
 
 No **new** functional P0–P2 from live journey.
 
