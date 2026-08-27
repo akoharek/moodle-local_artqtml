@@ -142,9 +142,6 @@ class ajax_rate_limiter {
     /**
      * Reset an expired window only when windowstart still matches (CAS).
      *
-     * Uses UPDATE … RETURNING so MariaDB and PostgreSQL both report affected rows without
-     * MySQL-only ROW_COUNT().
-     *
      * @param \moodle_database $DB
      * @param int $id
      * @param int $now
@@ -157,16 +154,29 @@ class ajax_rate_limiter {
         int $now,
         int $expectedwindowstart
     ): bool {
-        $rows = $DB->get_records_sql(
+        if ($DB->get_dbfamily() === 'postgres') {
+            return $DB->count_records_sql(
+                "SELECT COUNT(1)
+                   FROM (
+                        UPDATE {local_artqtml_ajax_ratelimit}
+                           SET windowstart = ?, hitcount = 1
+                         WHERE id = ?
+                           AND windowstart = ?
+                        RETURNING id
+                        ) AS cas_rows",
+                [$now, $id, $expectedwindowstart]
+            ) === 1;
+        }
+
+        $DB->execute(
             "UPDATE {local_artqtml_ajax_ratelimit}
                 SET windowstart = ?, hitcount = 1
               WHERE id = ?
-                AND windowstart = ?
-         RETURNING id",
+                AND windowstart = ?",
             [$now, $id, $expectedwindowstart]
         );
 
-        return count($rows) === 1;
+        return self::mysql_affected_one_row($DB);
     }
 
     /**
@@ -184,16 +194,41 @@ class ajax_rate_limiter {
         int $expectedhitcount,
         int $limit
     ): bool {
-        $rows = $DB->get_records_sql(
+        if ($DB->get_dbfamily() === 'postgres') {
+            return $DB->count_records_sql(
+                "SELECT COUNT(1)
+                   FROM (
+                        UPDATE {local_artqtml_ajax_ratelimit}
+                           SET hitcount = hitcount + 1
+                         WHERE id = ?
+                           AND hitcount = ?
+                           AND hitcount < ?
+                        RETURNING id
+                        ) AS cas_rows",
+                [$id, $expectedhitcount, $limit]
+            ) === 1;
+        }
+
+        $DB->execute(
             "UPDATE {local_artqtml_ajax_ratelimit}
                 SET hitcount = hitcount + 1
               WHERE id = ?
                 AND hitcount = ?
-                AND hitcount < ?
-         RETURNING id",
+                AND hitcount < ?",
             [$id, $expectedhitcount, $limit]
         );
 
-        return count($rows) === 1;
+        return self::mysql_affected_one_row($DB);
+    }
+
+    /**
+     * Whether the immediately preceding UPDATE on MySQL/MariaDB changed exactly one row.
+     *
+     * @param \moodle_database $DB
+     * @return bool
+     */
+    protected static function mysql_affected_one_row(\moodle_database $DB): bool {
+        $row = $DB->get_record_sql('SELECT ROW_COUNT() AS affectedrows');
+        return $row && (int) $row->affectedrows === 1;
     }
 }
