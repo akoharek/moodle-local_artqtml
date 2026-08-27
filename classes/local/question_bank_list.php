@@ -24,8 +24,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Builds a "categoryid,contextid" => label option list for a category-select dropdown.
  */

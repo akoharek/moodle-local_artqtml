@@ -28,8 +28,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The single answer to "may this generation's source still be edited?".
  */

@@ -24,8 +24,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Shared rollback-to-started cleanup used by the status-page Abort button and by pipeline
  * Gates that must refuse to call a provider without leaving the generation stuck in

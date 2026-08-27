@@ -29,8 +29,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Runs the two content screens against uploaded/typed source text.
  */

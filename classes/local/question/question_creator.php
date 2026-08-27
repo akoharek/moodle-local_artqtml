@@ -27,8 +27,6 @@ namespace local_artqtml\local\question;
 
 use local_artqtml\local\question_types;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Loads the category, resolves the qtype, builds the form and saves the real question.
  */

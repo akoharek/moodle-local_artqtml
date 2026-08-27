@@ -24,8 +24,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Maps the plugin's two-letter type codes (IH/FE/SR) to Moodle qtypes and lang strings.
  */

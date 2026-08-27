@@ -24,8 +24,6 @@
 
 namespace local_artqtml\event;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Triggered when a teacher takes back their own approval of a draft question, before it has been
  * Moved into a real question bank.

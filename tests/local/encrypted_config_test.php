@@ -16,8 +16,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Unit tests for encrypted admin API-key storage and plaintext upgrade migration.
  *

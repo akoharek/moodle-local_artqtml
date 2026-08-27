@@ -28,8 +28,6 @@ namespace local_artqtml\task;
 use local_artqtml\local\generation_status;
 use local_artqtml\local\security_filter;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Security_filter re-runs at generate/validate before any provider call.
  *

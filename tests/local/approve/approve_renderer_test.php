@@ -18,8 +18,6 @@ namespace local_artqtml\local\approve;
 
 use local_artqtml\local\draft_bank;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * After a question is moved to the Moodle bank, the approve row shows Open, not Edit.
  *

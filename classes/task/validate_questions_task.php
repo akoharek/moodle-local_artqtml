@@ -29,8 +29,6 @@ use local_artqtml\local\generation_recover;
 use local_artqtml\local\model_list;
 use local_artqtml\local\security_filter;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Validates the not-yet-evaluated questions of a single generation via Gemini.
  */
@@ -86,7 +84,7 @@ class validate_questions_task {
             foreach ($this->build_batches($generation, $unevaluated) as $batch) {
                 $results = $this->call_gemini($generation, $batch);
 
-                // each Gemini call can take a while, and a generation may have several
+                // Each Gemini call can take a while, and a generation may have several.
                 // Batches - re-check before saving every single batch's results, not just once
                 // Up front, so an abort/delete mid-run is caught before the very next write.
                 $generation = $this->reload_if_active($generationid, \local_artqtml\local\generation_status::VALIDATING);
@@ -456,7 +454,8 @@ class validate_questions_task {
                         'type' => 'OBJECT',
                         'properties' => [
                             'question_id'      => ['type' => 'STRING'],
-                            // Exactly the three verdicts, read from the single source of truth that build_system_instruction also names in the prompt.
+                            // Exactly the three verdicts, read from the single source of truth that
+                            // build_system_instruction also names in the prompt.
                             'suggestion'       => [
                                 'type' => 'STRING',
                                 'enum' => \local_artqtml\local\validation_suggestion::VALUES,

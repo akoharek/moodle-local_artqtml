@@ -24,8 +24,6 @@
 
 namespace local_artqtml\event;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Triggered for every successful Claude/Gemini API call.
  *

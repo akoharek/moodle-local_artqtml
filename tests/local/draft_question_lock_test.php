@@ -19,8 +19,6 @@ namespace local_artqtml\local;
 use local_artqtml\local\approve\question_approval_service;
 use local_artqtml\local\approve\question_move_service;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Locked draft question behaviour.
  *

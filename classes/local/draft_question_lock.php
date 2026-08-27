@@ -24,8 +24,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Whether a draft question row is locked after an external Moodle edit.
  */

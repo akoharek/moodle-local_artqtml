@@ -24,8 +24,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Fetches, filters and caches the providers' model lists.
  */

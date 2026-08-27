@@ -24,8 +24,6 @@
 
 namespace local_artqtml\event;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Triggered when a teacher explicitly approves a draft question - a distinct step from moving
  * It: a question must be approved before it can be moved into a real question bank.

@@ -24,8 +24,6 @@
 
 namespace local_artqtml\task;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Common helpers for updating a generation's status and recording log/event entries.
  */

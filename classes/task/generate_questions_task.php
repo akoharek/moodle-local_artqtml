@@ -39,8 +39,6 @@ use local_artqtml\local\question_schema;
 use local_artqtml\local\security_filter;
 use local_artqtml\local\source_text_limit;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Generates AI quiz questions for a single local_artqtml_generations record.
  */
@@ -102,7 +100,7 @@ class generate_questions_task {
             // One call per question type, not one call for the generation.
             [$questions, $outcomes] = $this->call_claude_per_type($generation, $settings);
 
-            // the calls above can take a long time - re-check the generation still exists
+            // The calls above can take a long time - re-check the generation still exists.
             // And hasn't been aborted/deleted while they were in flight before saving results.
             $generation = $this->reload_if_active($generationid, \local_artqtml\local\generation_status::GENERATING);
             if ($generation === null) {

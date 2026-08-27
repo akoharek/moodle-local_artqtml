@@ -16,8 +16,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Move-target category list must never offer the draft course's banks.
  *

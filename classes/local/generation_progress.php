@@ -24,8 +24,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Status -> progress bar presentation, shared by the PHP render and the JS poll.
  */

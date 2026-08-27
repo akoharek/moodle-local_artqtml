@@ -53,8 +53,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * A per-generation lock around read-decide-write.
  */

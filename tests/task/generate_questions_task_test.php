@@ -16,8 +16,6 @@
 
 namespace local_artqtml\task;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Unit tests for the Claude generation task's system-prompt building
  * Specifically that every {{PLACEHOLDER}} in the template is substituted.

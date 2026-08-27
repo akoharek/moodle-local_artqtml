@@ -24,8 +24,6 @@
 
 namespace local_artqtml\local\question;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Checks that schema-valid AI JSON is also semantically usable before it is ever imported.
  */

@@ -29,8 +29,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Generation deletion, minus the diagnostic log.
  */

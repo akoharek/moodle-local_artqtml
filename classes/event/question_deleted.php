@@ -24,8 +24,6 @@
 
 namespace local_artqtml\event;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Triggered when a draft question is deleted from the approval page.
  */

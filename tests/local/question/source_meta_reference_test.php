@@ -16,8 +16,6 @@
 
 namespace local_artqtml\local\question;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Source-document meta-references must be detectable and safely stripable at the stem start.
  *

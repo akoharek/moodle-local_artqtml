@@ -26,8 +26,6 @@ namespace local_artqtml;
 
 use local_artqtml\local\question_importer;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Reacts to core question bank events for questions this plugin created.
  */

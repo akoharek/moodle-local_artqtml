@@ -26,8 +26,6 @@ namespace local_artqtml\admin;
 
 use local_artqtml\local\encrypted_config;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Transparently encrypts on write and decrypts on read, so the admin form/unmask toggle still
  * shows the real plaintext key, while `config_plugins` only ever holds ciphertext.

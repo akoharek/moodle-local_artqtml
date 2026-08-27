@@ -16,8 +16,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The English and Hungarian language packs must hold the same keys.
  *

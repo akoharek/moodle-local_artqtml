@@ -182,7 +182,7 @@ if (in_array($bulkaction, ['move', 'allaccepted', 'delete'], true)) {
 
     try {
         $result = question_move_service::move_selected($questionids, $generationid, $categoryvalue, $context);
-        // draft_bank::delete_if_empty() runs deliberately OUTSIDE move_selected()'s
+        // Draft_bank::delete_if_empty() runs deliberately OUTSIDE move_selected()'s.
         // transaction. The atomic unit that must never partially apply is the move itself (the
         // Moodle question move + the movedout flag updates). Pruning the now-empty draft category
         // is best-effort post-commit cleanup: it only makes sense once the move has committed (so
@@ -206,7 +206,7 @@ if (in_array($bulkaction, ['move', 'allaccepted', 'delete'], true)) {
     redirect($pageurl);
 }
 
-// sortable columns and pagination, matching the list page's pattern.
+// Sortable columns and pagination, matching the list page's pattern.
 $sort = optional_param('qsort', 'id', PARAM_ALPHA);
 $dir = strtoupper(optional_param('qdir', 'ASC', PARAM_ALPHA)) === 'DESC' ? 'DESC' : 'ASC';
 $page = optional_param('qpage', 0, PARAM_INT);
@@ -214,7 +214,7 @@ $perpage = (int) get_config('moodle', 'perpage') ?: 20;
 
 $totalquestions = approve_page_data::total_questions($generationid);
 
-// four-status validation summary, counted independently of the per-row
+// Four-status validation summary, counted independently of the per-row.
 // badges below so a teacher can see the overall picture without scrolling the whole table.
 $statuscounts = approve_page_data::status_counts($generationid);
 $statustotal = array_sum($statuscounts);
@@ -231,7 +231,7 @@ echo html_writer::tag('p', format_string($generation->name), [
     'data-testid' => 'artqtm-approve-generationname',
 ]);
 
-// index.php is context_system, same as this page — no course id.
+// Index.php is context_system, same as this page — no course id.
 $indexurl = new moodle_url('/local/artqtml/index.php');
 echo html_writer::div(
     $OUTPUT->single_button($indexurl, get_string('backtolist', 'local_artqtml'), 'get'),
@@ -239,7 +239,7 @@ echo html_writer::div(
     ['data-testid' => 'artqtm-approve-backtolist']
 );
 
-// still relevant here even after generation completes - a teacher reviewing questions
+// Still relevant here even after generation completes - a teacher reviewing questions.
 // should know Claude didn't return what was actually requested.
 $countdiscrepancy = json_decode((string) $generation->countdiscrepancy, true);
 if (is_array($countdiscrepancy) && !empty($countdiscrepancy)) {

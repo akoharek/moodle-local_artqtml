@@ -24,8 +24,6 @@
 
 namespace local_artqtml\event;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Triggered when a user submits the question settings form and the generation is queued.
  */

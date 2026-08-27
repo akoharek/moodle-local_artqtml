@@ -34,8 +34,6 @@ use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Tests the saved Claude/Gemini API key and lists available models.
  */

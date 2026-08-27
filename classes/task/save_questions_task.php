@@ -31,8 +31,6 @@ use local_artqtml\local\question_types;
 use local_artqtml\local\question_importer;
 use local_artqtml\local\difficulty_label;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Writes a single generation's questions + validation results into local_artqtml_questions.
  */

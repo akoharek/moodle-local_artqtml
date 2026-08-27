@@ -16,8 +16,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The per-answer explanation: the switch, the schema and where the text lands.
  *

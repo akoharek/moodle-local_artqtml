@@ -29,8 +29,6 @@ namespace local_artqtml\local\approve;
 use local_artqtml\local\generation_access_policy;
 use local_artqtml\local\question_mover;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Bulk move of selected, approved questions into a chosen target category.
  */

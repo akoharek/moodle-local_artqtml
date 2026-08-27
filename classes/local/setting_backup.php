@@ -31,8 +31,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Stores the previous value of a setting before a migration overwrites it.
  */

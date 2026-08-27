@@ -30,8 +30,6 @@ use local_artqtml\local\question_types;
 use local_artqtml\local\draft_bank;
 use local_artqtml\local\difficulty_label;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Renders the approve page's validation summary, question table, bulk buttons and inline scripts.
  */
@@ -44,7 +42,7 @@ class approve_renderer {
      * @return string
      */
     public static function validation_summary(array $statuscounts, int $statustotal): string {
-        // exactly four counters plus the total, each individually addressable so the
+        // Exactly four counters plus the total, each individually addressable so the.
         // element-count assertion can check "four + total", not just the rendered text.
         $html = \html_writer::start_div('artqtm-validationsummary mb-3', [
             'data-testid' => 'artqtm-approve-validationsummary',
@@ -93,7 +91,7 @@ class approve_renderer {
         int $generationid,
         bool $canmutate = true
     ): string {
-        // needed to tell "your own generation" from "someone else's" when deciding
+        // Needed to tell "your own generation" from "someone else's" when deciding.
         // whether the Edit action prompts first.
         global $USER;
 
@@ -124,7 +122,7 @@ class approve_renderer {
             self::sortable_header_cell($pageurl, 'date', 'timecreated', 'coldate', $sort, $dir),
             self::header_cell('actions', get_string('colactions', 'local_artqtml')),
         ];
-        // fluid, wrapping table - no horizontal scroller, and no clipped Actions
+        // Fluid, wrapping table - no horizontal scroller, and no clipped Actions.
         // column (this table was the known worst case, overflowing its container with the actions
         // cut off entirely). Type/difficulty/creator/last-editor/date collapse below lg via Boost's
         // own display utilities and reappear as a secondary line inside the name cell; the select,
@@ -201,7 +199,7 @@ class approve_renderer {
 
             $statuscell = $statusbadge;
             if ($question->validationsuggestion !== \local_artqtml\local\validation_suggestion::NOT_EVALUATED) {
-                // 'ok' shows its "No issue" label here too - not an empty cell, and
+                // The 'ok' status shows its "No issue" label here too - not an empty cell, and.
                 // distinct from the "Accepted" suggestion badge above it.
                 if ($displaycategory !== null) {
                     $statuscell .= \html_writer::div(
@@ -222,7 +220,10 @@ class approve_renderer {
             // content the requirement replaces, and duplicated the "Last edited by" column
             // that already carries exactly that name. Only the approver line survives, and an edit
             // always resets approved to 0 (classes/observer.php), so the two can never both appear.
-            if (empty($question->edited) && empty($question->externallyedited) && !empty($question->approved) && !empty($question->approvedby)) {
+            if (
+                empty($question->edited) && empty($question->externallyedited)
+                    && !empty($question->approved) && !empty($question->approvedby)
+            ) {
                 $approver = \core_user::get_user($question->approvedby);
                 if ($approver) {
                     $statuscell .= \html_writer::div(
@@ -233,7 +234,7 @@ class approve_renderer {
             }
 
             // A row for a question moved into a real bank cannot be selected: its checkbox is
-            // disabled. The checkbox is rendered but disabled, not omitted - a missing control can't
+            // Disabled. The checkbox is rendered but disabled, not omitted - a missing control can't.
             $checkbox = '';
             if ($canmutate) {
                 $checkboxattrs = ['class' => 'artqtm-rowselect', 'data-testid' => 'artqtm-approve-rowselect'];
@@ -347,7 +348,7 @@ class approve_renderer {
                 ]);
             }
 
-            // empty if never edited - independent of (and persists past) the "Edited" badge
+            // Empty if never edited - independent of (and persists past) the "Edited" badge.
             // above, which resets once the question is re-validated; this is the plain historical record.
             $lasteditorname = '';
             if (!empty($question->lasteditedby)) {
@@ -357,7 +358,7 @@ class approve_renderer {
                 }
             }
 
-            // the question name/text toggles an inline details row (below) open/closed,
+            // The question name/text toggles an inline details row (below) open/closed,.
             // instead of being plain unclickable text - js/approve... (inline script further down)
             // wires the click handler, matching this file's existing plain-JS style.
             //
@@ -374,7 +375,7 @@ class approve_renderer {
                 ]
             );
 
-            // the values of the columns that collapse on narrower screens, repeated
+            // The values of the columns that collapse on narrower screens, repeated.
             // inside the name cell so collapsing a column never makes its information
             // unreachable. Hidden at >= xl, where every real column is visible. These carry no
             // data-testid on purpose: T-10 - the same values appear twice in the DOM at narrow
@@ -402,7 +403,7 @@ class approve_renderer {
                 // lookup for the control resolves to two elements (the <td> and the <input>).
                 self::cell('selectcell', $checkbox),
                 self::cell('namecell', $namecell),
-                // icon AND type name, in this column only.
+                // Icon AND type name, in this column only.
                 self::cell('typecell', $typeicon . \html_writer::span($typelabel, '', [
                     'data-testid' => 'artqtm-approve-typelabel',
                 ])),
@@ -411,20 +412,20 @@ class approve_renderer {
                 self::cell('creatorcell', fullname($creator)),
                 self::cell('lasteditedbycell', $lasteditorname),
                 self::cell('datecell', userdate($question->timecreated, get_string('datetimeformat', 'local_artqtml'))),
-                // the actions wrap onto as many lines as they need instead of forcing
+                // The actions wrap onto as many lines as they need instead of forcing.
                 // the table wider; a separator character would defeat flex-wrap.
                 self::cell('actionscell', \html_writer::div(implode('', array_map(static function (string $action): string {
                     return \html_writer::span($action, 'artqtm-rowaction');
                 }, $actions)), 'artqtm-rowactions')),
             ]);
-            // every row carries a screen-scoped testid
+            // Every row carries a screen-scoped testid.
             // plus a content identifier, so a row assertion can select the question it means
             // instead of silently running against the first match.
             $row->attributes['data-testid'] = 'artqtm-approve-row';
             $row->attributes['data-questioncode'] = $question->questioncode;
             $table->data[] = $row;
 
-            // what the question says now, not what the AI first returned. The stored copy
+            // What the question says now, not what the AI first returned. The stored copy.
             // stays as the record of the generation; this panel is what a teacher reads before
             // pressing Approve, so it must not show a version they have already replaced.
             $detailscell = new \html_table_cell(
@@ -551,7 +552,7 @@ class approve_renderer {
         if ($eligibleforapproval === 0) {
             $approveallattrs['disabled'] = 'disabled';
         }
-        // each bulk bar wraps onto more rows at narrow widths instead of overflowing.
+        // Each bulk bar wraps onto more rows at narrow widths instead of overflowing.
         $html = \html_writer::start_div('artqtm-bulkactions artqtm-bulkapprove mb-3', [
             'data-testid' => 'artqtm-approve-bulk-approveblock',
         ]);
@@ -588,7 +589,7 @@ class approve_renderer {
             ]);
             $html .= \html_writer::end_div();
 
-            // disabled until at least one row is selected; the selection script below is
+            // Disabled until at least one row is selected; the selection script below is.
             // what re-enables it, so the server-rendered state (nothing selected) is disabled.
             $html .= \html_writer::tag(
                 'button',
@@ -599,7 +600,7 @@ class approve_renderer {
             );
         }
 
-        // the confirmation must show how many questions are actually selected at click time (the
+        // The confirmation must show how many questions are actually selected at click time (the.
         // selection changes client-side without a page reload), so the message is rendered with a
         // sentinel placeholder here and substituted for the live checked-checkbox count in JS below.
         $html .= \html_writer::tag(
@@ -737,7 +738,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 foreach ((array) ($questiondata['options'] ?? []) as $option) {
                     $text = s((string) ($option['text'] ?? ''));
                     $iscorrect = !empty($option['correct']);
-                    // the per-option explanation, shown here so the teacher reviews it
+                    // The per-option explanation, shown here so the teacher reviews it.
                     // before approving - it is what the student will read after choosing this
                     // option, and it is generated text like everything else on this panel.
                     $explanation = trim((string) ($option['explanation'] ?? ''));

@@ -35,8 +35,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Seeds the prompt settings from the shipped defaults, filling only what is empty.
  */

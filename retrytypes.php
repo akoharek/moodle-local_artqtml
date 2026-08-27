@@ -108,7 +108,7 @@ function local_artqtml_create_followup(stdClass $source, array $settings, array 
     $record = new stdClass();
     $record->userid = $USER->id;
     $record->name = get_string('retrymissingtypesname', 'local_artqtml', format_string($source->name));
-    // the shortname is alphanumeric, 8 characters, and ends up inside every
+    // The shortname is alphanumeric, 8 characters, and ends up inside every.
     // generated question code - so it cannot simply be the original with a suffix bolted on. Seven
     // characters of the original plus '2' keeps it recognisable, legal and distinguishable from
     // the questions the first run already produced. The teacher can change it on the settings page.
@@ -136,7 +136,7 @@ function local_artqtml_create_followup(stdClass $source, array $settings, array 
     redirect(new moodle_url('/local/artqtml/generate.php', ['id' => $newid]));
 }
 
-// the duplicate screen. Unlike upload.php this compares against every generation
+// The duplicate screen. Unlike upload.php this compares against every generation.
 // including the source one - being told "you already generated questions from this text on
 // Saturday, and here it is" is exactly the information the teacher needs before spending money on
 // the same text again.

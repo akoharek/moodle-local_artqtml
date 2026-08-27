@@ -24,8 +24,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Renders the admin-configured difficulty definition for a generation's scale mode.
  *

@@ -24,8 +24,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Hash-based exact match plus shingling/Jaccard near-duplicate detection.
  */

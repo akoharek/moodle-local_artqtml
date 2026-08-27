@@ -30,8 +30,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Looks up and renders the validation summary for one draft question.
  */
@@ -79,7 +77,7 @@ class validation_panel {
             ),
         ];
         if ($row->validationsuggestion !== \local_artqtml\local\validation_suggestion::NOT_EVALUATED) {
-            // show the problem category for any validated question, via its lang
+            // Show the problem category for any validated question, via its lang.
             // Label (never the raw key). 'ok' renders as "No issue", not as an
             // Empty field. normalise() guards against a stale/legacy value reaching get_string().
             $category = \local_artqtml\local\problem_category::normalise($row->problemcategory);

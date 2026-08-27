@@ -28,8 +28,6 @@
 
 namespace local_artqtml\task;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Finds every generation currently waiting on an AI call and runs it through to completion.
  */
@@ -82,7 +80,7 @@ class process_pending_generations extends \core\task\scheduled_task {
             $generationid = (int) $generation->id;
             mtrace('local_artqtml: claimed generation ' . $generationid . ' (status: ' . $generation->status . ').');
 
-            // a plain try/finally only protects against catchable Throwables - a true PHP
+            // A plain try/finally only protects against catchable Throwables - a true PHP.
             // Fatal partway through process_one() (max_execution_time exceeded, memory
             // Exhaustion) terminates the script without ever running the finally block, which
             // Would leave processingtoken set forever and permanently block that generation from

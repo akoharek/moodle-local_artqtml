@@ -29,8 +29,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Decrypts encrypted plugin config, migrating pre-encryption plaintext.
  */

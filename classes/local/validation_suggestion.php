@@ -29,8 +29,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Canonical list + display helper for the validator's suggestion values.
  */

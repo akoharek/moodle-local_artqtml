@@ -24,8 +24,6 @@
 
 namespace local_artqtml\local\question;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Quiz stems must not point at the source document (according-to-the-text meta-references).
  *

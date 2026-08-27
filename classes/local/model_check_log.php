@@ -29,8 +29,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Appends model-check results to local_artqtml_modelcheck.
  */

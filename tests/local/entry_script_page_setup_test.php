@@ -16,8 +16,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Static check: every entry script sets up $PAGE.
  *

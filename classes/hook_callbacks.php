@@ -30,8 +30,6 @@ use core\hook\output\before_standard_top_of_body_html_generation;
 use local_artqtml\local\plugin_setup;
 use local_artqtml\local\validation_panel;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Listeners for core output hooks.
  */

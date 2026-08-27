@@ -18,8 +18,6 @@ namespace local_artqtml\form;
 
 use local_artqtml\local\question_types;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Unit tests for the question-settings form's server-side validation.
  *

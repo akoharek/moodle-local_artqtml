@@ -29,8 +29,6 @@ namespace local_artqtml\local\approve;
 use local_artqtml\local\draft_bank;
 use local_artqtml\local\generation_access_policy;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Single-row and bulk deletion of draft questions.
  */
@@ -53,7 +51,8 @@ class question_deletion_service {
      * Delete a single draft question: its real Moodle question (if not already
      * moved out) and its local row, then prune the draft bank if it is now empty.
      *
-     * A question that has already been moved into a real question bank is skipped here, matching the delete_selected() filter below. The
+     * A question that has already been moved into a real question bank is skipped here,
+     * matching the delete_selected() filter below. The
      * approve page renders no Delete control for such a row, so this is the server-side half of the
      * same rule, for a replayed or hand-built URL.
      *

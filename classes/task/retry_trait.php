@@ -29,8 +29,6 @@
 
 namespace local_artqtml\task;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * HTTP retry/backoff helper for AI adhoc tasks.
  */

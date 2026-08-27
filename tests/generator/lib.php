@@ -32,8 +32,6 @@ use local_artqtml\local\question\question_creator;
 use local_artqtml\local\question_types;
 use local_artqtml\local\validation_suggestion;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Creates generations and draft questions without calling an LLM.
  *

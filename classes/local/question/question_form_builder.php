@@ -28,8 +28,6 @@ namespace local_artqtml\local\question;
 
 use local_artqtml\local\question_types;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Maps AI-generated per-type question data onto the shape save_question() consumes.
  */

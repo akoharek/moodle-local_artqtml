@@ -16,8 +16,6 @@
 
 namespace local_artqtml;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Unit tests for the question-save observer.
  *

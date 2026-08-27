@@ -24,8 +24,6 @@
 
 namespace local_artqtml\local\question;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Renormalises qtype_multichoice answer fractions after a teacher edits the question.
  */

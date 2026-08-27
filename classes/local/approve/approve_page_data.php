@@ -28,8 +28,6 @@ namespace local_artqtml\local\approve;
 
 use local_artqtml\local\draft_bank;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Supplies the approve page's display data.
  */

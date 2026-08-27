@@ -19,8 +19,6 @@ namespace local_artqtml\task;
 use local_artqtml\local\validation_suggestion;
 use local_artqtml\local\problem_category;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Unit tests for the validator prompt's output-language clause.
  *

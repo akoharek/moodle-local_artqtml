@@ -16,8 +16,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Unit tests for missing_types per-level shortfall.
  *
@@ -57,11 +55,13 @@ final class missing_types_test extends \advanced_testcase {
             'timemodified' => $now,
         ]);
 
-        foreach ([
+        foreach (
+            [
             ['easy', 'TST1-IH-001'],
             ['easy', 'TST1-IH-002'],
             ['medium', 'TST1-IH-003'],
-        ] as [$level, $code]) {
+            ] as [$level, $code]
+        ) {
             $DB->insert_record('local_artqtml_questions', (object) [
                 'generationid' => $generationid,
                 'typecode' => 'IH',

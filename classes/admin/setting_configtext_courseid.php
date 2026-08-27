@@ -24,8 +24,6 @@
 
 namespace local_artqtml\admin;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Validates that the draft course id is set and the course exists.
  */

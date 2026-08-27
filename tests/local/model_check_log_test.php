@@ -16,8 +16,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Unit tests for the model-check diagnostic log.
  *
@@ -311,5 +309,4 @@ final class model_check_log_test extends \advanced_testcase {
             'db/upgrade.php must add pluginversion at savepoint 2026081300'
         );
     }
-
 }

@@ -36,8 +36,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Builds and sends every structured-output request the plugin makes.
  */

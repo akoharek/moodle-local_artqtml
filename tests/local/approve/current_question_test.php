@@ -16,8 +16,6 @@
 
 namespace local_artqtml\local\approve;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The approve page's detail panel must describe the question as it is now.
  *

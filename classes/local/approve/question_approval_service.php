@@ -28,8 +28,6 @@ namespace local_artqtml\local\approve;
 
 use local_artqtml\local\generation_access_policy;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Single-row and bulk "approve all accepted" approval.
  */

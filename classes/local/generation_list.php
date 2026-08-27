@@ -29,8 +29,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * One sortable/filterable/paginated section of the list page.
  */
@@ -60,7 +58,7 @@ class generation_list {
         generation_status::VALIDATING => 1,
         generation_status::SAVING     => 2,
         generation_status::COMPLETED  => 3,
-        // partial weighs the same as completed. The weight answers "how far did it get",
+        // Partial weighs the same as completed. The weight answers "how far did it get",.
         // and a partly successful run got all the way to the end - it just brought back less than
         // was ordered. Sorting it next to the runs that finished is where a teacher will look for
         // it; the amber badge is what tells the two apart.
@@ -127,7 +125,7 @@ class generation_list {
         $total = $DB->count_records_sql($countsql, $params);
 
         $orderby = self::SORTABLE[$sort] . ' ' . $dir . ', g.timecreated DESC';
-        // movedoutcount drives the "this generation can no longer be deleted" state of the
+        // Movedoutcount drives the "this generation can no longer be deleted" state of the.
         // row's Delete button. Counted in the same query as the other per-row aggregates rather than
         // one extra query per rendered row.
         $sql = "SELECT g.*$namefields, $statuscase AS statusorder, $creatorsort AS creatorname,
@@ -146,7 +144,7 @@ class generation_list {
 
         // All current state (filters + sort/dir) merged onto the base URL, so that sort-header
         // links, the paging bar, and the filter form each only need to override the one param
-        // they're actually changing without dropping the other two (
+        // They're actually changing without dropping the other two (.
         $stateurl = self::section_url($baseurl, $prefix, [
             $prefix . '_status'   => $status !== '' ? $status : null,
             $prefix . '_datefrom' => $datefrom !== '' ? $datefrom : null,
@@ -401,7 +399,7 @@ class generation_list {
         ];
 
         $table = new \html_table();
-        // fluid, wrapping table - no horizontal scroller. The lower-priority columns
+        // Fluid, wrapping table - no horizontal scroller. The lower-priority columns.
         // collapse below lg via Boost's own display utilities and reappear as a secondary line
         // inside the name cell, so collapsing hides the cell, never the information. The actions
         // column carries no d-none and is therefore reachable at every width.
@@ -435,14 +433,14 @@ class generation_list {
         $table->head[] = get_string('colactions', 'local_artqtml');
 
         foreach ($generations as $generation) {
-            // the badge shows the lang label ('started' -> "Started" in English / localized label),
+            // The badge shows the lang label ('started' -> "Started" in English / localized label),.
             // never the raw status key.
             $statusbadge = \html_writer::span(
                 generation_status::label($generation->status),
                 'badge ' . generation_status::badge_class($generation->status)
             );
 
-            // collaborative :use by design; delete is owner-only (see delete.php).
+            // Collaborative :use by design; delete is owner-only (see delete.php).
             // Open is offered in both "mine" and "others" sections; Delete only when $candelete.
             $openurl = self::open_url($generation);
             $openlink = \html_writer::link($openurl, get_string('actionopen', 'local_artqtml'), [
@@ -497,7 +495,7 @@ class generation_list {
                 ]);
             }
 
-            // the values of the columns that collapse below lg, repeated inside the
+            // The values of the columns that collapse below lg, repeated inside the.
             // name cell so nothing becomes unreachable on a narrow screen. Hidden at >= lg by
             // .d-lg-none, where the real columns are visible instead.
             $collapsedparts = [
@@ -525,7 +523,7 @@ class generation_list {
                 $generation->unvalidatedcount . '/' . $generation->questioncount,
                 $actionscell,
             ]);
-            // row anchor + content identifier, so a row
+            // Row anchor + content identifier, so a row.
             // assertion can select the generation it means rather than the first match.
             $row->attributes['data-testid'] = 'artqtm-list-row';
             $row->attributes['data-generationid'] = $generation->id;
@@ -592,13 +590,13 @@ class generation_list {
      * @return \moodle_url
      */
     public static function open_url(\stdClass $generation): \moodle_url {
-        // no re-listing of the seven statuses - completed goes to the approval page, the
+        // No re-listing of the seven statuses - completed goes to the approval page, the.
         // in-progress trio plus failed and partial go to the status page, and anything else
         // ('started') falls through to the settings page it can be resumed from.
         if ($generation->status === generation_status::COMPLETED) {
             return new \moodle_url('/local/artqtml/approve.php', ['generationid' => $generation->id]);
         }
-        // partial belongs on the status page, not the approval page and certainly not the
+        // Partial belongs on the status page, not the approval page and certainly not the.
         // settings page it was falling through to. Everything the teacher needs to decide about a
         // partly successful run is there and nowhere else: what is missing, the button that asks
         // for it again, and the Continue link to the questions that did get made.

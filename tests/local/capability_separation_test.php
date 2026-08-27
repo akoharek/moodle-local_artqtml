@@ -16,8 +16,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Pins the mutual exclusion of local/artqtml:use and local/artqtml:configure.
  *

@@ -37,8 +37,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Creates and hands out the draft preview role.
  */

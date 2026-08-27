@@ -16,8 +16,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Pins: deleting a generation must NOT delete its diagnostic log rows.
  *

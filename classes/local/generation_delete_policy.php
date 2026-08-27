@@ -34,8 +34,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The single answer to "may this user delete this generation?".
  */

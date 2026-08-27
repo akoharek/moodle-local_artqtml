@@ -16,8 +16,6 @@
 
 namespace local_artqtml\local\question;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Pins the retry penalty that question_form_builder writes onto the real Moodle question.
  *

@@ -24,8 +24,6 @@
 
 namespace local_artqtml\admin;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Validates this setting against both a fixed minimum and a sibling setting's submitted value.
  *

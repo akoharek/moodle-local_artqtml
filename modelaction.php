@@ -32,8 +32,6 @@ use local_artqtml\local\model_list;
 
 require_login();
 
-defined('MOODLE_INTERNAL') || die();
-
 $context = context_system::instance();
 require_capability('local/artqtml:configure', $context);
 if (!data_submitted()) {

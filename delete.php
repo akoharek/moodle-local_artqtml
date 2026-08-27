@@ -26,8 +26,6 @@ require(__DIR__ . '/../../config.php');
 
 require_login();
 
-defined('MOODLE_INTERNAL') || die();
-
 $context = context_system::instance();
 require_capability('local/artqtml:use', $context);
 if (!data_submitted()) {

@@ -115,7 +115,7 @@ if ($editid > 0) {
         $DB->set_field('local_artqtml_generations', 'error', null, ['id' => $editid]);
         $editgeneration->error = null;
     }
-    // no owner check here. Until 2026-08-03 this page required
+    // No owner check here. Until 2026-08-03 this page required.
     // local/artqtml:configure to open somebody else's generation, and it was the only page in the
     // plugin that did - every other one lets any :use holder open any generation, because the tool
     // is deliberately site-wide and collaborative.
@@ -210,7 +210,7 @@ function local_artqtml_redirect_after_refused_save(int $generationid, \moodle_ur
     );
 }
 
-// the user chose "Folytatom".
+// The user chose "Folytatom".
 //
 // this is a bare HTML form that only ever posts sesskey + artqtmconfirmdup=1, not a
 // resubmission of upload_form's own fields - $mform->get_data() would therefore always return
@@ -281,8 +281,7 @@ if ($mform->is_cancelled()) {
 
     $sourcetext = (string) $data->sourcetext;
 
-    //
-    // file bytes () so an identical re-upload is still caught as a duplicate even if text
+    // Compare file bytes so an identical re-upload is still caught as a duplicate even if text
     // extraction happens to produce slightly different output than it did the first time.
     //
     // 2026-08-04, two changes here.
@@ -321,7 +320,7 @@ if ($mform->is_cancelled()) {
             $sourcetext = $sourcetext !== '' ? ($sourcetext . "\n\n" . $report['text']) : $report['text'];
         }
 
-        // the plausibility check. Extraction "succeeding" with almost nothing is the silent
+        // The plausibility check. Extraction "succeeding" with almost nothing is the silent.
         // failure this exists for: a 1.1 MB, 21-page presentation returned 64 characters, and
         // because 64 is not zero the upload was accepted, the teacher saw no problem, and the
         // questions were generated from a fragment.
@@ -360,13 +359,13 @@ if ($mform->is_cancelled()) {
         redirect(new moodle_url('/local/artqtml/upload.php', $editid ? ['id' => $editid] : []));
     }
 
-    // security screen. On failure the text is deliberately never redisplayed.
+    // Security screen. On failure the text is deliberately never redisplayed.
     if (security_filter::has_sql_injection($sourcetext) || security_filter::has_prompt_injection($sourcetext)) {
         \core\notification::error(get_string('errorsecurityfilter', 'local_artqtml'));
         redirect(new moodle_url('/local/artqtml/upload.php', $editid ? ['id' => $editid] : []));
     }
 
-    // duplicate/similarity screen ($confirmed is always false here - the true case
+    // Duplicate/similarity screen ($confirmed is always false here - the true case.
     // returned above before ever reaching $mform->get_data()).
     // duplicate detection is text-content based (sourcetexthash), not file-byte
     // based - see duplicate_detector::find_match(). $filehash is still recorded on the generation
@@ -441,7 +440,7 @@ if ($mform->is_cancelled()) {
 echo $OUTPUT->header();
 echo local_artqtml_model_warning_banner();
 echo local_artqtml_apikey_decrypt_notice();
-// this page was the only one that could show another user's generation
+// This page was the only one that could show another user's generation.
 // without saying so, and only because until today it could not show one at all - the owner check
 // removed above kept it out. The warning belongs wherever a colleague's generation is on screen,
 // which is why approve.php, generate.php and status.php have carried it all along. Walking the
@@ -453,7 +452,7 @@ if ($editgeneration) {
 echo $OUTPUT->heading(get_string('uploadheading', 'local_artqtml'));
 $mform->display();
 
-// the warning is relative to the generating model's context window, not a flat
+// The warning is relative to the generating model's context window, not a flat.
 // admin-configured token count. The context window is no longer passed to the counter separately,
 // because source_text_limit::token_limit() already derives the limit from it when no explicit one
 // is set - passing both meant two places could disagree about the same number.
@@ -465,7 +464,7 @@ $sourcetokenlimit = source_text_limit::token_limit();
 $counterlimittemplate = get_string('textcounterlimitlabel', 'local_artqtml', $sourcetokenlimit);
 $countererrormessage = get_string('errorsourcetexttoolong', 'local_artqtml');
 
-// the counter text must come from a lang string, not be hardcoded in JS -
+// The counter text must come from a lang string, not be hardcoded in JS -.
 // render it with sentinel placeholders here, substituted for the live counts in amd/src/textcounter.js.
 $countertemplate = get_string('textcounterlabel', 'local_artqtml', (object) [
     'chars'  => '__CHARS__',

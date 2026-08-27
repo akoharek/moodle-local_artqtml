@@ -16,8 +16,6 @@
 
 namespace local_artqtml\local\question;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * What reaches the question bank from the model is wording, not appearance.
  *

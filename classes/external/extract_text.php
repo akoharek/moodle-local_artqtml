@@ -34,8 +34,6 @@ use local_artqtml\local\extraction_result;
 use local_artqtml\local\source_text_limit;
 use local_artqtml\local\text_extractor;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Returns the extracted plain text for a draft file area, or '' if nothing could be extracted.
  */

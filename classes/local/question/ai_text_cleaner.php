@@ -24,8 +24,6 @@
 
 namespace local_artqtml\local\question;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The model supplies wording, not appearance - and it does so BEFORE validation.
  *

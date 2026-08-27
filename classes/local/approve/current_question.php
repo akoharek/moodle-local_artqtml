@@ -16,8 +16,6 @@
 
 namespace local_artqtml\local\approve;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * What the question says *now*, in the shape the approve page's detail panel already reads.
  *

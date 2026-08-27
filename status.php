@@ -68,7 +68,7 @@ function local_artqtml_rollback(stdClass $generation): void {
     $generation->timemodified = $fresh->timemodified;
 }
 
-// available while generating/validating.
+// Available while generating/validating.
 // State-changing: POST + sesskey only (no GET+sesskey URL).
 if (optional_param('abort', 0, PARAM_BOOL)) {
     if (!data_submitted()) {
@@ -89,7 +89,7 @@ if (optional_param('abort', 0, PARAM_BOOL)) {
     redirect(new moodle_url('/local/artqtml/generate.php', ['id' => $generationid]));
 }
 
-// full restart from zero.
+// Full restart from zero.
 // State-changing: POST + sesskey only (no GET+sesskey URL).
 if (optional_param('retry', 0, PARAM_BOOL)) {
     if (!data_submitted()) {
@@ -140,7 +140,7 @@ if (optional_param('retry', 0, PARAM_BOOL)) {
         $generation->timemodified = time();
         $DB->update_record('local_artqtml_generations', $generation);
 
-        // the "generating" status set above is the queue signal for the
+        // The "generating" status set above is the queue signal for the.
         // process_pending_generations scheduled task - see generate.php.
     }
     redirect(new moodle_url('/local/artqtml/status.php', ['generationid' => $generationid]));
@@ -181,14 +181,13 @@ echo local_artqtml_apikey_decrypt_notice();
 echo local_artqtml_owner_warning_banner($generation);
 echo html_writer::tag('p', format_string($generation->name));
 
-// only known once the generating stage has run - rendered up front if already known,
+// Only known once the generating stage has run - rendered up front if already known,.
 // otherwise revealed live by amd/src/status.js once countdiscrepancymessage turns non-empty.
 $countdiscrepancy = json_decode((string) $generation->countdiscrepancy, true);
 $countdiscrepancymessage = (is_array($countdiscrepancy) && !empty($countdiscrepancy))
     ? question_types::format_count_discrepancy($countdiscrepancy)
     : '';
-//
-// hidden on a partly successful run, where the partial notice below prints the very same
+// Hidden on a partly successful run, where the partial notice below prints the very same
 // sentence as part of explaining itself - two identical amber boxes stacked on top of each other
 // was what the screen actually showed. The region stays in the markup either way, because
 // amd/src/status.js reveals it mid-poll for the runs that are not partial.
@@ -199,7 +198,7 @@ echo html_writer::div(
     ['data-region' => 'countdiscrepancy']
 );
 
-// a distinct green "completed successfully" notification (separate from just filling the
+// A distinct green "completed successfully" notification (separate from just filling the.
 // progress bar and revealing Continue), shown up front if the generation is already completed on
 // page load, otherwise revealed live by amd/src/status.js the moment the poll returns 'completed'.
 // The question count sits in its own span (like question-count above) so the JS can refresh it to
@@ -211,7 +210,7 @@ echo html_writer::div(
     ['data-region' => 'success']
 );
 
-// the third outcome. The pipeline ran to the end and the teacher still did not get what
+// The third outcome. The pipeline ran to the end and the teacher still did not get what.
 // they asked for - which is neither the green notice above nor the red one at the bottom, and
 // was shown as the green one until 2026-08-01.
 if ($generation->status === generation_status::PARTIAL) {
@@ -234,7 +233,7 @@ if ($generation->status === generation_status::PARTIAL) {
         $retrytypeslink = $OUTPUT->render($retrytypesbutton);
     }
 
-    // countdiscrepancy only names the shortfall. The why is already in
+    // Countdiscrepancy only names the shortfall. The why is already in.
     // local_artqtml_log (type_generation_failed / question_rejected / undershoot outcomes) -
     // surface it here so the teacher is not left guessing why SR/RV came back empty.
     $partialreasons = \local_artqtml\local\partial_reason::render($generationid);
@@ -286,7 +285,7 @@ $barstriped = $stage['striped'];
 switch ($generation->status) {
     case generation_status::GENERATING:
         $barlabel = get_string('stagegenerating', 'local_artqtml');
-        // name the type being generated, so six calls do not look like one stuck one.
+        // Name the type being generated, so six calls do not look like one stuck one.
         $intype = \local_artqtml\local\generation_progress::generating_type($generation->pendingdata);
         if ($intype !== '') {
             $barlabel .= ' - ' . \local_artqtml\local\question_types::label($intype);
@@ -360,7 +359,7 @@ if (generation_status::is_in_progress($generation->status) && $canmutate) {
     echo $OUTPUT->render($abortbutton);
 }
 
-// shown server-side for a partly successful run. The notice above tells the teacher the
+// Shown server-side for a partly successful run. The notice above tells the teacher the.
 // questions that did get made are usable - and until this line the page then gave them no way to
 // reach them, because Continue was only ever revealed by the JS on 'completed'. The other statuses
 // are unchanged: hidden here, unhidden by amd/src/status.js when the poll says completed.

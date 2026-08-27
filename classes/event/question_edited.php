@@ -24,8 +24,6 @@
 
 namespace local_artqtml\event;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Triggered when a teacher edits a still-in-draft AI question in the native question editor:
  * Its stale Gemini validation result is cleared and it must be re-approved before it can move.

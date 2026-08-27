@@ -18,8 +18,6 @@ namespace local_artqtml\task;
 
 use local_artqtml\local\validation_suggestion;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Unit tests for the validator's suggestion enum as a single source of truth.
  *

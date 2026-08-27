@@ -24,8 +24,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Reads a partial generation's recorded shortfall and narrows its settings down to it.
  */
@@ -185,7 +183,12 @@ class missing_types {
         global $DB;
 
         $saved = [];
-        $records = $DB->get_recordset('local_artqtml_questions', ['generationid' => $generationid], '', 'typecode, difficultylabel');
+        $records = $DB->get_recordset(
+            'local_artqtml_questions',
+            ['generationid' => $generationid],
+            '',
+            'typecode, difficultylabel'
+        );
         foreach ($records as $row) {
             $code = (string) $row->typecode;
             if (!in_array($code, question_types::CODES, true)) {
@@ -285,6 +288,8 @@ class missing_types {
     }
 
     /**
+     * Format per-type shortfall counts for user-facing messages.
+     *
      * @param array<string, int> $shortfall
      * @return string
      */

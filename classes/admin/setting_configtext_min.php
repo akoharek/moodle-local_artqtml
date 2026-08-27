@@ -24,8 +24,6 @@
 
 namespace local_artqtml\admin;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Adds a minimum-value cross-check on top of the normal PARAM_INT text setting.
  */

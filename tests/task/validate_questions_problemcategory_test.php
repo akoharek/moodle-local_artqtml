@@ -18,8 +18,6 @@ namespace local_artqtml\task;
 
 use local_artqtml\local\problem_category;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Unit tests for the validation problem_category enum.
  *

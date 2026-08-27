@@ -16,8 +16,6 @@
 
 namespace local_artqtml;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Tests for the plugin data generator used by Behat.
  *

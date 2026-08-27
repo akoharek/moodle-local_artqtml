@@ -16,8 +16,6 @@
 
 namespace local_artqtml\form;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Unit tests.
  *

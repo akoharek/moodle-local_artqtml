@@ -28,8 +28,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The closed set of extraction outcomes and reasons, with the helpers that build them.
  */

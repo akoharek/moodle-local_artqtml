@@ -24,8 +24,6 @@
 
 namespace local_artqtml\event;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Triggered for an HTTP-level failure or an exhausted JSON-retry fallback.
  *

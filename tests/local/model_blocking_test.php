@@ -16,8 +16,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Unit tests for the model blocking state.
  *
@@ -126,7 +124,7 @@ final class model_blocking_test extends \advanced_testcase {
         $root = realpath(__DIR__ . '/../..');
         $allowed = [
             $root . '/classes/local/model_blocking.php', // The class itself.
-            $root . '/classes/local/model_checker.php', // 's sole permitted writer.
+            $root . '/classes/local/model_checker.php', // Model_checker's sole permitted writer.
         ];
 
         $offenders = [];

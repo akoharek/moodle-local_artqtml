@@ -19,8 +19,6 @@ namespace local_artqtml\local;
 use local_artqtml\local\question_schema;
 use local_artqtml\task\validate_questions_task;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Provider-agnostic well-formedness checks over EVERY enum in EVERY request schema the plugin
  * Sends - the Gemini validation response schema and the Claude generation Structured Outputs

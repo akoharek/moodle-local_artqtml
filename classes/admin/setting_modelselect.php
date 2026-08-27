@@ -28,8 +28,6 @@ namespace local_artqtml\admin;
 
 use local_artqtml\local\model_list;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * A select populated from the cached provider model list.
  */

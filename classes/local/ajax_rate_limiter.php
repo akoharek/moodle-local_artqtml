@@ -27,8 +27,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Counts AJAX calls per user per action and rejects bursts above the configured caps.
  */

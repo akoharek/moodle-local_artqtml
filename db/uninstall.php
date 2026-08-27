@@ -31,8 +31,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Delete every generation's draft question bank category before the plugin's own tables go.
  *

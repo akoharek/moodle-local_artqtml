@@ -24,8 +24,6 @@
 
 namespace local_artqtml\task;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Runs the availability and structure checks for both providers once a day.
  */

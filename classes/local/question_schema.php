@@ -25,8 +25,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Per-type and combined JSON schema fragments for IH, FE and SR.
  */

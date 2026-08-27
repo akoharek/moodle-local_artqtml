@@ -27,8 +27,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Estimates source-text size and answers whether it is over the configured limit.
  */

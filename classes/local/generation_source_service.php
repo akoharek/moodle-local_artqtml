@@ -35,8 +35,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The write path for a generation's source text and identifiers.
  */
@@ -146,7 +144,7 @@ class generation_source_service {
         // property it is given, so handing back the whole loaded record wrote every column -
         // including `status`. A generation started in another tab between the read above and the
         // write here therefore had its status pushed back from `generating` to `started` by a form
-        // that never meant to touch it
+        // That never meant to touch it.
         $DB->update_record('local_artqtml_generations', (object) [
             'id'             => $editingid,
             'name'           => $name,

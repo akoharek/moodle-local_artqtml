@@ -16,8 +16,6 @@
 
 namespace local_artqtml\local;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * The shipped prompt seed must stay in step with the code that substitutes into it.
  *

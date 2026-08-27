@@ -35,8 +35,6 @@ use local_artqtml\local\question\question_semantic_validator;
 use local_artqtml\local\question\question_creator;
 use local_artqtml\local\question\multichoice_fraction_normalizer;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Stable public facade for AI-question semantic validation, creation and post-edit normalisation.
  */
