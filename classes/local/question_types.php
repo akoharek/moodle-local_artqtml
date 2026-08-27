@@ -71,13 +71,13 @@ class question_types {
     }
 
     /**
-     * supports hints.
+     * Whether Moodle supports per-question hints (question_hints) for this type.
      *
      * @param string $code one of self::CODES
      * @return bool
      */
     public static function supports_hints(string $code): bool {
-        return in_array($code, ['FE', 'SR'], true);
+        return in_array($code, ['IH', 'FE', 'SR'], true);
     }
 
     /**
