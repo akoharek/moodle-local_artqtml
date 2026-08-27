@@ -303,8 +303,7 @@ class validate_questions_task {
      * @return string
      */
     protected function extract_gemini_error(string $body): string {
-        $decoded = json_decode($body, true);
-        return (string) ($decoded['error']['message'] ?? $body);
+        return ai_request::error_message_from_body($body);
     }
 
     /**

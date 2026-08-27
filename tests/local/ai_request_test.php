@@ -481,4 +481,18 @@ final class ai_request_test extends \advanced_testcase {
         $this->assertArrayHasKey('schema', $claude['payload']['output_config']['format']);
         $this->assertArrayHasKey('responseSchema', $gemini['payload']['generationConfig']);
     }
+
+    /**
+     * JSON API errors keep error.message; non-JSON bodies are capped (S-04).
+     */
+    public function test_error_message_from_body_json_and_non_json(): void {
+        $json = json_encode(['error' => ['message' => 'Rate limit exceeded']]);
+        $this->assertSame('Rate limit exceeded', ai_request::error_message_from_body($json));
+
+        $longhtml = str_repeat('X', 600);
+        $truncated = ai_request::error_message_from_body($longhtml);
+        $this->assertSame(501, \core_text::strlen($truncated));
+        $this->assertStringEndsWith('…', $truncated);
+        $this->assertSame(str_repeat('X', 500), \core_text::substr($truncated, 0, 500));
+    }
 }

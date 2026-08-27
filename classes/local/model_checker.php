@@ -276,10 +276,12 @@ class model_checker {
      * @return string
      */
     protected static function transient_message(string $body, int $httpcode): string {
-        $decoded = json_decode($body, true);
-        $message = is_array($decoded) ? (string) ($decoded['error']['message'] ?? '') : '';
+        $message = ai_request::error_message_from_body($body);
+        if ($message !== '') {
+            return $message;
+        }
 
-        return $message !== '' ? $message : 'HTTP ' . $httpcode;
+        return 'HTTP ' . $httpcode;
     }
 
     /**
