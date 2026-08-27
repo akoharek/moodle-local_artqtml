@@ -72,7 +72,7 @@ Feature: Reviewing generated ArtQTML questions
   Scenario: Teacher moves an approved question into a course question bank
     When I open the ArtQTML generation named "Review pack"
     And I click on "Approve" "button" in the "REV1-IH-0001" "table_row"
-    And I click on the "artqtml-approve-rowselect" "checkbox" in the "REV1-IH-0001" "table_row"
+    And I click on "[data-testid='artqtml-approve-rowselect']" "css_element" in the "REV1-IH-0001" "table_row"
     And I choose the first ArtQTML move target category
     And I press "Move selected"
     Then I should see "question(s) moved to the selected question bank"
