@@ -21,7 +21,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Unit tests for generation deletion authorisation.
  *
- * Product decision 2026-08-10: delete requires local/artqtml:use and ownership.
+ * delete requires local/artqtml:use and ownership.
  * local/artqtml:configure never authorises deletion.
  *
  * @package    local_artqtml

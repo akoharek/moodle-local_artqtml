@@ -50,7 +50,7 @@ trait generation_status_trait {
 
     /**
      * Re-check that a generation still exists and is still in the expected in-progress status
-     * Before committing further work (C-03). A long-running Claude/Gemini HTTP call can take
+     * Before committing further work. A long-running Claude/Gemini HTTP call can take
      * Tens of seconds; in that window the user could have aborted (status reset to "started"
      * After a rollback) or deleted the generation entirely via the UI, and results from a call
      * Started before that must never be silently saved afterwards.

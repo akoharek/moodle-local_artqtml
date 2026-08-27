@@ -30,6 +30,9 @@ defined('MOODLE_INTERNAL') || die();
 
 $context = context_system::instance();
 require_capability('local/artqtml:use', $context);
+if (!data_submitted()) {
+    throw new moodle_exception('invalidrequest');
+}
 require_sesskey();
 
 $generationid = required_param('id', PARAM_INT);

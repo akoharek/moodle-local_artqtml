@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Step 3 of the "New generation" flow: poll and display generation status (functional spec ch.5).
+ * Step 3 of the "New generation" flow: poll and display generation status.
  *
  * @package    local_artqtml
  * @copyright  2026 AR Tudásmenedzsment Kft.
@@ -39,7 +39,7 @@ require_capability('local/artqtml:use', $context);
 $generationid = required_param('generationid', PARAM_INT);
 
 $generation = $DB->get_record('local_artqtml_generations', ['id' => $generationid], '*', MUST_EXIST);
-// S-02: :use may open any generation; mutation requires ownership or local/artqtml:manageall.
+// Capability local/artqtml:use may open any generation; mutation requires ownership or local/artqtml:manageall.
 $canmutate = generation_access_policy::can_mutate($generation, null, $context);
 
 // Recoverable pipeline rollback (Finding #5 security gate, or Abort) leaves status=started.
@@ -67,7 +67,7 @@ function local_artqtml_rollback(stdClass $generation): void {
     $generation->timemodified = $fresh->timemodified;
 }
 
-// Megszakítás (Gen-008/009/010): available while generating/validating.
+// available while generating/validating.
 // State-changing: POST + sesskey only (no GET+sesskey URL).
 if (optional_param('abort', 0, PARAM_BOOL)) {
     if (!data_submitted()) {
@@ -88,7 +88,7 @@ if (optional_param('abort', 0, PARAM_BOOL)) {
     redirect(new moodle_url('/local/artqtml/generate.php', ['id' => $generationid]));
 }
 
-// Gen-015 (újrapróbálás): full restart from zero.
+// full restart from zero.
 // State-changing: POST + sesskey only (no GET+sesskey URL).
 if (optional_param('retry', 0, PARAM_BOOL)) {
     if (!data_submitted()) {
@@ -107,9 +107,9 @@ if (optional_param('retry', 0, PARAM_BOOL)) {
         \core\notification::error(local_artqtml_apikey_start_error());
         redirect(new moodle_url('/local/artqtml/status.php', ['generationid' => $generationid]));
     }
-    // BL-57 (Andras, 2026-08-06): Retry puts a generation back into 'generating', so it is a start
+    // Retry puts a generation back into 'generating', so it is a start
     // like any other and it asks the same question - does this user already have one running? It
-    // did not when BL-57 was first built, which meant this button walked straight past the limit.
+    // , which meant this button walked straight past the limit.
     //
     // The check sits BEFORE local_artqtml_rollback(), because a refusal may not destroy the
     // failed attempt's draft bank and questions on the way out. Same message and same destination
@@ -136,7 +136,7 @@ if (optional_param('retry', 0, PARAM_BOOL)) {
         $generation->timemodified = time();
         $DB->update_record('local_artqtml_generations', $generation);
 
-        // Gen-015: the "generating" status set above is the queue signal for the
+        // the "generating" status set above is the queue signal for the
         // process_pending_generations scheduled task - see generate.php.
     }
     redirect(new moodle_url('/local/artqtml/status.php', ['generationid' => $generationid]));
@@ -164,11 +164,10 @@ $PAGE->set_heading(get_string('statusheading', 'local_artqtml'));
 $PAGE->requires->js_call_amd('local_artqtml/status', 'init');
 
 $questioncount = $DB->count_records('local_artqtml_questions', ['generationid' => $generationid]);
-// Light edition: no monthly token-budget UI (Full-only Admin-030-033).
 $tokenwarningmessage = '';
 
 $approveurl = new moodle_url('/local/artqtml/approve.php', ['generationid' => $generationid]);
-$backurl = new moodle_url('/local/artqtml/generate.php', ['id' => $generationid]);
+$backurl = new moodle_url('/local/artqtml/index.php');
 $retryurl = new moodle_url('/local/artqtml/status.php', ['generationid' => $generationid, 'retry' => 1]);
 $aborturl = new moodle_url('/local/artqtml/status.php', ['generationid' => $generationid, 'abort' => 1]);
 
@@ -178,7 +177,7 @@ echo local_artqtml_apikey_decrypt_notice();
 echo local_artqtml_owner_warning_banner($generation);
 echo html_writer::tag('p', format_string($generation->name));
 
-// Gen-018/019: rendered up front if already known, otherwise revealed live by amd/src/status.js
+// rendered up front if already known, otherwise revealed live by amd/src/status.js
 // once the AJAX poll's tokenwarningmessage turns non-empty (e.g. the warning appears
 // mid-generation). Plain markup (not $OUTPUT->notification()) so amd/src/status.js can safely
 // overwrite just the message text without disturbing a dismiss-button/JS init.
@@ -188,14 +187,14 @@ echo html_writer::div(
     ['data-region' => 'tokenwarning']
 );
 
-// M-08: only known once the generating stage has run - rendered up front if already known,
+// only known once the generating stage has run - rendered up front if already known,
 // otherwise revealed live by amd/src/status.js the same way the token-budget warning above is.
 $countdiscrepancy = json_decode((string) $generation->countdiscrepancy, true);
 $countdiscrepancymessage = (is_array($countdiscrepancy) && !empty($countdiscrepancy))
     ? question_types::format_count_discrepancy($countdiscrepancy)
     : '';
 //
-// BL-35: hidden on a partly successful run, where the partial notice below prints the very same
+// hidden on a partly successful run, where the partial notice below prints the very same
 // sentence as part of explaining itself - two identical amber boxes stacked on top of each other
 // was what the screen actually showed. The region stays in the markup either way, because
 // amd/src/status.js reveals it mid-poll for the runs that are not partial.
@@ -206,7 +205,7 @@ echo html_writer::div(
     ['data-region' => 'countdiscrepancy']
 );
 
-// Gen-011: a distinct green "completed successfully" notification (separate from just filling the
+// a distinct green "completed successfully" notification (separate from just filling the
 // progress bar and revealing Continue), shown up front if the generation is already completed on
 // page load, otherwise revealed live by amd/src/status.js the moment the poll returns 'completed'.
 // The question count sits in its own span (like question-count above) so the JS can refresh it to
@@ -218,7 +217,7 @@ echo html_writer::div(
     ['data-region' => 'success']
 );
 
-// BL-35: the third outcome. The pipeline ran to the end and the teacher still did not get what
+// the third outcome. The pipeline ran to the end and the teacher still did not get what
 // they asked for - which is neither the green notice above nor the red one at the bottom, and
 // was shown as the green one until 2026-08-01.
 if ($generation->status === generation_status::PARTIAL) {
@@ -241,7 +240,7 @@ if ($generation->status === generation_status::PARTIAL) {
         $retrytypeslink = $OUTPUT->render($retrytypesbutton);
     }
 
-    // BL-30 leftover: countdiscrepancy only names the shortfall. The why is already in
+    // countdiscrepancy only names the shortfall. The why is already in
     // local_artqtml_log (type_generation_failed / question_rejected / undershoot outcomes) -
     // surface it here so the teacher is not left guessing why SR/RV came back empty.
     $partialreasons = \local_artqtml\local\partial_reason::render($generationid);
@@ -271,11 +270,11 @@ echo html_writer::start_div('', [
     'data-progress-config'   => \local_artqtml\local\generation_progress::config_json(),
 ]);
 
-// Gen-001/M-15: a single Bootstrap progress bar over the pipeline stages
+// A single Bootstrap progress bar over the pipeline stages
 // (generating/validating/saving/completed - 25/50/75/100%), matching the spec's own "Moodle native
 // striped progress bar" wording instead of a plain color-coded list.
 //
-// BL-35: the generating stage is no longer one step. It is one API call per requested question
+// the generating stage is no longer one step. It is one API call per requested question
 // type, so the bar advances within it, 25% to 45%, and the label names the type in flight. The
 // individual call is still a single synchronous HTTP request with no streaming signal - what
 // changed is that there are now several of them, and how many have finished is a real number
@@ -293,7 +292,7 @@ $barstriped = $stage['striped'];
 switch ($generation->status) {
     case generation_status::GENERATING:
         $barlabel = get_string('stagegenerating', 'local_artqtml');
-        // BL-35: name the type being generated, so six calls do not look like one stuck one.
+        // name the type being generated, so six calls do not look like one stuck one.
         $intype = \local_artqtml\local\generation_progress::generating_type($generation->pendingdata);
         if ($intype !== '') {
             $barlabel .= ' - ' . \local_artqtml\local\question_types::label($intype);
@@ -339,10 +338,10 @@ echo html_writer::div(
 );
 echo html_writer::end_div();
 
-// Gen-004: "Minden szakasznál szöveges visszajelzés is megjelenik a progress bar alatt".
+// "Minden szakasznál szöveges visszajelzés is megjelenik a progress bar alatt".
 // S-4: this used to be written inside the bar, where at 25% the bar was narrower than its own
 // label and Bootstrap's overflow: hidden clipped the text away - content made unreachable by
-// clipping, which Glob-034 forbids. It was worked around in CSS; below the bar it needs no
+//  was worked around in CSS; below the bar it needs no
 // workaround at all.
 echo html_writer::tag(
     'p',
@@ -369,7 +368,7 @@ if (generation_status::is_in_progress($generation->status) && $canmutate) {
     echo $OUTPUT->render($abortbutton);
 }
 
-// BL-35: shown server-side for a partly successful run. The notice above tells the teacher the
+// shown server-side for a partly successful run. The notice above tells the teacher the
 // questions that did get made are usable - and until this line the page then gave them no way to
 // reach them, because Continue was only ever revealed by the JS on 'completed'. The other statuses
 // are unchanged: hidden here, unhidden by amd/src/status.js when the poll says completed.
@@ -389,14 +388,14 @@ $retrybutton->class = 'singlebutton';
 $retrybutton->add_confirm_action(get_string('retryconfirm', 'local_artqtml', format_string($generation->name)));
 $retrylink = $OUTPUT->render($retrybutton);
 
-// Gen-014/M-27: the raw technical error (may contain provider-internal details) is shown to
+// The raw technical error (may contain provider-internal details) is shown to
 // anyone allowed to configure the plugin, regardless of debug mode - everyone else only sees
 // the generic message.
 $technicalerror = has_capability('local/artqtml:configure', $context) ? s($generation->error ?? '') : '';
 
 $failedactions = html_writer::div(
     ($canmutate ? $retrylink : '') .
-        html_writer::link($backurl, get_string('backtosettingsshort', 'local_artqtml'), ['class' => 'btn btn-secondary']),
+        html_writer::link($backurl, get_string('backtolist', 'local_artqtml'), ['class' => 'btn btn-secondary']),
     'artqtm-buttonrow'
 );
 

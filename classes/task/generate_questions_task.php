@@ -102,7 +102,7 @@ class generate_questions_task {
             // One call per question type, not one call for the generation.
             [$questions, $outcomes] = $this->call_claude_per_type($generation, $settings);
 
-            // C-03: the calls above can take a long time - re-check the generation still exists
+            // the calls above can take a long time - re-check the generation still exists
             // And hasn't been aborted/deleted while they were in flight before saving results.
             $generation = $this->reload_if_active($generationid, \local_artqtml\local\generation_status::GENERATING);
             if ($generation === null) {

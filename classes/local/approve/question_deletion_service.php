@@ -15,8 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Question deletion business logic for the draft approval page (functional spec ch.7,
- * Jov-010/015) - split out of the approve.php controller. Deletes the real Moodle question and
+ * Question deletion business logic for the draft approval page -
+ * split out of the approve.php controller. Deletes the real Moodle question and
  * the local row, logs question_deleted, and prunes the draft bank when empty; never renders.
  *
  * @package    local_artqtml
@@ -50,10 +50,10 @@ class question_deletion_service {
     }
 
     /**
-     * Delete a single draft question (Jov-010/015): its real Moodle question (if not already
+     * Delete a single draft question: its real Moodle question (if not already
      * moved out) and its local row, then prune the draft bank if it is now empty.
      *
-     * Jov-041: "Áthelyezett kérdés soronként sem törölhető" - a question that has already been moved
+     * "Áthelyezett kérdés soronként sem törölhető" - a question that has already been moved
      * into a real question bank is skipped here, matching the delete_selected() filter below. The
      * approve page renders no Delete control for such a row, so this is the server-side half of the
      * same rule, for a replayed or hand-built URL.
@@ -73,7 +73,7 @@ class question_deletion_service {
             return false;
         }
 
-        // V20 #4: the real-question delete + local-row delete + draft-bank prune must succeed
+        // The real-question delete + local-row delete + draft-bank prune must succeed
         // or fail together, exactly like delete_selected() already does - otherwise a failure
         // between them can orphan a Moodle question or leave a stale draft category.
         $transaction = $DB->start_delegated_transaction();
@@ -103,9 +103,9 @@ class question_deletion_service {
 
     /**
      * Whether the generation still contains at least one question that has been moved into a real
-     * Moodle question bank (Jov-043).
+     * Moodle question bank.
      *
-     * Jov-043: "Ha a generálás tartalmaz legalább egy áthelyezett kérdést, a generálás nem
+     * "Ha a generálás tartalmaz legalább egy áthelyezett kérdést, a generálás nem
      * törölhető". Used by the list page to render (and by delete.php to enforce) that rule.
      *
      * @param int $generationid
@@ -121,7 +121,7 @@ class question_deletion_service {
     }
 
     /**
-     * Bulk-delete the selected, not-yet-moved questions in one transaction (Jov-015).
+     * Bulk-delete the selected, not-yet-moved questions in one transaction.
      *
      * @param int[] $questionids the selected local_artqtml_questions ids
      * @param int $generationid

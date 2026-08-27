@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Moves already-approved draft questions into a real question bank (functional spec ch.7,
- * Jov-014) - split out of the approve.php controller. The Moodle question move and the movedout
- * flag update happen in one transaction (M-22); never renders anything.
+ * Moves already-approved draft questions into a real question bank - split out of the
+ * approve.php controller. The Moodle question move and the movedout
+ * flag update happen in one transaction; never renders anything.
  *
  * @package    local_artqtml
  * @copyright  2026 AR Tudásmenedzsment Kft.
@@ -53,7 +53,7 @@ class question_move_service {
      * Move the selected, already-approved questions into the given real bank category.
      *
      * Only already-approved rows are moved - a selected-but-not-approved row is silently excluded
-     * (same pattern as delete/approve) but counted separately (M-23) so the caller can tell the
+     * (same pattern as delete/approve) but counted separately so the caller can tell the
      * user why the moved count differs from their selection.
      *
      * @param int[] $questionids the selected local_artqtml_questions ids
@@ -61,7 +61,7 @@ class question_move_service {
      * @param string $categoryvalue "categoryid,contextid" target
      * @param \context $context system context, for the events
      * @return array{moved: int, skipped: int} moved: successfully moved; skipped: selected but
-     *      not yet approved (M-23)
+     *      not yet approved
      */
     public static function move_selected(
         array $questionids,
@@ -82,7 +82,7 @@ class question_move_service {
             array_merge(['generationid' => $generationid], $inparams)
         );
 
-        // M-23: count selected-but-not-approved rows separately so the notification tells the user
+        // Count selected-but-not-approved rows separately so the notification tells the user
         // why their selected count and the moved count differ, instead of silently moving fewer.
         $skippedcount = $DB->count_records_select(
             'local_artqtml_questions',
@@ -114,7 +114,7 @@ class question_move_service {
             return (int) $row->questionbankid;
         }, $rows);
 
-        // M-22: the Moodle question move and the movedout flag update must succeed or fail
+        // The Moodle question move and the movedout flag update must succeed or fail
         // together - without a transaction, a mid-batch failure could leave questions physically
         // moved into the real bank while local_artqtml_questions still says movedout=0.
         $transaction = $DB->start_delegated_transaction();

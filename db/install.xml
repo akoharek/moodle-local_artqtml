@@ -17,7 +17,7 @@
         <FIELD NAME="settings" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON encoded generation settings: difficulty mode, per-type counts and options, seed, knowledge source"/>
         <FIELD NAME="draftcategoryid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="question_categories.id of this generation's isolated draft bank"/>
         <FIELD NAME="error" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Technical error message from the last failed Claude/Gemini API call"/>
-        <FIELD NAME="processingtoken" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" COMMENT="Random token set by an atomic UPDATE to claim this generation for processing; NULL means unclaimed (C-02: prevents two concurrent task runs processing the same generation)"/>
+        <FIELD NAME="processingtoken" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" COMMENT="Random token set by an atomic UPDATE to claim this generation for processing; NULL means unclaimed (prevents two concurrent task runs processing the same generation)"/>
         <FIELD NAME="pendingdata" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Column"/>
         <FIELD NAME="countdiscrepancy" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Column"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -42,7 +42,7 @@
         <FIELD NAME="typecode" TYPE="char" LENGTH="2" NOTNULL="true" SEQUENCE="false" COMMENT="IH/FE/SR type codes"/>
         <FIELD NAME="questiontype" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="Moodle qtype: truefalse, multichoice, ordering, shortanswer, essay"/>
         <FIELD NAME="questiontext" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The generated question text"/>
-        <FIELD NAME="difficultylabel" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Emlékezés/Megértés/Alkalmazás, Könnyű/Közepes/Nehéz, or empty for free-text mode"/>
+        <FIELD NAME="difficultylabel" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Difficulty label for this question during generation (easy, medium, or hard). Empty if not set."/>
         <FIELD NAME="sourcereference" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Short reference into the source text this question was derived from"/>
         <FIELD NAME="questiondata" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON encoded type-specific fields from the AI response"/>
         <FIELD NAME="validationsuggestion" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="not_evaluated" SEQUENCE="false" COMMENT="accepted, needs_review, rejected or not_evaluated"/>

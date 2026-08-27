@@ -234,7 +234,7 @@ final class generation_source_service_test extends \advanced_testcase {
     }
 
     /**
-     * A colleague's draft is not editable without :manageall (S-02).
+     * A colleague's draft is not editable without :manageall.
      */
     public function test_a_colleagues_draft_requires_manageall_to_edit(): void {
         global $DB;

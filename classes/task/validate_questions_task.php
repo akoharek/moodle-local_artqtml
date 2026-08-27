@@ -86,7 +86,7 @@ class validate_questions_task {
             foreach ($this->build_batches($generation, $unevaluated) as $batch) {
                 $results = $this->call_gemini($generation, $batch);
 
-                // C-03: each Gemini call can take a while, and a generation may have several
+                // each Gemini call can take a while, and a generation may have several
                 // Batches - re-check before saving every single batch's results, not just once
                 // Up front, so an abort/delete mid-run is caught before the very next write.
                 $generation = $this->reload_if_active($generationid, \local_artqtml\local\generation_status::VALIDATING);

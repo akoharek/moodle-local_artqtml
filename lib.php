@@ -121,34 +121,41 @@ function local_artqtml_render_test_button(string $provider): string {
 /**
  * Render the model-list actions for one LLM tab: "Refresh models".
  *
- * Plain links with a sesskey rather than AJAX: the actions change server state and the page must
- * Re-render from the refreshed cache anyway, so a round trip is the honest mechanism and needs no
- * JavaScript to be testable.
+ * POST forms rather than AJAX: the actions change server state and the page must re-render from the
+ * refreshed cache anyway, so a round trip is the honest mechanism and needs no JavaScript to be
+ * testable. Sesskey stays in the form body, not the URL (S-05).
  *
  * @param string $provider one of \local_artqtml\local\model_list::PROVIDERS
  * @return string
  */
 function local_artqtml_render_model_buttons(string $provider): string {
-    $refreshurl = new moodle_url('/local/artqtml/modelaction.php', [
-        'provider' => $provider,
-        'action'   => 'refresh',
-        'sesskey'  => sesskey(),
-    ]);
+    global $OUTPUT;
 
-    $html = html_writer::link($refreshurl, get_string('refreshmodels', 'local_artqtml'), [
-        'class' => 'btn btn-secondary',
-        'data-testid' => 'artqtml-admin-refreshmodels-' . $provider,
-    ]);
+    $refreshbutton = new single_button(
+        new moodle_url('/local/artqtml/modelaction.php', [
+            'provider' => $provider,
+            'action'   => 'refresh',
+        ]),
+        get_string('refreshmodels', 'local_artqtml'),
+        'post',
+        single_button::BUTTON_SECONDARY
+    );
+    $refreshbutton->class = 'singlebutton d-inline';
+    $refreshbutton->set_attribute('data-testid', 'artqtml-admin-refreshmodels-' . $provider);
 
-    $checkurl = new moodle_url('/local/artqtml/modelaction.php', [
-        'provider' => $provider,
-        'action'   => 'check',
-        'sesskey'  => sesskey(),
-    ]);
-    $html .= html_writer::link($checkurl, get_string('runmodelcheck', 'local_artqtml'), [
-        'class' => 'btn btn-secondary ml-2',
-        'data-testid' => 'artqtml-admin-runmodelcheck-' . $provider,
-    ]);
+    $checkbutton = new single_button(
+        new moodle_url('/local/artqtml/modelaction.php', [
+            'provider' => $provider,
+            'action'   => 'check',
+        ]),
+        get_string('runmodelcheck', 'local_artqtml'),
+        'post',
+        single_button::BUTTON_SECONDARY
+    );
+    $checkbutton->class = 'singlebutton d-inline ml-2';
+    $checkbutton->set_attribute('data-testid', 'artqtml-admin-runmodelcheck-' . $provider);
+
+    $html = $OUTPUT->render($refreshbutton) . $OUTPUT->render($checkbutton);
 
     // Say how old the cached list is, so "the dropdown looks wrong" has an obvious first thing to check.
     $cached = \local_artqtml\local\model_list::get_cached($provider);

@@ -79,7 +79,7 @@ class process_pending_generations extends \core\task\scheduled_task {
 
             $generationid = (int) $generation->id;
 
-            // C-01: a plain try/finally only protects against catchable Throwables - a true PHP
+            // a plain try/finally only protects against catchable Throwables - a true PHP
             // Fatal partway through process_one() (max_execution_time exceeded, memory
             // Exhaustion) terminates the script without ever running the finally block, which
             // Would leave processingtoken set forever and permanently block that generation from
@@ -106,7 +106,7 @@ class process_pending_generations extends \core\task\scheduled_task {
     /**
      * Atomically claim a generation for processing by this run: only succeeds if the row is
      * Still unclaimed (processingtoken IS NULL) at the moment the UPDATE executes, so two
-     * Concurrent runs racing on the same row can never both win (C-02).
+     *
      *
      * @param int $generationid
      * @return \stdClass|null the freshly claimed record, or null if another run claimed it first

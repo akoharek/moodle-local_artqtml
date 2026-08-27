@@ -90,7 +90,7 @@ class generation_source_service {
             // transaction gives atomicity; it issues no row-level SELECT ... FOR UPDATE, so without
             // this another request could start the generation between the status check and the
             // write, and the source text would be replaced under a model already reading it
-            // (2026-08-05, BL-51). The lock is released whether this returns or throws.
+            // The lock is released whether this returns or throws.
             return (int) generation_lock::run(
                 $editingid,
                 static fn(): int => self::update_draft_source($editingid, $name, $shortname, $sourcetext, $filehash)
@@ -146,7 +146,7 @@ class generation_source_service {
         // property it is given, so handing back the whole loaded record wrote every column -
         // including `status`. A generation started in another tab between the read above and the
         // write here therefore had its status pushed back from `generating` to `started` by a form
-        // that never meant to touch it (2026-08-05, BL-51).
+        // that never meant to touch it
         $DB->update_record('local_artqtml_generations', (object) [
             'id'             => $editingid,
             'name'           => $name,

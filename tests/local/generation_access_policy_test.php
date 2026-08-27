@@ -19,7 +19,7 @@ namespace local_artqtml\local;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Unit tests for generation mutation authorisation (S-02).
+ * Unit tests for generation mutation authorisation.
  *
  * @package    local_artqtml
  * @copyright  2026 AR Tudásmenedzsment Kft.

@@ -19,7 +19,7 @@ namespace local_artqtml\local;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Admin-visible API-key banner and status Retry/Back layout.
+ *  API-key banner and status Retry/Back layout.
  *
  * @package    local_artqtml
  * @copyright  2026 AR Tudásmenedzsment Kft.

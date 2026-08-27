@@ -79,7 +79,7 @@ class validation_panel {
             ),
         ];
         if ($row->validationsuggestion !== \local_artqtml\local\validation_suggestion::NOT_EVALUATED) {
-            // PROB-F001/F002: show the problem category for any validated question, via its lang
+            // show the problem category for any validated question, via its lang
             // Label (never the raw key). 'ok' renders as "No issue"/"Nincs probléma", not as an
             // Empty field. normalise() guards against a stale/legacy value reaching get_string().
             $category = \local_artqtml\local\problem_category::normalise($row->problemcategory);

@@ -1,7 +1,7 @@
 # local_artqtml Marketplace code review — unified triage
 
 **Scope:** `local/artqtml` (Light / Marketplace)  
-**Updated:** 2026-08-26  
+**Updated:** 2026-08-27 (C-10 fixed; C-09 fixed in tracker; code already clean)  
 **Passes merged:** Security (Sonnet `a2368d28`), Compliance (Sonnet `7072ded4`), Functional (Gemini `1db629c4`); prior tracker retained for stable IDs  
 **Status:** Triage only — no product code changed in this pass
 
@@ -14,13 +14,13 @@ Severity: **P0** Marketplace blocker · **P1** fix before submit · **P2** backl
 | Severity | Count | Role |
 |----------|------:|------|
 | **P0** | **5** | Marketplace blockers |
-| **P1** | **11** | Fix before HQ / Marketplace submit |
-| **P2** | **18** | Backlog after submit-critical work |
+| **P1** | **9** | Fix before HQ / Marketplace submit |
+| **P2** | **16** | Backlog after submit-critical work |
 | **Nit** | **9** | Optional polish |
 
 **Marketplace blockers (P0):** (1) ~~missing object-level ownership~~ **S-02 fixed**, (2) ~~permanent draft-course editall/useall~~ **S-01 fixed (2026082602)**, (3) missing `@copyright` / phpcs exclude vs moodle.org CI, (4) missing `MOODLE_INTERNAL` guards, (5) fresh install blocked until admin sets hidden draft course (`draftcourseid=0` / `is_configured()`).
 
-**Later (P1–Nit):** privacy metadata, Full-leak lang/comments, FAILED-state UX loop, Move button crash, rate-limiter/logging hygiene, AMD/CLI leftovers, schema/label nits.
+**Later (P1–Nit):** privacy metadata, Full-leak lang/comments, ~~FAILED-state UX loop~~ **F-08 fixed**, ~~Move button crash~~ **F-01 false positive (misreported — not a fatal)**, rate-limiter/logging hygiene, AMD/CLI leftovers, schema/label nits.
 
 **Recommended fix order**
 
@@ -28,7 +28,7 @@ Severity: **P0** Marketplace blocker · **P1** fix before submit · **P2** backl
 2. ~~**Draft role** — stop permanent `moodle/question:editall`+`useall`; revoke when unused.~~ **Done (2026082602): preview-only role + external-edit lock**
 3. **Copyright + `MOODLE_INTERNAL`** — drop `CopyrightTagMissing` exclude; add guards (C-01, C-02).  
 4. **Fresh-install draft course** — allow first-run without preconfigured hidden course (F-07).  
-5. **UX / compliance P1** — FAILED abort·retry loop, Move-without-categories, privacy metadata, dead Full lang strings, reparent upgrade, ticket-ID scrub.  
+5. **UX / compliance P1** — ~~FAILED misleading back-to-settings~~ **F-08 fixed**, ~~Move-without-categories crash~~ **F-01 false positive (retracted)**, privacy metadata, dead Full lang strings, reparent upgrade, ticket-ID scrub.  
 6. **P2 / Nit** as capacity allows; re-audit touched security surfaces after ownership + draft-role fixes.
 
 ---
@@ -50,18 +50,18 @@ Severity: **P0** Marketplace blocker · **P1** fix before submit · **P2** backl
 | C-07 | P1 | Compliance | open | `draft_category_reparent.php`; `db/upgrade.php` | Reparent helper claimed / present but not called from upgrade | Compliance; prior C-07 | Invoke from current upgrade step or remove dead claim |
 | C-08 | P1 | Compliance | open | install.xml; get_status; process_pending; WS/comments | Spec/ticket IDs in shipped comments (`C-01`, `M-08`, …) | Compliance; prior C-08 | Scrub ticket/spec IDs from release tree |
 | C-06 | P1 | Compliance | open | `db/install.xml` | Schema COMMENT still Bloom / free-text and/or Hungarian (Full leak) | Compliance; prior C-06 | English COMMENT describing easy/medium/hard only |
-| F-01 | P1 | Functional | open | `approve_renderer.php`; `approve.php` | Move button when no categories → `required_param` fatal | Functional (re-verified); prior F-01 | Hide/disable Move or soft-fail without required param |
-| F-08 | P1 | Functional | open | `status.php`; `generate.php` | FAILED generation: status→generate rejects non-STARTED (redirect loop); Abort hidden on FAILED | Functional (new) | Allow abort/retry from FAILED; stop bounce to generate for terminal states |
-| S-05 | P2 | Security | open | generation_list; approve_renderer; `lib.php` | State-changing GET + sesskey in URL | Security; prior S-05 | Prefer POST + `data_submitted()` |
-| S-07 | P2 | Security | open | `text_extractor.php` | Up to ~64 MiB TXT held in memory | Security; prior S-07 | Lower cap; stream/chunk |
+| F-01 | P1 | Functional | **false positive** (misreported) | `approve_renderer.php`; `approve.php` | Historical claim: Move without category → `required_param` fatal. **Verified:** soft `\core\notification::error(errornocategory)` + redirect (~158–161); empty `$categoryoptions` hides Move; no per-row Move. Provenance: GPT `bc2f036b` → Gemini `1db629c4` → triage. Optional Nit only: empty choosedots → intentional soft notification. `errornocategory` may be HU-only (not F-01). | Functional re-check 2026-08-27; prior F-01 | **Do not treat as crash.** No product fix for alleged fatal; skip as open P1 |
+| F-08 | P1 | Functional | **fixed** | `status.php`; lang | FAILED UI promised settings edit via “Back to settings” but `generate.php` rejected non-STARTED (bounce loop) | Functional (new); fixed 2026-08-26 (option C) | `generationfailed` copy retry-only; secondary button → list (`backtolist` / `index.php`) |
+| S-05 | P2 | Security | **fixed** | generation_list; approve_renderer; `lib.php`; delete/modelaction | State-changing GET + sesskey in URL | Security; prior S-05; fixed 2026-08-27 | POST forms + `data_submitted()` on mutate scripts |
+| S-07 | P2 | Security | **wontfix** | `text_extractor.php` | Up to ~64 MiB TXT held in memory (`get_content()`); theoretical OOM on tight `memory_limit` | Security; prior S-07; **product decision 2026-08-27** | **No code change.** Accepted risk: `:use`-only, TXT-only, `maxfiles=1`, per-file 64 MiB cap + merged `source_text_limit`; normal teacher uploads KB–low MB. Revisit only if shared-hosting memory incidents |
 | S-08 | P2 | Security | **fixed** | `retrytypes.php` | Narrower IDOR / missing ownership on retry-types path | Security (new) | Same ownership helper as S-02 |
-| C-10 | P2 | Compliance | open | `version.php` / README | `requires` labelled wrong (4.5.0 vs 4.5.1 wording) | Compliance; prior C-10 | Align comment and `requires` value |
+| C-10 | P2 | Compliance | **fixed** | `version.php` / README | `requires` labelled wrong (4.5.0 vs 4.5.1 wording) | Compliance; prior C-10 | Aligned docs to Moodle 4.5.0; kept `2024100700` (2026-08-27) |
 | C-12 | P2 | Compliance | open | `lib.php`; `upload.php` | Plain `$PAGE->requires->js()` instead of AMD | Compliance; prior C-12 | Convert to AMD modules |
 | C-15 | P2 | Compliance | open | get_status / status UI | Dead `tokenwarningmessage` WS field always empty | Compliance; prior C-15 | Remove field + UI |
 | C-16 | P2 | Compliance | open | `setting_configtext_percentage.php` | Unused class | Compliance; prior C-16 | Delete |
 | C-17 | P2 | Compliance | open | migrate CLI / component_rename | `migrate_from_aiquizgen` CLI ships in Marketplace ZIP | Compliance; prior C-17 | Exclude from ZIP or document one-shot-only |
 | C-19 | P2 | Compliance | open | `db/caches.php` | “security finding #7” leftover comment | Compliance; prior C-19 | Scrub |
-| C-09 | P2 | Compliance | open | file headers | `@license` URL has `Www` | Prior C-09 | Fix to `www.gnu.org` |
+| C-09 | P2 | Compliance | **fixed** | file headers | `@license` URL had `Www.gnu.org` instead of `www.gnu.org` | Prior C-09; mass-replaced in C-02 copyright sweep (`4a6e759`) | Verified: zero `Www.gnu.org` in PHP tree (2026-08-27) |
 | C-11 | P2 | Compliance | open | `lib.php` nav | Magic `extend_navigation` while Hooks API already used | Prior C-11 | Move to primary_extend hook |
 | C-13 | P2 | Compliance | open | approve/generate comments | Hungarian inline comments in shipped PHP | Prior C-13 | English comments (PHPCS capitalization) |
 | C-14 | P2 | Compliance | open | `settings.php` | Dual-edition / stripped-Full wording | Prior C-14 | Describe Light settings only |
@@ -92,10 +92,13 @@ Severity: **P0** Marketplace blocker · **P1** fix before submit · **P2** backl
 | **S-01** | Prior S-01; Security elevated to P0 |
 | **S-04**, **S-06** | Prior P2; Security elevated to P1 |
 | **F-07**, **F-08**, **F-09**, **F-10** | New from Functional pass |
+| **S-07** | Prior S-07; **wontfix 2026-08-27** — product decision: no memory-cap hardening (64 MiB TXT + existing guards accepted) |
+| **C-09** | Prior C-09; **fixed** with C-02 header sweep (`4a6e759`) — `Www.gnu.org` → `www.gnu.org` |
+| **C-10** | Prior C-10; **fixed 2026-08-27** — docs aligned to Moodle 4.5.0; `$plugin->requires` stays `2024100700` |
 | **S-08**, **S-N1**, **C-N6** | New from Security / Compliance nits |
-| Unchanged open from prior tracker | C-01–C-08, C-09–C-19 as listed; F-01–F-06, F-N1 re-verified still open |
+| Unchanged open from prior tracker | C-01–C-08, C-11–C-19 as listed; F-02–F-06, F-N1 re-verified still open (**F-01 false positive / retracted**; **F-08 fixed** 2026-08-26; **S-07 wontfix** 2026-08-27; **C-09 fixed** 2026-08-27; **C-10 fixed** 2026-08-27) |
 
-Prior note: REVIEW-FINDINGS tracked **C-01, C-02, C-05, C-07, C-08, C-10, C-16, C-17, C-19** as still open — confirmed retained above.
+Prior note: REVIEW-FINDINGS tracked **C-01, C-02, C-05, C-07, C-08, C-16, C-17, C-19** as still open — confirmed retained above (**C-10 fixed** 2026-08-27).
 
 ---
 

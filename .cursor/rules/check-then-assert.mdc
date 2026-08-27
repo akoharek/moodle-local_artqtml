@@ -1,0 +1,13 @@
+---
+description: Check facts first, then assert — no hedging about unverified state
+alwaysApply: true
+---
+
+# Először ellenőrzés, aztán állítás
+
+GitHub PR, CI, ZIP, merge, fájl létezik-e: **előbb nézd meg** (`gh pr view`, `git status`, fájl a lemezen), **aztán állíts**.
+
+- Tilos: „merge-re várhat, ha még nyitva van”, „valószínűleg”, „ha a CI zöld”.
+- Kötelező: „[PR #17](...) **nyitva**, CI zöld, nincs merge” — csak ha ezt most ellenőrizted.
+
+Ha nem ellenőrizted, ne állítsd a státuszt. Ne takard a hiányzó ellenőrzést feltételes móddal.

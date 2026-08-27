@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Kérdésbank - Draft jóváhagyó oldal (functional spec ch.7).
+ * Kérdésbank - Draft jóváhagyó oldal.
  *
  * Reviews AI-generated/validated questions, which already exist as real Moodle question
- * objects in this generation's isolated draft bank category (Gen-005), and lets the teacher
+ *  and lets the teacher
  * edit/preview/tag them via Moodle's own native question bank UI, then move approved ones
  * into a real target question bank or delete them.
  *
@@ -55,7 +55,7 @@ require_capability('local/artqtml:use', $context);
 $generationid = required_param('generationid', PARAM_INT);
 
 $generation = $DB->get_record('local_artqtml_generations', ['id' => $generationid], '*', MUST_EXIST);
-// S-02: :use may open any generation; mutation requires ownership or local/artqtml:manageall.
+// Capability local/artqtml:use may open any generation; mutation requires ownership or local/artqtml:manageall.
 
 $pageurl = new moodle_url('/local/artqtml/approve.php', ['generationid' => $generationid]);
 
@@ -100,28 +100,40 @@ if (
 // Soronkénti jóváhagyás: a human approval step, independent of the AI's validationsuggestion -
 // a question must be approved before it can be moved into a real question bank.
 if ($approveid) {
+    if (!data_submitted()) {
+        throw new moodle_exception('invalidrequest');
+    }
     require_sesskey();
     question_approval_service::approve_single($approveid, $generationid, (int) $USER->id, $context);
     redirect($pageurl);
 }
 
-// Soronkénti jóváhagyás visszavonása (Jov-040): only the approved flag is cleared, the AI's
+// Soronkénti jóváhagyás visszavonása: only the approved flag is cleared, the AI's
 // validation verdict is deliberately left untouched.
 if ($revokeid) {
+    if (!data_submitted()) {
+        throw new moodle_exception('invalidrequest');
+    }
     require_sesskey();
     question_approval_service::revoke_single($revokeid, $generationid, $context);
     redirect($pageurl);
 }
 
-// Soronkénti törlés (Jov-010/015).
+// Soronkénti törlés.
 if ($deleteid) {
+    if (!data_submitted()) {
+        throw new moodle_exception('invalidrequest');
+    }
     require_sesskey();
     question_deletion_service::delete_single($deleteid, $generationid, $context);
     redirect($pageurl);
 }
 
-// Tömeges műveletek (Jov-013/014/015/016).
+// Tömeges műveletek.
 if (in_array($bulkaction, ['move', 'allaccepted', 'delete'], true)) {
+    if (!data_submitted()) {
+        throw new moodle_exception('invalidrequest');
+    }
     require_sesskey();
 
     if ($bulkaction === 'delete') {
@@ -134,7 +146,7 @@ if (in_array($bulkaction, ['move', 'allaccepted', 'delete'], true)) {
             $count = question_deletion_service::delete_selected($questionids, $generationid, $context);
             \core\notification::success(get_string('bulkdeletesuccess', 'local_artqtml', $count));
         } catch (\Throwable $e) {
-            // V20 #3: never surface the raw exception message to the user - log the full detail
+            // Never surface the raw exception message to the user - log the full detail
             // for admins/developers, show a generic translated message.
             debugging('local_artqtml bulk delete failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
             \core\notification::error(get_string('errorbulkactionfailed', 'local_artqtml'));
@@ -147,7 +159,7 @@ if (in_array($bulkaction, ['move', 'allaccepted', 'delete'], true)) {
             $count = question_approval_service::approve_accepted_bulk($generationid, (int) $USER->id, $context);
             \core\notification::success(get_string('bulkapprovesuccess', 'local_artqtml', $count));
         } catch (\Throwable $e) {
-            // V20 #3: log the full detail, show only a generic translated message.
+            // Log the full detail, show only a generic translated message.
             debugging('local_artqtml bulk approve failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
             \core\notification::error(get_string('errorbulkactionfailed', 'local_artqtml'));
         }
@@ -169,7 +181,7 @@ if (in_array($bulkaction, ['move', 'allaccepted', 'delete'], true)) {
 
     try {
         $result = question_move_service::move_selected($questionids, $generationid, $categoryvalue, $context);
-        // V20 #11: draft_bank::delete_if_empty() runs deliberately OUTSIDE move_selected()'s M-22
+        // draft_bank::delete_if_empty() runs deliberately OUTSIDE move_selected()'s
         // transaction. The atomic unit that must never partially apply is the move itself (the
         // Moodle question move + the movedout flag updates). Pruning the now-empty draft category
         // is best-effort post-commit cleanup: it only makes sense once the move has committed (so
@@ -186,14 +198,14 @@ if (in_array($bulkaction, ['move', 'allaccepted', 'delete'], true)) {
             \core\notification::success(get_string('movesuccess', 'local_artqtml', $result['moved']));
         }
     } catch (\Throwable $e) {
-        // V20 #3: log the full detail, show only a generic translated message.
+        // Log the full detail, show only a generic translated message.
         debugging('local_artqtml bulk move failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
         \core\notification::error(get_string('errorbulkactionfailed', 'local_artqtml'));
     }
     redirect($pageurl);
 }
 
-// Jov-011/012, Glob-005: sortable columns and pagination, matching the list page's pattern.
+// sortable columns and pagination, matching the list page's pattern.
 $sort = optional_param('qsort', 'id', PARAM_ALPHA);
 $dir = strtoupper(optional_param('qdir', 'ASC', PARAM_ALPHA)) === 'DESC' ? 'DESC' : 'ASC';
 $page = optional_param('qpage', 0, PARAM_INT);
@@ -201,13 +213,13 @@ $perpage = (int) get_config('moodle', 'perpage') ?: 20;
 
 $totalquestions = approve_page_data::total_questions($generationid);
 
-// Val-017/TC-Val-019: four-status validation summary, counted independently of the per-row
+// four-status validation summary, counted independently of the per-row
 // badges below so a teacher can see the overall picture without scrolling the whole table.
 $statuscounts = approve_page_data::status_counts($generationid);
 $statustotal = array_sum($statuscounts);
 
 // Same eligibility criteria as the 'allaccepted' bulk action above (accepted, not yet approved,
-// not yet moved out) - TC-Val-019/TC-Val-043: the bulk-approve button reacts to this count.
+// the bulk-approve button reacts to this count.
 $eligibleforapproval = approve_page_data::eligible_for_approval($generationid);
 
 echo $OUTPUT->header();
@@ -218,7 +230,7 @@ echo html_writer::tag('p', format_string($generation->name), [
     'data-testid' => 'artqtm-approve-generationname',
 ]);
 
-// Site-wide list (Glob-022): index.php is context_system, same as this page — no course id.
+// index.php is context_system, same as this page — no course id.
 $indexurl = new moodle_url('/local/artqtml/index.php');
 echo html_writer::div(
     $OUTPUT->single_button($indexurl, get_string('backtolist', 'local_artqtml'), 'get'),
@@ -226,7 +238,7 @@ echo html_writer::div(
     ['data-testid' => 'artqtm-approve-backtolist']
 );
 
-// M-08: still relevant here even after generation completes - a teacher reviewing questions
+// still relevant here even after generation completes - a teacher reviewing questions
 // should know Claude didn't return what was actually requested.
 $countdiscrepancy = json_decode((string) $generation->countdiscrepancy, true);
 if (is_array($countdiscrepancy) && !empty($countdiscrepancy)) {

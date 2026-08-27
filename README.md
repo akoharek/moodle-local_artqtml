@@ -12,7 +12,7 @@ Scope (GPLv3+):
 
 ## Requirements
 
-- Moodle 4.5.1+
+- Moodle 4.5.0+
 - `qtype_ordering`
 - Anthropic (Claude) and Google (Gemini) API keys configured by the site admin (bring your own keys)
 

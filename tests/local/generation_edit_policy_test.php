@@ -102,7 +102,7 @@ final class generation_edit_policy_test extends \advanced_testcase {
     }
 
     /**
-     * The rule looks at status and nothing else - ownership is enforced separately (S-02).
+     * The rule looks at status and nothing else - ownership is enforced separately.
      */
     public function test_the_rule_does_not_consider_ownership(): void {
         $mine = (object) ['status' => generation_status::STARTED, 'userid' => 1];

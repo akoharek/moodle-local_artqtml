@@ -119,6 +119,21 @@ final class entry_script_page_setup_test extends \advanced_testcase {
     }
 
     /**
+     * Act-and-redirect scripts must reject GET and require POST + sesskey (S-05).
+     *
+     * @return void
+     */
+    public function test_act_and_redirect_scripts_require_post(): void {
+        foreach (['delete.php', 'modelaction.php'] as $name) {
+            $scripts = $this->entry_scripts();
+            $this->assertArrayHasKey($name, $scripts);
+            $source = file_get_contents($scripts[$name]);
+            $this->assertStringContainsString('data_submitted()', $source, $name);
+            $this->assertStringContainsString('require_sesskey()', $source, $name);
+        }
+    }
+
+    /**
      * Approve.php must expose a GET navigation control back to the site-wide list page.
      *
      * @return void

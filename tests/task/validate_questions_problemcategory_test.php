@@ -21,7 +21,7 @@ use local_artqtml\local\problem_category;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Unit tests for the validation problem_category enum (//, PROB-F004).
+ * Unit tests for the validation problem_category enum.
  *
  * @package    local_artqtml
  * @copyright  2026 AR Tudásmenedzsment Kft.
@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 final class validate_questions_problemcategory_test extends \advanced_testcase {
     /**
-     * PROB-F004: the enum is exactly the four fixed keys, in order, with no empty string.
+     * the enum is exactly the four fixed keys, in order, with no empty string.
      */
     public function test_enum_is_exactly_four_keys_no_empty_string(): void {
         $this->assertSame(
@@ -47,7 +47,7 @@ final class validate_questions_problemcategory_test extends \advanced_testcase {
     }
 
     /**
-     * PROB-F004 / technikai_melleklet: the schema's enum is the SAME set (single source of truth),
+     * the schema's enum is the SAME set (single source of truth),
      * Problem_category stays required, and no empty string leaked into the schema.
      */
     public function test_schema_enum_matches_single_source_and_is_required(): void {

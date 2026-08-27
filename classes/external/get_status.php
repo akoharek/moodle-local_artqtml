@@ -122,11 +122,11 @@ class get_status extends external_api {
             'tokenwarningmessage' => new external_value(PARAM_RAW, 'Reserved warning message field (always empty)'),
             'countdiscrepancymessage' => new external_value(
                 PARAM_RAW,
-                'Requested-vs-received question count warning, empty if none (M-08)'
+                'Requested-vs-received question count warning, empty if none'
             ),
             'failedpercent' => new external_value(
                 PARAM_INT,
-                'Progress-bar percent (25/50/75) for a failed generation, based on which stage it reached (M-15)'
+                'Progress-bar percent (25/50/75) for a failed generation, based on which stage it reached'
             ),
             'generatingpercent' => new external_value(
                 PARAM_INT,

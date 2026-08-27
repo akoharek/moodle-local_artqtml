@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Ask again for the question types a partly successful generation did not deliver (BL-35).
+ * Ask again for the question types a partly successful generation did not deliver.
  *
  * Not a retry of the original generation: that one is finished, its questions are real and are
  * waiting for approval, and re-running it would throw them away. This starts a NEW generation on
@@ -108,7 +108,7 @@ function local_artqtml_create_followup(stdClass $source, array $settings, array 
     $record = new stdClass();
     $record->userid = $USER->id;
     $record->name = get_string('retrymissingtypesname', 'local_artqtml', format_string($source->name));
-    // Felt-003/004/005: the shortname is alphanumeric, 8 characters, and ends up inside every
+    // the shortname is alphanumeric, 8 characters, and ends up inside every
     // generated question code - so it cannot simply be the original with a suffix bolted on. Seven
     // characters of the original plus '2' keeps it recognisable, legal and distinguishable from
     // the questions the first run already produced. The teacher can change it on the settings page.
@@ -136,7 +136,7 @@ function local_artqtml_create_followup(stdClass $source, array $settings, array 
     redirect(new moodle_url('/local/artqtml/generate.php', ['id' => $newid]));
 }
 
-// Felt-021-024: the duplicate screen. Unlike upload.php this compares against every generation
+// the duplicate screen. Unlike upload.php this compares against every generation
 // including the source one - being told "you already generated questions from this text on
 // Saturday, and here it is" is exactly the information the teacher needs before spending money on
 // the same text again.

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Step 1 of the "New generation" flow: upload/paste source text (functional spec ch.3).
+ * Step 1 of the "New generation" flow: upload/paste source text.
  *
  * @package    local_artqtml
  * @copyright  2026 AR Tudásmenedzsment Kft.
@@ -70,7 +70,7 @@ $PAGE->set_heading(get_string('newgeneration', 'local_artqtml'));
 
 $indexurl = new moodle_url('/local/artqtml/index.php');
 
-// Beal-023/024: "Vissza" on the question settings page returns here with the generation's own
+// "Vissza" on the question settings page returns here with the generation's own
 // id, to edit its already-saved identifiers/source text in place rather than starting a new one.
 $editid = optional_param('id', 0, PARAM_INT);
 $editgeneration = null;
@@ -83,7 +83,7 @@ if ($editid > 0) {
     // they were. Nothing appeared to break; the questions and the material they came from simply
     // stopped describing each other.
     //
-    // NOT an ownership rule. Glob-031 is untouched: any :use holder still edits any colleague's
+    // NOT an ownership rule: any :use holder still edits any colleague's
     // draft, and the message deliberately does not say "permission" - the user has permission,
     // the generation is just past the point where this page applies.
     //
@@ -114,7 +114,7 @@ if ($editid > 0) {
         $DB->set_field('local_artqtml_generations', 'error', null, ['id' => $editid]);
         $editgeneration->error = null;
     }
-    // Glob-031: no owner check here. Until 2026-08-03 this page required
+    // no owner check here. Until 2026-08-03 this page required
     // local/artqtml:configure to open somebody else's generation, and it was the only page in the
     // plugin that did - every other one lets any :use holder open any generation, because the tool
     // is deliberately site-wide and collaborative.
@@ -209,9 +209,9 @@ function local_artqtml_redirect_after_refused_save(int $generationid, \moodle_ur
     );
 }
 
-// Step 2 of the duplicate confirmation popup (Felt-023/024): the user chose "Folytatom".
+// the user chose "Folytatom".
 //
-// M-17: this is a bare HTML form that only ever posts sesskey + artqtmconfirmdup=1, not a
+// this is a bare HTML form that only ever posts sesskey + artqtmconfirmdup=1, not a
 // resubmission of upload_form's own fields - $mform->get_data() would therefore always return
 // false for it (missing required fields/wrong submit button name), so this must be handled
 // entirely on its own, before ever touching $mform->get_data(), using the data stashed in the
@@ -264,12 +264,12 @@ if ($mform->is_cancelled()) {
     // one value read twice.
     //
     // And there was nothing for it to protect. Submitting a different generation's id opens that
-    // generation - which any :use holder is entitled to do, because Glob-031 makes the tool
+    // generation - which any :use holder is entitled to do, because collaborative :use is by design
     // site-wide and collaborative. What actually bounds this page is the status gate above and the
     // re-read inside the transaction in generation_source_service::save(): only a draft may be
     // written, and its status is checked again immediately before the write.
     //
-    // Felt-002 (C1): the browser enforces maxlength=100 on the name field, but the form binds it
+    // the browser enforces maxlength=100 on the name field, but the form binds it
     // as PARAM_TEXT which does not bound length, so a hand-crafted/altered POST could exceed it.
     // Enforce the 100-character limit server-side (core_text::strlen counts characters, matching
     // the browser's maxlength semantics for multibyte Hungarian names).
@@ -280,8 +280,8 @@ if ($mform->is_cancelled()) {
 
     $sourcetext = (string) $data->sourcetext;
 
-    // Merge in any uploaded file's extracted text (Felt-010/011), and separately hash the raw
-    // file bytes (M-19) so an identical re-upload is still caught as a duplicate even if text
+    //
+    // file bytes () so an identical re-upload is still caught as a duplicate even if text
     // extraction happens to produce slightly different output than it did the first time.
     //
     // 2026-08-04, two changes here.
@@ -290,7 +290,7 @@ if ($mform->is_cancelled()) {
     // ever used for was the hash, and Moodle has already hashed every stored file - reading a
     // whole upload into memory a second time to compute a number the File API is holding was pure
     // cost. `get_contenthash()` is that number, and it stands for the same thing: the identity of
-    // the bytes, as a supplementary signal beside the text hash (M-19/C2 - see duplicate_detector),
+    // the bytes, as a supplementary signal beside the text hash (see duplicate_detector),
     // because the same content in a different format hashes differently.
     //
     // THE STORED VALUE IS NOT THE SAME NUMBER IT USED TO BE, and that is worth saying plainly
@@ -320,7 +320,7 @@ if ($mform->is_cancelled()) {
             $sourcetext = $sourcetext !== '' ? ($sourcetext . "\n\n" . $report['text']) : $report['text'];
         }
 
-        // BL-48, the plausibility check. Extraction "succeeding" with almost nothing is the silent
+        // the plausibility check. Extraction "succeeding" with almost nothing is the silent
         // failure this exists for: a 1.1 MB, 21-page presentation returned 64 characters, and
         // because 64 is not zero the upload was accepted, the teacher saw no problem, and the
         // questions were generated from a fragment.
@@ -359,15 +359,15 @@ if ($mform->is_cancelled()) {
         redirect(new moodle_url('/local/artqtml/upload.php', $editid ? ['id' => $editid] : []));
     }
 
-    // Felt-017-020: security screen. On failure the text is deliberately never redisplayed.
+    // security screen. On failure the text is deliberately never redisplayed.
     if (security_filter::has_sql_injection($sourcetext) || security_filter::has_prompt_injection($sourcetext)) {
         \core\notification::error(get_string('errorsecurityfilter', 'local_artqtml'));
         redirect(new moodle_url('/local/artqtml/upload.php', $editid ? ['id' => $editid] : []));
     }
 
-    // Felt-021-024: duplicate/similarity screen ($confirmed is always false here - the true case
+    // duplicate/similarity screen ($confirmed is always false here - the true case
     // returned above before ever reaching $mform->get_data()).
-    // C2 (Felt-021): duplicate detection is text-content based (sourcetexthash), not file-byte
+    // duplicate detection is text-content based (sourcetexthash), not file-byte
     // based - see duplicate_detector::find_match(). $filehash is still recorded on the generation
     // row for reference but is intentionally not used to decide duplicates.
     $match = duplicate_detector::find_match($sourcetext, $editid);
@@ -440,7 +440,7 @@ if ($mform->is_cancelled()) {
 echo $OUTPUT->header();
 echo local_artqtml_model_warning_banner();
 echo local_artqtml_apikey_decrypt_notice();
-// Glob-031, 2026-08-03: this page was the only one that could show another user's generation
+// this page was the only one that could show another user's generation
 // without saying so, and only because until today it could not show one at all - the owner check
 // removed above kept it out. The warning belongs wherever a colleague's generation is on screen,
 // which is why approve.php, generate.php and status.php have carried it all along. Walking the
@@ -452,7 +452,7 @@ if ($editgeneration) {
 echo $OUTPUT->heading(get_string('uploadheading', 'local_artqtml'));
 $mform->display();
 
-// Felt-016: the warning is relative to the generating model's context window, not a flat
+// the warning is relative to the generating model's context window, not a flat
 // admin-configured token count. The context window is no longer passed to the counter separately,
 // because source_text_limit::token_limit() already derives the limit from it when no explicit one
 // is set - passing both meant two places could disagree about the same number.
@@ -464,7 +464,7 @@ $sourcetokenlimit = source_text_limit::token_limit();
 $counterlimittemplate = get_string('textcounterlimitlabel', 'local_artqtml', $sourcetokenlimit);
 $countererrormessage = get_string('errorsourcetexttoolong', 'local_artqtml');
 
-// Felt-015/Glob-029: the counter text must come from a lang string, not be hardcoded in JS -
+// the counter text must come from a lang string, not be hardcoded in JS -
 // render it with sentinel placeholders here, substituted for the live counts in textcounter.js.
 $countertemplate = get_string('textcounterlabel', 'local_artqtml', (object) [
     'chars'  => '__CHARS__',
@@ -490,7 +490,7 @@ echo html_writer::script(
     '}});'
 );
 
-// Felt-010/011/012/013/014: extracts a picked file's text into the box for review/editing, and
+// extracts a picked file's text into the box for review/editing, and
 // warns when the user mixes typed text and an uploaded file.
 $PAGE->requires->js_call_amd('local_artqtml/uploadconflict', 'init', [
     'id_sourcetext',
@@ -504,7 +504,7 @@ $PAGE->requires->js_call_amd('local_artqtml/uploadconflict', 'init', [
     ],
 ]);
 
-// Felt-025: the Continue button is only active once all three required fields are filled.
+// the Continue button is only active once all three required fields are filled.
 $PAGE->requires->js(new moodle_url('/local/artqtml/js/continuebutton.js'));
 echo html_writer::script(
     'document.addEventListener("DOMContentLoaded", function() {' .
@@ -513,7 +513,7 @@ echo html_writer::script(
     '}});'
 );
 
-// Felt-027/028/029: confirm before discarding entered data via the Cancel button.
+// confirm before discarding entered data via the Cancel button.
 echo html_writer::script(
     'document.addEventListener("DOMContentLoaded", function() {' .
     'var cancelbtn = document.querySelector(\'input[name="cancel"], button[name="cancel"]\');' .

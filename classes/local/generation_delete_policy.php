@@ -17,7 +17,7 @@
 /**
  * Who may delete a generation.
  *
- * Product decision 2026-08-26 (S-02): deletion follows generation_access_policy — owner with
+ * deletion follows generation_access_policy — owner with
  * local/artqtml:use, or local/artqtml:manageall for anyone's generation. local/artqtml:configure
  * never authorises deletion.
  *
