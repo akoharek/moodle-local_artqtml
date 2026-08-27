@@ -1,7 +1,7 @@
 # local_artqtml Marketplace code review — unified triage
 
 **Scope:** `local/artqtml` (Light / Marketplace)  
-**Updated:** 2026-08-27 (F-04 fixed — difficulty_label canonicalised to easy/medium/hard; F-03 fixed — IH hints persist to question bank; F-02 false positive — bulk move Light scope; matrix updated; C-19 fixed; C-18 fixed; C-17 fixed; C-16 fixed; C-15 fixed; C-14 fixed; C-11/C-12/C-13 fixed; C-10 fixed; C-09 fixed in tracker)  
+**Updated:** 2026-08-27 (F-05 fixed — retry grants draft role like start; F-04 fixed — difficulty_label canonicalised to easy/medium/hard; F-03 fixed — IH hints persist to question bank; F-02 false positive — bulk move Light scope; matrix updated; C-19 fixed; C-18 fixed; C-17 fixed; C-16 fixed; C-15 fixed; C-14 fixed; C-11/C-12/C-13 fixed; C-10 fixed; C-09 fixed in tracker)  
 **Passes merged:** Security (Sonnet `a2368d28`), Compliance (Sonnet `7072ded4`), Functional (Gemini `1db629c4`); prior tracker retained for stable IDs  
 **Status:** Triage only — no product code changed in this pass
 
@@ -15,7 +15,7 @@ Severity: **P0** Marketplace blocker · **P1** fix before submit · **P2** backl
 |----------|------:|------|
 | **P0** | **5** | Marketplace blockers |
 | **P1** | **9** | Fix before HQ / Marketplace submit |
-| **P2** | **4** | Backlog after submit-critical work |
+| **P2** | **3** | Backlog after submit-critical work |
 | **Nit** | **9** | Optional polish |
 
 **Marketplace blockers (P0):** (1) ~~missing object-level ownership~~ **S-02 fixed**, (2) ~~permanent draft-course editall/useall~~ **S-01 fixed (2026082602)**, (3) missing `@copyright` / phpcs exclude vs moodle.org CI, (4) missing `MOODLE_INTERNAL` guards, (5) fresh install blocked until admin sets hidden draft course (`draftcourseid=0` / `is_configured()`).
@@ -69,7 +69,7 @@ Severity: **P0** Marketplace blocker · **P1** fix before submit · **P2** backl
 | F-02 | P2 | Functional | **false positive** (closed) | approve_renderer / approve.php | Historical claim: “Move selected” label but moves only one row. **Verified:** Light supports bulk move via checkbox + “Move selected”; `question_move_service::move_selected()` handles multiple approved rows. Prior finding misread single-row-only behaviour. **`light_full_funkcio_matrix_l.md` updated:** bulk move **Igen** in Light. | Functional re-check 2026-08-27; prior F-02; matrix decision | **Closed / false positive.** Bulk move by design; matrix + test docs aligned |
 | F-03 | P2 | Functional | **fixed** | generate_form / question_form_builder | IH hints UI present but hints not persisted | Functional (re-verified); prior F-03; fixed 2026-08-27 (option B) | `supports_hints('IH')` — hints flow through `question_form_builder` to Moodle `question_hints` |
 | F-04 | P2 | Functional | **fixed** | question_schema / save_questions_task / approve_renderer | `difficulty_label` unconstrained from AI | Functional (re-verified); prior F-04; fixed 2026-08-27 | `difficulty_label` helper + schema enum; normalise on save; localised approve display |
-| F-05 | P2 | Functional | open | status.php / generate.php | Retry does not rewrite userid / re-apply draft role like start | Functional (re-verified); prior F-05 | Owner-only retry; grant draft role as on start |
+| F-05 | P2 | Functional | **fixed** | status.php / generate.php | Retry did not re-apply draft role like start (userid rewrite intentionally unchanged) | Functional (re-verified); prior F-05; fixed 2026-08-27 | `draft_role::grant($USER->id)` on retry after `draft_bank::create()`, mirroring generate.php start path |
 | F-06 | P2 | Functional | open | test_connection / model_checker | Connection test probes every model sync (timeout risk) | Functional (re-verified); prior F-06 | Fast key check; optional async full sweep |
 | F-09 | P2 | Functional | open | approve / bank link UI | “Open” link gated on draft bank caps (users without caps cannot open) | Functional (new) | Gate on view capability appropriate for Light, or clarify UX |
 | F-10 | P2 | Functional | open | missing_types / retry | Retry missing-types count wrong across difficulties | Functional (new) | Recount per difficulty / type matrix |
@@ -104,7 +104,7 @@ Severity: **P0** Marketplace blocker · **P1** fix before submit · **P2** backl
 | **C-14** | Prior C-14; **fixed 2026-08-27** — removed Full-edition prompt-template wording from `settings.php` file docblock |
 | **F-02** | Prior F-02; **false positive / closed 2026-08-27** — bulk move Light in scope; `light_full_funkcio_matrix_l.md` updated; checkbox + “Move selected” + `move_selected()` |
 | **S-08**, **S-N1**, **C-N6** | New from Security / Compliance nits |
-| Unchanged open from prior tracker | C-01–C-08 as listed; F-05–F-06, F-N1 re-verified still open (**F-01 false positive / retracted**; **F-02 false positive / closed — matrix updated** 2026-08-27; **F-03 fixed** 2026-08-27; **F-04 fixed** 2026-08-27; **F-08 fixed** 2026-08-26; **S-07 wontfix** 2026-08-27; **C-09 fixed** 2026-08-27; **C-10 fixed** 2026-08-27; **C-11 fixed** 2026-08-27; **C-12 fixed** 2026-08-27; **C-13 fixed** 2026-08-27; **C-14 fixed** 2026-08-27; **C-15 fixed** 2026-08-27; **C-16 fixed** 2026-08-27; **C-17 fixed** 2026-08-27; **C-18 fixed** 2026-08-27; **C-19 fixed** 2026-08-27) |
+| Unchanged open from prior tracker | C-01–C-08 as listed; F-06, F-N1 re-verified still open (**F-01 false positive / retracted**; **F-02 false positive / closed — matrix updated** 2026-08-27; **F-03 fixed** 2026-08-27; **F-04 fixed** 2026-08-27; **F-05 fixed** 2026-08-27; **F-08 fixed** 2026-08-26; **S-07 wontfix** 2026-08-27; **C-09 fixed** 2026-08-27; **C-10 fixed** 2026-08-27; **C-11 fixed** 2026-08-27; **C-12 fixed** 2026-08-27; **C-13 fixed** 2026-08-27; **C-14 fixed** 2026-08-27; **C-15 fixed** 2026-08-27; **C-16 fixed** 2026-08-27; **C-17 fixed** 2026-08-27; **C-18 fixed** 2026-08-27; **C-19 fixed** 2026-08-27) |
 
 Prior note: REVIEW-FINDINGS tracked **C-01, C-02, C-05, C-07, C-08** as still open — confirmed retained above (**C-10 fixed** 2026-08-27; **C-16 fixed** 2026-08-27; **C-17 fixed** 2026-08-27; **C-19 fixed** 2026-08-27).
 

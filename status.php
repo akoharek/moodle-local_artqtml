@@ -131,6 +131,9 @@ if (optional_param('retry', 0, PARAM_BOOL)) {
         local_artqtml_rollback($generation);
 
         $draftcategoryid = draft_bank::create($generation);
+
+        \local_artqtml\local\draft_role::grant((int) $USER->id);
+
         $generation->draftcategoryid = $draftcategoryid;
         $generation->status = generation_status::GENERATING;
         $generation->error = null;
