@@ -22,7 +22,8 @@
  * Waiting for the next scheduled tick.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\task;
@@ -56,6 +57,8 @@ class process_pending_generations extends \core\task\scheduled_task {
             'timecreated ASC'
         );
 
+        mtrace('local_artqtml: found ' . count($pending) . ' pending generation(s).');
+
         $apitimeout = (int) (get_config('local_artqtml', 'apitimeout') ?: 60);
         $httpcycle = (generate_questions_task::MAX_HTTP_ATTEMPTS * $apitimeout)
             + generate_questions_task::MAX_BACKOFF_SECONDS;
@@ -75,8 +78,9 @@ class process_pending_generations extends \core\task\scheduled_task {
             }
 
             $generationid = (int) $generation->id;
+            mtrace('local_artqtml: claimed generation ' . $generationid . ' (status: ' . $generation->status . ').');
 
-            // C-01: a plain try/finally only protects against catchable Throwables - a true PHP
+            // A plain try/finally only protects against catchable Throwables - a true PHP.
             // Fatal partway through process_one() (max_execution_time exceeded, memory
             // Exhaustion) terminates the script without ever running the finally block, which
             // Would leave processingtoken set forever and permanently block that generation from
@@ -103,7 +107,7 @@ class process_pending_generations extends \core\task\scheduled_task {
     /**
      * Atomically claim a generation for processing by this run: only succeeds if the row is
      * Still unclaimed (processingtoken IS NULL) at the moment the UPDATE executes, so two
-     * Concurrent runs racing on the same row can never both win (C-02).
+     *
      *
      * @param int $generationid
      * @return \stdClass|null the freshly claimed record, or null if another run claimed it first
@@ -147,16 +151,19 @@ class process_pending_generations extends \core\task\scheduled_task {
         global $DB;
 
         if ($generation->status === \local_artqtml\local\generation_status::GENERATING) {
+            mtrace('local_artqtml: generation ' . (int) $generation->id . ' -> Claude generate.');
             (new generate_questions_task())->process($generation);
             $generation = $DB->get_record('local_artqtml_generations', ['id' => $generation->id]);
         }
 
         if ($generation && $generation->status === \local_artqtml\local\generation_status::VALIDATING) {
+            mtrace('local_artqtml: generation ' . (int) $generation->id . ' -> Gemini validate.');
             (new validate_questions_task())->process($generation);
             $generation = $DB->get_record('local_artqtml_generations', ['id' => $generation->id]);
         }
 
         if ($generation && $generation->status === \local_artqtml\local\generation_status::SAVING) {
+            mtrace('local_artqtml: generation ' . (int) $generation->id . ' -> save questions.');
             (new save_questions_task())->process($generation);
         }
     }

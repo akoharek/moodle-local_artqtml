@@ -30,7 +30,8 @@
  * - which is precisely why one class has to know both. See claude_schema()/gemini_schema().
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -430,6 +431,45 @@ class ai_request {
             : (string) ($decoded['candidates'][0]['finishReason'] ?? '');
 
         return strcasecmp($reason, 'max_tokens') === 0;
+    }
+
+    /** @var int max stored length for non-JSON provider error bodies. */
+    public const MAX_NONJSON_ERROR_LENGTH = 500;
+
+    /**
+     * Extract a storable error string from a provider HTTP response body.
+     *
+     * Structured JSON API errors use error.message unchanged. Plain-text or HTML bodies
+     * (proxy pages, connection failures) are capped so untrusted payloads cannot flood logs.
+     *
+     * @param string $body raw response body
+     * @return string empty when the body is blank
+     */
+    public static function error_message_from_body(string $body): string {
+        $body = trim($body);
+        if ($body === '') {
+            return '';
+        }
+
+        $decoded = json_decode($body, true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            if (isset($decoded['error']['message']) && is_string($decoded['error']['message'])) {
+                return $decoded['error']['message'];
+            }
+
+            // Valid JSON but not the API error envelope — cap like plain-text bodies.
+            if (\core_text::strlen($body) <= self::MAX_NONJSON_ERROR_LENGTH) {
+                return $body;
+            }
+
+            return \core_text::substr($body, 0, self::MAX_NONJSON_ERROR_LENGTH) . '…';
+        }
+
+        if (\core_text::strlen($body) <= self::MAX_NONJSON_ERROR_LENGTH) {
+            return $body;
+        }
+
+        return \core_text::substr($body, 0, self::MAX_NONJSON_ERROR_LENGTH) . '…';
     }
 
     /**

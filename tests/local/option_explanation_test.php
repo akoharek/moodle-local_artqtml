@@ -22,8 +22,9 @@ namespace local_artqtml\local;
  * IH and FE can store per-answer explanations; SR cannot.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\question_schema
  * @covers     \local_artqtml\local\question_types::supports_option_explanation
  */

@@ -19,16 +19,22 @@
  * Per-type options.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require(__DIR__ . '/../../config.php');
+require_once($CFG->dirroot . '/local/artqtml/lib.php');
 
 use local_artqtml\form\generate_form;
+use local_artqtml\local\generation_access_policy;
+use local_artqtml\local\generation_list;
 use local_artqtml\local\question_types;
 use local_artqtml\local\draft_bank;
 
 require_login();
+
+defined('MOODLE_INTERNAL') || die();
 
 $context = context_system::instance();
 require_capability('local/artqtml:use', $context);
@@ -36,6 +42,15 @@ require_capability('local/artqtml:use', $context);
 $generationid = required_param('id', PARAM_INT);
 
 $generation = $DB->get_record('local_artqtml_generations', ['id' => $generationid], '*', MUST_EXIST);
+
+if (!generation_access_policy::can_mutate($generation, null, $context)) {
+    redirect(
+        generation_list::open_url($generation),
+        get_string('cannotmutateothers', 'local_artqtml'),
+        null,
+        \core\output\notification::NOTIFY_ERROR
+    );
+}
 
 if ($generation->status !== \local_artqtml\local\generation_status::STARTED) {
     $message = $generation->status === \local_artqtml\local\generation_status::COMPLETED
@@ -125,7 +140,7 @@ function local_artqtml_build_settings(stdClass $data): array {
     return $settings;
 }
 
-// Törlés és kilépés: POST + sesskey (no GET+sesskey URL).
+// Delete and exit: POST + sesskey (no GET+sesskey URL).
 $abortaction = optional_param('artqtmlabort', '', PARAM_ALPHA);
 if ($abortaction === 'delete') {
     if (!data_submitted()) {
@@ -145,6 +160,7 @@ if ($mform->is_cancelled()) {
     redirect($indexurl);
 } else if ($mform->is_submitted() && in_array($formaction, ['save', 'back'], true)) {
     require_sesskey();
+    generation_access_policy::require_can_mutate($generation, $context);
 
     $rawdata = $mform->get_submitted_data();
     if ($rawdata) {
@@ -165,6 +181,8 @@ if ($mform->is_cancelled()) {
     }
     redirect($indexurl);
 } else if ($data = $mform->get_data()) {
+    generation_access_policy::require_can_mutate($generation, $context);
+
     if (!get_config('local_artqtml', 'enabled')) {
         \core\notification::error(get_string('plugindisabled', 'local_artqtml'));
         redirect($indexurl);
@@ -293,7 +311,7 @@ echo local_artqtml_owner_warning_banner($generation);
 $mform->display();
 
 $candeleteown = \local_artqtml\local\generation_delete_policy::can_delete($generation, null, $context);
-// The "Generálás indítása", "Vissza" and "Megszakít" buttons all need the currently-typed field
+// The start-generation, back and cancel buttons all need the currently-typed field
 // Values, so
 // All three live outside generate_form's own <form> as plain (type=button) elements in this one
 // Row, and amd/src/generatesettings.js submits the real form on their behalf via requestSubmit() -

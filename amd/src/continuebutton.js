@@ -14,13 +14,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Plain JS (no AMD/grunt build), matching this plugin's other JS files.
+ * Enable the upload Continue button only when required fields are filled.
  *
- * @package    local_artqtml
+ * @module     local_artqtml/continuebutton
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-window.ArtqtmlContinueButton = (function() {
+define(['local_artqtml/uploadconflict'], function(UploadConflict) {
     'use strict';
 
     /**
@@ -36,24 +36,22 @@ window.ArtqtmlContinueButton = (function() {
         var shortname = document.getElementById(shortnameid);
         var textarea = document.getElementById(textareaid);
         var filehidden = document.getElementById(filehiddenid);
-        var submitbtn = document.querySelector('input[type="submit"][name="submitbutton"], button[type="submit"][name="submitbutton"]');
+        var submitbtn = document.querySelector(
+            'input[type="submit"][name="submitbutton"], button[type="submit"][name="submitbutton"]'
+        );
         if (!name || !shortname || !textarea || !submitbtn) {
             return;
-        }
-
-        // Defer to uploadconflict.js's notion of "is a file actually attached" (it tracks
-        // drop/replace state that a simple DOM/value check here can't see) so both scripts
-        // agree on what will actually be submitted.
-        function hasFile() {
-            return !!window.ArtqtmlUploadConflict && window.ArtqtmlUploadConflict.hasFile();
         }
 
         var fitem = filehidden ? filehidden.closest('.fitem') : null;
         var filelist = fitem ? fitem.querySelector('.filepicker-filelist') : null;
 
+        /**
+         * Enable or disable the Continue button from current field values.
+         */
         function update() {
             var ready = name.value.trim() !== '' && shortname.value.trim() !== '' &&
-                (textarea.value.trim() !== '' || hasFile());
+                (textarea.value.trim() !== '' || UploadConflict.hasFile());
             submitbtn.disabled = !ready;
         }
 
@@ -67,5 +65,7 @@ window.ArtqtmlContinueButton = (function() {
         update();
     }
 
-    return {init: init};
-})();
+    return {
+        init: init
+    };
+});

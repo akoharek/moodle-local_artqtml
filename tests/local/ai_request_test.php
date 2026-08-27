@@ -20,8 +20,9 @@ namespace local_artqtml\local;
  * Unit tests for the single-source structured-output request.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\ai_request
  */
 final class ai_request_test extends \advanced_testcase {
@@ -477,5 +478,24 @@ final class ai_request_test extends \advanced_testcase {
 
         $this->assertArrayHasKey('schema', $claude['payload']['output_config']['format']);
         $this->assertArrayHasKey('responseSchema', $gemini['payload']['generationConfig']);
+    }
+
+    /**
+     * JSON API errors keep error.message; non-JSON bodies are capped.
+     */
+    public function test_error_message_from_body_json_and_non_json(): void {
+        $json = json_encode(['error' => ['message' => 'Rate limit exceeded']]);
+        $this->assertSame('Rate limit exceeded', ai_request::error_message_from_body($json));
+
+        $longhtml = str_repeat('X', 600);
+        $truncated = ai_request::error_message_from_body($longhtml);
+        $this->assertSame(501, \core_text::strlen($truncated));
+        $this->assertStringEndsWith('…', $truncated);
+        $this->assertSame(str_repeat('X', 500), \core_text::substr($truncated, 0, 500));
+
+        $longjson = json_encode(['status' => str_repeat('Y', 600)]);
+        $truncatedjson = ai_request::error_message_from_body($longjson);
+        $this->assertSame(501, \core_text::strlen($truncatedjson));
+        $this->assertStringEndsWith('…', $truncatedjson);
     }
 }

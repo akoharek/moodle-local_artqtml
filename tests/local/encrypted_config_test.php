@@ -20,6 +20,7 @@ namespace local_artqtml\local;
  * Unit tests for encrypted admin API-key storage and plaintext upgrade migration.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\encrypted_config

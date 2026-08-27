@@ -18,16 +18,20 @@
  * Capability definitions for local_artqtml.
  *
  * The plugin is site-wide: context is always system.
+ * :use — view any generation; mutate own only. :manageall — mutate any generation (manager).
+ * Draft questions edited outside the plugin are locked (externallyedited); generation delete
+ * still allowed for owner/:use or :manageall unless the generation has moved-out questions.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
     'local/artqtml:use' => [
-        // Teachers generate/see AI content; collaborative :use can expose others' generations.
+        // Teachers generate and review AI content; may view others' generations but mutate own only.
         'riskbitmask'  => RISK_SPAM | RISK_XSS | RISK_PERSONAL,
         'captype'      => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
@@ -37,8 +41,17 @@ $capabilities = [
             'manager'        => CAP_ALLOW,
         ],
     ],
+    'local/artqtml:manageall' => [
+        // Elevated: mutate (approve, edit source, abort, delete, …) any user's generation.
+        'riskbitmask'  => RISK_PERSONAL | RISK_DATALOSS,
+        'captype'      => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes'   => [
+            'manager' => CAP_ALLOW,
+        ],
+    ],
     'local/artqtml:configure' => [
-        // Admin settings and API keys — config + secrets + potential data loss.
+        // Admin settings, API keys, license — config + secrets + potential data loss.
         'riskbitmask'  => RISK_CONFIG | RISK_XSS | RISK_DATALOSS | RISK_PERSONAL,
         'captype'      => 'write',
         'contextlevel' => CONTEXT_SYSTEM,

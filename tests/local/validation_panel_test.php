@@ -20,6 +20,7 @@ namespace local_artqtml\local;
  * The native editor validation overlay is only for still-in-draft questions.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\validation_panel

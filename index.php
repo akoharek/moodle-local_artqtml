@@ -18,14 +18,18 @@
  * List page: entry point for the ArtQTML.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require(__DIR__ . '/../../config.php');
+require_once($CFG->dirroot . '/local/artqtml/lib.php');
 
 use local_artqtml\local\generation_list;
 
 require_login();
+
+defined('MOODLE_INTERNAL') || die();
 
 $context = context_system::instance();
 require_capability('local/artqtml:use', $context);

@@ -18,7 +18,8 @@
  * Provider model list: fetch, normalise, filter and cache.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -38,6 +39,20 @@ class model_list {
 
     /** @var int cache lifetime in seconds (: 24 hours). */
     public const CACHE_TTL = 86400;
+
+    /** @var string fallback validator model when Google retires older Gemini ids. */
+    public const GEMINI_MODEL_FALLBACK = 'gemini-3.6-flash';
+
+    /**
+     * Gemini model ids that return HTTP 404 for new API keys (Aug 2026).
+     *
+     * @var string[]
+     */
+    public const DEPRECATED_GEMINI_MODELS = [
+        'gemini-2.0-flash',
+        'gemini-2.5-flash',
+        'gemini-2.5-pro',
+    ];
 
     /**
      * Helper.
@@ -123,8 +138,8 @@ class model_list {
      *
      * Only the "Refresh models" button and the scheduled model check call this.
      *
-     * On failure the previous cache content is deliberately left in place (annex, "Hibakezelés":
-     * "Ha a lekérés meghiúsul, a korábbi gyorsítótár-tartalom marad érvényben"), so a transient
+     * On failure the previous cache content is deliberately left in place (annex error-handling rule:
+     * when a fetch fails, the previous cache content remains valid), so a transient
      * Provider outage does not empty the dropdown of an admin who is mid-configuration.
      *
      * @param string $provider one of self::PROVIDERS
@@ -326,7 +341,7 @@ class model_list {
                 $models[] = [
                     'id'           => $id,
                     'display_name' => (string) ($model['displayName'] ?? $id),
-                    // The annex filters Gemini "a támogatott generálási metódusok alapján".
+                    // The annex filters Gemini models by supported generation methods.
                     // GenerateContent is the method the plugin's structured-output calls use.
                     'supports_structured_output' => in_array('generateContent', $methods, true),
                 ];
@@ -365,5 +380,21 @@ class model_list {
      */
     protected static function cache_key(string $provider): string {
         return 'modellistcache_' . $provider;
+    }
+
+    /**
+     * Move sites still pointing at retired Gemini models to {@see self::GEMINI_MODEL_FALLBACK}.
+     *
+     * @return bool true when the configured model was updated
+     */
+    public static function migrate_deprecated_gemini_model(): bool {
+        $current = (string) get_config('local_artqtml', 'geminimodel');
+        if ($current === '' || !in_array($current, self::DEPRECATED_GEMINI_MODELS, true)) {
+            return false;
+        }
+
+        set_config('geminimodel', self::GEMINI_MODEL_FALLBACK, 'local_artqtml');
+
+        return true;
     }
 }

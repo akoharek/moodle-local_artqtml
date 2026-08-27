@@ -23,6 +23,7 @@
  * settings form) must go through this helper instead of a plain `get_config()` call.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

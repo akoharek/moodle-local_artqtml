@@ -21,7 +21,8 @@
  * {@see self::IN_PROGRESS} from here.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -110,7 +111,7 @@ class generation_status {
 
     /**
      * Human-readable label for a status, from a lang string - the raw machine key (e.g. 'started')
-     * Must never reach the UI. fixes the 'started' label as "Megkezdett" in Hungarian.
+     * Must never reach the UI. The 'started' label is localized (e.g. "Started" in English).
      *
      * @param string $value one of {@see self::VALUES}
      * @return string

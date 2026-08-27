@@ -2,10 +2,7 @@
 <ruleset name="local_artqtml">
     <description>Moodle coding standard for local_artqtml.</description>
 
-    <rule ref="moodle">
-        <!-- Copyright is stated once in COPYRIGHT.txt; keep @license / boilerplate checks. -->
-        <exclude name="moodle.Commenting.FileExpectedTags.CopyrightTagMissing"/>
-    </rule>
+    <rule ref="moodle"/>
 
     <arg name="extensions" value="php"/>
     <!-- Warnings fail the build (no ignore_warnings_on_exit). -->

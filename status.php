@@ -18,16 +18,21 @@
  * Step 3 of the "New generation" flow: poll and display generation status.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require(__DIR__ . '/../../config.php');
+require_once($CFG->dirroot . '/local/artqtml/lib.php');
 
 use local_artqtml\local\draft_bank;
 use local_artqtml\local\generation_status;
+use local_artqtml\local\generation_access_policy;
 use local_artqtml\local\question_types;
 
 require_login();
+
+defined('MOODLE_INTERNAL') || die();
 
 $context = context_system::instance();
 require_capability('local/artqtml:use', $context);
@@ -35,7 +40,12 @@ require_capability('local/artqtml:use', $context);
 $generationid = required_param('generationid', PARAM_INT);
 
 $generation = $DB->get_record('local_artqtml_generations', ['id' => $generationid], '*', MUST_EXIST);
+// Capability local/artqtml:use may open any generation; mutation requires ownership or local/artqtml:manageall.
+$canmutate = generation_access_policy::can_mutate($generation, null, $context);
 
+// Recoverable pipeline rollback (Finding #5 security gate, or Abort) leaves status=started.
+// This page is the live progress view for in-flight runs — send the teacher back to settings
+// (from which they can open upload). generate.php surfaces any stored generic error once.
 if ($generation->status === generation_status::STARTED) {
     redirect(new moodle_url('/local/artqtml/generate.php', ['id' => $generationid]));
 }
@@ -47,7 +57,7 @@ if ($generation->status === generation_status::STARTED) {
  * @return void
  */
 function local_artqtml_rollback(stdClass $generation): void {
-    // Shared with the pipeline security gate — keep Abort and task recover identical.
+    // Shared with the pipeline security gate (Finding #5) — keep Abort and task recover identical.
     $fresh = \local_artqtml\local\generation_recover::to_started($generation, null);
     // Keep the caller's in-memory row aligned (retry/abort continue using this object).
     $generation->draftcategoryid = $fresh->draftcategoryid;
@@ -58,11 +68,14 @@ function local_artqtml_rollback(stdClass $generation): void {
     $generation->timemodified = $fresh->timemodified;
 }
 
+// Available while generating/validating.
+// State-changing: POST + sesskey only (no GET+sesskey URL).
 if (optional_param('abort', 0, PARAM_BOOL)) {
     if (!data_submitted()) {
         throw new moodle_exception('invalidrequest');
     }
     require_sesskey();
+    generation_access_policy::require_can_mutate($generation, $context);
     if (generation_status::is_in_progress($generation->status)) {
         local_artqtml_rollback($generation);
 
@@ -76,12 +89,14 @@ if (optional_param('abort', 0, PARAM_BOOL)) {
     redirect(new moodle_url('/local/artqtml/generate.php', ['id' => $generationid]));
 }
 
-// (újrapróbálás): full restart from zero. State-changing: POST + sesskey only (no GET+sesskey URL).
+// Full restart from zero.
+// State-changing: POST + sesskey only (no GET+sesskey URL).
 if (optional_param('retry', 0, PARAM_BOOL)) {
     if (!data_submitted()) {
         throw new moodle_exception('invalidrequest');
     }
     require_sesskey();
+    generation_access_policy::require_can_mutate($generation, $context);
     if ($generation->status === generation_status::FAILED && !draft_bank::is_configured()) {
         \core\notification::error(get_string('errordraftcoursenotconfigured', 'local_artqtml'));
         redirect(new moodle_url('/local/artqtml/generate.php', ['id' => $generationid]));
@@ -93,6 +108,15 @@ if (optional_param('retry', 0, PARAM_BOOL)) {
         \core\notification::error(local_artqtml_apikey_start_error());
         redirect(new moodle_url('/local/artqtml/status.php', ['generationid' => $generationid]));
     }
+    // Retry puts a generation back into 'generating', so it is a start
+    // like any other and it asks the same question - does this user already have one running? It
+    // , which meant this button walked straight past the limit.
+    //
+    // The check sits BEFORE local_artqtml_rollback(), because a refusal may not destroy the
+    // failed attempt's draft bank and questions on the way out. Same message and same destination
+    // as the start path: the running generation's status page, which is where the progress is shown
+    // and where the Cancel button is - so a stuck run can be cleared from the page the teacher
+    // is sent to.
     if ($generation->status === generation_status::FAILED) {
         $running = \local_artqtml\local\generation_start_policy::find_running((int) $USER->id, $generationid);
         if ($running !== null) {
@@ -107,17 +131,36 @@ if (optional_param('retry', 0, PARAM_BOOL)) {
         local_artqtml_rollback($generation);
 
         $draftcategoryid = draft_bank::create($generation);
+
+        \local_artqtml\local\draft_role::grant((int) $USER->id);
+
         $generation->draftcategoryid = $draftcategoryid;
         $generation->status = generation_status::GENERATING;
         $generation->error = null;
         $generation->timemodified = time();
         $DB->update_record('local_artqtml_generations', $generation);
+
+        // The "generating" status set above is the queue signal for the
+        // process_pending_generations scheduled task - see generate.php.
     }
     redirect(new moodle_url('/local/artqtml/status.php', ['generationid' => $generationid]));
 }
 
 $PAGE->set_url('/local/artqtml/status.php', ['generationid' => $generationid]);
 $PAGE->set_context($context);
+// These pages carry wide data tables, and 'standard' is the one layout Boost caps at
+// $course-content-maxwidth (830px) from the md breakpoint up
+// (theme/boost/scss/moodle/layout.scss:56-62) - which squeezed the columns into a narrow strip on
+// a full-screen browser while the page around them stayed wide, and pushed the actions column off
+// the right edge. 'report' is byte-for-byte the same layout in Boost's config.php (same file, same
+// regions, same default region) and differs only in the body class, which that rule does not
+// match; it is what core's own wide-table pages use (report/log/index.php:100).
+//
+// 'mediumwidth' then caps the result at $medium-content-maxwidth (1120px, variables.scss:28)
+// instead of letting it run the full viewport width. Decided 2026-07-29 against both extremes:
+// 830px is what the demo complaint was about, and edge-to-edge spreads eight columns thin on a
+// wide screen. Note that core defines this class but never sets it - every core page picks
+// 'limitedwidth' or nothing - so the rule to lean on is the SCSS, not core precedent.
 $PAGE->set_pagelayout('report');
 $PAGE->add_body_class('mediumwidth');
 $PAGE->set_title(get_string('statusheading', 'local_artqtml'));
@@ -125,10 +168,9 @@ $PAGE->set_heading(get_string('statusheading', 'local_artqtml'));
 $PAGE->requires->js_call_amd('local_artqtml/status', 'init');
 
 $questioncount = $DB->count_records('local_artqtml_questions', ['generationid' => $generationid]);
-$tokenwarningmessage = '';
 
 $approveurl = new moodle_url('/local/artqtml/approve.php', ['generationid' => $generationid]);
-$backurl = new moodle_url('/local/artqtml/generate.php', ['id' => $generationid]);
+$backurl = new moodle_url('/local/artqtml/index.php');
 $retryurl = new moodle_url('/local/artqtml/status.php', ['generationid' => $generationid, 'retry' => 1]);
 $aborturl = new moodle_url('/local/artqtml/status.php', ['generationid' => $generationid, 'abort' => 1]);
 
@@ -138,17 +180,16 @@ echo local_artqtml_apikey_decrypt_notice();
 echo local_artqtml_owner_warning_banner($generation);
 echo html_writer::tag('p', format_string($generation->name));
 
-// Reserved warning region for status.js polling compatibility (message stays empty).
-echo html_writer::div(
-    html_writer::div($tokenwarningmessage, 'alert alert-warning mb-0', ['data-region' => 'tokenwarning-text']),
-    'mb-3 d-none',
-    ['data-region' => 'tokenwarning']
-);
-
+// Only known once the generating stage has run — rendered up front if already known,
+// otherwise revealed live by amd/src/status.js once countdiscrepancymessage turns non-empty.
 $countdiscrepancy = json_decode((string) $generation->countdiscrepancy, true);
 $countdiscrepancymessage = (is_array($countdiscrepancy) && !empty($countdiscrepancy))
     ? question_types::format_count_discrepancy($countdiscrepancy)
     : '';
+// Hidden on a partly successful run, where the partial notice below prints the very same
+// sentence as part of explaining itself - two identical amber boxes stacked on top of each other
+// was what the screen actually showed. The region stays in the markup either way, because
+// amd/src/status.js reveals it mid-poll for the runs that are not partial.
 $discrepancyhidden = $countdiscrepancymessage === '' || $generation->status === generation_status::PARTIAL;
 echo html_writer::div(
     html_writer::div($countdiscrepancymessage, 'alert alert-warning mb-0', ['data-region' => 'countdiscrepancy-text']),
@@ -156,6 +197,11 @@ echo html_writer::div(
     ['data-region' => 'countdiscrepancy']
 );
 
+// A distinct green "completed successfully" notification (separate from just filling the progress
+// bar and revealing Continue), shown up front if the generation is already completed on page load,
+// otherwise revealed live by amd/src/status.js the moment the poll returns 'completed'.
+// The question count sits in its own span (like question-count above) so the JS can refresh it to
+// the final value when completion happens mid-poll rather than on a fresh already-completed load.
 $successcountspan = html_writer::tag('span', $questioncount, ['data-region' => 'success-count']);
 echo html_writer::div(
     '✓ ' . get_string('generationcompletedsuccess', 'local_artqtml', $successcountspan),
@@ -163,14 +209,17 @@ echo html_writer::div(
     ['data-region' => 'success']
 );
 
+// The third outcome: the pipeline ran to the end and the teacher still did not get what
+// they asked for — neither the green notice above nor the red one at the bottom (shown as
+// green until 2026-08-01).
 if ($generation->status === generation_status::PARTIAL) {
     // The button is inside the notice, not down with Retry/Back, because it is the answer to the
-    // Sentence directly above it - and because Retry means something else here: it restarts this
-    // Generation from zero and throws away the questions it did produce. This one keeps them.
+    // sentence directly above it - and because Retry means something else here: it restarts this
+    // generation from zero and throws away the questions it did produce. This one keeps them.
     $shortfall = \local_artqtml\local\missing_types::shortfall($generation);
     $retrytypeslink = '';
-    if ($shortfall !== []) {
-        $described = \local_artqtml\local\missing_types::describe($shortfall);
+    if ($shortfall !== [] && $canmutate) {
+        $described = \local_artqtml\local\missing_types::describe($generation);
         $retrytypesbutton = new single_button(
             new moodle_url('/local/artqtml/retrytypes.php', ['generationid' => $generationid]),
             get_string('retrymissingtypes', 'local_artqtml'),
@@ -183,6 +232,9 @@ if ($generation->status === generation_status::PARTIAL) {
         $retrytypeslink = $OUTPUT->render($retrytypesbutton);
     }
 
+    // Countdiscrepancy only names the shortfall; the why is already in local_artqtml_log
+    // (type_generation_failed / question_rejected / undershoot outcomes) — surface it here so the
+    // teacher is not left guessing why SR/RV came back empty.
     $partialreasons = \local_artqtml\local\partial_reason::render($generationid);
 
     echo html_writer::div(
@@ -205,9 +257,22 @@ echo html_writer::start_div('', [
     'data-label-completed'   => get_string('status_completed', 'local_artqtml'),
     'data-label-partial'     => get_string('status_partial', 'local_artqtml'),
     'data-label-failed'      => get_string('status_failed', 'local_artqtml'),
+    // Stage-to-percent/colour/striping map and terminal-status list, emitted from PHP so
+    // amd/src/status.js can read them instead of owning copies.
     'data-progress-config'   => \local_artqtml\local\generation_progress::config_json(),
 ]);
 
+// A single Bootstrap progress bar over the pipeline stages
+// (generating/validating/saving/completed - 25/50/75/100%), matching the spec's own "Moodle native
+// striped progress bar" wording instead of a plain color-coded list.
+//
+// the generating stage is no longer one step. It is one API call per requested question
+// type, so the bar advances within it, 25% to 45%, and the label names the type in flight. The
+// individual call is still a single synchronous HTTP request with no streaming signal - what
+// changed is that there are now several of them, and how many have finished is a real number
+// rather than a fabricated one.
+//
+// The mapping lives in generation_progress, shared with amd/src/status.js.
 $stage = \local_artqtml\local\generation_progress::for_status($generation->status);
 $barpercent = $stage['percent'] ?? \local_artqtml\local\generation_progress::failed_percent($generation->pendingdata);
 if ($generation->status === generation_status::GENERATING) {
@@ -265,6 +330,9 @@ echo html_writer::div(
 );
 echo html_writer::end_div();
 
+// Text feedback is also shown under the progress bar at every stage.
+// This label used to sit inside the bar; at 25% width Bootstrap overflow clipped it, so it
+// is shown below the bar instead.
 echo html_writer::tag(
     'p',
     $barlabel . ' (' . $barpercent . '%)',
@@ -277,7 +345,7 @@ echo html_writer::tag(
         html_writer::tag('span', $questioncount, ['data-region' => 'question-count'])
 );
 
-if (generation_status::is_in_progress($generation->status)) {
+if (generation_status::is_in_progress($generation->status) && $canmutate) {
     $abortbutton = new single_button(
         $aborturl,
         get_string('abortgeneration', 'local_artqtml'),
@@ -290,6 +358,10 @@ if (generation_status::is_in_progress($generation->status)) {
     echo $OUTPUT->render($abortbutton);
 }
 
+// Shown server-side for a partly successful run. The notice above tells the teacher the questions
+// that did get made are usable — and until this line the page then gave them no way to reach them,
+// because Continue was only ever revealed by the JS on 'completed'. The other statuses are
+// unchanged: hidden here, unhidden by amd/src/status.js when the poll says completed.
 echo html_writer::div(
     html_writer::link($approveurl, get_string('continuebutton', 'local_artqtml'), ['class' => 'btn btn-primary']),
     $generation->status === generation_status::PARTIAL ? '' : 'd-none',
@@ -306,11 +378,14 @@ $retrybutton->class = 'singlebutton';
 $retrybutton->add_confirm_action(get_string('retryconfirm', 'local_artqtml', format_string($generation->name)));
 $retrylink = $OUTPUT->render($retrybutton);
 
+// The raw technical error (may contain provider-internal details) is shown to
+// anyone allowed to configure the plugin, regardless of debug mode - everyone else only sees
+// the generic message.
 $technicalerror = has_capability('local/artqtml:configure', $context) ? s($generation->error ?? '') : '';
 
 $failedactions = html_writer::div(
-    $retrylink .
-        html_writer::link($backurl, get_string('backtosettingsshort', 'local_artqtml'), ['class' => 'btn btn-secondary']),
+    ($canmutate ? $retrylink : '') .
+        html_writer::link($backurl, get_string('backtolist', 'local_artqtml'), ['class' => 'btn btn-secondary']),
     'artqtml-buttonrow'
 );
 

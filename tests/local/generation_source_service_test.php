@@ -20,12 +20,13 @@ namespace local_artqtml\local;
  * Unit tests for the generation source write path.
  *
  * The test that matters most here is the stale one: a form opened on a draft and submitted after
- * The generation started running. That case is why the write moved out of upload.php in the first
- * Place - as a function declared inside a controller it could not be called at all.
+ * the generation started running. That case is why the write moved out of upload.php in the first
+ * place - as a function declared inside a controller it could not be called at all.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\generation_source_service
  */
 final class generation_source_service_test extends \advanced_testcase {
@@ -103,8 +104,8 @@ final class generation_source_service_test extends \advanced_testcase {
      * Every non-draft status is refused, and NOTHING is written.
      *
      * The second half is the assertion that matters. A refusal that had already changed three
-     * Fields before throwing would be worse than no refusal at all - the record would be
-     * Half-rewritten with nothing on screen to say so.
+     * fields before throwing would be worse than no refusal at all - the record would be
+     * half-rewritten with nothing on screen to say so.
      *
      * @dataProvider non_draft_status_provider
      * @param string $status
@@ -154,13 +155,13 @@ final class generation_source_service_test extends \advanced_testcase {
      * The stale form: a draft that started running while the form was open.
      *
      * This is the sequence the fix exists for, and it needs no attacker - the tool is site-wide,
-     * So the second tab can belong to a different teacher. Modelled by changing the status between
+     * so the second tab can belong to a different teacher. Modelled by changing the status between
      * "the form was built" and "the form was submitted", which is exactly what a race does, minus
-     * The timing.
+     * the timing.
      *
      * Without the re-read inside save(), step 4 rewrites the source text of a generation Claude is
-     * Reading at that moment - and which Gemini will read again afterwards to judge the questions
-     * Against it.
+     * reading at that moment - and which Gemini will read again afterwards to judge the questions
+     * against it.
      */
     public function test_a_form_submitted_after_the_generation_started_writes_nothing(): void {
         global $DB;
@@ -193,8 +194,8 @@ final class generation_source_service_test extends \advanced_testcase {
      * The same for the duplicate-confirmation path.
      *
      * That path carries the generation id through the session, from one request to the next. The
-     * Session remembers which generation was being edited; it cannot remember what state it is in
-     * Now, and it must not be trusted to.
+     * session remembers which generation was being edited; it cannot remember what state it is in
+     * now, and it must not be trusted to.
      */
     public function test_a_stale_duplicate_confirmation_writes_nothing(): void {
         global $DB;
@@ -207,6 +208,7 @@ final class generation_source_service_test extends \advanced_testcase {
         // The pending data was prepared while the generation was a draft.
         $pending = ['name' => 'Confirmed', 'shortname' => 'CONF', 'sourcetext' => 'Confirmed text.'];
 
+        // It finished before the user pressed "continue".
         $DB->set_field('local_artqtml_generations', 'status', generation_status::COMPLETED, ['id' => $before->id]);
 
         try {
@@ -230,23 +232,60 @@ final class generation_source_service_test extends \advanced_testcase {
     }
 
     /**
-     * A colleague's draft is still editable - the refusal is about status, never about ownership.
+     * A colleague's draft is not editable without :manageall.
      */
-    public function test_a_colleagues_draft_is_still_editable(): void {
+    public function test_a_colleagues_draft_requires_manageall_to_edit(): void {
         global $DB;
 
         $this->resetAfterTest();
-        $this->setAdminUser();
 
+        $owner = $this->getDataGenerator()->create_user();
         $other = $this->getDataGenerator()->create_user();
-        $before = $this->make_generation(generation_status::STARTED, (int) $other->id);
+        $context = \context_system::instance();
+        $roleid = create_role('artqtm use only', 'artqtmuseonly', '');
+        assign_capability('local/artqtml:use', CAP_ALLOW, $roleid, $context->id);
+        role_assign($roleid, $other->id, $context->id);
+        accesslib_clear_all_caches_for_unit_testing();
+        $this->setUser($other);
 
-        generation_source_service::save('Edited by a colleague', 'COLL', 'New text.', (int) $before->id, null, 1);
+        $before = $this->make_generation(generation_status::STARTED, (int) $owner->id);
+
+        try {
+            generation_source_service::save('Edited by a colleague', 'COLL', 'New text.', (int) $before->id, null, 1);
+            $this->fail('colleague edit without manageall must not write');
+        } catch (\moodle_exception $e) {
+            $this->assertSame('cannotmutateothers', $e->errorcode);
+        }
+
+        $after = $DB->get_record('local_artqtml_generations', ['id' => $before->id], '*', MUST_EXIST);
+        $this->assertSame($before->name, $after->name);
+    }
+
+    /**
+     * :manageall allows editing a colleague's draft.
+     */
+    public function test_manageall_may_edit_a_colleagues_draft(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $owner = $this->getDataGenerator()->create_user();
+        $manager = $this->getDataGenerator()->create_user();
+        $context = \context_system::instance();
+        $roleid = create_role('artqtm manageall', 'artqtmmgrall', '');
+        assign_capability('local/artqtml:use', CAP_ALLOW, $roleid, $context->id);
+        assign_capability('local/artqtml:manageall', CAP_ALLOW, $roleid, $context->id);
+        role_assign($roleid, $manager->id, $context->id);
+        accesslib_clear_all_caches_for_unit_testing();
+        $this->setUser($manager);
+
+        $before = $this->make_generation(generation_status::STARTED, (int) $owner->id);
+
+        generation_source_service::save('Edited by manager', 'COLL', 'New text.', (int) $before->id, null, 1);
 
         $after = $DB->get_record('local_artqtml_generations', ['id' => $before->id], '*', MUST_EXIST);
 
-        $this->assertSame('Edited by a colleague', $after->name);
-        // And the owner is not silently reassigned to whoever edited it.
-        $this->assertSame((int) $other->id, (int) $after->userid);
+        $this->assertSame('Edited by manager', $after->name);
+        $this->assertSame((int) $owner->id, (int) $after->userid);
     }
 }

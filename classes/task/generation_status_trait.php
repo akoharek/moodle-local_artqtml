@@ -18,7 +18,8 @@
  * Shared status/log helpers for local_artqtml adhoc tasks (7, 8).
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\task;
@@ -47,7 +48,7 @@ trait generation_status_trait {
 
     /**
      * Re-check that a generation still exists and is still in the expected in-progress status
-     * Before committing further work (C-03). A long-running Claude/Gemini HTTP call can take
+     * Before committing further work. A long-running Claude/Gemini HTTP call can take
      * Tens of seconds; in that window the user could have aborted (status reset to "started"
      * After a rollback) or deleted the generation entirely via the UI, and results from a call
      * Started before that must never be silently saved afterwards.

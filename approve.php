@@ -15,23 +15,32 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Kérdésbank - Draft jóváhagyó oldal.
+ * Question bank — draft approval page.
+ *
+ * Reviews AI-generated/validated questions, which already exist as real Moodle question
+ *  and lets the teacher
+ * edit/preview/tag them via Moodle's own native question bank UI, then move approved ones
+ * into a real target question bank or delete them.
  *
  * Thin controller: bootstrap -> capability -> parameter parsing -> service call + notification +
- * Redirect (POST actions), or data gathering + renderer calls (GET). The business logic lives in
- * Local_artqtml\local\approve\* (approval / move / deletion services, page data, renderer).
+ * redirect (POST actions), or data gathering + renderer calls (GET). The business logic lives in
+ * local_artqtml\local\approve\* (approval / move / deletion services, page data, renderer).
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require(__DIR__ . '/../../config.php');
+require_once($CFG->dirroot . '/local/artqtml/lib.php');
 require_once($CFG->libdir . '/questionlib.php');
 require_once($CFG->dirroot . '/question/engine/bank.php');
 
 use local_artqtml\local\question_types;
 use local_artqtml\local\question_bank_list;
 use local_artqtml\local\draft_bank;
+use local_artqtml\local\draft_role;
+use local_artqtml\local\generation_access_policy;
 use local_artqtml\local\approve\question_approval_service;
 use local_artqtml\local\approve\question_move_service;
 use local_artqtml\local\approve\question_deletion_service;
@@ -40,17 +49,33 @@ use local_artqtml\local\approve\approve_renderer;
 
 require_login();
 
+defined('MOODLE_INTERNAL') || die();
+
 $context = context_system::instance();
 require_capability('local/artqtml:use', $context);
 
 $generationid = required_param('generationid', PARAM_INT);
 
 $generation = $DB->get_record('local_artqtml_generations', ['id' => $generationid], '*', MUST_EXIST);
+// Capability local/artqtml:use may open any generation; mutation requires ownership or local/artqtml:manageall.
 
 $pageurl = new moodle_url('/local/artqtml/approve.php', ['generationid' => $generationid]);
 
 $PAGE->set_url($pageurl);
 $PAGE->set_context($context);
+// These pages carry wide data tables, and 'standard' is the one layout Boost caps at
+// $course-content-maxwidth (830px) from the md breakpoint up
+// (theme/boost/scss/moodle/layout.scss:56-62) - which squeezed the columns into a narrow strip on
+// a full-screen browser while the page around them stayed wide, and pushed the actions column off
+// the right edge. 'report' is byte-for-byte the same layout in Boost's config.php (same file, same
+// regions, same default region) and differs only in the body class, which that rule does not
+// match; it is what core's own wide-table pages use (report/log/index.php:100).
+//
+// 'mediumwidth' then caps the result at $medium-content-maxwidth (1120px, variables.scss:28)
+// instead of letting it run the full viewport width. Decided 2026-07-29 against both extremes:
+// 830px is what the demo complaint was about, and edge-to-edge spreads eight columns thin on a
+// wide screen. Note that core defines this class but never sets it - every core page picks
+// 'limitedwidth' or nothing - so the rule to lean on is the SCSS, not core precedent.
 $PAGE->set_pagelayout('report');
 $PAGE->add_body_class('mediumwidth');
 $PAGE->set_title(get_string('approveheading', 'local_artqtml'));
@@ -58,61 +83,59 @@ $PAGE->set_heading(get_string('approveheading', 'local_artqtml'));
 
 $categoryoptions = question_bank_list::options_for_user((int) $USER->id, (int) $generation->draftcategoryid);
 
-// Soronkénti jóváhagyás: a human approval step, independent of the AI's validationsuggestion -
-// A question must be approved before it can be moved into a real question bank.
+// Per-row approval: the human approval step, independent of the AI's validationsuggestion -
+// a question must be approved before it can be moved into a real question bank.
 $approveid = optional_param('approvequestion', 0, PARAM_INT);
+$revokeid = optional_param('revokequestion', 0, PARAM_INT);
+$deleteid = optional_param('deletequestion', 0, PARAM_INT);
+$bulkaction = optional_param('bulkaction', '', PARAM_ALPHA);
+
+if (
+    $approveid
+    || $revokeid
+    || $deleteid
+    || in_array($bulkaction, ['move', 'allaccepted', 'delete'], true)
+) {
+    generation_access_policy::require_can_mutate($generation, $context);
+}
+
+// Per-row approval: the human approval step, independent of the AI's validationsuggestion -
+// a question must be approved before it can be moved into a real question bank.
 if ($approveid) {
+    if (!data_submitted()) {
+        throw new moodle_exception('invalidrequest');
+    }
     require_sesskey();
     question_approval_service::approve_single($approveid, $generationid, (int) $USER->id, $context);
     redirect($pageurl);
 }
 
-$revokeid = optional_param('revokequestion', 0, PARAM_INT);
+// Per-row approval revocation: only the approved flag is cleared, the AI's
+// validation verdict is deliberately left untouched.
 if ($revokeid) {
+    if (!data_submitted()) {
+        throw new moodle_exception('invalidrequest');
+    }
     require_sesskey();
     question_approval_service::revoke_single($revokeid, $generationid, $context);
     redirect($pageurl);
 }
 
-$deleteid = optional_param('deletequestion', 0, PARAM_INT);
+// Per-row deletion.
 if ($deleteid) {
+    if (!data_submitted()) {
+        throw new moodle_exception('invalidrequest');
+    }
     require_sesskey();
     question_deletion_service::delete_single($deleteid, $generationid, $context);
     redirect($pageurl);
 }
 
-// Single-question move to the bank.
-$moveid = optional_param('movequestion', 0, PARAM_INT);
-if ($moveid) {
-    require_sesskey();
-    $categoryvalue = required_param('categoryvalue', PARAM_RAW);
-    if (!isset($categoryoptions[$categoryvalue])) {
-        \core\notification::error(get_string('errornocategory', 'local_artqtml'));
-        redirect($pageurl);
+// Bulk actions.
+if (in_array($bulkaction, ['move', 'allaccepted', 'delete'], true)) {
+    if (!data_submitted()) {
+        throw new moodle_exception('invalidrequest');
     }
-    try {
-        $result = question_move_service::move_single($moveid, $generationid, $categoryvalue, $context);
-        draft_bank::delete_if_empty($generationid, (int) $generation->draftcategoryid);
-        if ($result['skipped'] > 0) {
-            \core\notification::success(get_string('movesuccesswithskipped', 'local_artqtml', (object) [
-                'moved'   => $result['moved'],
-                'skipped' => $result['skipped'],
-            ]));
-        } else if ($result['moved'] > 0) {
-            \core\notification::success(get_string('movesuccess', 'local_artqtml', $result['moved']));
-        } else {
-            \core\notification::error(get_string('errorbulkactionfailed', 'local_artqtml'));
-        }
-    } catch (\Throwable $e) {
-        debugging('local_artqtml single move failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
-        \core\notification::error(get_string('errorbulkactionfailed', 'local_artqtml'));
-    }
-    redirect($pageurl);
-}
-
-// Tömeges műveletek — approve-all and bulk delete.
-$bulkaction = optional_param('bulkaction', '', PARAM_ALPHA);
-if (in_array($bulkaction, ['allaccepted', 'delete'], true)) {
     require_sesskey();
 
     if ($bulkaction === 'delete') {
@@ -125,19 +148,60 @@ if (in_array($bulkaction, ['allaccepted', 'delete'], true)) {
             $count = question_deletion_service::delete_selected($questionids, $generationid, $context);
             \core\notification::success(get_string('bulkdeletesuccess', 'local_artqtml', $count));
         } catch (\Throwable $e) {
+            // Never surface the raw exception message to the user - log the full detail
+            // for admins/developers, show a generic translated message.
             debugging('local_artqtml bulk delete failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
             \core\notification::error(get_string('errorbulkactionfailed', 'local_artqtml'));
         }
         redirect($pageurl);
     }
 
-    // Remaining allowed bulk action: approve all accepted.
+    if ($bulkaction === 'allaccepted') {
+        try {
+            $count = question_approval_service::approve_accepted_bulk($generationid, (int) $USER->id, $context);
+            \core\notification::success(get_string('bulkapprovesuccess', 'local_artqtml', $count));
+        } catch (\Throwable $e) {
+            // Log the full detail, show only a generic translated message.
+            debugging('local_artqtml bulk approve failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
+            \core\notification::error(get_string('errorbulkactionfailed', 'local_artqtml'));
+        }
+        redirect($pageurl);
+    }
+
+    // Only $bulkaction === 'move' reaches here, and it needs a target bank.
+    $categoryvalue = required_param('categoryvalue', PARAM_RAW);
+    if (!isset($categoryoptions[$categoryvalue])) {
+        \core\notification::error(get_string('errornocategory', 'local_artqtml'));
+        redirect($pageurl);
+    }
+
+    $questionids = optional_param_array('questionids', [], PARAM_INT);
+    if (empty($questionids)) {
+        \core\notification::error(get_string('errornoselection', 'local_artqtml'));
+        redirect($pageurl);
+    }
+
     try {
-        $count = question_approval_service::approve_accepted_bulk($generationid, (int) $USER->id, $context);
-        \core\notification::success(get_string('bulkapprovesuccess', 'local_artqtml', $count));
+        $result = question_move_service::move_selected($questionids, $generationid, $categoryvalue, $context);
+        // Draft_bank::delete_if_empty() runs deliberately OUTSIDE move_selected()'s.
+        // transaction. The atomic unit that must never partially apply is the move itself (the
+        // Moodle question move + the movedout flag updates). Pruning the now-empty draft category
+        // is best-effort post-commit cleanup: it only makes sense once the move has committed (so
+        // the moved questions no longer count towards the category), and a failure to prune must
+        // never roll back a successful move - a leftover empty draft category is harmless and gets
+        // pruned by any later delete/move anyway.
+        draft_bank::delete_if_empty($generationid, (int) $generation->draftcategoryid);
+        if ($result['skipped'] > 0) {
+            \core\notification::success(get_string('movesuccesswithskipped', 'local_artqtml', (object) [
+                'moved'   => $result['moved'],
+                'skipped' => $result['skipped'],
+            ]));
+        } else {
+            \core\notification::success(get_string('movesuccess', 'local_artqtml', $result['moved']));
+        }
     } catch (\Throwable $e) {
         // Log the full detail, show only a generic translated message.
-        debugging('local_artqtml bulk approve failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
+        debugging('local_artqtml bulk move failed: ' . $e->getMessage(), DEBUG_DEVELOPER);
         \core\notification::error(get_string('errorbulkactionfailed', 'local_artqtml'));
     }
     redirect($pageurl);
@@ -151,9 +215,13 @@ $perpage = (int) get_config('moodle', 'perpage') ?: 20;
 
 $totalquestions = approve_page_data::total_questions($generationid);
 
+// Four-status validation summary, counted independently of the per-row.
+// badges below so a teacher can see the overall picture without scrolling the whole table.
 $statuscounts = approve_page_data::status_counts($generationid);
 $statustotal = array_sum($statuscounts);
 
+// Same eligibility criteria as the 'allaccepted' bulk action above (accepted, not yet approved,
+// the bulk-approve button reacts to this count.
 $eligibleforapproval = approve_page_data::eligible_for_approval($generationid);
 
 echo $OUTPUT->header();
@@ -164,7 +232,7 @@ echo html_writer::tag('p', format_string($generation->name), [
     'data-testid' => 'artqtml-approve-generationname',
 ]);
 
-// Site-wide list: index.php is context_system, same as this page — no course id.
+// Index.php is context_system, same as this page — no course id.
 $indexurl = new moodle_url('/local/artqtml/index.php');
 echo html_writer::div(
     $OUTPUT->single_button($indexurl, get_string('backtolist', 'local_artqtml'), 'get'),
@@ -172,6 +240,8 @@ echo html_writer::div(
     ['data-testid' => 'artqtml-approve-backtolist']
 );
 
+// Still relevant here even after generation completes - a teacher reviewing questions.
+// should know Claude didn't return what was actually requested.
 $countdiscrepancy = json_decode((string) $generation->countdiscrepancy, true);
 if (is_array($countdiscrepancy) && !empty($countdiscrepancy)) {
     echo html_writer::div(question_types::format_count_discrepancy($countdiscrepancy), 'alert alert-warning mb-3');
@@ -191,32 +261,41 @@ $page = min($page, $lastpage);
 $questions = approve_page_data::questions($generationid, $sort, $dir, $page, $perpage);
 $creator = core_user::get_user($generation->userid);
 
-// C9: the Edit and Preview actions both open the native Moodle question bank UI for a draft
-// Question, which requires moodle/question:editall in the draft course context (there is no
-// "moodle/question:edit" capability - using it made has_capability() emit a "capability not
-// Found" debug warning and always return false, so the actions never rendered). A user can hold
-// Local/artqtml:use (enough to view/approve/move here) without being enrolled as an
-// Editingteacher in the draft course, in which case those links would only lead to a permission
-// Error - so compute the capability once here and show them only when the user actually has it.
-$candrafteditquestions = false;
+// Preview opens native Moodle question UI in the draft course (draft_role grants use).
+$candraftpreviewquestions = false;
+$canmutate = generation_access_policy::can_mutate($generation, null, $context);
+if ($canmutate && draft_bank::is_configured()) {
+    draft_role::grant((int) $USER->id);
+}
 if (draft_bank::is_configured()) {
     $draftcontextid = draft_bank::get_draft_context_id();
     if ($draftcontextid !== null) {
-        $candrafteditquestions = has_capability('moodle/question:editall', \context::instance_by_id($draftcontextid));
+        $candraftpreviewquestions = has_capability('moodle/question:useall', \context::instance_by_id($draftcontextid));
     }
 }
+$candraftpreviewquestions = $candraftpreviewquestions && $canmutate;
 
 echo html_writer::start_tag('form', ['method' => 'post', 'action' => $pageurl->out(false)]);
 echo html_writer::input_hidden_params($pageurl);
 echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()]);
 
-echo approve_renderer::questions_table($OUTPUT, $questions, $sort, $dir, $pageurl, $candrafteditquestions, $creator, $generationid);
+echo approve_renderer::questions_table(
+    $OUTPUT,
+    $questions,
+    $sort,
+    $dir,
+    $pageurl,
+    $candraftpreviewquestions,
+    $creator,
+    $generationid,
+    $canmutate
+);
 echo approve_renderer::toggle_script();
 
 $pagingurl = new moodle_url($pageurl, ['qsort' => $sort, 'qdir' => $dir]);
 echo $OUTPUT->paging_bar($totalquestions, $page, $perpage, $pagingurl, 'qpage');
 
-echo approve_renderer::bulk_action_buttons($OUTPUT, $eligibleforapproval, $categoryoptions);
+echo approve_renderer::bulk_action_buttons($OUTPUT, $eligibleforapproval, $categoryoptions, $canmutate);
 
 echo html_writer::end_tag('form');
 

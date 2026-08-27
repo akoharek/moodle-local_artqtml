@@ -25,8 +25,9 @@ namespace local_artqtml\local\approve;
  * Before pressing Approve, so it was describing one version and approving another.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\approve\current_question
  */
 final class current_question_test extends \advanced_testcase {

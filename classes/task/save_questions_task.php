@@ -21,13 +21,15 @@
  * Touches local_artqtml_questions or creates a real Moodle question until this stage runs).
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\task;
 
 use local_artqtml\local\question_types;
 use local_artqtml\local\question_importer;
+use local_artqtml\local\difficulty_label;
 
 /**
  * Writes a single generation's questions + validation results into local_artqtml_questions.
@@ -209,13 +211,19 @@ class save_questions_task {
 
             $evaluation = $evaluations[$pseudoid] ?? null;
 
+            $normaliseddifficulty = difficulty_label::normalise(
+                isset($question['difficulty_label']) ? (string) $question['difficulty_label'] : null,
+                difficulty_label::MEDIUM
+            );
+            $question['difficulty_label'] = $normaliseddifficulty;
+
             $record = new \stdClass();
             $record->generationid = $generation->id;
             $record->questioncode = $questioncode;
             $record->typecode = $typecode;
             $record->questiontype = question_types::QTYPE[$typecode];
             $record->questiontext = (string) ($question['questiontext'] ?? '');
-            $record->difficultylabel = (string) ($question['difficulty_label'] ?? '');
+            $record->difficultylabel = $normaliseddifficulty;
             $record->sourcereference = (string) ($question['source_reference'] ?? '');
             $record->questiondata = json_encode($question);
             $record->validationsuggestion = $evaluation['validationsuggestion'] ?? 'not_evaluated';

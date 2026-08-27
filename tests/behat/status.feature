@@ -21,14 +21,14 @@ Feature: ArtQTML generation status
     When I open the ArtQTML generation named "Completed pack"
     Then I should see "Review and approve questions"
 
-  Scenario: Failed generation shows Retry and Back to settings
+  Scenario: Failed generation shows Retry and Back to list
     Given the following "local_artqtml > generations" exist:
       | user     | name          | shortname | status | error                    |
       | teacher1 | Failed pack   | FAIL1     | failed | Behat fixture API error  |
     When I open the ArtQTML generation named "Failed pack"
     Then the ArtQTML failed-generation actions should be visible
     And I should see "Retry"
-    And I should see "Back to settings"
+    And I should see "Back to list"
     And ".artqtml-buttonrow" "css_element" should exist
 
   Scenario: In-progress generation shows Abort

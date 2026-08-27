@@ -20,8 +20,9 @@ namespace local_artqtml\local;
  * Unit tests for the shared status -> progress-bar mapping.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\generation_progress
  */
 final class generation_progress_test extends \advanced_testcase {

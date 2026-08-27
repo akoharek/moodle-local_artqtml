@@ -27,8 +27,9 @@ namespace local_artqtml\local;
  * Call sites rely on.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\generation_lock
  */
 final class generation_lock_test extends \advanced_testcase {

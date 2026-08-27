@@ -20,7 +20,8 @@
  * The plugin is site-wide: generations are not tied to a course, so all personal data lives at the system context.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\privacy;
@@ -51,13 +52,21 @@ class provider implements
         $collection->add_database_table(
             'local_artqtml_generations',
             [
-                'userid' => 'privacy:metadata:local_artqtml_generations:userid',
+                'countdiscrepancy' => 'privacy:metadata:local_artqtml_generations:countdiscrepancy',
+                'draftcategoryid' => 'privacy:metadata:local_artqtml_generations:draftcategoryid',
+                'error' => 'privacy:metadata:local_artqtml_generations:error',
                 'name' => 'privacy:metadata:local_artqtml_generations:name',
+                'pendingdata' => 'privacy:metadata:local_artqtml_generations:pendingdata',
+                'processingtoken' => 'privacy:metadata:local_artqtml_generations:processingtoken',
+                'settings' => 'privacy:metadata:local_artqtml_generations:settings',
                 'shortname' => 'privacy:metadata:local_artqtml_generations:shortname',
+                'sourcefilehash' => 'privacy:metadata:local_artqtml_generations:sourcefilehash',
                 'sourcetext' => 'privacy:metadata:local_artqtml_generations:sourcetext',
+                'sourcetexthash' => 'privacy:metadata:local_artqtml_generations:sourcetexthash',
                 'status' => 'privacy:metadata:local_artqtml_generations:status',
                 'timecreated' => 'privacy:metadata:local_artqtml_generations:timecreated',
                 'timemodified' => 'privacy:metadata:local_artqtml_generations:timemodified',
+                'userid' => 'privacy:metadata:local_artqtml_generations:userid',
             ],
             'privacy:metadata:local_artqtml_generations'
         );
@@ -65,15 +74,26 @@ class provider implements
         $collection->add_database_table(
             'local_artqtml_questions',
             [
-                'questiontype' => 'privacy:metadata:local_artqtml_questions:questiontype',
-                'questiontext' => 'privacy:metadata:local_artqtml_questions:questiontext',
-                'questiondata' => 'privacy:metadata:local_artqtml_questions:questiondata',
-                'validationsuggestion' => 'privacy:metadata:local_artqtml_questions:validationsuggestion',
-                'justification' => 'privacy:metadata:local_artqtml_questions:justification',
-                'confidence' => 'privacy:metadata:local_artqtml_questions:confidence',
-                'timecreated' => 'privacy:metadata:local_artqtml_questions:timecreated',
-                'lasteditedby' => 'privacy:metadata:local_artqtml_questions:lasteditedby',
+                'approved' => 'privacy:metadata:local_artqtml_questions:approved',
                 'approvedby' => 'privacy:metadata:local_artqtml_questions:approvedby',
+                'confidence' => 'privacy:metadata:local_artqtml_questions:confidence',
+                'difficultylabel' => 'privacy:metadata:local_artqtml_questions:difficultylabel',
+                'edited' => 'privacy:metadata:local_artqtml_questions:edited',
+                'externallyedited' => 'privacy:metadata:local_artqtml_questions:externallyedited',
+                'justification' => 'privacy:metadata:local_artqtml_questions:justification',
+                'lasteditedat' => 'privacy:metadata:local_artqtml_questions:lasteditedat',
+                'lasteditedby' => 'privacy:metadata:local_artqtml_questions:lasteditedby',
+                'movedout' => 'privacy:metadata:local_artqtml_questions:movedout',
+                'problemcategory' => 'privacy:metadata:local_artqtml_questions:problemcategory',
+                'questioncode' => 'privacy:metadata:local_artqtml_questions:questioncode',
+                'questiondata' => 'privacy:metadata:local_artqtml_questions:questiondata',
+                'questiontext' => 'privacy:metadata:local_artqtml_questions:questiontext',
+                'questiontype' => 'privacy:metadata:local_artqtml_questions:questiontype',
+                'sourcereference' => 'privacy:metadata:local_artqtml_questions:sourcereference',
+                'timecreated' => 'privacy:metadata:local_artqtml_questions:timecreated',
+                'typecode' => 'privacy:metadata:local_artqtml_questions:typecode',
+                'validationdata' => 'privacy:metadata:local_artqtml_questions:validationdata',
+                'validationsuggestion' => 'privacy:metadata:local_artqtml_questions:validationsuggestion',
             ],
             'privacy:metadata:local_artqtml_questions'
         );
@@ -102,6 +122,17 @@ class provider implements
                 'timecreated' => 'privacy:metadata:local_artqtml_log:timecreated',
             ],
             'privacy:metadata:local_artqtml_log'
+        );
+
+        $collection->add_database_table(
+            'local_artqtml_ajax_ratelimit',
+            [
+                'userid' => 'privacy:metadata:local_artqtml_ajax_ratelimit:userid',
+                'action' => 'privacy:metadata:local_artqtml_ajax_ratelimit:action',
+                'windowstart' => 'privacy:metadata:local_artqtml_ajax_ratelimit:windowstart',
+                'hitcount' => 'privacy:metadata:local_artqtml_ajax_ratelimit:hitcount',
+            ],
+            'privacy:metadata:local_artqtml_ajax_ratelimit'
         );
 
         $collection->add_external_location_link(
@@ -134,7 +165,8 @@ class provider implements
         $hasdata = $DB->record_exists('local_artqtml_generations', ['userid' => $userid])
             || $DB->record_exists('local_artqtml_questions', ['lasteditedby' => $userid])
             || $DB->record_exists('local_artqtml_questions', ['approvedby' => $userid])
-            || $DB->record_exists('local_artqtml_log', ['userid' => $userid]);
+            || $DB->record_exists('local_artqtml_log', ['userid' => $userid])
+            || $DB->record_exists('local_artqtml_ajax_ratelimit', ['userid' => $userid]);
 
         if ($hasdata) {
             $contextlist->add_system_context();
@@ -170,6 +202,11 @@ class provider implements
         $userlist->add_from_sql(
             'userid',
             'SELECT DISTINCT l.userid FROM {local_artqtml_log} l WHERE l.userid IS NOT NULL',
+            []
+        );
+        $userlist->add_from_sql(
+            'userid',
+            'SELECT DISTINCT r.userid FROM {local_artqtml_ajax_ratelimit} r',
             []
         );
     }
@@ -263,8 +300,17 @@ class provider implements
             ];
         }, array_values($logrows));
 
+        $ratelimitrows = $DB->get_records('local_artqtml_ajax_ratelimit', ['userid' => $user->id]);
+        $ratelimits = array_map(static function ($entry) {
+            return [
+                'action' => $entry->action,
+                'windowstart' => transform::datetime($entry->windowstart),
+                'hitcount' => $entry->hitcount,
+            ];
+        }, array_values($ratelimitrows));
+
         // A user whose only remaining footprint is a retained log must not export nothing.
-        if (empty($data) && empty($footprint) && empty($logs)) {
+        if (empty($data) && empty($footprint) && empty($logs) && empty($ratelimits)) {
             return;
         }
 
@@ -274,6 +320,7 @@ class provider implements
                 'generations' => $data,
                 'edited_or_approved_questions' => $footprint,
                 'logs' => $logs,
+                'ajax_ratelimits' => $ratelimits,
             ]
         );
     }
@@ -296,6 +343,7 @@ class provider implements
         // Orphan log rows (generation already gone) may still carry a userid; clear it.
         // Log rows do not store full diagnostic payloads in log.data.
         $DB->set_field_select('local_artqtml_log', 'userid', null, 'userid IS NOT NULL');
+        $DB->delete_records('local_artqtml_ajax_ratelimit');
     }
 
     /**
@@ -305,6 +353,8 @@ class provider implements
      * @return void
      */
     public static function delete_data_for_user(approved_contextlist $contextlist): void {
+        global $DB;
+
         $user = $contextlist->get_user();
 
         foreach ($contextlist->get_contexts() as $context) {
@@ -314,6 +364,7 @@ class provider implements
 
             self::delete_generations(['userid' => $user->id]);
             self::scrub_user_references((int) $user->id);
+            $DB->delete_records('local_artqtml_ajax_ratelimit', ['userid' => $user->id]);
         }
     }
 
@@ -324,6 +375,8 @@ class provider implements
      * @return void
      */
     public static function delete_data_for_users(approved_userlist $userlist): void {
+        global $DB;
+
         $context = $userlist->get_context();
         if ($context->contextlevel != CONTEXT_SYSTEM) {
             return;
@@ -333,6 +386,7 @@ class provider implements
             self::delete_generations(['userid' => $userid]);
             // Scrub the user's editor/approver/log footprint from other users' generations.
             self::scrub_user_references((int) $userid);
+            $DB->delete_records('local_artqtml_ajax_ratelimit', ['userid' => $userid]);
         }
     }
 
@@ -378,6 +432,12 @@ class provider implements
 
         $DB->delete_records_select('local_artqtml_questions', "generationid $insql", $inparams);
         $DB->delete_records_select('local_artqtml_generations', "id $insql", $inparams);
+
+        foreach ($generations as $generation) {
+            if (!empty($generation->userid)) {
+                \local_artqtml\local\draft_role::revoke_if_idle((int) $generation->userid);
+            }
+        }
     }
 
     /**

@@ -20,8 +20,9 @@ namespace local_artqtml\local;
  * Pins: deleting a generation must NOT delete its diagnostic log rows.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\generation_deletion
  */
 final class generation_deletion_test extends \advanced_testcase {

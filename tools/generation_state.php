@@ -5,7 +5,7 @@
  *
  * Why this exists. `process_pending_generations` selects on two columns at once - an in-progress
  * Status AND `processingtoken IS NULL` - and the interface shows neither. A generation displaying
- * "Kérdések generálása" for an hour is therefore ambiguous from the screen alone: it may be
+ * the generating-stage label for an hour is therefore ambiguous from the screen alone: it may be
  * Waiting for the next tick, or it may carry a claim token from a run that never released it, in
  * Which case no future tick will ever pick it up. C-01 in that task installs a
  * Register_shutdown_function() as a safety net, but that net does not run when the process is

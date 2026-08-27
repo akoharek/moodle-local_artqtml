@@ -20,8 +20,9 @@ namespace local_artqtml\local;
  * Unit tests for list-page date filter parsing (security audit finding #6).
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\generation_list
  */
 final class generation_list_date_filter_test extends \advanced_testcase {

@@ -15,22 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details for ArtQTML (local_artqtml).
+ * Version details for local_artqtml.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_artqtml';
-$plugin->version   = 2026081306;
-$plugin->requires  = 2024100700; // Moodle 4.5.1.
-$plugin->release   = '1.0.0';
+$plugin->version   = 2026082705;
+$plugin->requires  = 2024100700; // Moodle 4.5.0.
+$plugin->release   = '2026.08.27';
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->supported = [405, 502]; // Moodle 4.5–5.2.
-// SR (ordering) questions need qtype_ordering — without declaring the dependency,
-// Install/upgrade would succeed and fail only later at first SR generation.
+$plugin->supported = [405, 502]; // Moodle 4.5–5.2 (smoke PASS).
+// SR (ordering) questions are created via qtype_ordering - without declaring the
+// dependency, installing this plugin on a site without that qtype would let install/upgrade
+// succeed and then fail only later, at first SR generation, with a much more confusing error.
 $plugin->dependencies = [
     'qtype_ordering' => ANY_VERSION,
 ];

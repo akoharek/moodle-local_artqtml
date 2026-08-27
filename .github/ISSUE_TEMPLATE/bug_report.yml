@@ -43,7 +43,7 @@ body:
     id: moodle
     attributes:
       label: Moodle version
-      description: e.g. 4.5.1, 5.1, 5.2
+      description: e.g. 4.5.0, 5.1, 5.2
       placeholder: "5.1"
     validations:
       required: true

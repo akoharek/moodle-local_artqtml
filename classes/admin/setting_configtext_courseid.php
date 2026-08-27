@@ -15,44 +15,57 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * A percentage (0-100) admin setting.
+ * Required draft-course ID: positive integer pointing at an existing course.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\admin;
 
 /**
- * Rejects values outside the 0-100 range.
+ * Validates that the draft course id is set and the course exists.
  */
-class setting_configtext_percentage extends \admin_setting_configtext {
+class setting_configtext_courseid extends \admin_setting_configtext {
     /**
      * Constructor.
      *
      * @param string $name
      * @param string $visiblename
      * @param string $description
-     * @param mixed $defaultsetting
      */
-    public function __construct($name, $visiblename, $description, $defaultsetting) {
-        parent::__construct($name, $visiblename, $description, $defaultsetting, PARAM_INT);
+    public function __construct(string $name, string $visiblename, string $description) {
+        // Default 0: fresh installs deliberately leave draft course unset until an admin picks one.
+        parent::__construct($name, $visiblename, $description, '0', PARAM_INT);
     }
 
     /**
      * Validate the submitted value.
      *
      * @param string $data
-     * @return true|string true if valid, an error message string otherwise
+     * @return true|string
      */
     public function validate($data) {
+        global $CFG;
+
         $parentresult = parent::validate($data);
         if ($parentresult !== true) {
             return $parentresult;
         }
 
-        if ((int) $data < 0 || (int) $data > 100) {
-            return get_string('errorpercentagerange', 'local_artqtml');
+        $courseid = (int) $data;
+        if ($courseid <= 0) {
+            // Moodle applies plugin defaults during install/upgrade; unset is valid then.
+            if (\during_initial_install() || !empty($CFG->upgraderunning) || CLI_SCRIPT) {
+                return true;
+            }
+            return get_string('errordraftcourserequired', 'local_artqtml');
+        }
+
+        global $DB;
+        if (!$DB->record_exists('course', ['id' => $courseid])) {
+            return get_string('errordraftcoursemissing', 'local_artqtml', $courseid);
         }
 
         return true;

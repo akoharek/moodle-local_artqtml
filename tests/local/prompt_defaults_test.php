@@ -22,7 +22,8 @@ namespace local_artqtml\local;
  * Scale + sourceonly prompt defaults for IH/FE/SR.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\prompt_seed
  */
 final class prompt_defaults_test extends \advanced_testcase {

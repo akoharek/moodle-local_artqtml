@@ -18,7 +18,8 @@
  * Delete an AI quiz question generation, its draft question bank and its questions.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require(__DIR__ . '/../../config.php');
@@ -27,6 +28,9 @@ require_login();
 
 $context = context_system::instance();
 require_capability('local/artqtml:use', $context);
+if (!data_submitted()) {
+    throw new moodle_exception('invalidrequest');
+}
 require_sesskey();
 
 $generationid = required_param('id', PARAM_INT);

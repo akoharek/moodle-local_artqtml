@@ -20,8 +20,9 @@ namespace local_artqtml\form;
  * Unit tests.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\form\upload_form
  */
 final class upload_form_test extends \advanced_testcase {

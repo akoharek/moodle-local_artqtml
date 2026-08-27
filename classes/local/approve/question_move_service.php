@@ -15,56 +15,89 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Helper.
+ * Moves already-approved draft questions into a real question bank - split out of the
+ * approve.php controller. The Moodle question move and the movedout
+ * flag update happen in one transaction; never renders anything.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local\approve;
 
+use local_artqtml\local\generation_access_policy;
 use local_artqtml\local\question_mover;
 
 /**
- * Single-question move of an approved question into a chosen target category.
+ * Bulk move of selected, approved questions into a chosen target category.
  */
 class question_move_service {
     /**
-     * Move one already-approved question into the given real bank category.
+     * Ensure the current user may mutate this generation before moving its questions.
      *
-     * @param int $questionid the local_artqtml_questions id
+     * @param int $generationid
+     * @param \context $context
+     * @return void
+     */
+    private static function require_generation_mutable(int $generationid, \context $context): void {
+        global $DB;
+
+        $generation = $DB->get_record('local_artqtml_generations', ['id' => $generationid], 'id, userid', MUST_EXIST);
+        generation_access_policy::require_can_mutate($generation, $context);
+    }
+
+    /**
+     * Move the selected, already-approved questions into the given real bank category.
+     *
+     * Only already-approved rows are moved - a selected-but-not-approved row is silently excluded
+     * (same pattern as delete/approve) but counted separately so the caller can tell the
+     * user why the moved count differs from their selection.
+     *
+     * @param int[] $questionids the selected local_artqtml_questions ids
      * @param int $generationid
      * @param string $categoryvalue "categoryid,contextid" target
      * @param \context $context system context, for the events
-     * @return array{moved: int, skipped: int} moved: 0 or 1; skipped: 1 if selected but not approved
+     * @return array{moved: int, skipped: int} moved: successfully moved; skipped: selected but
+     *      not yet approved
      */
-    public static function move_single(
-        int $questionid,
+    public static function move_selected(
+        array $questionids,
         int $generationid,
         string $categoryvalue,
         \context $context
     ): array {
         global $DB;
 
-        $row = $DB->get_record_select(
+        self::require_generation_mutable($generationid, $context);
+
+        [$insql, $inparams] = $DB->get_in_or_equal($questionids, SQL_PARAMS_NAMED);
+        // Only already-approved questions may be moved - selecting a not-yet-approved row and
+        // clicking "move" silently excludes it rather than erroring (same pattern as delete/approve).
+        $rows = $DB->get_records_select(
             'local_artqtml_questions',
-            'generationid = :generationid AND id = :id AND movedout = 0 AND approved = 1',
-            ['generationid' => $generationid, 'id' => $questionid]
+            "generationid = :generationid AND id $insql AND movedout = 0 AND approved = 1 AND externallyedited = 0",
+            array_merge(['generationid' => $generationid], $inparams)
         );
 
-        if (!$row) {
-            $skipped = $DB->record_exists_select(
-                'local_artqtml_questions',
-                'generationid = :generationid AND id = :id AND movedout = 0 AND approved = 0',
-                ['generationid' => $generationid, 'id' => $questionid]
-            );
+        // Count selected-but-not-approved rows separately so the notification tells the user
+        // why their selected count and the moved count differ, instead of silently moving fewer.
+        $skippedcount = $DB->count_records_select(
+            'local_artqtml_questions',
+            "generationid = :generationid AND id $insql AND movedout = 0 AND approved = 0",
+            array_merge(['generationid' => $generationid], $inparams)
+        );
 
-            return ['moved' => 0, 'skipped' => $skipped ? 1 : 0];
+        $moved = self::move_rows(array_values($rows), $categoryvalue, $context);
+
+        $generation = $DB->get_record('local_artqtml_generations', ['id' => $generationid], 'userid', MUST_EXIST);
+        \local_artqtml\local\draft_role::revoke_if_idle((int) $generation->userid);
+        global $USER;
+        if ((int) $USER->id !== (int) $generation->userid) {
+            \local_artqtml\local\draft_role::revoke_if_idle((int) $USER->id);
         }
 
-        $moved = self::move_rows([$row], $categoryvalue, $context);
-
-        return ['moved' => $moved, 'skipped' => 0];
+        return ['moved' => $moved, 'skipped' => $skippedcount];
     }
 
     /**
@@ -86,6 +119,9 @@ class question_move_service {
             return (int) $row->questionbankid;
         }, $rows);
 
+        // The Moodle question move and the movedout flag update must succeed or fail
+        // together - without a transaction, a mid-batch failure could leave questions physically
+        // moved into the real bank while local_artqtml_questions still says movedout=0.
         $transaction = $DB->start_delegated_transaction();
 
         question_mover::move($questionids, $categoryvalue);

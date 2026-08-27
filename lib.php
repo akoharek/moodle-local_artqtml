@@ -18,37 +18,9 @@
  * Library functions and callbacks for local_artqtml.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-/**
- * Add a link to the ArtQTML into the primary/global navigation.
- *
- * @param global_navigation $navigation the global navigation tree
- * @return void
- */
-function local_artqtml_extend_navigation(global_navigation $navigation) {
-    if (!get_config('local_artqtml', 'enabled')) {
-        return;
-    }
-
-    $context = context_system::instance();
-    if (!has_capability('local/artqtml:use', $context)) {
-        return;
-    }
-
-    $url = new moodle_url('/local/artqtml/index.php');
-    $node = navigation_node::create(
-        get_string('navigationlink', 'local_artqtml'),
-        $url,
-        navigation_node::TYPE_CUSTOM,
-        null,
-        'local_artqtml',
-        new pix_icon('i/settings', '')
-    );
-
-    $navigation->add_node($node);
-}
 
 /**
  * Map a generation status to a Bootstrap badge CSS class.
@@ -85,32 +57,22 @@ function local_artqtml_validation_badge_class(string $status): string {
 function local_artqtml_render_test_button(string $provider): string {
     global $PAGE;
 
-    $PAGE->requires->js(new moodle_url('/local/artqtml/js/admintest.js'));
-
-    static $stringsemitted = false;
-    if (!$stringsemitted) {
-        $PAGE->requires->data_for_js('M.artqtml_admintest', [
-            'testing'      => get_string('admintesttesting', 'local_artqtml'),
-            'errorunknown' => get_string('errorajaxunknown', 'local_artqtml'),
-        ]);
-        $stringsemitted = true;
-    }
-
     $buttonid = 'artqtml-test-' . $provider;
     $statusid = 'artqtml-teststatus-' . $provider;
+
+    $PAGE->requires->js_call_amd('local_artqtml/admintest', 'initButton', [
+        $provider,
+        $buttonid,
+        $statusid,
+        get_string('admintesttesting', 'local_artqtml'),
+        get_string('errorajaxunknown', 'local_artqtml'),
+    ]);
 
     $html = html_writer::tag('button', get_string('testconnectionbutton', 'local_artqtml'), [
         'type' => 'button', 'id' => $buttonid, 'class' => 'btn btn-secondary',
         'data-testid' => 'artqtml-admin-connectiontest-' . $provider,
     ]);
     $html .= html_writer::tag('span', '', ['id' => $statusid, 'class' => 'ml-2']);
-    $html .= html_writer::script(
-        'document.addEventListener("DOMContentLoaded", function() {' .
-        'if (window.ArtqtmlAdminTest) {' .
-        'window.ArtqtmlAdminTest.init(' . json_encode($provider) . ', ' . json_encode($buttonid) . ', ' .
-        json_encode($statusid) . ');' .
-        '}});'
-    );
 
     return $html;
 }
@@ -118,34 +80,41 @@ function local_artqtml_render_test_button(string $provider): string {
 /**
  * Render the model-list actions for one LLM tab: "Refresh models".
  *
- * Plain links with a sesskey rather than AJAX: the actions change server state and the page must
- * Re-render from the refreshed cache anyway, so a round trip is the honest mechanism and needs no
- * JavaScript to be testable.
+ * POST forms rather than AJAX: the actions change server state and the page must re-render from the
+ * refreshed cache anyway, so a round trip is the honest mechanism and needs no JavaScript to be
+ * testable. Sesskey stays in the form body, not the URL.
  *
  * @param string $provider one of \local_artqtml\local\model_list::PROVIDERS
  * @return string
  */
 function local_artqtml_render_model_buttons(string $provider): string {
-    $refreshurl = new moodle_url('/local/artqtml/modelaction.php', [
-        'provider' => $provider,
-        'action'   => 'refresh',
-        'sesskey'  => sesskey(),
-    ]);
+    global $OUTPUT;
 
-    $html = html_writer::link($refreshurl, get_string('refreshmodels', 'local_artqtml'), [
-        'class' => 'btn btn-secondary',
-        'data-testid' => 'artqtml-admin-refreshmodels-' . $provider,
-    ]);
+    $refreshbutton = new single_button(
+        new moodle_url('/local/artqtml/modelaction.php', [
+            'provider' => $provider,
+            'action'   => 'refresh',
+        ]),
+        get_string('refreshmodels', 'local_artqtml'),
+        'post',
+        single_button::BUTTON_SECONDARY
+    );
+    $refreshbutton->class = 'singlebutton d-inline';
+    $refreshbutton->set_attribute('data-testid', 'artqtml-admin-refreshmodels-' . $provider);
 
-    $checkurl = new moodle_url('/local/artqtml/modelaction.php', [
-        'provider' => $provider,
-        'action'   => 'check',
-        'sesskey'  => sesskey(),
-    ]);
-    $html .= html_writer::link($checkurl, get_string('runmodelcheck', 'local_artqtml'), [
-        'class' => 'btn btn-secondary ml-2',
-        'data-testid' => 'artqtml-admin-runmodelcheck-' . $provider,
-    ]);
+    $checkbutton = new single_button(
+        new moodle_url('/local/artqtml/modelaction.php', [
+            'provider' => $provider,
+            'action'   => 'check',
+        ]),
+        get_string('runmodelcheck', 'local_artqtml'),
+        'post',
+        single_button::BUTTON_SECONDARY
+    );
+    $checkbutton->class = 'singlebutton d-inline ml-2';
+    $checkbutton->set_attribute('data-testid', 'artqtml-admin-runmodelcheck-' . $provider);
+
+    $html = $OUTPUT->render($refreshbutton) . $OUTPUT->render($checkbutton);
 
     // Say how old the cached list is, so "the dropdown looks wrong" has an obvious first thing to check.
     $cached = \local_artqtml\local\model_list::get_cached($provider);
@@ -277,6 +246,16 @@ function local_artqtml_apikey_start_error(): string {
         return get_string('apikeyupgradeunrecoverable', 'local_artqtml');
     }
 
+    $missingclaude = \local_artqtml\local\encrypted_config::get('claudeapikey') === '';
+    $missinggemini = \local_artqtml\local\encrypted_config::get('geminiapikey') === '';
+
+    if ($missingclaude && $missinggemini) {
+        return get_string('errormissingapikeys', 'local_artqtml');
+    }
+    if ($missinggemini) {
+        return get_string('errormissinggeminikey', 'local_artqtml');
+    }
+
     return get_string('errormissingapikey', 'local_artqtml');
 }
 
@@ -302,5 +281,31 @@ function local_artqtml_model_warning_banner(): string {
         html_writer::tag('ul', $items, ['class' => 'mb-0']),
         'alert alert-danger',
         ['data-testid' => 'artqtml-modelblocked-banner']
+    );
+}
+
+/**
+ * Setup checklist banner for admin settings when mandatory fields are still empty.
+ *
+ * @return string HTML, or '' when setup is complete
+ */
+function local_artqtml_setup_incomplete_banner(): string {
+    if (!\local_artqtml\local\plugin_setup::user_can_configure()) {
+        return '';
+    }
+    if (\local_artqtml\local\plugin_setup::is_complete()) {
+        return '';
+    }
+
+    $items = '';
+    foreach (\local_artqtml\local\plugin_setup::missing_labels() as $label) {
+        $items .= html_writer::tag('li', s($label));
+    }
+
+    return html_writer::div(
+        html_writer::tag('p', get_string('setupincomplete_heading', 'local_artqtml'), ['class' => 'mb-2']) .
+        html_writer::tag('ul', $items, ['class' => 'mb-0']),
+        'alert alert-warning',
+        ['data-testid' => 'artqtml-setup-incomplete-banner']
     );
 }

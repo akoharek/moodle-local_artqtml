@@ -25,8 +25,9 @@ namespace local_artqtml\local\question;
  * Field of every type, and that running the cleaner twice changes nothing.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\question\ai_text_cleaner
  */
 final class ai_text_cleaner_test extends \advanced_testcase {
@@ -136,7 +137,7 @@ final class ai_text_cleaner_test extends \advanced_testcase {
     }
 
     /**
-     * A leading "szöveg szerint / according to the text" clause is removed at the clean step.
+     * A leading according-to-the-text clause is removed at the clean step.
      */
     public function test_leading_source_meta_reference_is_stripped(): void {
         $question = ai_text_cleaner::clean_question([

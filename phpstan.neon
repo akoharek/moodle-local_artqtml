@@ -40,3 +40,17 @@ parameters:
             message: '#Parameter \#2 \$value of static method core\\output\\html_writer::checkbox\(\) expects string, int given\.#'
             identifier: argument.type
             path: classes/local/approve/approve_renderer.php
+        # phpstan-bootstrap must define CLI_SCRIPT before config.php (PHPStan runs as CLI).
+        # Runtime guards on CLI_SCRIPT in plugin code look always-true during static analysis.
+        -
+            message: '#^If condition is always true\.$#'
+            path: classes/hook_callbacks.php
+        -
+            message: '#^Unreachable statement - code above always terminates\.$#'
+            path: classes/hook_callbacks.php
+        -
+            message: '#^Right side of \|\| is always true\.$#'
+            path: classes/admin/setting_configtext_courseid.php
+        -
+            message: '#^Unreachable statement - code above always terminates\.$#'
+            path: classes/admin/setting_configtext_courseid.php

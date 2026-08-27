@@ -18,7 +18,8 @@
  * Reduces AI-generated question text to plain text, keeping only <sub> and <sup>.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local\question;
@@ -58,8 +59,8 @@ class ai_text_cleaner {
      * In ordinary prose ("igaz-e, hogy x < 5") comes out of the purifier as "&lt;", so
      * Strip_tags() can no longer swallow the rest of the sentence as if it were a tag. Doing it
      * The other way round loses text, silently.
-     * 2. Turn block boundaries into newlines BEFORE the tags go, or "<p>Első</p><p>Második</p>"
-     * Comes out as "ElsőMásodik" - the same words-run-together defect fixed when block tags
+     * 2. Turn block boundaries into newlines BEFORE the tags go, or "<p>First</p><p>Second</p>"
+     * comes out as "FirstSecond" - the same words-run-together defect fixed when block tags
      * Were stripped without inserting separators.
      * 3. Strip everything except the two kept tags.
      * 4. Normalise the whitespace this leaves behind.
@@ -94,9 +95,9 @@ class ai_text_cleaner {
 
         $clean = trim($clean);
 
-        // Strip a leading "szöveg szerint / according to the text" clause when the model still
-        // Wrote one despite the prompt. Embedded occurrences are left for the semantic validator
-        // To reject - cutting them out mid-sentence would leave broken Hungarian/English.
+        // Strip a leading according-to-the-text clause when the model still
+        // wrote one despite the prompt. Embedded occurrences are left for the semantic validator
+        // to reject - cutting them out mid-sentence would leave broken grammar.
         return source_meta_reference::strip_leading($clean);
     }
 

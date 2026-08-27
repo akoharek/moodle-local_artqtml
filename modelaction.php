@@ -22,7 +22,8 @@
  * Honest mechanism - and it keeps the behaviour testable without driving JavaScript.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require(__DIR__ . '/../../config.php');
@@ -33,6 +34,9 @@ require_login();
 
 $context = context_system::instance();
 require_capability('local/artqtml:configure', $context);
+if (!data_submitted()) {
+    throw new moodle_exception('invalidrequest');
+}
 require_sesskey();
 
 $provider = required_param('provider', PARAM_ALPHA);

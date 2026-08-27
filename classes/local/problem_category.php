@@ -20,11 +20,11 @@
  * The four fixed machine keys live here and nowhere else: the Gemini response schema
  * ({@see \local_artqtml\task\validate_questions_task::build_schema()}), the validator prompt
  * Assembly, and every UI display path all read {@see self::VALUES} / {@see self::label()} from
- * This class, so the schema's value set and the prompt's value set are guaranteed identical
- * (a technikai melléklet: "Ez a négy érték a JSON séma egyetlen forrása").
+ * This class, so the schema's value set and the prompt's value set are guaranteed identical.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -42,7 +42,7 @@ class problem_category {
      * Exactly four members; none is an empty string (an empty string is not a permitted Gemini
      * Structured-output enum value - it fails schema validation with
      * "problem_category.enum[0]: cannot be empty"). Do not add a fifth or reorder without a spec
-     * Change: PROB-F004 asserts this set verbatim.
+     *
      *
      * @var string[]
      */

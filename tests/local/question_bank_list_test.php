@@ -20,7 +20,8 @@ namespace local_artqtml\local;
  * Move-target category list must never offer the draft course's banks.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\question_bank_list
  */
 final class question_bank_list_test extends \advanced_testcase {

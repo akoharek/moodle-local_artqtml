@@ -18,6 +18,7 @@
  * Upgrade steps for local_artqtml.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -34,8 +35,7 @@ function xmldb_local_artqtml_upgrade($oldversion) {
 
     if ($oldversion < 2026081300) {
         // Pluginversion scopes a model-check exclusion to the plugin version that produced it.
-        // Fresh installs get it from install.xml; existing sites (and aiquizgen renames that
-        // restore a table without the column) need this add-field.
+        // Fresh installs get it from install.xml; existing sites need this add-field.
         $table = new xmldb_table('local_artqtml_modelcheck');
         $field = new xmldb_field('pluginversion', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'triggertype');
         if ($dbman->table_exists($table) && !$dbman->field_exists($table, $field)) {
@@ -54,6 +54,67 @@ function xmldb_local_artqtml_upgrade($oldversion) {
         \local_artqtml\local\encrypted_config::migrate_plaintext_on_upgrade();
 
         upgrade_plugin_savepoint(true, 2026081301, 'local', 'artqtml');
+    }
+
+    if ($oldversion < 2026082602) {
+        // Draft course is a holding area only: drop native edit cap from the draft role and
+        // track external Moodle edits as locked rows.
+        $table = new xmldb_table('local_artqtml_questions');
+        $field = new xmldb_field(
+            'externallyedited',
+            XMLDB_TYPE_INTEGER,
+            '1',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0',
+            'edited'
+        );
+        if ($dbman->table_exists($table) && !$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        \local_artqtml\local\draft_role::ensure_role();
+        $roleid = (int) $DB->get_field('role', 'id', ['shortname' => \local_artqtml\local\draft_role::SHORTNAME]);
+        if ($roleid) {
+            $systemcontext = \context_system::instance();
+            unassign_capability('moodle/question:editall', $roleid, $systemcontext->id);
+        }
+
+        upgrade_plugin_savepoint(true, 2026082602, 'local', 'artqtml');
+    }
+
+    if ($oldversion < 2026082700) {
+        // Google retired gemini-2.x ids for new API keys (404 on generateContent).
+        \local_artqtml\local\model_list::migrate_deprecated_gemini_model();
+
+        upgrade_plugin_savepoint(true, 2026082700, 'local', 'artqtml');
+    }
+
+    if ($oldversion < 2026082701) {
+        // Replace non-atomic MUC counters with a DB table and optimistic UPDATEs.
+        $table = new xmldb_table('local_artqtml_ajax_ratelimit');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('action', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('windowstart', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('hitcount', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+        $table->add_index('userid_action', (int) XMLDB_INDEX_UNIQUE, ['userid', 'action']);
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2026082701, 'local', 'artqtml');
+    }
+
+    if ($oldversion < 2026082704) {
+        // Pass-2: least-privilege draft role (view + useall only) and remove lingering editall.
+        \local_artqtml\local\draft_role::ensure_role();
+
+        upgrade_plugin_savepoint(true, 2026082704, 'local', 'artqtml');
     }
 
     return true;

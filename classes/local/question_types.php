@@ -18,13 +18,14 @@
  * Single source of truth for the three supported question types (IH/FE/SR).
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
 
 /**
- * Maps the spec's two-letter type codes (IH/FE/SR) to Moodle qtypes and lang strings.
+ * Maps the plugin's two-letter type codes (IH/FE/SR) to Moodle qtypes and lang strings.
  */
 class question_types {
     /** @var string[] ordered list of the three type codes, as they should appear in the UI. */
@@ -45,7 +46,7 @@ class question_types {
     ];
 
     /**
-     * Human readable label for a type code, e.g. "Igaz/Hamis" (True/False).
+     * Human readable label for a type code, e.g. "True/False".
      *
      * @param string $code one of self::CODES
      * @return string
@@ -68,13 +69,13 @@ class question_types {
     }
 
     /**
-     * supports hints.
+     * Whether Moodle supports per-question hints (question_hints) for this type.
      *
      * @param string $code one of self::CODES
      * @return bool
      */
     public static function supports_hints(string $code): bool {
-        return in_array($code, ['FE', 'SR'], true);
+        return in_array($code, ['IH', 'FE', 'SR'], true);
     }
 
     /**

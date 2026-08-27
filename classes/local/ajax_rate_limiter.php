@@ -15,13 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Per-user AJAX rate limits for extract_text and get_status (security audit finding #7).
+ * Per-user AJAX rate limits for extract_text and get_status.
  *
  * Fixed 60-second windows (core_ai-style counter, shorter window). Limits leave headroom for
- * The status page's 3s poll (~20/min) plus a few tabs, while capping extract_text bursts.
+ * the status page's 3s poll (~20/min) plus a few tabs, while capping extract_text bursts.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -39,10 +40,10 @@ class ajax_rate_limiter {
     /** @var int Max extract_text calls per user per window. */
     public const LIMIT_EXTRACT_TEXT = 10;
 
-    /** @var string Cache key action for status polling. */
+    /** @var string Rate-limit action for status polling. */
     public const ACTION_GET_STATUS = 'get_status';
 
-    /** @var string Cache key action for draft text extraction. */
+    /** @var string Rate-limit action for draft text extraction. */
     public const ACTION_EXTRACT_TEXT = 'extract_text';
 
     /**
@@ -94,35 +95,140 @@ class ajax_rate_limiter {
      * @return bool
      */
     public static function allow(string $action, int $userid, int $limit, int $now): bool {
-        $cache = \cache::make('local_artqtml', 'ajax_ratelimit');
-        $key = self::cache_key($action, $userid);
-        $ratedata = $cache->get($key);
+        global $DB;
 
-        if ($ratedata === false || !is_array($ratedata)) {
-            $ratedata = ['count' => 0, 'start_time' => $now];
+        $expiredbefore = $now - self::WINDOW_SECONDS;
+
+        for ($attempt = 0; $attempt < 3; $attempt++) {
+            $record = $DB->get_record('local_artqtml_ajax_ratelimit', [
+                'userid' => $userid,
+                'action' => $action,
+            ]);
+
+            if ($record) {
+                if ((int) $record->windowstart <= $expiredbefore) {
+                    if (self::cas_reset_window($DB, (int) $record->id, $now, (int) $record->windowstart)) {
+                        return true;
+                    }
+                    continue;
+                }
+
+                if ((int) $record->hitcount >= $limit) {
+                    return false;
+                }
+
+                if (self::cas_increment($DB, (int) $record->id, (int) $record->hitcount, $limit)) {
+                    return true;
+                }
+                continue;
+            }
+
+            try {
+                $DB->insert_record('local_artqtml_ajax_ratelimit', (object) [
+                    'userid' => $userid,
+                    'action' => $action,
+                    'windowstart' => $now,
+                    'hitcount' => 1,
+                ]);
+                return true;
+            } catch (\dml_write_exception $e) {
+                continue;
+            }
         }
 
-        if ($now - (int) $ratedata['start_time'] >= self::WINDOW_SECONDS) {
-            $ratedata = ['count' => 0, 'start_time' => $now];
-        }
-
-        if ((int) $ratedata['count'] >= $limit) {
-            return false;
-        }
-
-        $ratedata['count'] = (int) $ratedata['count'] + 1;
-        $cache->set($key, $ratedata);
-        return true;
+        return false;
     }
 
     /**
-     * Build a simple cache key.
+     * Reset an expired window only when windowstart still matches (CAS).
      *
-     * @param string $action
-     * @param int $userid
-     * @return string
+     * @param \moodle_database $DB
+     * @param int $id
+     * @param int $now
+     * @param int $expectedwindowstart
+     * @return bool
      */
-    public static function cache_key(string $action, int $userid): string {
-        return $action . '_' . $userid;
+    protected static function cas_reset_window(
+        \moodle_database $DB,
+        int $id,
+        int $now,
+        int $expectedwindowstart
+    ): bool {
+        if ($DB->get_dbfamily() === 'postgres') {
+            $DB->execute(
+                "UPDATE {local_artqtml_ajax_ratelimit}
+                    SET windowstart = ?, hitcount = 1
+                  WHERE id = ?
+                    AND windowstart = ?",
+                [$now, $id, $expectedwindowstart]
+            );
+            $updated = $DB->get_record('local_artqtml_ajax_ratelimit', ['id' => $id]);
+
+            return $updated
+                && (int) $updated->windowstart === $now
+                && (int) $updated->hitcount === 1;
+        }
+
+        $DB->execute(
+            "UPDATE {local_artqtml_ajax_ratelimit}
+                SET windowstart = ?, hitcount = 1
+              WHERE id = ?
+                AND windowstart = ?",
+            [$now, $id, $expectedwindowstart]
+        );
+
+        return self::mysql_affected_one_row($DB);
+    }
+
+    /**
+     * Increment hitcount only when it still matches and remains below the cap (CAS).
+     *
+     * @param \moodle_database $DB
+     * @param int $id
+     * @param int $expectedhitcount
+     * @param int $limit
+     * @return bool
+     */
+    protected static function cas_increment(
+        \moodle_database $DB,
+        int $id,
+        int $expectedhitcount,
+        int $limit
+    ): bool {
+        if ($DB->get_dbfamily() === 'postgres') {
+            $DB->execute(
+                "UPDATE {local_artqtml_ajax_ratelimit}
+                    SET hitcount = hitcount + 1
+                  WHERE id = ?
+                    AND hitcount = ?
+                    AND hitcount < ?",
+                [$id, $expectedhitcount, $limit]
+            );
+            $updated = $DB->get_record('local_artqtml_ajax_ratelimit', ['id' => $id]);
+
+            return $updated && (int) $updated->hitcount === $expectedhitcount + 1;
+        }
+
+        $DB->execute(
+            "UPDATE {local_artqtml_ajax_ratelimit}
+                SET hitcount = hitcount + 1
+              WHERE id = ?
+                AND hitcount = ?
+                AND hitcount < ?",
+            [$id, $expectedhitcount, $limit]
+        );
+
+        return self::mysql_affected_one_row($DB);
+    }
+
+    /**
+     * Whether the immediately preceding UPDATE on MySQL/MariaDB changed exactly one row.
+     *
+     * @param \moodle_database $DB
+     * @return bool
+     */
+    protected static function mysql_affected_one_row(\moodle_database $DB): bool {
+        $row = $DB->get_record_sql('SELECT ROW_COUNT() AS affectedrows');
+        return $row && (int) $row->affectedrows === 1;
     }
 }

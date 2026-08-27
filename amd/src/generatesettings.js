@@ -105,17 +105,27 @@ define(['jquery', 'core/str'], function($, Str) {
     /**
      * Find the real question-settings <form>, via a field guaranteed to be inside it.
      *
+     * Light uses a hidden difficultymode field; Moodle does not render id_<name> on hidden
+     * elements, so id_difficultymode is absent. The step-2 total region is always in the form.
+     *
      * @return {HTMLFormElement|null}
      */
     function findForm() {
-        var anchor = document.getElementById('id_difficultymode');
+        var anchor = document.getElementById('artqtml-step2total');
+        if (anchor) {
+            return anchor.closest('form');
+        }
+        anchor = document.getElementById('id_matrix_IH_easy');
         return anchor ? anchor.closest('form') : null;
     }
 
     /**
      * Set the hidden artqtmlaction field and submit the real form.
      *
-     * @param {string} action 'generate' or 'save'
+     * Back/save use form.submit() so navigation is not blocked by HTML5 or
+     * Moodle client validation; generate uses requestSubmit() when available.
+     *
+     * @param {string} action 'generate', 'back', or 'save'
      */
     function submitForm(action) {
         var form = findForm();
@@ -128,7 +138,9 @@ define(['jquery', 'core/str'], function($, Str) {
             actionfield.value = action;
         }
 
-        if (typeof form.requestSubmit === 'function') {
+        if (action === 'back' || action === 'save') {
+            form.submit();
+        } else if (typeof form.requestSubmit === 'function') {
             form.requestSubmit();
         } else {
             form.submit();

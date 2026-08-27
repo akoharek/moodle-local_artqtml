@@ -20,8 +20,9 @@ namespace local_artqtml\local;
  * Unit tests for the migration setting backup.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\setting_backup
  */
 final class setting_backup_test extends \advanced_testcase {
@@ -64,7 +65,7 @@ final class setting_backup_test extends \advanced_testcase {
     }
 
     /**
-     * "A mentés nem íródik felül": a second backup at the same version keeps the first, which is
+     * Backups must not overwrite an earlier backup: a second backup at the same version keeps the first, which is
      * The more original value, and takes a suffixed key instead.
      */
     public function test_an_existing_backup_is_never_overwritten(): void {

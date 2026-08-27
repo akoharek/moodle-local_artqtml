@@ -1,0 +1,42 @@
+---
+description: Moodle plugin — state-changing actions must use POST, never GET+sesskey URLs
+globs: **/*.php
+alwaysApply: false
+---
+
+# POST kötelező állapotváltoztató műveleteknél (S-05)
+
+Moodle fejlesztésnél **tilos** törlés, jóváhagyás, visszavonás, admin cache refresh, fizetős API check stb. **GET link + `sesskey` query param** formában.
+
+## Kötelező minta
+
+**UI:** `single_button` / form submit / `html_writer::tag('button', …, ['type' => 'submit'])` — sesskey **hidden mezőben**, nem az URL-ben.
+
+**Szerver (minden mutate entry script / ág):**
+
+```php
+if (!data_submitted()) {
+    throw new moodle_exception('invalidrequest');
+}
+require_sesskey();
+```
+
+## Tilos
+
+```php
+// BAD — prefetch/log leak, Moodle best practice ellen
+$url = new moodle_url('/local/example/delete.php', ['id' => $id, 'sesskey' => sesskey()]);
+echo html_writer::link($url, 'Delete');
+```
+
+## Megengedett GET
+
+- Navigáció (Open, Preview, listára vissza)
+- Read-only oldalak
+- AJAX read (`core/ajax` external functions) — ott is capability + ownership
+
+## Review checklist
+
+- Új gomb/link **módosít DB-t, fájlt, cache-t vagy API-t?** → POST.
+- `action_link` + `confirm_action` destructív műveletre? → `single_button` POST vagy submit a meglévő formban.
+- Entry script csak `require_sesskey()`? → add `data_submitted()` is.

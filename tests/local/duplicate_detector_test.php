@@ -20,8 +20,9 @@ namespace local_artqtml\local;
  * Unit tests for duplicate/near-duplicate source-text detection.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\duplicate_detector
  */
 final class duplicate_detector_test extends \advanced_testcase {

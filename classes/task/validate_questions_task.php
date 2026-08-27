@@ -18,7 +18,8 @@
  * Calls the Gemini API to validate AI-generated quiz questions.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\task;
@@ -83,7 +84,7 @@ class validate_questions_task {
             foreach ($this->build_batches($generation, $unevaluated) as $batch) {
                 $results = $this->call_gemini($generation, $batch);
 
-                // C-03: each Gemini call can take a while, and a generation may have several
+                // Each Gemini call can take a while, and a generation may have several.
                 // Batches - re-check before saving every single batch's results, not just once
                 // Up front, so an abort/delete mid-run is caught before the very next write.
                 $generation = $this->reload_if_active($generationid, \local_artqtml\local\generation_status::VALIDATING);
@@ -300,8 +301,7 @@ class validate_questions_task {
      * @return string
      */
     protected function extract_gemini_error(string $body): string {
-        $decoded = json_decode($body, true);
-        return (string) ($decoded['error']['message'] ?? $body);
+        return ai_request::error_message_from_body($body);
     }
 
     /**
@@ -454,7 +454,8 @@ class validate_questions_task {
                         'type' => 'OBJECT',
                         'properties' => [
                             'question_id'      => ['type' => 'STRING'],
-                            // Exactly the three verdicts, read from the single source of truth that build_system_instruction also names in the prompt.
+                            // Exactly the three verdicts, read from the single source of truth that
+                            // build_system_instruction also names in the prompt.
                             'suggestion'       => [
                                 'type' => 'STRING',
                                 'enum' => \local_artqtml\local\validation_suggestion::VALUES,

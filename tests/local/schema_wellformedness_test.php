@@ -34,8 +34,9 @@ use local_artqtml\task\validate_questions_task;
  * If it finds no enums at all it fails, so the walk silently going blind is itself a failure.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\question_schema
  * @covers     \local_artqtml\task\validate_questions_task
  */

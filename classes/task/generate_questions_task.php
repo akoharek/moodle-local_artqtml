@@ -24,7 +24,8 @@
  * Be unit-tested and invoked directly without going through Moodle's task runner.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\task;
@@ -99,7 +100,7 @@ class generate_questions_task {
             // One call per question type, not one call for the generation.
             [$questions, $outcomes] = $this->call_claude_per_type($generation, $settings);
 
-            // C-03: the calls above can take a long time - re-check the generation still exists
+            // The calls above can take a long time - re-check the generation still exists.
             // And hasn't been aborted/deleted while they were in flight before saving results.
             $generation = $this->reload_if_active($generationid, \local_artqtml\local\generation_status::GENERATING);
             if ($generation === null) {
@@ -457,8 +458,7 @@ class generate_questions_task {
      * @return string
      */
     protected function extract_claude_error(string $body): string {
-        $decoded = json_decode($body, true);
-        return (string) ($decoded['error']['message'] ?? $body);
+        return ai_request::error_message_from_body($body);
     }
 
     /**

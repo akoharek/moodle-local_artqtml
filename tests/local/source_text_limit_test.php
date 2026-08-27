@@ -24,8 +24,9 @@ namespace local_artqtml\local;
  * Because four call sites now depend on it giving the same answer every time.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\source_text_limit
  */
 final class source_text_limit_test extends \advanced_testcase {

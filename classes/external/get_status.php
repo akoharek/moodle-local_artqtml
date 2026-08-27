@@ -18,7 +18,8 @@
  * External function returning the status and question count of a generation.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\external;
@@ -92,7 +93,6 @@ class get_status extends external_api {
             'questioncount'           => $questioncount,
             'unvalidatedcount'        => $unvalidatedcount,
             'error'                   => $technicalerror,
-            'tokenwarningmessage'     => '',
             'countdiscrepancymessage' => $countdiscrepancymessage,
             'failedpercent'           => $failedpercent,
             'generatingpercent'       => $generatingpercent,
@@ -116,14 +116,13 @@ class get_status extends external_api {
             'questioncount' => new external_value(PARAM_INT, 'Number of questions generated so far'),
             'unvalidatedcount' => new external_value(PARAM_INT, 'Number of questions not yet validated'),
             'error' => new external_value(PARAM_RAW, 'Technical error message from the last failed API call, empty if none'),
-            'tokenwarningmessage' => new external_value(PARAM_RAW, 'Reserved warning message field (always empty)'),
             'countdiscrepancymessage' => new external_value(
                 PARAM_RAW,
-                'Requested-vs-received question count warning, empty if none (M-08)'
+                'Requested-vs-received question count warning, empty if none'
             ),
             'failedpercent' => new external_value(
                 PARAM_INT,
-                'Progress-bar percent (25/50/75) for a failed generation, based on which stage it reached (M-15)'
+                'Progress-bar percent (25/50/75) for a failed generation, based on which stage it reached'
             ),
             'generatingpercent' => new external_value(
                 PARAM_INT,

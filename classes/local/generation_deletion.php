@@ -23,7 +23,8 @@
  * Of a hand-rolled copy.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -69,5 +70,8 @@ class generation_deletion {
         );
 
         $DB->delete_records('local_artqtml_generations', ['id' => $generationid]);
+        if (!empty($generation->userid)) {
+            draft_role::revoke_if_idle((int) $generation->userid);
+        }
     }
 }

@@ -20,8 +20,9 @@ namespace local_artqtml\local\approve;
  * Unit tests for approval and its revocation.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\approve\question_approval_service
  */
 final class question_approval_service_test extends \advanced_testcase {

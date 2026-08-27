@@ -16,13 +16,11 @@
 /**
  * Live character/word/token counter for the source text upload page.
  *
- * Plain JS (no AMD/grunt build), matching js/status.js's approach elsewhere in this plugin.
- *
- * @package    local_artqtml
+ * @module     local_artqtml/textcounter
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-window.ArtqtmlTextCounter = (function() {
+define([], function() {
     'use strict';
 
     /**
@@ -37,24 +35,15 @@ window.ArtqtmlTextCounter = (function() {
     }
 
     /**
- * Wire up a textarea to update a counter region on every keystroke.
- *
- * THE CONTEXT-WINDOW COLOURING IS GONE, removed 2026-08-04 evening. It was the behaviour for
- * the case where no source-text limit applied, and there is no such case: the server's
- * source_text_limit::token_limit() derives a limit from the context window when none is set
- * explicitly and never returns less than 1. So the branch could not be reached, and a reader
- * comparing this file with the settings screen would have concluded the two disagreed.
- *
- * @param {string} textareaid
- * @param {string} counterid
- * @param {number} sourcetokenlimit the effective server-side source-text limit in estimated
- * tokens (: the warning is relative to this, not a flat count)
- * @param {string} labeltemplate the "textcounterlabel" lang string, pre-rendered server-side
- * @param {string} limittemplate the "textcounterlimitlabel" lang string, already carrying the
- * limit, appended after the counts
- * @param {string} errormessage the localised message shown by the browser when the text is
- * over the limit
- */
+     * Wire up a textarea to update a counter region on every keystroke.
+     *
+     * @param {string} textareaid
+     * @param {string} counterid
+     * @param {number} sourcetokenlimit the effective server-side source-text limit in estimated tokens
+     * @param {string} labeltemplate the "textcounterlabel" lang string, pre-rendered server-side
+     * @param {string} limittemplate the "textcounterlimitlabel" lang string
+     * @param {string} errormessage the localised message shown when the text is over the limit
+     */
     function init(textareaid, counterid, sourcetokenlimit, labeltemplate, limittemplate, errormessage) {
         var textarea = document.getElementById(textareaid);
         var counter = document.getElementById(counterid);
@@ -65,6 +54,9 @@ window.ArtqtmlTextCounter = (function() {
         var limit = sourcetokenlimit > 0 ? sourcetokenlimit : 0;
         var warnthreshold = limit * 0.9;
 
+        /**
+         * Refresh the counter label and limit validation from textarea content.
+         */
         function update() {
             var text = textarea.value;
             var chars = text.length;
@@ -85,9 +77,6 @@ window.ArtqtmlTextCounter = (function() {
             if (limit > 0) {
                 if (tokens > limit) {
                     counter.classList.add('text-danger');
-                    // Refuses an ordinary form submission and shows the reason at the field. Not a
-                    // security control - it is a courtesy, so the user is not told about the size
-                    // only after a page load.
                     textarea.setCustomValidity(errormessage || '');
                 } else {
                     textarea.setCustomValidity('');
@@ -102,5 +91,7 @@ window.ArtqtmlTextCounter = (function() {
         update();
     }
 
-    return {init: init};
-})();
+    return {
+        init: init
+    };
+});

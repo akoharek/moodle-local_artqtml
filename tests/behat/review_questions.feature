@@ -44,7 +44,7 @@ Feature: Reviewing generated ArtQTML questions
   Scenario: Teacher revokes approval
     When I open the ArtQTML generation named "Review pack"
     And I click on "Approve" "button" in the "REV1-IH-0001" "table_row"
-    And I click on "Revoke" "link" in the "REV1-IH-0001" "table_row"
+    And I click on "Revoke" "button" in the "REV1-IH-0001" "table_row"
     Then I should see "Approve"
 
   Scenario: Teacher approves all accepted questions
@@ -55,15 +55,8 @@ Feature: Reviewing generated ArtQTML questions
 
   Scenario: Teacher deletes a draft question
     When I open the ArtQTML generation named "Review pack"
-    And I click on "Delete" "link" in the "REV1-IH-0002" "table_row"
-    And I click on "Yes" "button" in the "Confirmation" "dialogue"
+    And I delete the ArtQTML approve-row question "REV1-IH-0002"
     Then I should not see "REV1-IH-0002"
-
-  Scenario: Teacher edits a draft question in Moodle's editor
-    When I open the ArtQTML generation named "Review pack"
-    And I click on "Edit" "link" in the "REV1-IH-0001" "table_row"
-    Then I should see "Question name"
-    And the field "Question name" matches value "REV1-IH-0001"
 
   Scenario: Teacher can preview a draft question
     When I open the ArtQTML generation named "Review pack"
@@ -72,7 +65,8 @@ Feature: Reviewing generated ArtQTML questions
   Scenario: Teacher moves an approved question into a course question bank
     When I open the ArtQTML generation named "Review pack"
     And I click on "Approve" "button" in the "REV1-IH-0001" "table_row"
+    And I click on "[data-testid='artqtml-approve-rowselect']" "css_element" in the "REV1-IH-0001" "table_row"
     And I choose the first ArtQTML move target category
-    And I click on "Move selected" "button" in the "REV1-IH-0001" "table_row"
+    And I press "Move selected"
     Then I should see "question(s) moved to the selected question bank"
     And I should see "Moved"

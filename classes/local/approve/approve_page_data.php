@@ -20,7 +20,8 @@
  * Resolution; no HTML, no mutation.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local\approve;
@@ -100,6 +101,7 @@ class approve_page_data {
             'validationsuggestion' => \local_artqtml\local\validation_suggestion::ACCEPTED,
             'movedout'             => 0,
             'approved'             => 0,
+            'externallyedited'     => 0,
         ]);
     }
 

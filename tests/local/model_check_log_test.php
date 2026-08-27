@@ -20,8 +20,9 @@ namespace local_artqtml\local;
  * Unit tests for the model-check diagnostic log.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\model_check_log
  */
 final class model_check_log_test extends \advanced_testcase {
@@ -306,24 +307,6 @@ final class model_check_log_test extends \advanced_testcase {
             '/if\s*\(\s*\$oldversion\s*<\s*2026081300\s*\).*pluginversion.*upgrade_plugin_savepoint\s*\(\s*true\s*,\s*2026081300/s',
             $upgrade,
             'db/upgrade.php must add pluginversion at savepoint 2026081300'
-        );
-    }
-
-    /**
-     * The aiquizgen rename drops the install.xml table (which has the column) and restores the
-     * Old one. Install must add the field afterwards.
-     */
-    public function test_install_adds_pluginversion_after_rename(): void {
-        $install = file_get_contents(__DIR__ . '/../../db/install.php');
-
-        $this->assertStringContainsString(
-            'migrate_if_needed()',
-            $install
-        );
-        $this->assertMatchesRegularExpression(
-            '/migrate_if_needed\(\).*pluginversion.*add_field/s',
-            $install,
-            'db/install.php must add pluginversion after the aiquizgen table rename'
         );
     }
 }

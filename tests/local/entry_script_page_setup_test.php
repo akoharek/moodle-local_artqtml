@@ -27,8 +27,9 @@ namespace local_artqtml\local;
  * Act-and-redirect script cannot reintroduce it unnoticed.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversNothing
  */
 final class entry_script_page_setup_test extends \advanced_testcase {
@@ -113,6 +114,21 @@ final class entry_script_page_setup_test extends \advanced_testcase {
             $missing,
             "every entry script must set up \$PAGE, including act-and-redirect ones:\n" . implode("\n", $missing)
         );
+    }
+
+    /**
+     * Act-and-redirect scripts must reject GET and require POST + sesskey.
+     *
+     * @return void
+     */
+    public function test_act_and_redirect_scripts_require_post(): void {
+        foreach (['delete.php', 'modelaction.php'] as $name) {
+            $scripts = $this->entry_scripts();
+            $this->assertArrayHasKey($name, $scripts);
+            $source = file_get_contents($scripts[$name]);
+            $this->assertStringContainsString('data_submitted()', $source, $name);
+            $this->assertStringContainsString('require_sesskey()', $source, $name);
+        }
     }
 
     /**

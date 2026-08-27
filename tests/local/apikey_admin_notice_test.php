@@ -17,9 +17,10 @@
 namespace local_artqtml\local;
 
 /**
- * Admin-visible API-key banner and status Retry/Back layout.
+ *  API-key banner and status Retry/Back layout.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml_apikey_decrypt_notice
@@ -48,7 +49,7 @@ final class apikey_admin_notice_test extends \advanced_testcase {
 
         $this->assertSame('', \local_artqtml_apikey_decrypt_notice());
         $this->assertSame(
-            get_string('errormissingapikey', 'local_artqtml'),
+            get_string('errormissingapikeys', 'local_artqtml'),
             \local_artqtml_apikey_start_error()
         );
     }

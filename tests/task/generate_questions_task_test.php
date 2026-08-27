@@ -23,8 +23,9 @@ namespace local_artqtml\task;
  * Scale + sourceonly; user message is source text only.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\task\generate_questions_task
  */
 final class generate_questions_task_test extends \advanced_testcase {

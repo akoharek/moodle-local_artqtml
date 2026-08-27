@@ -24,8 +24,9 @@ use local_artqtml\local\question_types;
  * Scale-only matrix (IH/FE/SR); no per-type instruction fields / security filter.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\form\generate_form
  */
 final class generate_form_test extends \advanced_testcase {

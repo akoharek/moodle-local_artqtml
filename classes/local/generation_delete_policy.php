@@ -17,11 +17,19 @@
 /**
  * Who may delete a generation.
  *
+ * deletion follows generation_access_policy — owner with
+ * local/artqtml:use, or local/artqtml:manageall for anyone's generation. local/artqtml:configure
+ * never authorises deletion.
+ *
+ * Generations that contain externally locked draft questions remain deletable (only moved-out
+ * questions block whole-generation delete — see question_deletion_service::has_moved_questions()).
+ *
  * Shared by delete.php, generate.php's "Delete and exit" abort, and the list-page Delete control,
- * So the rule cannot drift between UI and server.
+ * so the rule cannot drift between UI and server.
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local;
@@ -33,8 +41,7 @@ class generation_delete_policy {
     /**
      * Whether the given user may delete this generation.
      *
-     * True only when the user has local/artqtml:use and owns the generation. :configure is
-     * Deliberately ignored.
+     * True when generation_access_policy::can_mutate() allows deletion.
      *
      * @param \stdClass $generation a local_artqtml_generations record (needs ->userid)
      * @param int|null $userid user to check; defaults to the current user
@@ -47,11 +54,7 @@ class generation_delete_policy {
         $userid = $userid ?? (int) $USER->id;
         $context = $context ?? \context_system::instance();
 
-        if (!has_capability('local/artqtml:use', $context, $userid)) {
-            return false;
-        }
-
-        return (int) ($generation->userid ?? 0) === $userid;
+        return generation_access_policy::can_mutate($generation, $userid, $context);
     }
 
     /**
@@ -66,13 +69,7 @@ class generation_delete_policy {
      * @throws \moodle_exception if the user is not the owner
      */
     public static function require_can_delete(\stdClass $generation, ?\context $context = null): void {
-        global $USER;
-
         $context = $context ?? \context_system::instance();
-        require_capability('local/artqtml:use', $context);
-
-        if ((int) ($generation->userid ?? 0) !== (int) $USER->id) {
-            throw new \moodle_exception('cannotdeleteothers', 'local_artqtml');
-        }
+        generation_access_policy::require_can_mutate($generation, $context);
     }
 }

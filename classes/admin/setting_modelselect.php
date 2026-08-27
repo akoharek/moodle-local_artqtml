@@ -20,7 +20,8 @@
  * Three states, decided entirely by what is in the cache:
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\admin;
@@ -137,5 +138,19 @@ class setting_modelselect extends \admin_setting_configselect {
         }
 
         return $html;
+    }
+
+    /**
+     * A model must be chosen before settings can be saved.
+     *
+     * @param string $data
+     * @return true|string
+     */
+    public function validate($data) {
+        if (trim((string) $data) === '') {
+            return get_string('errormodelrequired', 'local_artqtml');
+        }
+
+        return true;
     }
 }

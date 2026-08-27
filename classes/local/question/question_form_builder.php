@@ -20,7 +20,8 @@
  * (split out of question_importer - ).
  *
  * @package    local_artqtml
- * @license    http://Www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright  2026 AR Tudásmenedzsment Kft.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace local_artqtml\local\question;
@@ -121,8 +122,8 @@ class question_form_builder {
      * "<" in ordinary prose ("igaz-e, hogy x < 5") comes out of the purifier as "&lt;", so
      * Strip_tags() can no longer swallow the rest of the sentence as if it were a tag. Doing
      * It the other way round loses text, silently.
-     * 2. Turn block boundaries into newlines BEFORE the tags go, or "<p>Első</p><p>Második</p>"
-     * Comes out as "ElsőMásodik" - the same words-run-together defect fixed when block tags
+     * 2. Turn block boundaries into newlines BEFORE the tags go, or "<p>First</p><p>Second</p>"
+     * comes out as "FirstSecond" - the same words-run-together defect fixed when block tags
      * Were stripped without inserting separators.
      * 3. Strip everything except the two kept tags.
      * 4. Normalise the whitespace this leaves behind.
