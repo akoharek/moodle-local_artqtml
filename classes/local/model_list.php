@@ -42,6 +42,20 @@ class model_list {
     /** @var int cache lifetime in seconds (: 24 hours). */
     public const CACHE_TTL = 86400;
 
+    /** @var string fallback validator model when Google retires older Gemini ids. */
+    public const GEMINI_MODEL_FALLBACK = 'gemini-3.6-flash';
+
+    /**
+     * Gemini model ids that return HTTP 404 for new API keys (Aug 2026).
+     *
+     * @var string[]
+     */
+    public const DEPRECATED_GEMINI_MODELS = [
+        'gemini-2.0-flash',
+        'gemini-2.5-flash',
+        'gemini-2.5-pro',
+    ];
+
     /**
      * Helper.
      *
@@ -368,5 +382,21 @@ class model_list {
      */
     protected static function cache_key(string $provider): string {
         return 'modellistcache_' . $provider;
+    }
+
+    /**
+     * Move sites still pointing at retired Gemini models to {@see self::GEMINI_MODEL_FALLBACK}.
+     *
+     * @return bool true when the configured model was updated
+     */
+    public static function migrate_deprecated_gemini_model(): bool {
+        $current = (string) get_config('local_artqtml', 'geminimodel');
+        if ($current === '' || !in_array($current, self::DEPRECATED_GEMINI_MODELS, true)) {
+            return false;
+        }
+
+        set_config('geminimodel', self::GEMINI_MODEL_FALLBACK, 'local_artqtml');
+
+        return true;
     }
 }

@@ -23,6 +23,7 @@
  */
 
 require(__DIR__ . '/../../config.php');
+require_once($CFG->dirroot . '/local/artqtml/lib.php');
 
 use local_artqtml\local\draft_bank;
 use local_artqtml\local\generation_status;
@@ -164,7 +165,6 @@ $PAGE->set_heading(get_string('statusheading', 'local_artqtml'));
 $PAGE->requires->js_call_amd('local_artqtml/status', 'init');
 
 $questioncount = $DB->count_records('local_artqtml_questions', ['generationid' => $generationid]);
-$tokenwarningmessage = '';
 
 $settingsurl = new moodle_url('/local/artqtml/generate.php', ['id' => $generationid]);
 $approveurl = new moodle_url('/local/artqtml/approve.php', ['generationid' => $generationid]);
@@ -178,18 +178,8 @@ echo local_artqtml_apikey_decrypt_notice();
 echo local_artqtml_owner_warning_banner($generation);
 echo html_writer::tag('p', format_string($generation->name));
 
-// rendered up front if already known, otherwise revealed live by amd/src/status.js
-// once the AJAX poll's tokenwarningmessage turns non-empty (e.g. the warning appears
-// mid-generation). Plain markup (not $OUTPUT->notification()) so amd/src/status.js can safely
-// overwrite just the message text without disturbing a dismiss-button/JS init.
-echo html_writer::div(
-    html_writer::div($tokenwarningmessage, 'alert alert-warning mb-0', ['data-region' => 'tokenwarning-text']),
-    'mb-3 d-none',
-    ['data-region' => 'tokenwarning']
-);
-
 // only known once the generating stage has run - rendered up front if already known,
-// otherwise revealed live by amd/src/status.js the same way the token-budget warning above is.
+// otherwise revealed live by amd/src/status.js once countdiscrepancymessage turns non-empty.
 $countdiscrepancy = json_decode((string) $generation->countdiscrepancy, true);
 $countdiscrepancymessage = (is_array($countdiscrepancy) && !empty($countdiscrepancy))
     ? question_types::format_count_discrepancy($countdiscrepancy)
@@ -257,7 +247,7 @@ if ($generation->status === generation_status::PARTIAL) {
 }
 
 echo html_writer::start_div('', [
-    'data-region'            => 'artqtm-status',
+    'data-region'            => 'artqtml-status',
     'data-generationid'      => $generationid,
     'data-initialstatus'     => $generation->status,
     'data-label-generating'  => get_string('stagegenerating', 'local_artqtml'),

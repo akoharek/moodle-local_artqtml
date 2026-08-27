@@ -15,9 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file is a SEED, not a source. It is read once, by install.php and by the upgrade step that
- * Introduces these settings, and written into `config_plugins`. From that moment the database is
- * The only place the prompt lives.
+ * This file is a SEED, not a source. It is read on install only, via
+ * {@see \local_artqtml\local\prompt_seed::apply()} in db/install.php, and written into
+ * `config_plugins` for settings that are still empty. Admin-edited values are preserved.
+ * From that moment the database is the only place the prompt lives.
  *
  * @package    local_artqtml
  * @copyright  2026 AR Tudásmenedzsment Kft.

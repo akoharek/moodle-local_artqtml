@@ -152,7 +152,6 @@ $string['errornametoolong'] = 'A generálás neve legfeljebb 100 karakter lehet.
 $string['errornocategory'] = 'Válassz először egy kérdésbank kategóriát.';
 $string['errornoquestions'] = 'Adj meg legalább egy kérdést legalább egy kérdéstípusnál.';
 $string['errornoselection'] = 'Jelölj ki legalább egy kérdést.';
-$string['errorpercentagerange'] = 'Az értéknek 0 és 100 között kell lennie.';
 $string['errorsecurityfilter'] = 'A beküldött szöveg nem fogadható el. Ellenőrizd, és próbáld újra.';
 $string['errorshortnameformat'] = 'A rövidnév csak ASCII betűket és számokat tartalmazhat (a-z, A-Z, 0-9), legfeljebb 8 karakter.';
 $string['errorsourcetextrequired'] = 'Adj meg forrásszöveget, vagy tölts fel egy fájlt.';

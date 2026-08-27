@@ -59,6 +59,8 @@ class process_pending_generations extends \core\task\scheduled_task {
             'timecreated ASC'
         );
 
+        mtrace('local_artqtml: found ' . count($pending) . ' pending generation(s).');
+
         $apitimeout = (int) (get_config('local_artqtml', 'apitimeout') ?: 60);
         $httpcycle = (generate_questions_task::MAX_HTTP_ATTEMPTS * $apitimeout)
             + generate_questions_task::MAX_BACKOFF_SECONDS;
@@ -78,6 +80,7 @@ class process_pending_generations extends \core\task\scheduled_task {
             }
 
             $generationid = (int) $generation->id;
+            mtrace('local_artqtml: claimed generation ' . $generationid . ' (status: ' . $generation->status . ').');
 
             // a plain try/finally only protects against catchable Throwables - a true PHP
             // Fatal partway through process_one() (max_execution_time exceeded, memory
@@ -150,16 +153,19 @@ class process_pending_generations extends \core\task\scheduled_task {
         global $DB;
 
         if ($generation->status === \local_artqtml\local\generation_status::GENERATING) {
+            mtrace('local_artqtml: generation ' . (int) $generation->id . ' -> Claude generate.');
             (new generate_questions_task())->process($generation);
             $generation = $DB->get_record('local_artqtml_generations', ['id' => $generation->id]);
         }
 
         if ($generation && $generation->status === \local_artqtml\local\generation_status::VALIDATING) {
+            mtrace('local_artqtml: generation ' . (int) $generation->id . ' -> Gemini validate.');
             (new validate_questions_task())->process($generation);
             $generation = $DB->get_record('local_artqtml_generations', ['id' => $generation->id]);
         }
 
         if ($generation && $generation->status === \local_artqtml\local\generation_status::SAVING) {
+            mtrace('local_artqtml: generation ' . (int) $generation->id . ' -> save questions.');
             (new save_questions_task())->process($generation);
         }
     }

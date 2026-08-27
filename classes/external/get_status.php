@@ -95,7 +95,6 @@ class get_status extends external_api {
             'questioncount'           => $questioncount,
             'unvalidatedcount'        => $unvalidatedcount,
             'error'                   => $technicalerror,
-            'tokenwarningmessage'     => '',
             'countdiscrepancymessage' => $countdiscrepancymessage,
             'failedpercent'           => $failedpercent,
             'generatingpercent'       => $generatingpercent,
@@ -119,7 +118,6 @@ class get_status extends external_api {
             'questioncount' => new external_value(PARAM_INT, 'Number of questions generated so far'),
             'unvalidatedcount' => new external_value(PARAM_INT, 'Number of questions not yet validated'),
             'error' => new external_value(PARAM_RAW, 'Technical error message from the last failed API call, empty if none'),
-            'tokenwarningmessage' => new external_value(PARAM_RAW, 'Reserved warning message field (always empty)'),
             'countdiscrepancymessage' => new external_value(
                 PARAM_RAW,
                 'Requested-vs-received question count warning, empty if none'

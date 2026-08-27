@@ -37,8 +37,7 @@ function xmldb_local_artqtml_upgrade($oldversion) {
 
     if ($oldversion < 2026081300) {
         // Pluginversion scopes a model-check exclusion to the plugin version that produced it.
-        // Fresh installs get it from install.xml; existing sites (and aiquizgen renames that
-        // restore a table without the column) need this add-field.
+        // Fresh installs get it from install.xml; existing sites need this add-field.
         $table = new xmldb_table('local_artqtml_modelcheck');
         $field = new xmldb_field('pluginversion', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'triggertype');
         if ($dbman->table_exists($table) && !$dbman->field_exists($table, $field)) {
@@ -85,6 +84,13 @@ function xmldb_local_artqtml_upgrade($oldversion) {
         }
 
         upgrade_plugin_savepoint(true, 2026082602, 'local', 'artqtml');
+    }
+
+    if ($oldversion < 2026082700) {
+        // Google retired gemini-2.x ids for new API keys (404 on generateContent).
+        \local_artqtml\local\model_list::migrate_deprecated_gemini_model();
+
+        upgrade_plugin_savepoint(true, 2026082700, 'local', 'artqtml');
     }
 
     return true;

@@ -19,7 +19,7 @@ namespace local_artqtml\local;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Unit tests for AJAX rate limiting (security audit finding #7, option B).
+ * Unit tests for per-user AJAX rate limiting (extract_text and get_status).
  *
  * @package    local_artqtml
  * @copyright  2026 AR Tudásmenedzsment Kft.

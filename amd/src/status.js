@@ -55,7 +55,7 @@ define(['core/ajax'], function(Ajax) {
      *
      * @param {number} generationid
      * @return {Promise<{status: string, questioncount: number, unvalidatedcount: number,
-     *      error: string, tokenwarningmessage: string}>}
+     *      error: string}>}
      */
     function callGetStatus(generationid) {
         return Ajax.call([{
@@ -156,17 +156,6 @@ define(['core/ajax'], function(Ajax) {
         var countregion = root.querySelector(SELECTORS.QUESTION_COUNT);
         if (countregion) {
             countregion.textContent = statusdata.questioncount;
-        }
-
-        if (statusdata.tokenwarningmessage) {
-            var tokenwarning = document.querySelector('[data-region="tokenwarning"]');
-            var tokenwarningtext = document.querySelector('[data-region="tokenwarning-text"]');
-            if (tokenwarningtext) {
-                tokenwarningtext.textContent = statusdata.tokenwarningmessage;
-            }
-            if (tokenwarning) {
-                tokenwarning.classList.remove('d-none');
-            }
         }
 
         if (statusdata.countdiscrepancymessage && statusdata.status !== 'partial') {

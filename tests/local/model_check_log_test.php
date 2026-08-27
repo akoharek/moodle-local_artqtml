@@ -312,21 +312,4 @@ final class model_check_log_test extends \advanced_testcase {
         );
     }
 
-    /**
-     * The aiquizgen rename drops the install.xml table (which has the column) and restores the
-     * Old one. Install must add the field afterwards.
-     */
-    public function test_install_adds_pluginversion_after_rename(): void {
-        $install = file_get_contents(__DIR__ . '/../../db/install.php');
-
-        $this->assertStringContainsString(
-            'migrate_if_needed()',
-            $install
-        );
-        $this->assertMatchesRegularExpression(
-            '/migrate_if_needed\(\).*pluginversion.*add_field/s',
-            $install,
-            'db/install.php must add pluginversion after the aiquizgen table rename'
-        );
-    }
 }

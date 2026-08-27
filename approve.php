@@ -32,6 +32,7 @@
  */
 
 require(__DIR__ . '/../../config.php');
+require_once($CFG->dirroot . '/local/artqtml/lib.php');
 require_once($CFG->libdir . '/questionlib.php');
 require_once($CFG->dirroot . '/question/engine/bank.php');
 

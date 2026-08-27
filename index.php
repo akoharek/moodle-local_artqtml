@@ -23,6 +23,7 @@
  */
 
 require(__DIR__ . '/../../config.php');
+require_once($CFG->dirroot . '/local/artqtml/lib.php');
 
 use local_artqtml\local\generation_list;
 

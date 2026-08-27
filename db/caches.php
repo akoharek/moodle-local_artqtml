@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $definitions = [
-    // Per-user AJAX counters for extract_text / get_status (security finding #7).
+    // Per-user AJAX rate limit counters for extract_text and get_status.
     'ajax_ratelimit' => [
         'mode' => cache_store::MODE_APPLICATION,
         'simplekeys' => true,

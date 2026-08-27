@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Per-user AJAX rate limits for extract_text and get_status (security audit finding #7).
+ * Per-user AJAX rate limits for extract_text and get_status.
  *
  * Fixed 60-second windows (core_ai-style counter, shorter window). Limits leave headroom for
- * The status page's 3s poll (~20/min) plus a few tabs, while capping extract_text bursts.
+ * the status page's 3s poll (~20/min) plus a few tabs, while capping extract_text bursts.
  *
  * @package    local_artqtml
  * @copyright  2026 AR Tudásmenedzsment Kft.

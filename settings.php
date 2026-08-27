@@ -21,9 +21,6 @@
  * Moodle's admin_settingpage API does not support in-page tabs for a single settings form,
  * So tabs are sibling pages under one admin_category.
  *
- * Institutional prompt templates live in code (db/prompt_defaults.php / prompt_seed) only —
- * They are not editable from this page.
- *
  * @package    local_artqtml
  * @copyright  2026 AR Tudásmenedzsment Kft.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

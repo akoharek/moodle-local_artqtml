@@ -24,6 +24,7 @@
  */
 
 require(__DIR__ . '/../../config.php');
+require_once($CFG->dirroot . '/local/artqtml/lib.php');
 
 use local_artqtml\form\generate_form;
 use local_artqtml\local\question_types;

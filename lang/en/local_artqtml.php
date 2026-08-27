@@ -152,7 +152,6 @@ $string['errornametoolong'] = 'The generation name may be at most 100 characters
 $string['errorquestionlocked'] = 'This question was edited outside the plugin and is locked. Approve and move are not available; delete the question or delete the whole generation if you need to discard it.';
 $string['errornoquestions'] = 'Enter at least one question for at least one question type.';
 $string['errornoselection'] = 'Select at least one question first.';
-$string['errorpercentagerange'] = 'Value must be between 0 and 100.';
 $string['errorsecurityfilter'] = 'The submitted text could not be accepted. Please review it and try again.';
 $string['errorshortnameformat'] = 'The shortname may only contain ASCII letters and digits (a-z, A-Z, 0-9), up to 8 characters.';
 $string['errorsourcetextrequired'] = 'Enter source text or upload a file.';
