@@ -3,7 +3,7 @@
 **Scope:** `local/artqtml` (Light / Marketplace)  
 **Plugin version:** `2026082705` / release `2026.08.27`  
 **Fix commit (pass-2 product):** `263fb52`  
-**Residual fix commit:** (pending)  
+**Residual fix commit:** `19f2aef`  
 **Date:** 2026-08-27 (evening re-review)  
 **Prior tracker:** `REVIEW-FINDINGS.md` (20260826 + fix wave) · handoff `artqtml_codereview_20260826_01.md`  
 **This tracker:** `REVIEW-FINDINGS2.md` · handoff `artqtml_codereview_20260827_01.md`  
