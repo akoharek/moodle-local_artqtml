@@ -15,7 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Helper.
+ * Web service that extracts plain text from an upload-page draft file.
+ *
+ * Used by amd/src/uploadconflict.js via local_artqtml_extract_text.
  *
  * @package    local_artqtml
  * @copyright  2026 AR Tudásmenedzsment Kft.

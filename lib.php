@@ -248,6 +248,16 @@ function local_artqtml_apikey_start_error(): string {
         return get_string('apikeyupgradeunrecoverable', 'local_artqtml');
     }
 
+    $missingclaude = \local_artqtml\local\encrypted_config::get('claudeapikey') === '';
+    $missinggemini = \local_artqtml\local\encrypted_config::get('geminiapikey') === '';
+
+    if ($missingclaude && $missinggemini) {
+        return get_string('errormissingapikeys', 'local_artqtml');
+    }
+    if ($missinggemini) {
+        return get_string('errormissinggeminikey', 'local_artqtml');
+    }
+
     return get_string('errormissingapikey', 'local_artqtml');
 }
 

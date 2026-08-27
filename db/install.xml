@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/artqtml/db" VERSION="20260811" COMMENT="XMLDB file for Moodle local/artqtml"
+<XMLDB PATH="local/artqtml/db" VERSION="20260827" COMMENT="XMLDB file for Moodle local/artqtml"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -12,14 +12,14 @@
         <FIELD NAME="shortname" TYPE="char" LENGTH="8" NOTNULL="true" SEQUENCE="false" COMMENT="Alnum shortname used in generated question codes, e.g. BIO1"/>
         <FIELD NAME="sourcetext" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Uploaded/typed source text used for generation"/>
         <FIELD NAME="sourcetexthash" TYPE="char" LENGTH="40" NOTNULL="false" SEQUENCE="false" COMMENT="sha1 of the normalised source text, used for duplicate detection"/>
-        <FIELD NAME="sourcefilehash" TYPE="char" LENGTH="40" NOTNULL="false" SEQUENCE="false" COMMENT="Column"/>
-        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="started" SEQUENCE="false" COMMENT="Column"/>
+        <FIELD NAME="sourcefilehash" TYPE="char" LENGTH="40" NOTNULL="false" SEQUENCE="false" COMMENT="sha1 fingerprint of the uploaded source file bytes, used for duplicate detection independent of extracted text"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="started" SEQUENCE="false" COMMENT="Pipeline status: started, generating, validating, saving, completed, partial, or failed"/>
         <FIELD NAME="settings" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON encoded generation settings: difficulty mode, per-type counts and options, seed, knowledge source"/>
         <FIELD NAME="draftcategoryid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="question_categories.id of this generation's isolated draft bank"/>
         <FIELD NAME="error" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Technical error message from the last failed Claude/Gemini API call"/>
         <FIELD NAME="processingtoken" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" COMMENT="Random token set by an atomic UPDATE to claim this generation for processing; NULL means unclaimed (prevents two concurrent task runs processing the same generation)"/>
-        <FIELD NAME="pendingdata" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Column"/>
-        <FIELD NAME="countdiscrepancy" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Column"/>
+        <FIELD NAME="pendingdata" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON in-flight pipeline state (e.g. per-type generating progress) written during API calls"/>
+        <FIELD NAME="countdiscrepancy" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON list of per-type requested vs received question counts when output falls short"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
@@ -38,7 +38,7 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="generationid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The generation this question belongs to"/>
-        <FIELD NAME="questioncode" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" COMMENT="Plugin-generated code, e.g. BIO1-IH-0001 (spec 3.3.1)"/>
+        <FIELD NAME="questioncode" TYPE="char" LENGTH="32" NOTNULL="false" SEQUENCE="false" COMMENT="Plugin-generated code, e.g. BIO1-IH-0001"/>
         <FIELD NAME="typecode" TYPE="char" LENGTH="2" NOTNULL="true" SEQUENCE="false" COMMENT="IH/FE/SR type codes"/>
         <FIELD NAME="questiontype" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="Moodle qtype: truefalse, multichoice, ordering, shortanswer, essay"/>
         <FIELD NAME="questiontext" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The generated question text"/>
@@ -53,10 +53,10 @@
         <FIELD NAME="questionbankid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="id of the real Moodle question row, created immediately in the draft bank category"/>
         <FIELD NAME="movedout" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 once the question has been moved out of the draft category into a real target bank"/>
         <FIELD NAME="approved" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 once a teacher has explicitly approved this question; required before it can be moved to a real bank"/>
-        <FIELD NAME="edited" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Column"/>
+        <FIELD NAME="edited" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 once the question was edited via Moodle native editor while still in draft"/>
         <FIELD NAME="externallyedited" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 when edited via Moodle native editor while still in draft; locks plugin mutate paths"/>
         <FIELD NAME="lasteditedby" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="userid of whoever last edited this question in the native question editor, null if never edited"/>
-        <FIELD NAME="lasteditedat" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Column"/>
+        <FIELD NAME="lasteditedat" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Unix timestamp of the last native-editor edit, paired with lasteditedby"/>
         <FIELD NAME="approvedby" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="userid of whoever approved this question, null if not yet approved"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>

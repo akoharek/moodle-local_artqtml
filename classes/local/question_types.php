@@ -27,7 +27,7 @@ namespace local_artqtml\local;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Maps the spec's two-letter type codes (IH/FE/SR) to Moodle qtypes and lang strings.
+ * Maps the plugin's two-letter type codes (IH/FE/SR) to Moodle qtypes and lang strings.
  */
 class question_types {
     /** @var string[] ordered list of the three type codes, as they should appear in the UI. */
@@ -48,7 +48,7 @@ class question_types {
     ];
 
     /**
-     * Human readable label for a type code, e.g. "Igaz/Hamis" (True/False).
+     * Human readable label for a type code, e.g. "True/False".
      *
      * @param string $code one of self::CODES
      * @return string

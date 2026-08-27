@@ -24,8 +24,9 @@
  * What the role carries, read off Moodle's entry points:
  *
  * - moodle/course:view — preview and require_login($courseid) succeed through is_viewing().
- * - moodle/question:useall — qbank_previewquestion preview links on approve.php ask for 'use'.
- * - moodle/question:editall — Edit links on approve.php open Moodle's native question editor.
+ * - moodle/question:useall — qbank_previewquestion preview links on approve.php.
+ * - moodle/question:editall — native question editor links on approve.php; plugin approve/move
+ *   paths are blocked once externallyedited is set.
  *
  * Three capabilities, and deliberately no archetype.
  *

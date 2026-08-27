@@ -1,7 +1,7 @@
 # local_artqtml Marketplace code review — unified triage
 
 **Scope:** `local/artqtml` (Light / Marketplace)  
-**Updated:** 2026-08-27 (F-09 wontfix — Open link gated on draft preview caps by design; F-06 wontfix — connection test sync model probe by design; F-05 fixed — retry grants draft role like start; F-04 fixed — difficulty_label canonicalised to easy/medium/hard; F-03 fixed — IH hints persist to question bank; F-02 false positive — bulk move Light scope; matrix updated; C-19 fixed; C-18 fixed; C-17 fixed; C-16 fixed; C-15 fixed; C-14 fixed; C-11/C-12/C-13 fixed; C-10 fixed; C-09 fixed in tracker)  
+**Updated:** 2026-08-27 (F-10 fixed — missing-types retry per-level shortfall; C-N1…F-N1 nits fixed; F-09 wontfix — Open link gated on draft preview caps by design; F-06 wontfix — connection test sync model probe by design; F-05 fixed — retry grants draft role like start; F-04 fixed — difficulty_label canonicalised to easy/medium/hard; F-03 fixed — IH hints persist to question bank; F-02 false positive — bulk move Light scope; matrix updated; C-19 fixed; C-18 fixed; C-17 fixed; C-16 fixed; C-15 fixed; C-14 fixed; C-11/C-12/C-13 fixed; C-10 fixed; C-09 fixed in tracker)  
 **Passes merged:** Security (Sonnet `a2368d28`), Compliance (Sonnet `7072ded4`), Functional (Gemini `1db629c4`); prior tracker retained for stable IDs  
 **Status:** Triage only — no product code changed in this pass
 
@@ -15,8 +15,8 @@ Severity: **P0** Marketplace blocker · **P1** fix before submit · **P2** backl
 |----------|------:|------|
 | **P0** | **5** | Marketplace blockers |
 | **P1** | **9** | Fix before HQ / Marketplace submit |
-| **P2** | **1** | Backlog after submit-critical work |
-| **Nit** | **9** | Optional polish |
+| **P2** | **0** | Backlog after submit-critical work |
+| **Nit** | **0** | Optional polish |
 
 **Marketplace blockers (P0):** (1) ~~missing object-level ownership~~ **S-02 fixed**, (2) ~~permanent draft-course editall/useall~~ **S-01 fixed (2026082602)**, (3) missing `@copyright` / phpcs exclude vs moodle.org CI, (4) missing `MOODLE_INTERNAL` guards, (5) fresh install blocked until admin sets hidden draft course (`draftcourseid=0` / `is_configured()`).
 
@@ -72,15 +72,15 @@ Severity: **P0** Marketplace blocker · **P1** fix before submit · **P2** backl
 | F-05 | P2 | Functional | **fixed** | status.php / generate.php | Retry did not re-apply draft role like start (userid rewrite intentionally unchanged) | Functional (re-verified); prior F-05; fixed 2026-08-27 | `draft_role::grant($USER->id)` on retry after `draft_bank::create()`, mirroring generate.php start path |
 | F-06 | P2 | Functional | **wontfix** | test_connection / model_checker | Connection test probes every model sync (timeout risk) | Functional (re-verified); prior F-06; **product decision 2026-08-27** | **By design / no code change.** Connection test intentionally probes all listed models synchronously to filter dropdown to working models only; cost accepted per code comments (same spirit as S-07 wontfix) |
 | F-09 | P2 | Functional | **wontfix** | approve / bank link UI | “Open” link gated on draft bank caps (users without caps cannot open) | Functional (new); **product decision 2026-08-27** | **By design / no code change.** Preview, Edit and Open share `$candraftpreviewquestions` (draft `question:useall` + mutate). Normal teacher flow has draft_role from start/retry; edge case (manageall view without draft cap) accepted |
-| F-10 | P2 | Functional | open | missing_types / retry | Retry missing-types count wrong across difficulties | Functional (new) | Recount per difficulty / type matrix |
-| C-N1 | Nit | Compliance | open | `db/install.xml` | Weak `COMMENT="Column"` / VERSION drift vs plugin | Compliance; prior C-N1 | Meaningful COMMENTs; align VERSION |
-| C-N2 | Nit | Compliance | open | `question_types.php` | “spec” wording / weak docblocks | Prior C-N2 | Tighten docs |
-| C-N3 | Nit | Compliance | open | `textcounter.js` | Stale path to status.js | Prior C-N3 | Fix or remove reference |
-| C-N4 | Nit | Compliance | open | privacy lang | Unused `privacy:metadata` string vs non-null provider | Prior C-N4 | Align strings with provider |
-| C-N5 | Nit | Compliance | open | `version.php` | `release` stuck at `1.0.0` across version bumps | Compliance; prior C-N5 | Bump release with version |
-| C-N6 | Nit | Compliance | open | text extract helper | `extract_text` Helper docblock incomplete / stale | Compliance (new) | Refresh docblock |
-| S-N1 | Nit | Security | open | `draft_role.php` | Capability context comment inaccurate | Security (new) | Correct comment only |
-| F-N1 | Nit | Functional | open | missing API key path | Non-admin missing-key message always Claude-specific | Functional (re-verified); prior F-N1 | Provider-agnostic or provider-aware copy |
+| F-10 | P2 | Functional | **fixed** | missing_types / retry | Retry missing-types count wrong across difficulties | Functional (new); fixed 2026-08-27 | Per-level matrix shortfall from saved questions; narrowed_settings + describe |
+| C-N1 | Nit | Compliance | **fixed** | `db/install.xml` | Weak `COMMENT="Column"` / VERSION drift vs plugin | Compliance; prior C-N1; fixed 2026-08-27 | Meaningful COMMENTs; VERSION aligned to 20260827 |
+| C-N2 | Nit | Compliance | **fixed** | `question_types.php` | “spec” wording / weak docblocks | Prior C-N2; fixed 2026-08-27 | Plugin-oriented docblocks |
+| C-N3 | Nit | Compliance | **fixed** | `textcounter.js` | Stale path to status.js | Prior C-N3; fixed 2026-08-27 | AMD path comments aligned; status.js @copyright added |
+| C-N4 | Nit | Compliance | **fixed** | privacy lang | Unused `privacy:metadata` string vs non-null provider | Prior C-N4; fixed 2026-08-27 | Metadata copy + claude/gemini link strings |
+| C-N5 | Nit | Compliance | **fixed** | `version.php` | `release` stuck at `1.0.0` across version bumps | Compliance; prior C-N5; fixed 2026-08-27 | release 2026.08.27 |
+| C-N6 | Nit | Compliance | **fixed** | text extract helper | `extract_text` Helper docblock incomplete / stale | Compliance (new); fixed 2026-08-27 | Web service docblock refreshed |
+| S-N1 | Nit | Security | **fixed** | `draft_role.php` | Capability context comment inaccurate | Security (new); fixed 2026-08-27 | Header reflects editall + externallyedited lock |
+| F-N1 | Nit | Functional | **fixed** | missing API key path | Non-admin missing-key message always Claude-specific | Functional (re-verified); prior F-N1; fixed 2026-08-27 | Provider-aware errormissingapikey(s) |
 
 ---
 

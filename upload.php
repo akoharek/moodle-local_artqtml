@@ -466,7 +466,7 @@ $counterlimittemplate = get_string('textcounterlimitlabel', 'local_artqtml', $so
 $countererrormessage = get_string('errorsourcetexttoolong', 'local_artqtml');
 
 // the counter text must come from a lang string, not be hardcoded in JS -
-// render it with sentinel placeholders here, substituted for the live counts in textcounter.js.
+// render it with sentinel placeholders here, substituted for the live counts in amd/src/textcounter.js.
 $countertemplate = get_string('textcounterlabel', 'local_artqtml', (object) [
     'chars'  => '__CHARS__',
     'words'  => '__WORDS__',

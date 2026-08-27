@@ -19,6 +19,7 @@
  * Calls the local_artqtml_get_status external function via core/ajax.
  *
  * @module     local_artqtml/status
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 define(['core/ajax'], function(Ajax) {
