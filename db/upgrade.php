@@ -94,7 +94,7 @@ function xmldb_local_artqtml_upgrade($oldversion) {
     }
 
     if ($oldversion < 2026082701) {
-        // S-06: replace non-atomic MUC counters with a DB table and optimistic UPDATEs.
+        // Replace non-atomic MUC counters with a DB table and optimistic UPDATEs.
         $table = new xmldb_table('local_artqtml_ajax_ratelimit');
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);

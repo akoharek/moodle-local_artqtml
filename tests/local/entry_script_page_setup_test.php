@@ -119,7 +119,7 @@ final class entry_script_page_setup_test extends \advanced_testcase {
     }
 
     /**
-     * Act-and-redirect scripts must reject GET and require POST + sesskey (S-05).
+     * Act-and-redirect scripts must reject GET and require POST + sesskey.
      *
      * @return void
      */

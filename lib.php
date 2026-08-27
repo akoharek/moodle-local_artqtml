@@ -84,7 +84,7 @@ function local_artqtml_render_test_button(string $provider): string {
  *
  * POST forms rather than AJAX: the actions change server state and the page must re-render from the
  * refreshed cache anyway, so a round trip is the honest mechanism and needs no JavaScript to be
- * testable. Sesskey stays in the form body, not the URL (S-05).
+ * testable. Sesskey stays in the form body, not the URL.
  *
  * @param string $provider one of \local_artqtml\local\model_list::PROVIDERS
  * @return string

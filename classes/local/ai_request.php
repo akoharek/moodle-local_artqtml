@@ -435,7 +435,7 @@ class ai_request {
         return strcasecmp($reason, 'max_tokens') === 0;
     }
 
-    /** @var int max stored length for non-JSON provider error bodies (S-04). */
+    /** @var int max stored length for non-JSON provider error bodies. */
     public const MAX_NONJSON_ERROR_LENGTH = 500;
 
     /**

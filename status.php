@@ -259,8 +259,8 @@ echo html_writer::start_div('', [
     'data-label-completed'   => get_string('status_completed', 'local_artqtml'),
     'data-label-partial'     => get_string('status_partial', 'local_artqtml'),
     'data-label-failed'      => get_string('status_failed', 'local_artqtml'),
-    // S-3/S-2: the stage -> percent/colour/striping map and the terminal-status list, emitted
-    // from their single PHP source so amd/src/status.js can read them instead of owning copies.
+    // Stage-to-percent/colour/striping map and terminal-status list, emitted from PHP so
+    // amd/src/status.js can read them instead of owning copies.
     'data-progress-config'   => \local_artqtml\local\generation_progress::config_json(),
 ]);
 
@@ -274,7 +274,7 @@ echo html_writer::start_div('', [
 // changed is that there are now several of them, and how many have finished is a real number
 // rather than a fabricated one.
 //
-// S-3: the mapping itself lives in generation_progress, shared with amd/src/status.js.
+// The mapping lives in generation_progress, shared with amd/src/status.js.
 $stage = \local_artqtml\local\generation_progress::for_status($generation->status);
 $barpercent = $stage['percent'] ?? \local_artqtml\local\generation_progress::failed_percent($generation->pendingdata);
 if ($generation->status === generation_status::GENERATING) {
@@ -333,10 +333,8 @@ echo html_writer::div(
 echo html_writer::end_div();
 
 // Text feedback is also shown under the progress bar at every stage.
-// S-4: this used to be written inside the bar, where at 25% the bar was narrower than its own
-// label and Bootstrap's overflow: hidden clipped the text away - content made unreachable by
-// was worked around in CSS; below the bar it needs no
-// workaround at all.
+// This label used to sit inside the bar; at 25% width Bootstrap overflow clipped it, so it
+// is shown below the bar instead.
 echo html_writer::tag(
     'p',
     $barlabel . ' (' . $barpercent . '%)',

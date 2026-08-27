@@ -483,7 +483,7 @@ final class ai_request_test extends \advanced_testcase {
     }
 
     /**
-     * JSON API errors keep error.message; non-JSON bodies are capped (S-04).
+     * JSON API errors keep error.message; non-JSON bodies are capped.
      */
     public function test_error_message_from_body_json_and_non_json(): void {
         $json = json_encode(['error' => ['message' => 'Rate limit exceeded']]);
