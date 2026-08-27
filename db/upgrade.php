@@ -93,5 +93,24 @@ function xmldb_local_artqtml_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026082700, 'local', 'artqtml');
     }
 
+    if ($oldversion < 2026082701) {
+        // S-06: replace non-atomic MUC counters with a DB table and optimistic UPDATEs.
+        $table = new xmldb_table('local_artqtml_ajax_ratelimit');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('action', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('windowstart', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('hitcount', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
+        $table->add_index('userid_action', XMLDB_INDEX_UNIQUE, ['userid', 'action']);
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2026082701, 'local', 'artqtml');
+    }
+
     return true;
 }

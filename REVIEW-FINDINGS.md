@@ -1,7 +1,7 @@
 # local_artqtml Marketplace code review — unified triage
 
 **Scope:** `local/artqtml` (Light / Marketplace)  
-**Updated:** 2026-08-27 (S-04 fixed — cap non-JSON provider error bodies at 500 chars via ai_request::error_message_from_body; F-10 fixed — missing-types retry per-level shortfall; C-N1…F-N1 nits fixed; F-09 wontfix — Open link gated on draft preview caps by design; F-06 wontfix — connection test sync model probe by design; F-05 fixed — retry grants draft role like start; F-04 fixed — difficulty_label canonicalised to easy/medium/hard; F-03 fixed — IH hints persist to question bank; F-02 false positive — bulk move Light scope; matrix updated; C-19 fixed; C-18 fixed; C-17 fixed; C-16 fixed; C-15 fixed; C-14 fixed; C-11/C-12/C-13 fixed; C-10 fixed; C-09 fixed in tracker)  
+**Updated:** 2026-08-27 (S-06 fixed — atomic DB ajax rate limiter; C-03 fixed — full privacy get_metadata; S-04 fixed — cap non-JSON provider error bodies at 500 chars via ai_request::error_message_from_body; F-10 fixed — missing-types retry per-level shortfall; C-N1…F-N1 nits fixed; F-09 wontfix — Open link gated on draft preview caps by design; F-06 wontfix — connection test sync model probe by design; F-05 fixed — retry grants draft role like start; F-04 fixed — difficulty_label canonicalised to easy/medium/hard; F-03 fixed — IH hints persist to question bank; F-02 false positive — bulk move Light scope; matrix updated; C-19 fixed; C-18 fixed; C-17 fixed; C-16 fixed; C-15 fixed; C-14 fixed; C-11/C-12/C-13 fixed; C-10 fixed; C-09 fixed in tracker)  
 **Passes merged:** Security (Sonnet `a2368d28`), Compliance (Sonnet `7072ded4`), Functional (Gemini `1db629c4`); prior tracker retained for stable IDs  
 **Status:** Triage only — no product code changed in this pass
 
@@ -20,7 +20,7 @@ Severity: **P0** Marketplace blocker · **P1** fix before submit · **P2** backl
 
 **Marketplace blockers (P0):** (1) ~~missing object-level ownership~~ **S-02 fixed**, (2) ~~permanent draft-course editall/useall~~ **S-01 fixed (2026082602)**, (3) missing `@copyright` / phpcs exclude vs moodle.org CI, (4) missing `MOODLE_INTERNAL` guards, (5) fresh install blocked until admin sets hidden draft course (`draftcourseid=0` / `is_configured()`).
 
-**Later (P1–Nit):** privacy metadata, Full-leak lang/comments, ~~FAILED-state UX loop~~ **F-08 fixed**, ~~raw LLM error log flooding~~ **S-04 fixed**, ~~Move button crash~~ **F-01 false positive (misreported — not a fatal)**, ~~bulk move label mismatch~~ **F-02 false positive (bulk move in Light scope; matrix updated)**, rate-limiter/logging hygiene, AMD/CLI leftovers, schema/label nits.
+**Later (P1–Nit):** ~~privacy metadata~~ **C-03 fixed**, privacy deletion copy, Full-leak lang/comments, ~~FAILED-state UX loop~~ **F-08 fixed**, ~~raw LLM error log flooding~~ **S-04 fixed**, ~~non-atomic AJAX rate limit~~ **S-06 fixed**, ~~Move button crash~~ **F-01 false positive (misreported — not a fatal)**, ~~bulk move label mismatch~~ **F-02 false positive (bulk move in Light scope; matrix updated)**, AMD/CLI leftovers, schema/label nits.
 
 **Recommended fix order**
 
@@ -43,8 +43,8 @@ Severity: **P0** Marketplace blocker · **P1** fix before submit · **P2** backl
 | C-01 | P0 | Compliance | open | `lib.php`; `db/upgrade.php`; `db/install.php`; `db/uninstall.php` | Missing `defined('MOODLE_INTERNAL') \|\| die();` | Compliance; prior C-01 | Add guard after file docblock |
 | F-07 | P0 | Functional | open | config / `is_configured()`; generate entry | Fresh install blocked while `draftcourseid=0` until admin sets hidden draft course | Functional (new P0) | Bootstrap or auto-create draft course / allow first-run without admin pre-config |
 | S-04 | P1 | Security | **fixed** | `ai_request.php`; generate/validate tasks; `model_checker.php` | Raw provider error bodies logged / stored unbounded | Security (elevated from P2); prior S-04; fixed 2026-08-27 | `error_message_from_body()`: JSON `error.message` unchanged; non-JSON bodies capped at 500 chars |
-| S-06 | P1 | Security | open | `ajax_rate_limiter.php` | Non-atomic cache read-modify-write | Security (elevated from P2); prior S-06 | Use lock API or atomic counter |
-| C-03 | P1 | Compliance | open | `classes/privacy/provider.php` | Incomplete `get_metadata()` vs stored/exported personal fields | Compliance; prior C-03 | Declare all personal columns + matching lang strings |
+| S-06 | P1 | Security | **fixed** | `ajax_rate_limiter.php`; `db/install.xml`; `db/upgrade.php` | Non-atomic cache read-modify-write | Security (elevated from P2); prior S-06; fixed 2026-08-27 | DB table + optimistic UPDATE; removed MUC `ajax_ratelimit` cache def (C-19) |
+| C-03 | P1 | Compliance | **fixed** | `classes/privacy/provider.php`; lang EN/HU | Incomplete `get_metadata()` vs stored/exported personal fields | Compliance; prior C-03; fixed 2026-08-27 | All personal columns declared + matching lang strings |
 | C-04 | P1 | Compliance | open | privacy lang; `scrub_user_references()` | Deletion copy promises diagnostic wipe; code only nulls `userid` | Prior C-04 (not re-disputed) | Align privacy text with actual deletion behaviour |
 | C-05 | P1 | Compliance | open | `lang/en` (+ hu) | ~20 dead Full-leak strings (`aiinstruction*`, `diagnosticsmode*`, `settingdebug*`, …) | Compliance; prior C-05 | Delete unused keys; keep Light-only vocabulary |
 | C-07 | P1 | Compliance | open | `draft_category_reparent.php`; `db/upgrade.php` | Reparent helper claimed / present but not called from upgrade | Compliance; prior C-07 | Invoke from current upgrade step or remove dead claim |

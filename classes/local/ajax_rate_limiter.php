@@ -42,10 +42,10 @@ class ajax_rate_limiter {
     /** @var int Max extract_text calls per user per window. */
     public const LIMIT_EXTRACT_TEXT = 10;
 
-    /** @var string Cache key action for status polling. */
+    /** @var string Rate-limit action for status polling. */
     public const ACTION_GET_STATUS = 'get_status';
 
-    /** @var string Cache key action for draft text extraction. */
+    /** @var string Rate-limit action for draft text extraction. */
     public const ACTION_EXTRACT_TEXT = 'extract_text';
 
     /**
@@ -97,35 +97,64 @@ class ajax_rate_limiter {
      * @return bool
      */
     public static function allow(string $action, int $userid, int $limit, int $now): bool {
-        $cache = \cache::make('local_artqtml', 'ajax_ratelimit');
-        $key = self::cache_key($action, $userid);
-        $ratedata = $cache->get($key);
+        global $DB;
 
-        if ($ratedata === false || !is_array($ratedata)) {
-            $ratedata = ['count' => 0, 'start_time' => $now];
+        $expiredbefore = $now - self::WINDOW_SECONDS;
+
+        for ($attempt = 0; $attempt < 3; $attempt++) {
+            $record = $DB->get_record('local_artqtml_ajax_ratelimit', [
+                'userid' => $userid,
+                'action' => $action,
+            ]);
+
+            if ($record) {
+                if ((int) $record->windowstart <= $expiredbefore) {
+                    $DB->execute(
+                        "UPDATE {local_artqtml_ajax_ratelimit}
+                            SET windowstart = ?, hitcount = 1
+                          WHERE id = ?
+                            AND windowstart = ?",
+                        [$now, $record->id, $record->windowstart]
+                    );
+                    $fresh = $DB->get_record('local_artqtml_ajax_ratelimit', ['id' => $record->id]);
+                    if ($fresh && (int) $fresh->windowstart === $now && (int) $fresh->hitcount === 1) {
+                        return true;
+                    }
+                    continue;
+                }
+
+                if ((int) $record->hitcount >= $limit) {
+                    return false;
+                }
+
+                $DB->execute(
+                    "UPDATE {local_artqtml_ajax_ratelimit}
+                        SET hitcount = hitcount + 1
+                      WHERE id = ?
+                        AND hitcount = ?
+                        AND hitcount < ?",
+                    [$record->id, $record->hitcount, $limit]
+                );
+                $fresh = $DB->get_record('local_artqtml_ajax_ratelimit', ['id' => $record->id]);
+                if ($fresh && (int) $fresh->hitcount === (int) $record->hitcount + 1) {
+                    return true;
+                }
+                continue;
+            }
+
+            try {
+                $DB->insert_record('local_artqtml_ajax_ratelimit', (object) [
+                    'userid' => $userid,
+                    'action' => $action,
+                    'windowstart' => $now,
+                    'hitcount' => 1,
+                ]);
+                return true;
+            } catch (\dml_write_exception $e) {
+                continue;
+            }
         }
 
-        if ($now - (int) $ratedata['start_time'] >= self::WINDOW_SECONDS) {
-            $ratedata = ['count' => 0, 'start_time' => $now];
-        }
-
-        if ((int) $ratedata['count'] >= $limit) {
-            return false;
-        }
-
-        $ratedata['count'] = (int) $ratedata['count'] + 1;
-        $cache->set($key, $ratedata);
-        return true;
-    }
-
-    /**
-     * Build a simple cache key.
-     *
-     * @param string $action
-     * @param int $userid
-     * @return string
-     */
-    public static function cache_key(string $action, int $userid): string {
-        return $action . '_' . $userid;
+        return false;
     }
 }

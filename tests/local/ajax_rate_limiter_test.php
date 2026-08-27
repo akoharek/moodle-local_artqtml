@@ -19,7 +19,7 @@ namespace local_artqtml\local;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Unit tests for per-user AJAX rate limiting (extract_text and get_status).
+ * Unit tests for AJAX rate limiting.
  *
  * @package    local_artqtml
  * @copyright  2026 AR Tudásmenedzsment Kft.
@@ -31,7 +31,8 @@ final class ajax_rate_limiter_test extends \advanced_testcase {
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
-        \cache::make('local_artqtml', 'ajax_ratelimit')->purge();
+        global $DB;
+        $DB->delete_records('local_artqtml_ajax_ratelimit');
     }
 
     /**
@@ -106,18 +107,17 @@ final class ajax_rate_limiter_test extends \advanced_testcase {
     }
 
     /**
-     * Require_* throws moodle_exception once the configured cap is hit.
+     * require_* throws moodle_exception once the configured cap is hit.
      */
     public function test_require_extract_text_throws(): void {
+        global $DB;
+
         $this->setAdminUser();
-        $cache = \cache::make('local_artqtml', 'ajax_ratelimit');
-        $key = ajax_rate_limiter::cache_key(
-            ajax_rate_limiter::ACTION_EXTRACT_TEXT,
-            (int) $GLOBALS['USER']->id
-        );
-        $cache->set($key, [
-            'count' => ajax_rate_limiter::LIMIT_EXTRACT_TEXT,
-            'start_time' => time(),
+        $DB->insert_record('local_artqtml_ajax_ratelimit', (object) [
+            'userid' => (int) $GLOBALS['USER']->id,
+            'action' => ajax_rate_limiter::ACTION_EXTRACT_TEXT,
+            'windowstart' => time(),
+            'hitcount' => ajax_rate_limiter::LIMIT_EXTRACT_TEXT,
         ]);
 
         $this->expectException(\moodle_exception::class);
