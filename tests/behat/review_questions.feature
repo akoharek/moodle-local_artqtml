@@ -64,6 +64,17 @@ Feature: Reviewing generated ArtQTML questions
     Then I should see "Question name"
     And the field "Question name" matches value "REV1-IH-0001"
 
+  @javascript
+  Scenario: External edit locks row but list keeps questioncode
+    When I open the ArtQTML generation named "Review pack"
+    And I click on "Edit" "link" in the "REV1-IH-0001" "table_row"
+    And I set the field "Question name" to "REV1-IH-0001 [EDIT-TEST]"
+    And I press "Save changes"
+    When I open the ArtQTML generation named "Review pack"
+    Then I should see "REV1-IH-0001"
+    And I should not see "[EDIT-TEST]"
+    And I should see "Locked"
+
   Scenario: Teacher can preview a draft question
     When I open the ArtQTML generation named "Review pack"
     Then "[data-testid='artqtml-approve-preview-link']" "css_element" should exist
