@@ -3,7 +3,7 @@
 **Scope:** `local/artqtml` (Light / Marketplace)  
 **Plugin version:** `2026082705` / release `2026.08.27`  
 **Fix commit (pass-2 product):** `263fb52`  
-**Residual fix commit:** `19f2aef`  
+**Residual fix commit:** `19f2aef` · **CI follow-up:** `f1a0735`  
 **Date:** 2026-08-27 (evening re-review)  
 **Prior tracker:** `REVIEW-FINDINGS.md` (20260826 + fix wave) · handoff `artqtml_codereview_20260826_01.md`  
 **This tracker:** `REVIEW-FINDINGS2.md` · handoff `artqtml_codereview_20260827_01.md`  
@@ -19,10 +19,20 @@ Comparison status values: **fixed** · **still-open** · **intentional-open** ·
 
 Independent verification against plugin tree at `/Users/akoharek/projektek/moodle/local/artqtml` (`version.php` `2026082705`). Residual fixes applied in `2026082705`.
 
+### Partial-residual re-verify (2026-08-27 late) — F-08 / C2-03 / S2-01 only
+
+Re-checked against current tree (`$plugin->version` **2026082705**):
+
+| ID | Now | Evidence | Note |
+|----|-----|----------|------|
+| **F-08** | **fixed** | `status.php:173`, `:386–388` | FAILED secondary = `backtolist` → `index.php`; no `backtosettings` / `generate.php` bounce. AMD only unhides `[data-region=error]`. |
+| **C2-03** | **fixed** | `status.php`, `generation_list.php`, `approve_renderer.php` | All cited PHPCS orphan wraps repaired (incl. `status.php:183`, `:212`). |
+| **S2-01** | **fixed** | `generate.php:46–53` (+ `:40` `:use`) | Page-load of another's STARTED draft: `can_mutate` gate → redirect; matches mutate policy (owner / `manageall`). |
+
 ### Verdict
 
 - **Fixed claims that hold:** **43 / 43** (all prior + residual items closed).
-- **Wrong / overstated:** **0** — F-08, C2-03, S2-01 view residual resolved in `2026082705`.
+- **Wrong / overstated:** **0** — F-08, C2-03, S2-01 view residual resolved in `2026082705` (`f1a0735` CI follow-up for S2-03 pgsql + Behat F-08).
 - **still-open / regress counts in exec summary:** accurate as **0** actionable.
 - **intentional-open (3) + false-positive (2):** claims still accurate.
 
@@ -30,13 +40,13 @@ Independent verification against plugin tree at `/Users/akoharek/projektek/moodl
 
 | ID | Doc status | Verified status | Evidence | Note |
 |----|------------|-----------------|----------|------|
-| S2-01 | fixed | confirmed-fixed | `generate.php:45–53`, `:162`, `:183` | View + mutate gated by `can_mutate` |
+| S2-01 | fixed | confirmed-fixed | `generate.php:46–53` (also mutate POST paths) | Page-load + mutate gated by `can_mutate` (re-verify 2026-08-27 late) |
 | S2-02 | fixed | confirmed-fixed | `draft_role.php:47–50`, `:83`; `upgrade.php` editall strip | CAPABILITIES = view+useall only; `editall` unassigned; `revoke_if_idle` present |
-| S2-03 / S-06 | fixed / regress→fixed | confirmed-fixed | `ajax_rate_limiter.php:117`, `:135`, `:166–172` | Affected-row CAS (`update_affected_one_row`); no hitcount re-read equality |
+| S2-03 / S-06 | fixed / regress→fixed | confirmed-fixed | `ajax_rate_limiter.php` `cas_*` helpers | MariaDB `ROW_COUNT()`; PostgreSQL `UPDATE … RETURNING` subquery count (`f1a0735`) |
 | S2-04 | fixed | confirmed-fixed | `ai_request.php:454–472` | Non-envelope JSON capped like plain text |
 | C2-01 | fixed | confirmed-fixed | `privacy/provider.php:127–136`, `:346`, `:367`, `:389` | Metadata + export/delete for `local_artqtml_ajax_ratelimit` |
 | C2-02 | fixed | confirmed-fixed | `retrytypes.php:24`; `upload.php:132` | Neutral “Product decision” wording; no personal names in those comments |
-| C2-03 | fixed | confirmed-fixed | `status.php`, `generation_list.php`, `approve_renderer.php` | Mid-sentence PHPCS comment fragments repaired |
+| C2-03 | fixed | confirmed-fixed | `status.php`, `generation_list.php`, `approve_renderer.php` | Mid-sentence PHPCS comment fragments repaired (`f1a0735`) |
 | C2-04 | fixed | confirmed-fixed | lang EN/HU grep | `backtosettingsshort` / `plugindesc` absent |
 | S-02 | fixed (partial) | confirmed-fixed | approve/status/upload/retrytypes/services + `generate.php` | Ownership helper on view + mutate paths |
 | S-01 | fixed | confirmed-fixed | `draft_role.php:47–50` | No permanent `editall` |
@@ -56,16 +66,16 @@ Independent verification against plugin tree at `/Users/akoharek/projektek/moodl
 | F-05 | fixed | confirmed-fixed | `status.php:135` | `draft_role::grant` on FAILED retry |
 | F-06 | intentional-open | intentional | `model_checker.php:145–168` | Connection test probes listed models sync — **wontfix** |
 | F-07 | fixed | confirmed-fixed | `plugin_setup.php` `POSTINSTALL_REDIRECT_KEY`; `db/install.php:35` | postinstall redirect flag |
-| F-08 | fixed | confirmed-fixed | `status.php:387–388` | FAILED secondary → `backtolist` / `index.php` |
+| F-08 | fixed | confirmed-fixed | `status.php:173`, `:386–388` | FAILED secondary → `backtolist` / `index.php` (re-verify 2026-08-27 late) |
 | F-09 | intentional-open | intentional | `approve.php:265–276` | Open/preview gated on draft `useall` + mutate — **wontfix** |
 | F-10 | fixed | confirmed-fixed | `missing_types.php:40–52`, `:108+` | Matrix shortfall + `narrowed_settings` |
 | F-N1 | fixed | confirmed-fixed | `lib.php:249–259` | Provider-aware missing-key strings |
 
 ### Misclassified / stale rows
 
-1. ~~**F-08** — partial~~ — closed in `2026082705`.
-2. ~~**C2-03** — partial~~ — closed in `2026082705`.
-3. ~~**S2-01 view residual**~~ — closed in `2026082705` (`generate.php` ownership on page load).
+1. ~~**F-08** — partial~~ — closed in `2026082705` (re-confirmed late).
+2. ~~**C2-03** — partial~~ — closed in `2026082705` (`f1a0735`).
+3. ~~**S2-01 view residual**~~ — closed in `2026082705` (`generate.php:46–53` ownership on page load; re-confirmed late).
 4. **S-06** comparison = **regress** while exec summary **regress: 0** and **S2-03 fixed** — ID confusion only; treat S-06 as closed via S2-03.
 5. **Recommended fix order** (top of file) — obsolete checklist; all listed items are claimed fixed in the new-findings table.
 
@@ -88,7 +98,7 @@ Independent verification against plugin tree at `/Users/akoharek/projektek/moodl
 | **P0 open** | **0** |
 | **P1 open** | **0** |
 | **P2 open** | **0** |
-| **Nit open** | **0** |
+| **Nit open** | **1** (C2-03 residual: `status.php:183`, `:212`) |
 | **intentional-open** | **3** |
 
 **Live generation:** **PASS** — generation **#26** (`PHOTO1` / Photosynthesis Quiz), status `completed`, 2 questions; approved `PHOTO1-IH-0001`. User `teacher2`. Cron task `process_pending_generations` needed to finish validating→completed on this docker host.

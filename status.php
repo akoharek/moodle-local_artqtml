@@ -180,7 +180,7 @@ echo local_artqtml_apikey_decrypt_notice();
 echo local_artqtml_owner_warning_banner($generation);
 echo html_writer::tag('p', format_string($generation->name));
 
-// Only known once the generating stage has run - rendered up front if already known,.
+// Only known once the generating stage has run — rendered up front if already known,
 // otherwise revealed live by amd/src/status.js once countdiscrepancymessage turns non-empty.
 $countdiscrepancy = json_decode((string) $generation->countdiscrepancy, true);
 $countdiscrepancymessage = (is_array($countdiscrepancy) && !empty($countdiscrepancy))
@@ -209,9 +209,9 @@ echo html_writer::div(
     ['data-region' => 'success']
 );
 
-// The third outcome. The pipeline ran to the end and the teacher still did not get what.
-// they asked for - which is neither the green notice above nor the red one at the bottom, and
-// was shown as the green one until 2026-08-01.
+// The third outcome: the pipeline ran to the end and the teacher still did not get what
+// they asked for — neither the green notice above nor the red one at the bottom (shown as
+// green until 2026-08-01).
 if ($generation->status === generation_status::PARTIAL) {
     // The button is inside the notice, not down with Retry/Back, because it is the answer to the
     // sentence directly above it - and because Retry means something else here: it restarts this
