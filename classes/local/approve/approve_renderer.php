@@ -97,10 +97,10 @@ class approve_renderer {
         global $USER;
 
         $table = new \html_table();
-        // Spec v26, "Kérdéslista táblázat": "A táblázat oszlopai: jelölőnégyzet, kérdés neve,
-        // kérdéstípus (Moodle natív ikon és a típus neve), nehézségi mód, validációs javaslat,
-        // létrehozó, utoljára szerkesztette, dátum, műveletek. Konfidencia oszlop a táblázatban nem
-        // jelenik meg - a konfidencia % a kérdésszerkesztő csak olvasható validációs szekciójába
+        // Spec v26, question list table: columns are checkbox, question name,
+        // question type (native Moodle icon and type name), difficulty, validation suggestion,
+        // creator, last edited by, date, actions. The confidence column is not shown in the table -
+        // the confidence % belongs in the question editor's read-only validation section.
         // Exactly nine columns; a tenth (Confidence) is a defect.
         $table->head = [
             self::header_cell(
@@ -144,9 +144,9 @@ class approve_renderer {
         foreach ($questions as $question) {
             $typelabel = question_types::label($question->typecode);
             $qtype = question_types::QTYPE[$question->typecode] ?? $question->questiontype;
-            // "A Típus oszlop a Moodle natív kérdéstípus ikonját ÉS a típus nevét is
-            // megjeleníti (ikon + szöveg). Az ikon kizárólag a Típus oszlopban jelenhet meg, a
-            // kérdés neve előtt nem". pix_icon() already emits class="icon"; passing 'icon' again in
+            // The Type column shows both the native Moodle question-type icon and the type name
+            // (icon + text). The icon may appear only in the Type column, not before the
+            // question name. pix_icon() already emits class="icon"; passing 'icon' again in
             // the class attribute produced class="icon icon mr-1" - harmless but duplicated, and it
             // is what made the icon inherit the surrounding link's colour/underline when it sat
             // inside the question-name anchor. The icon is decorative here (the type name is right
@@ -215,8 +215,8 @@ class approve_renderer {
                 }
             }
 
-            // "Szerkesztett kérdésnél a validációs javaslat oszlopban »Szerkesztett« jelzés
-            // jelenik meg az ikon és a Gemini javaslat szövege HELYETT" - instead of, not in addition
+            // For an edited question, the validation suggestion column shows an "Edited" badge
+            // instead of the icon and Gemini suggestion text — not in addition
             // to. The former "Edited by <name>" sub-line under the badge supplemented the badge with
             // content the requirement replaces, and duplicated the "Last edited by" column
             // that already carries exactly that name. Only the approver line survives, and an edit
@@ -231,8 +231,8 @@ class approve_renderer {
                 }
             }
 
-            // "A kérdésbankba áthelyezett kérdés sora nem jelölhető ki: a jelölőnégyzete
-            // tiltott". The checkbox is rendered but disabled, not omitted - a missing control can't
+            // A row for a question moved into a real bank cannot be selected: its checkbox is
+            // disabled. The checkbox is rendered but disabled, not omitted - a missing control can't
             $checkbox = '';
             if ($canmutate) {
                 $checkboxattrs = ['class' => 'artqtm-rowselect', 'data-testid' => 'artqtm-approve-rowselect'];
@@ -246,8 +246,8 @@ class approve_renderer {
             $islocked = !empty($question->externallyedited);
             if (!empty($question->questionbankid) && $candraftpreviewquestions) {
                 if ($question->movedout) {
-                    // after move, Megnyitás opens the destination question-bank listing
-                    // (not question.php). No Előnézet, no owner confirm.
+                    // After move, Open links to the destination question-bank listing
+                    // (not question.php). No Preview, no owner confirm.
                     $bankurl = approve_page_data::question_bank_url((int) $question->questionbankid);
                     if ($bankurl) {
                         $actions[] = \html_writer::link(
@@ -291,7 +291,7 @@ class approve_renderer {
                     'data-testid' => 'artqtm-approve-moved-badge',
                 ]);
             } else if (!empty($question->approved)) {
-                // "a badge maga nem kattintható" - a plain span, with the revoke action as
+                // The badge itself is not clickable — a plain span, with the revoke action as
                 // its own separate link beside it.
                 $actions[] = \html_writer::span(get_string('approvedlabel', 'local_artqtml'), 'badge badge-success', [
                     'data-testid' => 'artqtm-approve-approved-badge',
@@ -306,7 +306,7 @@ class approve_renderer {
                     ]);
                 }
             } else if ($canmutate) {
-                // A gomb (button), and the field table types it as one,
+                // The button element (and the field table types it as one),
                 // so it is a real submit button in the surrounding form rather than the state-changing
                 // GET link it used to be. The form already carries the sesskey and the generationid.
                 // That much is not negotiable: approving over a GET link means a browser prefetcher
@@ -330,7 +330,7 @@ class approve_renderer {
                 ]);
             }
 
-            // "Áthelyezett kérdés soronként sem törölhető" - so the Delete action exists
+            // A moved-out question cannot be deleted per row — the Delete action exists
             // only while the question is still in the draft bank.
             if (!$question->movedout && $canmutate) {
                 $actions[] = \html_writer::tag('button', get_string('actiondelete', 'local_artqtml'), [
@@ -533,13 +533,12 @@ class approve_renderer {
         if (!$canmutate) {
             return '';
         }
-        // "A célkérdésbank kategória választó vizuálisan a »Kijelöltek áthelyezése« és
-        // »Kijelöltek törlése« gombokkal egy blokkban helyezkedik el; az »Összes elfogadható
-        // jóváhagyása« gomb ettől vizuálisan elkülönül, mivel ahhoz célkérdésbank megadása nem
+        // The target-bank category selector sits visually in one block with Move selected and
+        // Delete selected; Approve all acceptable sits apart because it needs no target bank.
         // Two containers, separated by a rule - not one flat button row.
         //
-        // "Összes elfogadható jóváhagyása" only sets the approval flag, so it needs no target bank
-        // and is not gated on $categoryoptions the way "Kijelöltek áthelyezése" is. it is
+        // Approve all acceptable only sets the approval flag, so it needs no target bank
+        // and is not gated on $categoryoptions the way Move selected is. It is
         // disabled (not just inert) when nothing is eligible, and labelled with the eligible count.
         $approveallattrs = [
             'type'        => 'submit',
@@ -577,9 +576,9 @@ class approve_renderer {
                 ['class' => 'mr-2']
             );
             // Deliberately NOT required="required": the <select> lives in the same form as every
-            // other control on this page, so an HTML5 required attribute blocked "Összes elfogadható
-            // jóváhagyása" ( no target bank), "Kijelöltek törlése" and the
-            // new per-row "Jóváhagyás" button from submitting at all until a category was picked.
+            // other control on this page, so an HTML5 required attribute blocked Approve all acceptable
+            // (no target bank), Delete selected and the
+            // new per-row Approve button from submitting at all until a category was picked.
             // The move path validates the value server-side in approve.php (errornocategory).
             $html .= \html_writer::select($categoryoptions, 'categoryvalue', '', ['' => 'choosedots'], [
                 'id'          => 'artqtm-categoryvalue',
@@ -630,7 +629,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var selectable = function() {
         return document.querySelectorAll('.artqtm-rowselect:not(:disabled)');
     };
-    // 'Kijelöltek áthelyezése' and 'Kijelöltek törlése' are disabled while nothing is
+    // Move selected and Delete selected are disabled while nothing is
     // selected. They render disabled server-side (nothing is selected on load), so this only ever
     // has to react to the selection changing.
     var syncBulkButtons = function() {

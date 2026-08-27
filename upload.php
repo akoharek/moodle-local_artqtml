@@ -70,7 +70,7 @@ $PAGE->set_heading(get_string('newgeneration', 'local_artqtml'));
 
 $indexurl = new moodle_url('/local/artqtml/index.php');
 
-// "Vissza" on the question settings page returns here with the generation's own
+// The Back button on the question settings page returns here with the generation's own
 // id, to edit its already-saved identifiers/source text in place rather than starting a new one.
 $editid = optional_param('id', 0, PARAM_INT);
 $editgeneration = null;
@@ -472,25 +472,16 @@ $countertemplate = get_string('textcounterlabel', 'local_artqtml', (object) [
     'tokens' => '__TOKENS__',
 ]);
 
-// THE PLUGIN VERSION IS IN THE URL, added 2026-08-04 after the browser proved it was needed. This
-// file is linked directly rather than served through Moodle's JavaScript cache, so a browser holds
-// on to whatever copy it fetched last. When init()'s parameter list changed, the cached copy went
-// on being called with the new arguments in the old positions - and the counter showed the limit
-// where the character count should have been, on a page that looked perfectly healthy. The version
-// changes whenever the file can have changed, which is exactly when the cache must be given up.
-$PAGE->requires->js(new moodle_url('/local/artqtml/js/textcounter.js', [
-    'v' => (int) get_config('local_artqtml', 'version'),
-]));
-echo html_writer::script(
-    'document.addEventListener("DOMContentLoaded", function() {' .
-    'if (window.ArtqtmTextCounter) {' .
-    'window.ArtqtmTextCounter.init("id_sourcetext", "artqtm-textcounter", ' .
-        $sourcetokenlimit . ', ' . json_encode($countertemplate) . ', ' .
-        json_encode($counterlimittemplate) . ', ' . json_encode($countererrormessage) . ');' .
-    '}});'
-);
+$PAGE->requires->js_call_amd('local_artqtml/textcounter', 'init', [
+    'id_sourcetext',
+    'artqtm-textcounter',
+    $sourcetokenlimit,
+    $countertemplate,
+    $counterlimittemplate,
+    $countererrormessage,
+]);
 
-// extracts a picked file's text into the box for review/editing, and
+// Extracts a picked file's text into the box for review/editing, and
 // warns when the user mixes typed text and an uploaded file.
 $PAGE->requires->js_call_amd('local_artqtml/uploadconflict', 'init', [
     'id_sourcetext',
@@ -504,26 +495,17 @@ $PAGE->requires->js_call_amd('local_artqtml/uploadconflict', 'init', [
     ],
 ]);
 
-// the Continue button is only active once all three required fields are filled.
-$PAGE->requires->js(new moodle_url('/local/artqtml/js/continuebutton.js'));
-echo html_writer::script(
-    'document.addEventListener("DOMContentLoaded", function() {' .
-    'if (window.ArtqtmContinueButton) {' .
-    'window.ArtqtmContinueButton.init("id_name", "id_shortname", "id_sourcetext", "id_sourcefile");' .
-    '}});'
-);
+// The Continue button is only active once all three required fields are filled.
+$PAGE->requires->js_call_amd('local_artqtml/continuebutton', 'init', [
+    'id_name',
+    'id_shortname',
+    'id_sourcetext',
+    'id_sourcefile',
+]);
 
-// confirm before discarding entered data via the Cancel button.
-echo html_writer::script(
-    'document.addEventListener("DOMContentLoaded", function() {' .
-    'var cancelbtn = document.querySelector(\'input[name="cancel"], button[name="cancel"]\');' .
-    'if (!cancelbtn) { return; }' .
-    'cancelbtn.addEventListener("click", function(e) {' .
-    'if (!window.confirm(' . json_encode(get_string('uploadcancelconfirm', 'local_artqtml')) . ')) {' .
-    'e.preventDefault(); e.stopPropagation();' .
-    '}' .
-    '}, true);' .
-    '});'
-);
+// Confirm before discarding entered data via the Cancel button.
+$PAGE->requires->js_call_amd('local_artqtml/uploadcancel', 'init', [
+    get_string('uploadcancelconfirm', 'local_artqtml'),
+]);
 
 echo $OUTPUT->footer();

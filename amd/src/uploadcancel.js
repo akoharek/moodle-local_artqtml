@@ -1,4 +1,3 @@
-<?php
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,26 +14,33 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Hooks API listener registrations for local_artqtml.
+ * Confirm before discarding upload form data via Cancel.
  *
- * @package    local_artqtml
+ * @module     local_artqtml/uploadcancel
  * @copyright  2026 AR Tudásmenedzsment Kft.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+define([], function() {
+    'use strict';
 
-defined('MOODLE_INTERNAL') || die();
+    /**
+     * @param {string} confirmmessage localised confirm dialog text
+     */
+    function init(confirmmessage) {
+        var cancelbtn = document.querySelector('input[name="cancel"], button[name="cancel"]');
+        if (!cancelbtn) {
+            return;
+        }
 
-$callbacks = [
-    [
-        'hook'     => \core\hook\navigation\primary_extend::class,
-        'callback' => [\local_artqtml\hook_callbacks::class, 'extend_primary_navigation'],
-    ],
-    [
-        'hook'     => \core\hook\after_config::class,
-        'callback' => [\local_artqtml\hook_callbacks::class, 'after_config'],
-    ],
-    [
-        'hook'     => \core\hook\output\before_standard_top_of_body_html_generation::class,
-        'callback' => \local_artqtml\hook_callbacks::class . '::before_standard_top_of_body_html',
-    ],
-];
+        cancelbtn.addEventListener('click', function(e) {
+            if (!window.confirm(confirmmessage)) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        }, true);
+    }
+
+    return {
+        init: init
+    };
+});

@@ -128,7 +128,7 @@ function local_artqtml_build_settings(stdClass $data): array {
     return $settings;
 }
 
-// Törlés és kilépés: POST + sesskey (no GET+sesskey URL).
+// Delete and exit: POST + sesskey (no GET+sesskey URL).
 $abortaction = optional_param('artqtmlabort', '', PARAM_ALPHA);
 if ($abortaction === 'delete') {
     if (!data_submitted()) {
@@ -296,7 +296,7 @@ echo local_artqtml_owner_warning_banner($generation);
 $mform->display();
 
 $candeleteown = \local_artqtml\local\generation_delete_policy::can_delete($generation, null, $context);
-// The "Generálás indítása", "Vissza" and "Megszakít" buttons all need the currently-typed field
+// The start-generation, back and cancel buttons all need the currently-typed field
 // Values, so
 // All three live outside generate_form's own <form> as plain (type=button) elements in this one
 // Row, and amd/src/generatesettings.js submits the real form on their behalf via requestSubmit() -

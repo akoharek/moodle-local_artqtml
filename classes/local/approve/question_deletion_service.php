@@ -53,8 +53,7 @@ class question_deletion_service {
      * Delete a single draft question: its real Moodle question (if not already
      * moved out) and its local row, then prune the draft bank if it is now empty.
      *
-     * "Áthelyezett kérdés soronként sem törölhető" - a question that has already been moved
-     * into a real question bank is skipped here, matching the delete_selected() filter below. The
+     * A question that has already been moved into a real question bank is skipped here, matching the delete_selected() filter below. The
      * approve page renders no Delete control for such a row, so this is the server-side half of the
      * same rule, for a replayed or hand-built URL.
      *
@@ -105,8 +104,8 @@ class question_deletion_service {
      * Whether the generation still contains at least one question that has been moved into a real
      * Moodle question bank.
      *
-     * "Ha a generálás tartalmaz legalább egy áthelyezett kérdést, a generálás nem
-     * törölhető". Used by the list page to render (and by delete.php to enforce) that rule.
+     * When a generation contains at least one moved-out question, the generation cannot be deleted.
+     * Used by the list page to render (and by delete.php to enforce) that rule.
      *
      * @param int $generationid
      * @return bool
@@ -163,10 +162,10 @@ class question_deletion_service {
             // never leaves a partially-deleted batch. rollback() rethrows $e by contract, so it
             // propagates to the controller, which turns it into a notification::error.
             //
-            // Az is_disposed() őr akkor számít, ha $e magából az allow_commit()-ból jön:
-            // commit_delegated_transaction() még a hiba előtt disposed-ra állítja a tranzakciót,
-            // és egy disposed tranzakcióra hívott rollback() dml_transaction_exception-t dob,
-            // elfedve a valódi hibát. Ilyenkor az eredeti $e-t dobjuk tovább változatlanul.
+            // The is_disposed() guard matters when $e comes from allow_commit() itself:
+            // commit_delegated_transaction() marks the transaction disposed before the error,
+            // and calling rollback() on a disposed transaction throws dml_transaction_exception,
+            // masking the real error. In that case rethrow the original $e unchanged.
             if (!$transaction->is_disposed()) {
                 $transaction->rollback($e);
             }

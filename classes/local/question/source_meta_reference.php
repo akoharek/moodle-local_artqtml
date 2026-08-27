@@ -27,7 +27,7 @@ namespace local_artqtml\local\question;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Quiz stems must not point at the source document ("szöveg szerint", "according to the text").
+ * Quiz stems must not point at the source document (according-to-the-text meta-references).
  *
  * The student already knows the material comes from the course. Naming the source in the stem
  * Reads as AI scaffolding, not as a finished question. The generator prompt forbids it; this
@@ -90,7 +90,7 @@ class source_meta_reference {
      * For the validator to reject - stripping those would produce ungrammatical leftovers.
      */
     private const LEADING_PATTERNS = [
-        // HU: "A szöveg szerint, …" / "Forrásszöveg alapján: …".
+        // Hungarian patterns: "According to the text, …" / "Based on the source text: …".
         '/^(?:a[z]?\s+)?(?:megadott\s+|fenti\s+)?'
             . '(?:szöveg|forrás(?:szöveg|anyag)?|dokumentum|leírás)\s+'
             . '(?:szerint|alapján)\s*[,:\-–—]?\s+/iu',

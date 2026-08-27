@@ -238,21 +238,11 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
     /**
      * Whether a file is currently attached and not "dropped".
      *
-     * js/continuebutton.js (still a plain, non-AMD script) reads this via the same
-     * window.ArtqtmlUploadConflict global this module always exposed, so both scripts agree
-     * on what will actually be submitted - migrating this module to AMD must not require
-     * migrating that one in lockstep.
-     *
      * @return {boolean}
      */
     function hasFile() {
         return sharedHasFile();
     }
-
-    window.ArtqtmlUploadConflict = {
-        init: init,
-        hasFile: hasFile
-    };
 
     return {
         init: init,

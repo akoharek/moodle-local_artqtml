@@ -18,8 +18,8 @@
  * Read-only AI validation panel injected into Moodle's native question editor.
  *
  * The plugin deliberately reuses Moodle's own /question/bank/editquestion/question.php rather
- * Than shipping a custom editing form (: "A szerkesztő pontosan ugyanaz az oldal
- * Amelyen a tanár bármely kérdésbanki kérdést szerkesztené"). Since that page belongs to core,
+ * than shipping a custom editing form (the editor is exactly the page where a teacher would
+ * edit any question-bank question). Since that page belongs to core,
  * This panel is injected via the before_standard_top_of_body_html plugin callback (lib.php)
  * Rather than by modifying the native edit form.
  *
@@ -60,7 +60,7 @@ class validation_panel {
      *
      * Returned as a hidden <div> plus a small inline script that relocates it immediately
      * Before the native form's "Question name" field (#id_name) once the DOM is ready - the
-     * Exact placement the spec calls for ("a kérdés neve előtt"). If that field can't be found
+     * Exact placement the spec calls for (before the question name field). If that field can't be found
      * (a future Moodle version changes the form), the panel simply stays visible at the top of
      * The page instead of disappearing.
      *
@@ -80,7 +80,7 @@ class validation_panel {
         ];
         if ($row->validationsuggestion !== \local_artqtml\local\validation_suggestion::NOT_EVALUATED) {
             // show the problem category for any validated question, via its lang
-            // Label (never the raw key). 'ok' renders as "No issue"/"Nincs probléma", not as an
+            // Label (never the raw key). 'ok' renders as "No issue", not as an
             // Empty field. normalise() guards against a stale/legacy value reaching get_string().
             $category = \local_artqtml\local\problem_category::normalise($row->problemcategory);
             if ($category !== null) {

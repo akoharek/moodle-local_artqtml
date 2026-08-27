@@ -99,8 +99,8 @@ class question_approval_service {
     /**
      * Revoke a single question's approval.
      *
-     * "A jóváhagyás visszavonható, kizárólag a »Jóváhagyva« állapotban [...] A visszavonás
-     * az approved jelzőt 0-ra állítja; a validációs státuszt nem módosítja." So this touches
+     * Approval may be revoked only while a question is in the approved state. Revocation
+     * clears the approved flag to 0; it does not change the validation status. So this touches
      * approved/approvedby and nothing else - validationsuggestion, problemcategory, justification,
      * confidence, validationdata and the edited flag are all left exactly as they were. It is
      * deliberately not the inverse of an edit (which does clear the validation - see
@@ -198,10 +198,10 @@ class question_approval_service {
             // never leaves a partially-approved batch. rollback() rethrows $e by contract, so it
             // propagates to the controller, which turns it into a notification::error.
             //
-            // Az is_disposed() őr akkor számít, ha $e magából az allow_commit()-ból jön:
-            // commit_delegated_transaction() még a hiba előtt disposed-ra állítja a tranzakciót,
-            // és egy disposed tranzakcióra hívott rollback() dml_transaction_exception-t dob,
-            // elfedve a valódi hibát. Ilyenkor az eredeti $e-t dobjuk tovább változatlanul.
+            // The is_disposed() guard matters when $e comes from allow_commit() itself:
+            // commit_delegated_transaction() marks the transaction disposed before the error,
+            // and calling rollback() on a disposed transaction throws dml_transaction_exception,
+            // masking the real error. In that case rethrow the original $e unchanged.
             if (!$transaction->is_disposed()) {
                 $transaction->rollback($e);
             }

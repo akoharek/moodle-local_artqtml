@@ -312,7 +312,7 @@ class generation_list {
         $html .= \html_writer::empty_tag('input', ['type' => 'hidden', 'name' => $prefix . '_dir', 'value' => $dir]);
 
         // The six filter options come from the single source of truth, and each
-        // is labelled from its lang string ('started' shows as "Megkezdett" / "Started") - the raw
+        // is labelled from its lang string ('started' shows as "Started" / localized label) - the raw
         // key is only ever the option's value, never its visible text.
         $statusoptions = ['' => get_string('filterany', 'local_artqtml')];
         foreach (generation_status::VALUES as $statusvalue) {
@@ -405,10 +405,10 @@ class generation_list {
         // collapse below lg via Boost's own display utilities and reappear as a secondary line
         // inside the name cell, so collapsing hides the cell, never the information. The actions
         // column carries no d-none and is therefore reachable at every width.
-        // Exactly seven columns: Név/cím, Létrehozó, Létrehozás dátuma, Státusz,
-        // Kérdések száma, Validálásra vár, Műveletek. The eighth "Módosította" column was removed:
+        // Exactly seven columns: Name/title, Creator, Created date, Status,
+        // Question count, Pending validation, Actions. The eighth "Last modified by" column was removed:
         // a list of generations does not need to name whoever last touched a question inside one; the approve
-        // page's own "Utoljára szerkesztette" column is where that belongs.
+        // page's own "Last edited by" column is where that belongs.
         $table->attributes['class'] = 'generaltable table table-striped artqtm-table';
         $table->colclasses = [
             0 => 'artqtm-col-name',
@@ -435,7 +435,7 @@ class generation_list {
         $table->head[] = get_string('colactions', 'local_artqtml');
 
         foreach ($generations as $generation) {
-            // the badge shows the lang label ('started' -> "Megkezdett" / "Started"),
+            // the badge shows the lang label ('started' -> "Started" in English / localized label),
             // never the raw status key.
             $statusbadge = \html_writer::span(
                 generation_status::label($generation->status),
@@ -453,9 +453,9 @@ class generation_list {
             $actions = $openlink;
             $deletereason = '';
             if ($rowcandelete) {
-                // "Ha a generálás tartalmaz legalább egy áthelyezett kérdést, a
-                // generálás nem törölhető [...] A tiltott Törlés gomb indoklást jelenít meg arról,
-                // hogy a generálás áthelyezett kérdést tartalmaz." Rendered as a genuinely disabled
+                // When a generation contains at least one moved-out question, the generation cannot
+                // be deleted. The disabled Delete button shows a reason explaining that the generation
+                // contains a moved-out question. Rendered as a genuinely disabled
                 // <button> (so it cannot be clicked or focused into a submit) carrying the reason as
                 // its title, plus the same reason as visible adjacent text - a title tooltip alone is
                 // unreachable by keyboard and by touch, so it cannot be the only place the
@@ -584,7 +584,7 @@ class generation_list {
      * This helper has no ownership gate — list Open links (including "Others' generations")
      * intentionally reach any generation the caller may open with :use.
      *
-     * Public: upload.php's duplicate-warning panel ("Megnyitom a meglévőt") links to the same
+     * Public: upload.php's duplicate-warning panel (Open existing link) links to the same
      * generation and must land on the same page the list page would, so the status->destination
      * rule stays stated in exactly one place. Do not re-derive it at the call site.
      *

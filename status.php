@@ -114,7 +114,7 @@ if (optional_param('retry', 0, PARAM_BOOL)) {
     // The check sits BEFORE local_artqtml_rollback(), because a refusal may not destroy the
     // failed attempt's draft bank and questions on the way out. Same message and same destination
     // as the start path: the running generation's status page, which is where the progress is shown
-    // and where the Megszakítás button is - so a stuck run can be cleared from the page the teacher
+    // and where the Cancel button is - so a stuck run can be cleared from the page the teacher
     // is sent to.
     if ($generation->status === generation_status::FAILED) {
         $running = \local_artqtml\local\generation_start_policy::find_running((int) $USER->id, $generationid);
@@ -339,7 +339,7 @@ echo html_writer::div(
 );
 echo html_writer::end_div();
 
-// "Minden szakasznál szöveges visszajelzés is megjelenik a progress bar alatt".
+// Text feedback is also shown under the progress bar at every stage.
 // S-4: this used to be written inside the bar, where at 25% the bar was narrower than its own
 // label and Bootstrap's overflow: hidden clipped the text away - content made unreachable by
 // was worked around in CSS; below the bar it needs no

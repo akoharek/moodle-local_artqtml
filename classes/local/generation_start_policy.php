@@ -26,7 +26,7 @@
  * `userid` - is counting the right person's runs.
  *
  * THE VISIBLE SIDE EFFECT OF THAT WRITE, said here so it is not discovered later. `userid` is
- * Also what the list page's "Létrehozó" column shows and what
+ * Also what the list page's Creator column shows and what
  * {@see local_artqtml_owner_warning_banner()} names in its yellow "you are viewing someone
  * Else's generation" bar. After a colleague starts a generation that somebody else created, both
  * Name the colleague - the person who started it - not the original creator. The column keeps its
@@ -40,7 +40,7 @@
  * WHAT THIS COSTS, written down before it is discovered. A generation stuck in `generating` - a
  * Cron that died, a run cut off half-way - now locks the person it belongs to out of starting
  * Anything at all, where before they would simply have started another one. The way out is the
- * Status page's "Megszakítás" (Cancel) button, which rolls the generation back to `started`; that
+ * Status page's Cancel button, which rolls the generation back to `started`; that
  * Is why both refusals below redirect the teacher to exactly that page rather than merely saying
  * No.
  *

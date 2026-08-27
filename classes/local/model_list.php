@@ -126,8 +126,8 @@ class model_list {
      *
      * Only the "Refresh models" button and the scheduled model check call this.
      *
-     * On failure the previous cache content is deliberately left in place (annex, "Hibakezelés":
-     * "Ha a lekérés meghiúsul, a korábbi gyorsítótár-tartalom marad érvényben"), so a transient
+     * On failure the previous cache content is deliberately left in place (annex error-handling rule:
+     * when a fetch fails, the previous cache content remains valid), so a transient
      * Provider outage does not empty the dropdown of an admin who is mid-configuration.
      *
      * @param string $provider one of self::PROVIDERS
@@ -329,7 +329,7 @@ class model_list {
                 $models[] = [
                     'id'           => $id,
                     'display_name' => (string) ($model['displayName'] ?? $id),
-                    // The annex filters Gemini "a támogatott generálási metódusok alapján".
+                    // The annex filters Gemini models by supported generation methods.
                     // GenerateContent is the method the plugin's structured-output calls use.
                     'supports_structured_output' => in_array('generateContent', $methods, true),
                 ];

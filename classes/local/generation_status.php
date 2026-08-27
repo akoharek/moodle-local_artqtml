@@ -113,7 +113,7 @@ class generation_status {
 
     /**
      * Human-readable label for a status, from a lang string - the raw machine key (e.g. 'started')
-     * Must never reach the UI. fixes the 'started' label as "Megkezdett" in Hungarian.
+     * Must never reach the UI. The 'started' label is localized (e.g. "Started" in English).
      *
      * @param string $value one of {@see self::VALUES}
      * @return string

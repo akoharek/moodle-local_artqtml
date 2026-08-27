@@ -1,0 +1,63 @@
+---
+description: Moodle 4.5+ Hooks API and AMD JavaScript standards (C-11, C-12)
+globs: **/*.{php,js}
+alwaysApply: false
+---
+
+# Moodle Hooks API + AMD (Marketplace compliance)
+
+ArtQTM Light targets **Moodle 4.5+**. Follow core conventions so HQ / moodle.org CI passes.
+
+## Hooks API — not magic lib.php callbacks
+
+Moodle 4.4+ deprecates `<plugin>_extend_navigation`, `<plugin>_before_http_headers`, etc.
+
+| Legacy (do not add) | Replacement |
+|---|---|
+| `local_artqtml_extend_navigation()` in `lib.php` | `\core\hook\navigation\primary_extend` listener in `classes/hook_callbacks.php`, registered in `db/hooks.php` |
+| Other magic callbacks | Matching class under `lib/classes/hook/` in core — register in `db/hooks.php` |
+
+**Pattern:**
+
+```php
+// db/hooks.php
+[
+    'hook' => \core\hook\navigation\primary_extend::class,
+    'callback' => [\local_artqtml\hook_callbacks::class, 'extend_primary_navigation'],
+],
+
+// classes/hook_callbacks.php
+public static function extend_primary_navigation(primary_extend $hook): void {
+    $hook->get_primaryview()->add_node($node);
+}
+```
+
+After changing `db/hooks.php`: purge caches (`php admin/cli/purge_caches.php`).
+
+## AMD JavaScript — not `$PAGE->requires->js()`
+
+**Never** load plugin JS from a top-level `js/` folder:
+
+```php
+// BAD — legacy, fails C-12 / HQ review
+$PAGE->requires->js(new moodle_url('/local/artqtml/js/foo.js'));
+echo html_writer::script('window.MyGlobal.init(...)');
+```
+
+**Required pattern:**
+
+1. Source in `amd/src/<module>.js` (use `define([...], function(...) {` like existing `uploadconflict.js`, or ES6 `export` if the plugin already uses it consistently).
+2. Build: `cd /path/to/moodle && npx grunt amd --root=local/artqtml`
+3. Commit `amd/build/*.min.js` (+ `.map` if generated).
+4. Load from PHP: `$PAGE->requires->js_call_amd('local_artqtml/<module>', 'init', [$args]);`
+5. Prefer `core/ajax`, `core/str`, `core/notification` over raw `fetch` / `M.cfg` globals.
+
+**Why:** Moodle's JS pipeline (RequireJS, caching, minification, PHPUnit AMD tests) expects AMD. Plain `js/` files bypass that and trigger compliance findings (C-12).
+
+## Checklist for new UI behaviour
+
+- [ ] Hook listener in `hook_callbacks` + `db/hooks.php` (not `lib.php` magic name)
+- [ ] AMD module in `amd/src/`, not `js/`
+- [ ] `grunt amd` run; build artefacts committed
+- [ ] PHP loads via `js_call_amd` only; no inline `<script>` init blocks
+- [ ] Lang strings passed as `js_call_amd` arguments (or `get_string` in templates), not hardcoded in JS

@@ -65,7 +65,7 @@ class generate_form extends \moodleform {
         $mform->setType('id', PARAM_INT);
 
         // Set by amd/src/generatesettings.js immediately before submitting, so generate.php can
-        // Tell "Generálás indítása" apart from "Mentés és kilépés".
+        // Tell start-generation apart from save-and-exit.
         $mform->addElement('hidden', 'artqtmlaction', 'generate');
         $mform->setType('artqtmlaction', PARAM_ALPHA);
 
@@ -74,7 +74,7 @@ class generate_form extends \moodleform {
         $mform->addElement('hidden', 'difficultymode', 'scale');
         $mform->setType('difficultymode', PARAM_ALPHA);
 
-        // Azonosítók: read-only.
+        // Identifiers: read-only.
         $mform->addElement('header', 'idheader', get_string('idsectionheading', 'local_artqtml'));
         $mform->setExpanded('idheader');
         $mform->addElement(
@@ -90,7 +90,7 @@ class generate_form extends \moodleform {
             s($generation->shortname)
         );
 
-        // 1. lépés — Easy/Medium/Hard scale.
+        // Step 1 — Easy/Medium/Hard scale.
         $mform->addElement('header', 'step1header', get_string('step1heading', 'local_artqtml'));
         $mform->setExpanded('step1header');
         $mform->addElement(
@@ -100,7 +100,7 @@ class generate_form extends \moodleform {
             get_string('difficultymode_scale', 'local_artqtml')
         );
 
-        // 2. lépés — per-type × easy/medium/hard grid.
+        // Step 2 — per-type × easy/medium/hard grid.
         $mform->addElement('header', 'step2header', get_string('step2heading', 'local_artqtml'));
         $mform->setExpanded('step2header');
 
@@ -145,11 +145,11 @@ class generate_form extends \moodleform {
 
         // Knowledge source is always the uploaded/pasted source text.
 
-        // Tagadó kérdés kiemelése, generálásonként felülírható.
+        // Negation highlighting, overridable per generation.
         $mform->addElement('advcheckbox', 'negationhighlight', get_string('negationhighlight', 'local_artqtml'));
         $mform->setDefault('negationhighlight', get_config('local_artqtml', 'negationhighlightdefault') ? 1 : 0);
 
-        // Részletes beállítások: egy accordion panel típusonként (IH/FE/SR).
+        // Advanced settings: one accordion panel per type (IH/FE/SR).
         foreach (question_types::CODES as $code) {
             $mform->addElement('header', 'typeheader_' . $code, question_types::label($code));
 

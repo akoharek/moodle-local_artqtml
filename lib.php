@@ -25,35 +25,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Add a link to the ArtQTML into the primary/global navigation.
- *
- * @param global_navigation $navigation the global navigation tree
- * @return void
- */
-function local_artqtml_extend_navigation(global_navigation $navigation) {
-    if (!get_config('local_artqtml', 'enabled')) {
-        return;
-    }
-
-    $context = context_system::instance();
-    if (!has_capability('local/artqtml:use', $context)) {
-        return;
-    }
-
-    $url = new moodle_url('/local/artqtml/index.php');
-    $node = navigation_node::create(
-        get_string('navigationlink', 'local_artqtml'),
-        $url,
-        navigation_node::TYPE_CUSTOM,
-        null,
-        'local_artqtml',
-        new pix_icon('i/settings', '')
-    );
-
-    $navigation->add_node($node);
-}
-
-/**
  * Map a generation status to a Bootstrap badge CSS class.
  *
  * Thin wrapper kept for the existing call sites; the map itself lives with the status values in
@@ -88,32 +59,22 @@ function local_artqtml_validation_badge_class(string $status): string {
 function local_artqtml_render_test_button(string $provider): string {
     global $PAGE;
 
-    $PAGE->requires->js(new moodle_url('/local/artqtml/js/admintest.js'));
-
-    static $stringsemitted = false;
-    if (!$stringsemitted) {
-        $PAGE->requires->data_for_js('M.artqtml_admintest', [
-            'testing'      => get_string('admintesttesting', 'local_artqtml'),
-            'errorunknown' => get_string('errorajaxunknown', 'local_artqtml'),
-        ]);
-        $stringsemitted = true;
-    }
-
     $buttonid = 'artqtml-test-' . $provider;
     $statusid = 'artqtml-teststatus-' . $provider;
+
+    $PAGE->requires->js_call_amd('local_artqtml/admintest', 'initButton', [
+        $provider,
+        $buttonid,
+        $statusid,
+        get_string('admintesttesting', 'local_artqtml'),
+        get_string('errorajaxunknown', 'local_artqtml'),
+    ]);
 
     $html = html_writer::tag('button', get_string('testconnectionbutton', 'local_artqtml'), [
         'type' => 'button', 'id' => $buttonid, 'class' => 'btn btn-secondary',
         'data-testid' => 'artqtml-admin-connectiontest-' . $provider,
     ]);
     $html .= html_writer::tag('span', '', ['id' => $statusid, 'class' => 'ml-2']);
-    $html .= html_writer::script(
-        'document.addEventListener("DOMContentLoaded", function() {' .
-        'if (window.ArtqtmlAdminTest) {' .
-        'window.ArtqtmlAdminTest.init(' . json_encode($provider) . ', ' . json_encode($buttonid) . ', ' .
-        json_encode($statusid) . ');' .
-        '}});'
-    );
 
     return $html;
 }

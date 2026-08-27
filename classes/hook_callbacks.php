@@ -25,6 +25,7 @@
 namespace local_artqtml;
 
 use core\hook\after_config;
+use core\hook\navigation\primary_extend;
 use core\hook\output\before_standard_top_of_body_html_generation;
 use local_artqtml\local\plugin_setup;
 use local_artqtml\local\validation_panel;
@@ -35,6 +36,34 @@ defined('MOODLE_INTERNAL') || die();
  * Listeners for core output hooks.
  */
 class hook_callbacks {
+    /**
+     * Add ArtQTML to the site primary navigation (Boost top bar).
+     *
+     * @param primary_extend $hook
+     * @return void
+     */
+    public static function extend_primary_navigation(primary_extend $hook): void {
+        if (!get_config('local_artqtml', 'enabled')) {
+            return;
+        }
+
+        $context = \context_system::instance();
+        if (!has_capability('local/artqtml:use', $context)) {
+            return;
+        }
+
+        $node = \navigation_node::create(
+            get_string('navigationlink', 'local_artqtml'),
+            new \moodle_url('/local/artqtml/index.php'),
+            \navigation_node::TYPE_CUSTOM,
+            null,
+            'local_artqtml',
+            new \pix_icon('i/settings', '')
+        );
+
+        $hook->get_primaryview()->add_node($node);
+    }
+
     /**
      * After install, send configure-capable users to plugin settings once.
      *

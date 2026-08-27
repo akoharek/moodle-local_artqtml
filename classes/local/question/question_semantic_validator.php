@@ -45,7 +45,7 @@ class question_semantic_validator {
             return $typecode . ': empty questiontext';
         }
 
-        // Source-document meta-references ("szöveg szerint", "according to the text") are
+        // Source-document meta-references (according-to-the-text clauses) are
         // Unprofessional scaffolding. The prompt forbids them and the cleaner strips a leading
         // Clause; anything still present in the stem is rejected here rather than imported.
         if (source_meta_reference::contains((string) $data['questiontext'])) {

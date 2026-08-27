@@ -14,11 +14,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    local_artqtml
+ * Admin "Test connection" button for Claude/Gemini tabs.
+ *
+ * @module     local_artqtml/admintest
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-window.ArtqtmlAdminTest = (function() {
+define(['core/ajax'], function(Ajax) {
     'use strict';
 
     /**
@@ -28,42 +30,23 @@ window.ArtqtmlAdminTest = (function() {
      * @return {Promise<{success: boolean, message: string, models: string[]}>}
      */
     function callTestConnection(provider) {
-        var url = M.cfg.wwwroot + '/lib/ajax/service.php?sesskey=' +
-            encodeURIComponent(M.cfg.sesskey) + '&info=local_artqtml_test_connection';
-
-        var body = JSON.stringify([{
-            index: 0,
+        return Ajax.call([{
             methodname: 'local_artqtml_test_connection',
             args: {provider: provider}
-        }]);
-
-        return fetch(url, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: body,
-            credentials: 'same-origin'
-        }).then(function(response) {
-            return response.json();
-        }).then(function(results) {
-            var result = results && results[0];
-            if (!result || result.error) {
-                throw new Error(
-                    (result && result.exception && result.exception.message) || window.M.artqtml_admintest.errorunknown
-                );
-            }
-            return result.data;
-        });
+        }])[0];
     }
 
     /**
- * Wire the "Test connection" button on one LLM tab.
- *
- * @param {string} provider 'claude' or 'gemini'
- * @param {string} buttonid id of the test button
- * @param {string} statusid id of the status span
- * @return {void}
- */
-    function init(provider, buttonid, statusid) {
+     * Wire the "Test connection" button on one LLM tab.
+     *
+     * @param {string} provider 'claude' or 'gemini'
+     * @param {string} buttonid id of the test button
+     * @param {string} statusid id of the status span
+     * @param {string} testinglabel shown while the request is in flight
+     * @param {string} errorunknownlabel shown when the request fails
+     * @return {void}
+     */
+    function initButton(provider, buttonid, statusid, testinglabel, errorunknownlabel) {
         var button = document.getElementById(buttonid);
         var status = document.getElementById(statusid);
 
@@ -72,24 +55,25 @@ window.ArtqtmlAdminTest = (function() {
         }
 
         button.addEventListener('click', function() {
-            status.textContent = (window.M && M.artqtml_admintest)
-                ? M.artqtml_admintest.testing : '...';
+            status.textContent = testinglabel;
 
             callTestConnection(provider).then(function(data) {
                 status.textContent = data.message;
                 status.className = 'ml-2 ' + (data.success ? 'text-success' : 'text-danger');
                 if (data.success) {
-                    // the dropdown only exists once a test has succeeded, and it is built server-side from the cache that test populated.
+                    // The dropdown only exists once a test has succeeded, and it is built server-side
+                    // from the cache that test populated.
                     window.location.reload();
                 }
                 return null;
             }).catch(function() {
-                status.textContent = (window.M && M.artqtml_admintest)
-                    ? M.artqtml_admintest.errorunknown : 'Error';
+                status.textContent = errorunknownlabel;
                 status.className = 'ml-2 text-danger';
             });
         });
     }
 
-    return {init: init};
-})();
+    return {
+        initButton: initButton
+    };
+});

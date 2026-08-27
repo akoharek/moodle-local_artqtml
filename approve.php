@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Kérdésbank - Draft jóváhagyó oldal.
+ * Question bank — draft approval page.
  *
  * Reviews AI-generated/validated questions, which already exist as real Moodle question
  *  and lets the teacher
@@ -81,7 +81,7 @@ $PAGE->set_heading(get_string('approveheading', 'local_artqtml'));
 
 $categoryoptions = question_bank_list::options_for_user((int) $USER->id, (int) $generation->draftcategoryid);
 
-// Soronkénti jóváhagyás: a human approval step, independent of the AI's validationsuggestion -
+// Per-row approval: the human approval step, independent of the AI's validationsuggestion -
 // a question must be approved before it can be moved into a real question bank.
 $approveid = optional_param('approvequestion', 0, PARAM_INT);
 $revokeid = optional_param('revokequestion', 0, PARAM_INT);
@@ -97,7 +97,7 @@ if (
     generation_access_policy::require_can_mutate($generation, $context);
 }
 
-// Soronkénti jóváhagyás: a human approval step, independent of the AI's validationsuggestion -
+// Per-row approval: the human approval step, independent of the AI's validationsuggestion -
 // a question must be approved before it can be moved into a real question bank.
 if ($approveid) {
     if (!data_submitted()) {
@@ -108,7 +108,7 @@ if ($approveid) {
     redirect($pageurl);
 }
 
-// Soronkénti jóváhagyás visszavonása: only the approved flag is cleared, the AI's
+// Per-row approval revocation: only the approved flag is cleared, the AI's
 // validation verdict is deliberately left untouched.
 if ($revokeid) {
     if (!data_submitted()) {
@@ -119,7 +119,7 @@ if ($revokeid) {
     redirect($pageurl);
 }
 
-// Soronkénti törlés.
+// Per-row deletion.
 if ($deleteid) {
     if (!data_submitted()) {
         throw new moodle_exception('invalidrequest');
@@ -129,7 +129,7 @@ if ($deleteid) {
     redirect($pageurl);
 }
 
-// Tömeges műveletek.
+// Bulk actions.
 if (in_array($bulkaction, ['move', 'allaccepted', 'delete'], true)) {
     if (!data_submitted()) {
         throw new moodle_exception('invalidrequest');

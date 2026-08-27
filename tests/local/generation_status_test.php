@@ -22,7 +22,7 @@ defined('MOODLE_INTERNAL') || die();
  * Unit tests for the seven generation status values.
  *
  * Requires one shared constant that every use site reads from, with the literal list
- * Appearing nowhere else ("a literál lista sehol nem ismételhető meg"). The last assertion here
+ * Appearing nowhere else (the literal list must not be duplicated elsewhere). The last assertion here
  * Greps the whole plugin for a re-typed list, so a future re-inlining fails the build.
  *
  * @package    local_artqtml
@@ -75,8 +75,8 @@ final class generation_status_test extends \advanced_testcase {
     }
 
     /**
-     * Every status has a real lang label, and 'started' shows as "Megkezdett" in
-     * Hungarian - no raw machine key may reach the UI.
+     * Every status has a real lang label, and 'started' shows as "Started" in
+     * English — no raw machine key may reach the UI.
      */
     public function test_every_status_has_a_lang_label(): void {
         $this->resetAfterTest();
@@ -95,7 +95,7 @@ final class generation_status_test extends \advanced_testcase {
 
         $this->assertSame('Started', generation_status::label(generation_status::STARTED));
 
-        // "A started státusz megjelenített neve »Megkezdett«". Asserted against the
+        // The started status display name is "Started" in English. Asserted against the
         // Shipped lang file rather than through get_string() under force_current_language('hu'):
         // The CI/PHPUnit install has only the English pack, so get_string() would silently fall
         // Back to English and the assertion would test nothing. What the requirement actually

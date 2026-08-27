@@ -35,19 +35,19 @@ defined('MOODLE_INTERNAL') || die();
  * Canonical list + display helper for the validator's suggestion values.
  */
 class validation_suggestion {
-    /** @var string the question is acceptable as generated ( "Elfogadható"). */
+    /** @var string the question is acceptable as generated ("Accepted"). */
     public const ACCEPTED = 'accepted';
 
-    /** @var string the question needs a teacher's edit before use ( "Módosítandó"). */
+    /** @var string the question needs a teacher's edit before use ("Needs review"). */
     public const NEEDS_REVIEW = 'needs_review';
 
-    /** @var string the question should be discarded ( "Törlendő"). */
+    /** @var string the question should be discarded ("Rejected"). */
     public const REJECTED = 'rejected';
 
     /**
      * Helper.
      *
-     * @var string the plugin's own "no verdict yet" marker (/ "Nem értékelt").
+     * @var string the plugin's own "no verdict yet" marker ("Not evaluated").
      */
     public const NOT_EVALUATED = 'not_evaluated';
 

@@ -67,7 +67,7 @@ final class setting_backup_test extends \advanced_testcase {
     }
 
     /**
-     * "A mentés nem íródik felül": a second backup at the same version keeps the first, which is
+     * Backups must not overwrite an earlier backup: a second backup at the same version keeps the first, which is
      * The more original value, and takes a suffixed key instead.
      */
     public function test_an_existing_backup_is_never_overwritten(): void {

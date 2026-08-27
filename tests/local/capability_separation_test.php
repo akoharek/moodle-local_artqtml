@@ -174,10 +174,10 @@ final class capability_separation_test extends \advanced_testcase {
      * Global navigation link is :use only — configure-only users must not get a generations entry.
      */
     public function test_navigation_is_gated_on_use_not_configure(): void {
-        $lib = file_get_contents(dirname(__DIR__, 2) . '/lib.php');
+        $hooks = file_get_contents(dirname(__DIR__, 2) . '/classes/hook_callbacks.php');
         $this->assertMatchesRegularExpression(
-            "/function local_artqtml_extend_navigation.*?has_capability\\('local\\/artqtml:use'/s",
-            $lib
+            "/function extend_primary_navigation.*?has_capability\\('local\\/artqtml:use'/s",
+            $hooks
         );
     }
 
