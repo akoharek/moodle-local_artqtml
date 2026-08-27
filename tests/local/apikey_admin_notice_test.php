@@ -49,7 +49,7 @@ final class apikey_admin_notice_test extends \advanced_testcase {
 
         $this->assertSame('', \local_artqtml_apikey_decrypt_notice());
         $this->assertSame(
-            get_string('errormissingapikey', 'local_artqtml'),
+            get_string('errormissingapikeys', 'local_artqtml'),
             \local_artqtml_apikey_start_error()
         );
     }

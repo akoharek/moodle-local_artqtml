@@ -228,7 +228,7 @@ echo local_artqtml_model_warning_banner();
 echo local_artqtml_apikey_decrypt_notice();
 echo local_artqtml_owner_warning_banner($generation);
 echo html_writer::tag('p', format_string($generation->name), [
-    'data-testid' => 'artqtm-approve-generationname',
+    'data-testid' => 'artqtml-approve-generationname',
 ]);
 
 // Index.php is context_system, same as this page — no course id.
@@ -236,7 +236,7 @@ $indexurl = new moodle_url('/local/artqtml/index.php');
 echo html_writer::div(
     $OUTPUT->single_button($indexurl, get_string('backtolist', 'local_artqtml'), 'get'),
     'mb-3',
-    ['data-testid' => 'artqtm-approve-backtolist']
+    ['data-testid' => 'artqtml-approve-backtolist']
 );
 
 // Still relevant here even after generation completes - a teacher reviewing questions.

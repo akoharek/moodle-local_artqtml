@@ -474,7 +474,7 @@ $countertemplate = get_string('textcounterlabel', 'local_artqtml', (object) [
 
 $PAGE->requires->js_call_amd('local_artqtml/textcounter', 'init', [
     'id_sourcetext',
-    'artqtm-textcounter',
+    'artqtml-textcounter',
     $sourcetokenlimit,
     $countertemplate,
     $counterlimittemplate,

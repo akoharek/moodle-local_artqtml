@@ -44,20 +44,20 @@ class approve_renderer {
     public static function validation_summary(array $statuscounts, int $statustotal): string {
         // Exactly four counters plus the total, each individually addressable so the.
         // element-count assertion can check "four + total", not just the rendered text.
-        $html = \html_writer::start_div('artqtm-validationsummary mb-3', [
-            'data-testid' => 'artqtm-approve-validationsummary',
+        $html = \html_writer::start_div('artqtml-validationsummary mb-3', [
+            'data-testid' => 'artqtml-approve-validationsummary',
         ]);
         foreach ($statuscounts as $statuskey => $statuscount) {
             $html .= \html_writer::span(
                 \local_artqtml\local\validation_suggestion::label($statuskey) . ': ' . $statuscount,
                 'badge ' . \local_artqtml\local\validation_suggestion::badge_class($statuskey) . ' mr-2',
-                ['data-testid' => 'artqtm-approve-summary-count']
+                ['data-testid' => 'artqtml-approve-summary-count']
             );
         }
         $html .= \html_writer::span(
             get_string('validationsummarytotal', 'local_artqtml') . ': ' . $statustotal,
             'badge badge-light mr-2',
-            ['data-testid' => 'artqtm-approve-summary-total']
+            ['data-testid' => 'artqtml-approve-summary-total']
         );
         $html .= \html_writer::end_div();
 
@@ -106,8 +106,8 @@ class approve_renderer {
                 'selectall',
                 $canmutate
                     ? \html_writer::checkbox('selectall', 1, false, '', [
-                        'id'          => 'artqtm-selectall',
-                        'data-testid' => 'artqtm-approve-selectall',
+                        'id'          => 'artqtml-selectall',
+                        'data-testid' => 'artqtml-approve-selectall',
                     ])
                     : ''
             ),
@@ -127,17 +127,17 @@ class approve_renderer {
         // cut off entirely). Type/difficulty/creator/last-editor/date collapse below lg via Boost's
         // own display utilities and reappear as a secondary line inside the name cell; the select,
         // name, validation and actions columns are never collapsed.
-        $table->attributes['class'] = 'generaltable table table-striped artqtm-table';
+        $table->attributes['class'] = 'generaltable table table-striped artqtml-table';
         $table->colclasses = [
-            0 => 'artqtm-col-select',
-            1 => 'artqtm-col-name',
+            0 => 'artqtml-col-select',
+            1 => 'artqtml-col-name',
             2 => 'd-none d-md-table-cell',
             3 => 'd-none d-lg-table-cell',
-            4 => 'artqtm-col-validation',
+            4 => 'artqtml-col-validation',
             5 => 'd-none d-xl-table-cell',
             6 => 'd-none d-xl-table-cell',
             7 => 'd-none d-lg-table-cell',
-            8 => 'artqtm-col-actions',
+            8 => 'artqtml-col-actions',
         ];
 
         foreach ($questions as $question) {
@@ -154,7 +154,7 @@ class approve_renderer {
             $typeicon = $output->pix_icon('icon', '', 'qtype_' . $qtype, [
                 'class'       => 'mr-1',
                 'aria-hidden' => 'true',
-                'data-testid' => 'artqtm-approve-typeicon',
+                'data-testid' => 'artqtml-approve-typeicon',
             ]);
 
             // Externally edited draft questions are locked: show that badge instead of AI/edited state.
@@ -204,7 +204,7 @@ class approve_renderer {
                 if ($displaycategory !== null) {
                     $statuscell .= \html_writer::div(
                         s(\local_artqtml\local\problem_category::label($displaycategory)),
-                        'small font-weight-bold mt-1 artqtm-problemcategory'
+                        'small font-weight-bold mt-1 artqtml-problemcategory'
                     );
                 }
                 if ($displayjustification !== '') {
@@ -237,7 +237,7 @@ class approve_renderer {
             // Disabled. The checkbox is rendered but disabled, not omitted - a missing control can't.
             $checkbox = '';
             if ($canmutate) {
-                $checkboxattrs = ['class' => 'artqtm-rowselect', 'data-testid' => 'artqtm-approve-rowselect'];
+                $checkboxattrs = ['class' => 'artqtml-rowselect', 'data-testid' => 'artqtml-approve-rowselect'];
                 if ($question->movedout || !empty($question->externallyedited)) {
                     $checkboxattrs['disabled'] = 'disabled';
                 }
@@ -255,7 +255,7 @@ class approve_renderer {
                         $actions[] = \html_writer::link(
                             $bankurl,
                             get_string('actionopenquestion', 'local_artqtml'),
-                            ['data-testid' => 'artqtm-approve-open-link']
+                            ['data-testid' => 'artqtml-approve-open-link']
                         );
                     }
                 } else {
@@ -270,7 +270,7 @@ class approve_renderer {
                     );
                     $actions[] = \html_writer::link($previewurl, get_string('actionpreview', 'local_artqtml'), [
                         'target'      => '_blank',
-                        'data-testid' => 'artqtm-approve-preview-link',
+                        'data-testid' => 'artqtml-approve-preview-link',
                     ]);
                     if (!$islocked && $canmutate) {
                         $editurl = new \moodle_url(
@@ -278,7 +278,7 @@ class approve_renderer {
                             approve_page_data::question_edit_url_params((int) $question->questionbankid, $pageurl)
                         );
                         $actions[] = \html_writer::link($editurl, get_string('actionedit', 'local_artqtml'), [
-                            'data-testid' => 'artqtm-approve-edit-link',
+                            'data-testid' => 'artqtml-approve-edit-link',
                         ]);
                     }
                 }
@@ -286,17 +286,17 @@ class approve_renderer {
 
             if ($islocked) {
                 $actions[] = \html_writer::span(get_string('questionlockedbadge', 'local_artqtml'), 'badge badge-dark', [
-                    'data-testid' => 'artqtm-approve-locked-badge',
+                    'data-testid' => 'artqtml-approve-locked-badge',
                 ]);
             } else if ($question->movedout) {
                 $actions[] = \html_writer::span(get_string('moved_badge', 'local_artqtml'), 'badge badge-info', [
-                    'data-testid' => 'artqtm-approve-moved-badge',
+                    'data-testid' => 'artqtml-approve-moved-badge',
                 ]);
             } else if (!empty($question->approved)) {
                 // The badge itself is not clickable — a plain span, with the revoke action as
                 // its own separate link beside it.
                 $actions[] = \html_writer::span(get_string('approvedlabel', 'local_artqtml'), 'badge badge-success', [
-                    'data-testid' => 'artqtm-approve-approved-badge',
+                    'data-testid' => 'artqtml-approve-approved-badge',
                 ]);
                 if ($canmutate) {
                     $actions[] = \html_writer::tag('button', get_string('revokeapproval', 'local_artqtml'), [
@@ -304,7 +304,7 @@ class approve_renderer {
                         'name'        => 'revokequestion',
                         'value'       => $question->id,
                         'class'       => 'btn btn-link p-0 align-baseline',
-                        'data-testid' => 'artqtm-approve-revoke-link',
+                        'data-testid' => 'artqtml-approve-revoke-link',
                     ]);
                 }
             } else if ($canmutate) {
@@ -328,7 +328,7 @@ class approve_renderer {
                     // guessed. Colour and weight already matched; the size was the whole
                     // difference, and without btn-sm both come out at 15px / 22.5px line height.
                     'class'       => 'btn btn-link p-0 align-baseline',
-                    'data-testid' => 'artqtm-approve-approve-button',
+                    'data-testid' => 'artqtml-approve-approve-button',
                 ]);
             }
 
@@ -340,7 +340,7 @@ class approve_renderer {
                     'name'        => 'deletequestion',
                     'value'       => $question->id,
                     'class'       => 'btn btn-link p-0 align-baseline text-danger',
-                    'data-testid' => 'artqtm-approve-delete-link',
+                    'data-testid' => 'artqtml-approve-delete-link',
                     'onclick'     => 'return confirm(' . json_encode(
                         get_string('confirmdeletequestion', 'local_artqtml'),
                         JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP
@@ -364,14 +364,14 @@ class approve_renderer {
             //
             // No icon before the question name, so the type icon that used to be
             // concatenated in front of this label now lives in the Type cell and nowhere else.
-            $detailsid = 'artqtm-details-' . $question->id;
+            $detailsid = 'artqtml-details-' . $question->id;
             $nametoggle = \html_writer::link(
                 '#',
                 format_string($question->questioncode ?: $question->questiontext),
                 [
-                    'class'       => 'artqtm-question-toggle',
+                    'class'       => 'artqtml-question-toggle',
                     'data-target' => $detailsid,
-                    'data-testid' => 'artqtm-approve-questionname',
+                    'data-testid' => 'artqtml-approve-questionname',
                 ]
             );
 
@@ -395,7 +395,7 @@ class approve_renderer {
             }
             $namecell = $nametoggle . \html_writer::div(
                 implode('', $collapsedparts),
-                'artqtm-collapsed-meta d-xl-none text-muted'
+                'artqtml-collapsed-meta d-xl-none text-muted'
             );
 
             $row = new \html_table_row([
@@ -405,7 +405,7 @@ class approve_renderer {
                 self::cell('namecell', $namecell),
                 // Icon AND type name, in this column only.
                 self::cell('typecell', $typeicon . \html_writer::span($typelabel, '', [
-                    'data-testid' => 'artqtm-approve-typelabel',
+                    'data-testid' => 'artqtml-approve-typelabel',
                 ])),
                 self::cell('difficultycell', s(difficulty_label::label($question->difficultylabel))),
                 self::cell('validationcell', $statuscell),
@@ -415,13 +415,13 @@ class approve_renderer {
                 // The actions wrap onto as many lines as they need instead of forcing.
                 // the table wider; a separator character would defeat flex-wrap.
                 self::cell('actionscell', \html_writer::div(implode('', array_map(static function (string $action): string {
-                    return \html_writer::span($action, 'artqtm-rowaction');
-                }, $actions)), 'artqtm-rowactions')),
+                    return \html_writer::span($action, 'artqtml-rowaction');
+                }, $actions)), 'artqtml-rowactions')),
             ]);
             // Every row carries a screen-scoped testid.
             // plus a content identifier, so a row assertion can select the question it means
             // instead of silently running against the first match.
-            $row->attributes['data-testid'] = 'artqtm-approve-row';
+            $row->attributes['data-testid'] = 'artqtml-approve-row';
             $row->attributes['data-questioncode'] = $question->questioncode;
             $table->data[] = $row;
 
@@ -432,7 +432,7 @@ class approve_renderer {
                 self::question_details_html($question->typecode, current_question::data_for($question))
             );
             $detailscell->colspan = count($table->head);
-            $detailscell->attributes['class'] = 'artqtm-question-details d-none';
+            $detailscell->attributes['class'] = 'artqtml-question-details d-none';
             // On html_table_cell the id is a dedicated property, not part of ->attributes - setting the
             // latter silently produces a <td> with no id, leaving the toggle script's
             // getElementById() lookup unable to find this row.
@@ -448,7 +448,7 @@ class approve_renderer {
      * A sortable header cell: the direction-aware sort link, wrapped in its test anchor.
      *
      * @param \moodle_url $pageurl
-     * @param string $testkey short field name, appended to the artqtm-approve-header- prefix
+     * @param string $testkey short field name, appended to the artqtml-approve-header- prefix
      * @param string $columnkey an approve_page_data::sortable_columns() key
      * @param string $labelkey lang string key for the visible column label
      * @param string $currentsort
@@ -472,14 +472,14 @@ class approve_renderer {
     /**
      * One header cell of the question table, tagged with its test anchor.
      *
-     * @param string $key short field name, appended to the artqtm-approve-header- prefix
+     * @param string $key short field name, appended to the artqtml-approve-header- prefix
      * @param string $content already-escaped cell HTML
      * @return \html_table_cell
      */
     protected static function header_cell(string $key, string $content): \html_table_cell {
         $cell = new \html_table_cell($content);
         $cell->header = true;
-        $cell->attributes['data-testid'] = 'artqtm-approve-header-' . $key;
+        $cell->attributes['data-testid'] = 'artqtml-approve-header-' . $key;
 
         return $cell;
     }
@@ -487,13 +487,13 @@ class approve_renderer {
     /**
      * One body cell of the question table, tagged with its test anchor.
      *
-     * @param string $key short field name, appended to the artqtm-approve- prefix
+     * @param string $key short field name, appended to the artqtml-approve- prefix
      * @param string $content already-escaped cell HTML
      * @return \html_table_cell
      */
     protected static function cell(string $key, string $content): \html_table_cell {
         $cell = new \html_table_cell($content);
-        $cell->attributes['data-testid'] = 'artqtm-approve-' . $key;
+        $cell->attributes['data-testid'] = 'artqtml-approve-' . $key;
 
         return $cell;
     }
@@ -505,7 +505,7 @@ class approve_renderer {
      */
     public static function toggle_script(): string {
         return \html_writer::script(
-            "document.querySelectorAll('.artqtm-question-toggle').forEach(function(link) {" .
+            "document.querySelectorAll('.artqtml-question-toggle').forEach(function(link) {" .
                 "link.addEventListener('click', function(e) {" .
                     "e.preventDefault();" .
                     "var target = document.getElementById(link.getAttribute('data-target'));" .
@@ -547,14 +547,14 @@ class approve_renderer {
             'name'        => 'bulkaction',
             'value'       => 'allaccepted',
             'class'       => 'btn btn-secondary',
-            'data-testid' => 'artqtm-approve-approveall-button',
+            'data-testid' => 'artqtml-approve-approveall-button',
         ];
         if ($eligibleforapproval === 0) {
             $approveallattrs['disabled'] = 'disabled';
         }
         // Each bulk bar wraps onto more rows at narrow widths instead of overflowing.
-        $html = \html_writer::start_div('artqtm-bulkactions artqtm-bulkapprove mb-3', [
-            'data-testid' => 'artqtm-approve-bulk-approveblock',
+        $html = \html_writer::start_div('artqtml-bulkactions artqtml-bulkapprove mb-3', [
+            'data-testid' => 'artqtml-approve-bulk-approveblock',
         ]);
         $html .= \html_writer::tag(
             'button',
@@ -563,17 +563,17 @@ class approve_renderer {
         );
         $html .= \html_writer::end_div();
 
-        $html .= \html_writer::start_div('artqtm-bulkactions artqtm-bulkmove mb-3', [
-            'data-testid' => 'artqtm-approve-bulk-moveblock',
+        $html .= \html_writer::start_div('artqtml-bulkactions artqtml-bulkmove mb-3', [
+            'data-testid' => 'artqtml-approve-bulk-moveblock',
         ]);
 
         if (empty($categoryoptions)) {
             $html .= $output->notification(get_string('nocategories', 'local_artqtml'), 'warning');
         } else {
-            $html .= \html_writer::start_div('form-inline artqtm-bulkcategory');
+            $html .= \html_writer::start_div('form-inline artqtml-bulkcategory');
             $html .= \html_writer::label(
                 get_string('selectcategory', 'local_artqtml'),
-                'artqtm-categoryvalue',
+                'artqtml-categoryvalue',
                 true,
                 ['class' => 'mr-2']
             );
@@ -583,9 +583,9 @@ class approve_renderer {
             // new per-row Approve button from submitting at all until a category was picked.
             // The move path validates the value server-side in approve.php (errornocategory).
             $html .= \html_writer::select($categoryoptions, 'categoryvalue', '', ['' => 'choosedots'], [
-                'id'          => 'artqtm-categoryvalue',
+                'id'          => 'artqtml-categoryvalue',
                 'class'       => 'mr-2',
-                'data-testid' => 'artqtm-approve-category-select',
+                'data-testid' => 'artqtml-approve-category-select',
             ]);
             $html .= \html_writer::end_div();
 
@@ -596,7 +596,7 @@ class approve_renderer {
                 get_string('moveselected', 'local_artqtml'),
                 ['type' => 'submit', 'name' => 'bulkaction', 'value' => 'move', 'class' => 'btn btn-primary',
                  'disabled' => 'disabled', 'data-selectionrequired' => '1',
-                 'data-testid' => 'artqtm-approve-move-button']
+                 'data-testid' => 'artqtml-approve-move-button']
             );
         }
 
@@ -608,7 +608,7 @@ class approve_renderer {
             get_string('bulkdelete', 'local_artqtml'),
             ['type' => 'submit', 'name' => 'bulkaction', 'value' => 'delete', 'class' => 'btn btn-outline-danger',
              'disabled' => 'disabled', 'data-selectionrequired' => '1',
-             'data-testid' => 'artqtm-approve-delete-button',
+             'data-testid' => 'artqtml-approve-delete-button',
              'data-confirmmessage' => get_string('confirmbulkdelete', 'local_artqtml', '__COUNT__')]
         );
         $html .= \html_writer::end_div();
@@ -624,18 +624,18 @@ class approve_renderer {
     public static function selection_script(): string {
         return \html_writer::script("
 document.addEventListener('DOMContentLoaded', function() {
-    var selectall = document.getElementById('artqtm-selectall');
+    var selectall = document.getElementById('artqtml-selectall');
     // the header 'select all' must skip moved rows, whose checkboxes are rendered
     // disabled - :not(:disabled) is what excludes them, so ticking the master box can never
     // select a question that is already in the real question bank.
     var selectable = function() {
-        return document.querySelectorAll('.artqtm-rowselect:not(:disabled)');
+        return document.querySelectorAll('.artqtml-rowselect:not(:disabled)');
     };
     // Move selected and Delete selected are disabled while nothing is
     // selected. They render disabled server-side (nothing is selected on load), so this only ever
     // has to react to the selection changing.
     var syncBulkButtons = function() {
-        var anyselected = document.querySelectorAll('.artqtm-rowselect:not(:disabled):checked').length > 0;
+        var anyselected = document.querySelectorAll('.artqtml-rowselect:not(:disabled):checked').length > 0;
         document.querySelectorAll('[data-selectionrequired]').forEach(function(button) {
             button.disabled = !anyselected;
         });
@@ -654,7 +654,7 @@ document.addEventListener('DOMContentLoaded', function() {
     syncBulkButtons();
     document.querySelectorAll('[data-confirmmessage]').forEach(function(button) {
         button.addEventListener('click', function(e) {
-            var count = document.querySelectorAll('.artqtm-rowselect:not(:disabled):checked').length;
+            var count = document.querySelectorAll('.artqtml-rowselect:not(:disabled):checked').length;
             var message = button.getAttribute('data-confirmmessage').replace('__COUNT__', count);
             if (!window.confirm(message)) {
                 e.preventDefault();

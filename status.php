@@ -387,7 +387,7 @@ $technicalerror = has_capability('local/artqtml:configure', $context) ? s($gener
 $failedactions = html_writer::div(
     ($canmutate ? $retrylink : '') .
         html_writer::link($settingsurl, get_string('backtosettings', 'local_artqtml'), ['class' => 'btn btn-secondary']),
-    'artqtm-buttonrow'
+    'artqtml-buttonrow'
 );
 
 echo html_writer::div(

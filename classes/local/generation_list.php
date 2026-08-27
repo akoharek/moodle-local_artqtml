@@ -294,11 +294,11 @@ class generation_list {
     ): string {
         global $DB, $OUTPUT;
 
-        $formid = 'artqtm-filter-' . $prefix;
+        $formid = 'artqtml-filter-' . $prefix;
         $html = \html_writer::start_tag('form', [
             'method' => 'get',
             'action' => $baseurl->out_omit_querystring(),
-            'class'  => 'form-inline artqtm-filterbar mb-2',
+            'class'  => 'form-inline artqtml-filterbar mb-2',
             'id'     => $formid,
         ]);
         foreach ($baseurl->params() as $name => $value) {
@@ -407,15 +407,15 @@ class generation_list {
         // Question count, Pending validation, Actions. The eighth "Last modified by" column was removed:
         // a list of generations does not need to name whoever last touched a question inside one; the approve
         // page's own "Last edited by" column is where that belongs.
-        $table->attributes['class'] = 'generaltable table table-striped artqtm-table';
+        $table->attributes['class'] = 'generaltable table table-striped artqtml-table';
         $table->colclasses = [
-            0 => 'artqtm-col-name',
+            0 => 'artqtml-col-name',
             1 => 'd-none d-lg-table-cell',
             2 => 'd-none d-lg-table-cell',
-            3 => 'artqtm-col-status',
+            3 => 'artqtml-col-status',
             4 => 'd-none d-md-table-cell',
             5 => 'd-none d-lg-table-cell',
-            6 => 'artqtm-col-actions',
+            6 => 'artqtml-col-actions',
         ];
         $table->head = [];
         foreach ($columns as $key => $label) {
@@ -488,7 +488,7 @@ class generation_list {
                 }
             }
 
-            $actionscell = \html_writer::div($actions, 'artqtm-rowactions');
+            $actionscell = \html_writer::div($actions, 'artqtml-rowactions');
             if ($deletereason !== '') {
                 $actionscell .= \html_writer::div($deletereason, 'small text-muted mt-1', [
                     'data-testid' => 'artqtm-list-delete-reason',
@@ -511,7 +511,7 @@ class generation_list {
             ];
             $namecell = format_string($generation->name) . \html_writer::div(
                 implode('', $collapsedparts),
-                'artqtm-collapsed-meta d-lg-none text-muted'
+                'artqtml-collapsed-meta d-lg-none text-muted'
             );
 
             $row = new \html_table_row([
