@@ -3,6 +3,14 @@
 Newest release first. Version numbers match `version.php` `$plugin->version`;
 the number in parentheses is `$plugin->release`.
 
+## 2026-08-27 — `2026082702` (2026.08.27)
+
+**Audit branch: manageall, tests, packaging**
+
+- S-02/S-08: `local/artqtml:manageall` + `generation_access_policy` on all mutate paths.
+- Behat: external edit locks row; approve list keeps `questioncode` (TC-CLICK-A-002).
+- CI green on Moodle 4.5.12 / 5.1.6 / 5.2.2 matrix.
+
 ## 2026-08-26 — `2026082604` (1.0.0)
 
 **F-07: mandatory admin setup after install (no auto-create draft course)**
@@ -13,7 +21,7 @@ the number in parentheses is `$plugin->release`.
   API keys (on first save), Claude/Gemini model (non-empty).
 - Setup checklist banner on **General**, **Generator LLM**, and **Validator LLM** tabs.
 - Teachers remain blocked from new generations until setup is complete (existing behaviour).
-- Light: remove accidental Full-only `token_budget` / `license_checker` references from entry scripts.
+- Light: remove accidental commercial-only `token_budget` / `license_checker` references from entry scripts.
 
 ## 2026-08-26 — `2026082602` (1.0.0)
 
