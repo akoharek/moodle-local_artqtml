@@ -60,11 +60,11 @@ final class draft_role_test extends \advanced_testcase {
     }
 
     /**
-     * The capability set is the whole point: three, and no more. The guard is against growth - a
-     * Fourth capability added "just to make something work" is how a narrow role becomes a broad
-     * One, and it would pass every functional test.
+     * The capability set is the whole point: two, and no more. The guard is against growth - a
+     * third capability added "just to make something work" is how a narrow role becomes a broad
+     * one, and it would pass every functional test.
      */
-    public function test_the_role_grants_exactly_three_capabilities(): void {
+    public function test_the_role_grants_exactly_two_capabilities(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -79,11 +79,12 @@ final class draft_role_test extends \advanced_testcase {
         );
 
         $this->assertSame(
-            ['moodle/course:view', 'moodle/question:editall', 'moodle/question:useall'],
+            ['moodle/course:view', 'moodle/question:useall'],
             array_keys($granted)
         );
+        $this->assertArrayNotHasKey('moodle/question:editall', $granted);
         // Named individually as well, because these are the ones an editingteacher enrolment would
-        // Have brought along - the breadth this role exists instead of.
+        // have brought along - the breadth this role exists instead of.
         $this->assertArrayNotHasKey('moodle/course:update', $granted);
         $this->assertArrayNotHasKey('moodle/course:manageactivities', $granted);
         $this->assertArrayNotHasKey('moodle/grade:edit', $granted);
@@ -118,8 +119,8 @@ final class draft_role_test extends \advanced_testcase {
         $this->assertTrue(draft_role::grant((int) $user->id));
 
         $this->assertTrue(has_capability('moodle/course:view', $context, $user));
-        $this->assertTrue(has_capability('moodle/question:editall', $context, $user));
         $this->assertTrue(has_capability('moodle/question:useall', $context, $user));
+        $this->assertFalse(has_capability('moodle/question:editall', $context, $user));
 
         $this->assertFalse(has_capability('moodle/course:update', $context, $user));
         $this->assertFalse(is_enrolled($context, $user));
@@ -163,5 +164,62 @@ final class draft_role_test extends \advanced_testcase {
 
         $this->assertFalse(draft_role::grant((int) $user->id));
         $this->assertSame(0, $DB->count_records('role_assignments', ['userid' => $user->id]));
+    }
+
+    /**
+     * revoke_if_idle drops the assignment once the user has no draft work left.
+     */
+    public function test_revoke_if_idle_removes_assignment_when_no_draft_work(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $course = $this->configure_draft_course();
+        $user = $this->getDataGenerator()->create_user();
+        $context = \context_course::instance($course->id);
+
+        $this->assertTrue(draft_role::grant((int) $user->id));
+        $this->assertTrue(has_capability('moodle/question:useall', $context, $user));
+
+        draft_role::revoke_if_idle((int) $user->id);
+
+        $this->assertFalse(has_capability('moodle/question:useall', $context, $user));
+    }
+
+    /**
+     * revoke_if_idle keeps the assignment while unmoved draft questions remain.
+     */
+    public function test_revoke_if_idle_keeps_assignment_while_draft_questions_remain(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $course = $this->configure_draft_course();
+        $user = $this->getDataGenerator()->create_user();
+        $context = \context_course::instance($course->id);
+
+        draft_role::grant((int) $user->id);
+
+        $generationid = (int) $DB->insert_record('local_artqtml_generations', (object) [
+            'userid' => $user->id,
+            'name' => 'Revoke fixture',
+            'shortname' => 'REV',
+            'status' => generation_status::COMPLETED,
+            'draftcategoryid' => 99,
+            'timecreated' => time(),
+            'timemodified' => time(),
+        ]);
+        $DB->insert_record('local_artqtml_questions', (object) [
+            'generationid' => $generationid,
+            'questiontype' => 'truefalse',
+            'questiontext' => 'Fixture',
+            'questiondata' => '{}',
+            'movedout' => 0,
+            'timecreated' => time(),
+        ]);
+
+        draft_role::revoke_if_idle((int) $user->id);
+
+        $this->assertTrue(has_capability('moodle/question:useall', $context, $user));
     }
 }

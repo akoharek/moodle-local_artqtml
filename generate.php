@@ -27,6 +27,7 @@ require(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/local/artqtml/lib.php');
 
 use local_artqtml\form\generate_form;
+use local_artqtml\local\generation_access_policy;
 use local_artqtml\local\question_types;
 use local_artqtml\local\draft_bank;
 
@@ -149,6 +150,7 @@ if ($mform->is_cancelled()) {
     redirect($indexurl);
 } else if ($mform->is_submitted() && in_array($formaction, ['save', 'back'], true)) {
     require_sesskey();
+    generation_access_policy::require_can_mutate($generation, $context);
 
     $rawdata = $mform->get_submitted_data();
     if ($rawdata) {
@@ -169,6 +171,8 @@ if ($mform->is_cancelled()) {
     }
     redirect($indexurl);
 } else if ($data = $mform->get_data()) {
+    generation_access_policy::require_can_mutate($generation, $context);
+
     if (!get_config('local_artqtml', 'enabled')) {
         \core\notification::error(get_string('plugindisabled', 'local_artqtml'));
         redirect($indexurl);

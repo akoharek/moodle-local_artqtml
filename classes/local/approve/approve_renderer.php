@@ -42,7 +42,7 @@ class approve_renderer {
      * @return string
      */
     public static function validation_summary(array $statuscounts, int $statustotal): string {
-        // Exactly four counters plus the total, each individually addressable so the.
+        // Exactly four counters plus the total, each individually addressable so the
         // element-count assertion can check "four + total", not just the rendered text.
         $html = \html_writer::start_div('artqtml-validationsummary mb-3', [
             'data-testid' => 'artqtml-approve-validationsummary',
@@ -91,8 +91,8 @@ class approve_renderer {
         int $generationid,
         bool $canmutate = true
     ): string {
-        // Needed to tell "your own generation" from "someone else's" when deciding.
-        // whether the Edit action prompts first.
+        // Needed to tell "your own generation" from "someone else's" when deciding whether to
+        // show owner-specific affordances on this row.
         global $USER;
 
         $table = new \html_table();
@@ -199,7 +199,7 @@ class approve_renderer {
 
             $statuscell = $statusbadge;
             if ($question->validationsuggestion !== \local_artqtml\local\validation_suggestion::NOT_EVALUATED) {
-                // The 'ok' status shows its "No issue" label here too - not an empty cell, and.
+                // The 'ok' status shows its "No issue" label here too - not an empty cell, and
                 // distinct from the "Accepted" suggestion badge above it.
                 if ($displaycategory !== null) {
                     $statuscell .= \html_writer::div(
@@ -234,7 +234,8 @@ class approve_renderer {
             }
 
             // A row for a question moved into a real bank cannot be selected: its checkbox is
-            // Disabled. The checkbox is rendered but disabled, not omitted - a missing control can't.
+            // Disabled. The checkbox is rendered but disabled, not omitted - a missing control cannot
+            // be mistaken for "nothing selected".
             $checkbox = '';
             if ($canmutate) {
                 $checkboxattrs = ['class' => 'artqtml-rowselect', 'data-testid' => 'artqtml-approve-rowselect'];
@@ -272,15 +273,6 @@ class approve_renderer {
                         'target'      => '_blank',
                         'data-testid' => 'artqtml-approve-preview-link',
                     ]);
-                    if (!$islocked && $canmutate) {
-                        $editurl = new \moodle_url(
-                            '/question/bank/editquestion/question.php',
-                            approve_page_data::question_edit_url_params((int) $question->questionbankid, $pageurl)
-                        );
-                        $actions[] = \html_writer::link($editurl, get_string('actionedit', 'local_artqtml'), [
-                            'data-testid' => 'artqtml-approve-edit-link',
-                        ]);
-                    }
                 }
             }
 

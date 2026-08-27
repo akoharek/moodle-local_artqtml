@@ -39,6 +39,7 @@ require_once($CFG->dirroot . '/question/engine/bank.php');
 use local_artqtml\local\question_types;
 use local_artqtml\local\question_bank_list;
 use local_artqtml\local\draft_bank;
+use local_artqtml\local\draft_role;
 use local_artqtml\local\generation_access_policy;
 use local_artqtml\local\approve\question_approval_service;
 use local_artqtml\local\approve\question_move_service;
@@ -260,9 +261,12 @@ $page = min($page, $lastpage);
 $questions = approve_page_data::questions($generationid, $sort, $dir, $page, $perpage);
 $creator = core_user::get_user($generation->userid);
 
-// Preview and Edit open native Moodle question UI in the draft course (draft_role grants use/edit).
+// Preview opens native Moodle question UI in the draft course (draft_role grants use).
 $candraftpreviewquestions = false;
 $canmutate = generation_access_policy::can_mutate($generation, null, $context);
+if ($canmutate && draft_bank::is_configured()) {
+    draft_role::grant((int) $USER->id);
+}
 if (draft_bank::is_configured()) {
     $draftcontextid = draft_bank::get_draft_context_id();
     if ($draftcontextid !== null) {

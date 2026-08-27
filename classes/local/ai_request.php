@@ -457,8 +457,12 @@ class ai_request {
                 return $decoded['error']['message'];
             }
 
-            // Valid JSON but not the API error envelope — keep prior behaviour (no cap).
-            return $body;
+            // Valid JSON but not the API error envelope — cap like plain-text bodies.
+            if (\core_text::strlen($body) <= self::MAX_NONJSON_ERROR_LENGTH) {
+                return $body;
+            }
+
+            return \core_text::substr($body, 0, self::MAX_NONJSON_ERROR_LENGTH) . '…';
         }
 
         if (\core_text::strlen($body) <= self::MAX_NONJSON_ERROR_LENGTH) {

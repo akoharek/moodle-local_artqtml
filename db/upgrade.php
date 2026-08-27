@@ -110,5 +110,12 @@ function xmldb_local_artqtml_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026082701, 'local', 'artqtml');
     }
 
+    if ($oldversion < 2026082704) {
+        // Pass-2: least-privilege draft role (view + useall only) and remove lingering editall.
+        \local_artqtml\local\draft_role::ensure_role();
+
+        upgrade_plugin_savepoint(true, 2026082704, 'local', 'artqtml');
+    }
+
     return true;
 }

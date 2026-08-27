@@ -47,7 +47,7 @@ class generation_list {
     /**
      * @var array<string,int> status -> sort weight for the status column's ordering.
      *
-     * the seven status values themselves come from
+     * The seven status values themselves come from
      * {@see \local_artqtml\local\generation_status}; only the weights are list-page-specific.
      * generation_status_test asserts these keys are exactly that class's VALUES.
      */
@@ -58,10 +58,10 @@ class generation_list {
         generation_status::VALIDATING => 1,
         generation_status::SAVING     => 2,
         generation_status::COMPLETED  => 3,
-        // Partial weighs the same as completed. The weight answers "how far did it get",.
-        // and a partly successful run got all the way to the end - it just brought back less than
-        // was ordered. Sorting it next to the runs that finished is where a teacher will look for
-        // it; the amber badge is what tells the two apart.
+        // Partial weighs the same as completed. The weight answers "how far did it get", and a
+        // partly successful run got all the way to the end - it just brought back less than was
+        // ordered. Sorting it next to the runs that finished is where a teacher will look for it;
+        // the amber badge is what tells the two apart.
         generation_status::PARTIAL    => 3,
     ];
 
@@ -370,7 +370,7 @@ class generation_list {
     }
 
     /**
-     *
+     * Render the generations table for one list section.
      *
      * @param string $prefix
      * @param \moodle_url $baseurl
@@ -433,7 +433,7 @@ class generation_list {
         $table->head[] = get_string('colactions', 'local_artqtml');
 
         foreach ($generations as $generation) {
-            // The badge shows the lang label ('started' -> "Started" in English / localized label),.
+            // The badge shows the lang label ('started' -> "Started" in English / localized label),
             // never the raw status key.
             $statusbadge = \html_writer::span(
                 generation_status::label($generation->status),

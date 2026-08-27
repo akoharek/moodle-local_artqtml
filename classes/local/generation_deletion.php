@@ -70,5 +70,8 @@ class generation_deletion {
         );
 
         $DB->delete_records('local_artqtml_generations', ['id' => $generationid]);
+        if (!empty($generation->userid)) {
+            draft_role::revoke_if_idle((int) $generation->userid);
+        }
     }
 }

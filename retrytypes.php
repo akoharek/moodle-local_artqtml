@@ -21,7 +21,7 @@
  * waiting for approval, and re-running it would throw them away. This starts a NEW generation on
  * the same source text, with the grid narrowed to what is missing - which is also why it goes
  * through the duplicate check like any other new generation, and why it stops on the settings page
- * instead of calling the API. Both are András's decisions, 2026-08-01:
+ * instead of calling the API. Product decisions (2026-08-01):
  *
  * - the teacher presses the button; the system never re-runs anything by itself;
  * - the duplicate check stays, because the teacher may come back to this days later, and being

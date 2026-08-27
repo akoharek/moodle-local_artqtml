@@ -228,4 +228,29 @@ final class provider_test extends \advanced_testcase {
         $this->assertFalse($DB->record_exists('local_artqtml_generations', ['id' => $made['generationid']]));
         $this->assertTrue($DB->record_exists('local_artqtml_log', ['id' => $made['logid']]));
     }
+
+    /**
+     * AJAX rate-limit rows are deleted with the user's privacy data.
+     */
+    public function test_ajax_ratelimit_rows_are_deleted_for_user(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $user = $this->getDataGenerator()->create_user();
+        $DB->insert_record('local_artqtml_ajax_ratelimit', (object) [
+            'userid' => $user->id,
+            'action' => 'get_status',
+            'windowstart' => time(),
+            'hitcount' => 3,
+        ]);
+
+        provider::delete_data_for_user(new approved_contextlist(
+            $user,
+            'local_artqtml',
+            [\context_system::instance()->id]
+        ));
+
+        $this->assertFalse($DB->record_exists('local_artqtml_ajax_ratelimit', ['userid' => $user->id]));
+    }
 }

@@ -140,7 +140,7 @@ if (optional_param('retry', 0, PARAM_BOOL)) {
         $generation->timemodified = time();
         $DB->update_record('local_artqtml_generations', $generation);
 
-        // The "generating" status set above is the queue signal for the.
+        // The "generating" status set above is the queue signal for the
         // process_pending_generations scheduled task - see generate.php.
     }
     redirect(new moodle_url('/local/artqtml/status.php', ['generationid' => $generationid]));

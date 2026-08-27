@@ -3,6 +3,17 @@
 Newest release first. Version numbers match `version.php` `$plugin->version`;
 the number in parentheses is `$plugin->release`.
 
+## 2026-08-27 — `2026082704` (2026.08.27)
+
+**Pass-2 security/compliance fixes (REVIEW-FINDINGS2 S2-01…C2-04)**
+
+- **S2-01:** `generate.php` save/back/start paths call `generation_access_policy::require_can_mutate()`.
+- **S-01 / S2-02:** Draft role least privilege (`course:view` + `question:useall` only); `revoke_if_idle()` lifecycle; native Edit link removed from approve table; upgrade `2026082704`.
+- **S2-03:** AJAX rate limiter uses `get_affected_rows()` instead of re-read equality (CAS/ABA fix).
+- **C2-01:** Privacy metadata/export/delete for `local_artqtml_ajax_ratelimit` (EN+HU).
+- **S2-04:** Cap valid JSON non-envelope error bodies at 500 chars.
+- **C2-02…C2-04:** Comment scrub, PHPCS comment repair, dead lang keys removed.
+
 ## 2026-08-27 — `2026082702` (2026.08.27)
 
 **Audit branch: manageall, tests, packaging**

@@ -129,7 +129,7 @@ if ($editid > 0) {
     // clicked. Same data, one route closed, the other open, and the closed one is the one a teacher
     // would use.
     //
-    // Decided by András, 2026-08-03: **the source text is shared working material.** The check is
+    // Product decision (2026-08-03): the source text is shared working material. The check is
     // removed rather than the other route being closed, because it was the check that contradicted
     // the product's stated principle.
 }

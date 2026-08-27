@@ -19,16 +19,15 @@
  *
  * The draft course is a holding area only: questions must not be edited through Moodle's native
  * question bank while they remain in the draft category. Review, approve and move happen on the
- * plugin approve page; preview uses Moodle's native preview UI and needs question:use.
+ * plugin approve page; preview uses Moodle's native preview UI and needs question:useall.
  *
  * What the role carries, read off Moodle's entry points:
  *
  * - moodle/course:view — preview and require_login($courseid) succeed through is_viewing().
  * - moodle/question:useall — qbank_previewquestion preview links on approve.php.
- * - moodle/question:editall — native question editor links on approve.php; plugin approve/move
- *   paths are blocked once externallyedited is set.
  *
- * Three capabilities, and deliberately no archetype.
+ * Two capabilities, and deliberately no archetype. Assignments are granted while a user has draft
+ * work in progress and revoked once they no longer need preview access in the shared draft course.
  *
  * @package    local_artqtml
  * @copyright  2026 AR Tudásmenedzsment Kft.
@@ -47,7 +46,6 @@ class draft_role {
     /** @var string[] The capabilities the role grants, and nothing else. */
     public const CAPABILITIES = [
         'moodle/course:view',
-        'moodle/question:editall',
         'moodle/question:useall',
     ];
 
@@ -58,6 +56,7 @@ class draft_role {
      * net before an assignment, so it must be safe to call when the role is already there. It only
      * ever adds the capabilities it owns - an administrator who has deliberately added another one
      * keeps it, because silently reverting a site's own decision is worse than a broad role.
+     * editall is explicitly removed when it is no longer part of CAPABILITIES.
      *
      * @return int the role id
      */
@@ -81,7 +80,51 @@ class draft_role {
             assign_capability($capability, CAP_ALLOW, $roleid, $systemcontext->id, true);
         }
 
+        unassign_capability('moodle/question:editall', $roleid, $systemcontext->id);
+
         return $roleid;
+    }
+
+    /**
+     * Whether the user still needs preview access in the shared draft course.
+     *
+     * True while they own an in-flight generation with a draft bank, or while they still have at
+     * least one unmoved draft question awaiting review on one of their generations.
+     *
+     * @param int $userid
+     * @return bool
+     */
+    public static function user_needs_draft_access(int $userid): bool {
+        global $DB;
+
+        if ($userid <= 0) {
+            return false;
+        }
+
+        $inflight = $DB->record_exists_select(
+            'local_artqtml_generations',
+            'userid = :userid
+                AND draftcategoryid IS NOT NULL AND draftcategoryid > 0
+                AND status IN (:generating, :validating, :saving)',
+            [
+                'userid' => $userid,
+                'generating' => generation_status::GENERATING,
+                'validating' => generation_status::VALIDATING,
+                'saving' => generation_status::SAVING,
+            ]
+        );
+        if ($inflight) {
+            return true;
+        }
+
+        $sql = "SELECT 1
+                  FROM {local_artqtml_generations} g
+                  JOIN {local_artqtml_questions} q ON q.generationid = g.id
+                 WHERE g.userid = :userid
+                   AND g.draftcategoryid IS NOT NULL AND g.draftcategoryid > 0
+                   AND q.movedout = 0";
+
+        return $DB->record_exists_sql($sql, ['userid' => $userid]);
     }
 
     /**
@@ -112,5 +155,41 @@ class draft_role {
         }
 
         return true;
+    }
+
+    /**
+     * Remove the draft preview role assignment for a user in the draft course.
+     *
+     * @param int $userid
+     * @return bool true when an assignment was removed
+     */
+    public static function revoke(int $userid): bool {
+        global $DB;
+
+        $coursecontext = draft_bank::get_draft_course_context();
+        if ($coursecontext === null) {
+            return false;
+        }
+
+        $roleid = (int) $DB->get_field('role', 'id', ['shortname' => self::SHORTNAME]);
+        if (!$roleid) {
+            return false;
+        }
+
+        return (bool) role_unassign($roleid, $userid, $coursecontext->id);
+    }
+
+    /**
+     * Drop the draft preview role when the user no longer has draft work that needs it.
+     *
+     * @param int $userid
+     * @return void
+     */
+    public static function revoke_if_idle(int $userid): void {
+        if (self::user_needs_draft_access($userid)) {
+            return;
+        }
+
+        self::revoke($userid);
     }
 }

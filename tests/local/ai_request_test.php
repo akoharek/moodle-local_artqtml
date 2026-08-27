@@ -492,5 +492,10 @@ final class ai_request_test extends \advanced_testcase {
         $this->assertSame(501, \core_text::strlen($truncated));
         $this->assertStringEndsWith('…', $truncated);
         $this->assertSame(str_repeat('X', 500), \core_text::substr($truncated, 0, 500));
+
+        $longjson = json_encode(['status' => str_repeat('Y', 600)]);
+        $truncatedjson = ai_request::error_message_from_body($longjson);
+        $this->assertSame(501, \core_text::strlen($truncatedjson));
+        $this->assertStringEndsWith('…', $truncatedjson);
     }
 }

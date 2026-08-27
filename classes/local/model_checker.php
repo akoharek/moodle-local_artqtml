@@ -58,7 +58,7 @@ class model_checker {
 
         if ($model === '') {
             // Nothing to check. The blocking state for an unset model is derived from the setting
-            // Itself (model_blocking::state()), so there is nothing to write here either.
+            // itself (model_blocking::state()), so there is nothing to write here either.
             return ['success' => false, 'messages' => [get_string('modelcheckskippednomodel', 'local_artqtml')]];
         }
 
@@ -114,7 +114,7 @@ class model_checker {
             return ['success' => false, 'messages' => [$probe['error'] . ' (' . $log['errorcode'] . ')']];
         }
 
-        // Both halves passed: says a successful run clears the blocking state.
+        // Both halves passed: a successful run clears the blocking state.
         model_blocking::clear($provider);
         $messages[] = get_string('modelcheckstructureok', 'local_artqtml', $model);
 
@@ -125,22 +125,22 @@ class model_checker {
      * Probe every listed model that this plugin version has not already ruled out, and record each.
      *
      * Already-excluded models are skipped rather than retried, because within one plugin version
-     * The answer cannot have changed: the verdict says this build cannot read that model. A version
-     * Bump clears the exclusions by construction (see model_check_log::excluded_models), so our own
-     * Fixes reopen them without anyone having to remember.
+     * the answer cannot have changed: the verdict says this build cannot read that model. A version
+     * bump clears the exclusions by construction (see model_check_log::excluded_models), so our own
+     * fixes reopen them without anyone having to remember.
      *
-     * THE COST IS REAL AND WAS ACCEPTED. One paid call per model, sequentially, each bounded by the
+     * The cost is real and was accepted. One paid call per model, sequentially, each bounded by the
      * API timeout - a dozen models make this a click that runs for minutes and costs a fraction of
-     * A cent. The judgement was that an edge case which surfaces about once a year is worth that,
-     * And the alternative is what happened on the day this was written: a button that reported
-     * Success for models on which every generation would fail.
+     * a cent. The judgement was that an edge case which surfaces about once a year is worth that,
+     * and the alternative is what happened on the day this was written: a button that reported
+     * success for models on which every generation would fail.
      *
      * Recording each result is not incidental - it is how the dropdown learns. Without the log
      * Entry the exclusion never happens and this loop is a slow no-op.
      *
      * @param string $provider one of model_list::PROVIDERS
      * @return array{checked: int, skipped: int, failed: string[]} failed holds the model ids that
-     * Did not return a readable question, and are now out of the dropdown
+     *     did not return a readable question, and are now out of the dropdown
      */
     public static function check_listed_models(string $provider): array {
         $cached = model_list::get_cached($provider);

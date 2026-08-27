@@ -90,6 +90,13 @@ class question_move_service {
 
         $moved = self::move_rows(array_values($rows), $categoryvalue, $context);
 
+        $generation = $DB->get_record('local_artqtml_generations', ['id' => $generationid], 'userid', MUST_EXIST);
+        \local_artqtml\local\draft_role::revoke_if_idle((int) $generation->userid);
+        global $USER;
+        if ((int) $USER->id !== (int) $generation->userid) {
+            \local_artqtml\local\draft_role::revoke_if_idle((int) $USER->id);
+        }
+
         return ['moved' => $moved, 'skipped' => $skippedcount];
     }
 

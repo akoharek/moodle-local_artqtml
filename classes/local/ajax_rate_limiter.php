@@ -107,18 +107,17 @@ class ajax_rate_limiter {
 
             if ($record) {
                 if ((int) $record->windowstart <= $expiredbefore) {
-                    $DB->execute(
-                        "UPDATE {local_artqtml_ajax_ratelimit}
-                            SET windowstart = ?, hitcount = 1
-                          WHERE id = ?
-                            AND windowstart = ?",
-                        [$now, $record->id, $record->windowstart]
-                    );
-                    $fresh = $DB->get_record('local_artqtml_ajax_ratelimit', ['id' => $record->id]);
-                    if ($fresh && (int) $fresh->windowstart === $now && (int) $fresh->hitcount === 1) {
-                        return true;
-                    }
-                    continue;
+                $DB->execute(
+                    "UPDATE {local_artqtml_ajax_ratelimit}
+                        SET windowstart = ?, hitcount = 1
+                      WHERE id = ?
+                        AND windowstart = ?",
+                    [$now, $record->id, $record->windowstart]
+                );
+                if (self::update_affected_one_row($DB)) {
+                    return true;
+                }
+                continue;
                 }
 
                 if ((int) $record->hitcount >= $limit) {
@@ -133,8 +132,7 @@ class ajax_rate_limiter {
                         AND hitcount < ?",
                     [$record->id, $record->hitcount, $limit]
                 );
-                $fresh = $DB->get_record('local_artqtml_ajax_ratelimit', ['id' => $record->id]);
-                if ($fresh && (int) $fresh->hitcount === (int) $record->hitcount + 1) {
+                if (self::update_affected_one_row($DB)) {
                     return true;
                 }
                 continue;
@@ -154,5 +152,23 @@ class ajax_rate_limiter {
         }
 
         return false;
+    }
+
+    /**
+     * Whether the immediately preceding UPDATE changed exactly one row.
+     *
+     * Uses driver affected-row count when available; otherwise ROW_COUNT() on the same connection.
+     * Avoids the CAS/ABA race of re-reading hitcount and treating another writer's increment as ours.
+     *
+     * @param \moodle_database $DB
+     * @return bool
+     */
+    protected static function update_affected_one_row(\moodle_database $DB): bool {
+        if (method_exists($DB, 'get_affected_rows')) {
+            return $DB->get_affected_rows() === 1;
+        }
+
+        $row = $DB->get_record_sql('SELECT ROW_COUNT() AS affectedrows');
+        return $row && (int) $row->affectedrows === 1;
     }
 }
