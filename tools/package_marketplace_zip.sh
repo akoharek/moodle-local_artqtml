@@ -32,6 +32,7 @@ rsync -a \
   --exclude 'tests/' \
   --exclude 'tools/' \
   --exclude 'dist/' \
+  --exclude 'moodle/' \
   --exclude 'amd/src/' \
   --exclude 'CLAUDE.md' \
   --exclude 'CHANGES.md' \

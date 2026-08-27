@@ -107,14 +107,7 @@ class ajax_rate_limiter {
 
             if ($record) {
                 if ((int) $record->windowstart <= $expiredbefore) {
-                    $DB->execute(
-                        "UPDATE {local_artqtml_ajax_ratelimit}
-                        SET windowstart = ?, hitcount = 1
-                      WHERE id = ?
-                        AND windowstart = ?",
-                        [$now, $record->id, $record->windowstart]
-                    );
-                    if (self::update_affected_one_row($DB)) {
+                    if (self::cas_reset_window($DB, (int) $record->id, $now, (int) $record->windowstart)) {
                         return true;
                     }
                     continue;
@@ -124,15 +117,7 @@ class ajax_rate_limiter {
                     return false;
                 }
 
-                $DB->execute(
-                    "UPDATE {local_artqtml_ajax_ratelimit}
-                        SET hitcount = hitcount + 1
-                      WHERE id = ?
-                        AND hitcount = ?
-                        AND hitcount < ?",
-                    [$record->id, $record->hitcount, $limit]
-                );
-                if (self::update_affected_one_row($DB)) {
+                if (self::cas_increment($DB, (int) $record->id, (int) $record->hitcount, $limit)) {
                     return true;
                 }
                 continue;
@@ -155,20 +140,60 @@ class ajax_rate_limiter {
     }
 
     /**
-     * Whether the immediately preceding UPDATE changed exactly one row.
+     * Reset an expired window only when windowstart still matches (CAS).
      *
-     * Uses driver affected-row count when available; otherwise ROW_COUNT() on the same connection.
-     * Avoids the CAS/ABA race of re-reading hitcount and treating another writer's increment as ours.
+     * Uses UPDATE … RETURNING so MariaDB and PostgreSQL both report affected rows without
+     * MySQL-only ROW_COUNT().
      *
      * @param \moodle_database $DB
+     * @param int $id
+     * @param int $now
+     * @param int $expectedwindowstart
      * @return bool
      */
-    protected static function update_affected_one_row(\moodle_database $DB): bool {
-        if (method_exists($DB, 'get_affected_rows')) {
-            return $DB->get_affected_rows() === 1;
-        }
+    protected static function cas_reset_window(
+        \moodle_database $DB,
+        int $id,
+        int $now,
+        int $expectedwindowstart
+    ): bool {
+        $rows = $DB->get_records_sql(
+            "UPDATE {local_artqtml_ajax_ratelimit}
+                SET windowstart = ?, hitcount = 1
+              WHERE id = ?
+                AND windowstart = ?
+         RETURNING id",
+            [$now, $id, $expectedwindowstart]
+        );
 
-        $row = $DB->get_record_sql('SELECT ROW_COUNT() AS affectedrows');
-        return $row && (int) $row->affectedrows === 1;
+        return count($rows) === 1;
+    }
+
+    /**
+     * Increment hitcount only when it still matches and remains below the cap (CAS).
+     *
+     * @param \moodle_database $DB
+     * @param int $id
+     * @param int $expectedhitcount
+     * @param int $limit
+     * @return bool
+     */
+    protected static function cas_increment(
+        \moodle_database $DB,
+        int $id,
+        int $expectedhitcount,
+        int $limit
+    ): bool {
+        $rows = $DB->get_records_sql(
+            "UPDATE {local_artqtml_ajax_ratelimit}
+                SET hitcount = hitcount + 1
+              WHERE id = ?
+                AND hitcount = ?
+                AND hitcount < ?
+         RETURNING id",
+            [$id, $expectedhitcount, $limit]
+        );
+
+        return count($rows) === 1;
     }
 }
