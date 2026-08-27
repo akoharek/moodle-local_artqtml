@@ -107,17 +107,17 @@ class ajax_rate_limiter {
 
             if ($record) {
                 if ((int) $record->windowstart <= $expiredbefore) {
-                $DB->execute(
-                    "UPDATE {local_artqtml_ajax_ratelimit}
+                    $DB->execute(
+                        "UPDATE {local_artqtml_ajax_ratelimit}
                         SET windowstart = ?, hitcount = 1
                       WHERE id = ?
                         AND windowstart = ?",
-                    [$now, $record->id, $record->windowstart]
-                );
-                if (self::update_affected_one_row($DB)) {
-                    return true;
-                }
-                continue;
+                        [$now, $record->id, $record->windowstart]
+                    );
+                    if (self::update_affected_one_row($DB)) {
+                        return true;
+                    }
+                    continue;
                 }
 
                 if ((int) $record->hitcount >= $limit) {

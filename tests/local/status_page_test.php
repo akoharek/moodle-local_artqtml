@@ -23,6 +23,7 @@ namespace local_artqtml\local;
  * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @coversNothing
  */
 final class status_page_test extends \advanced_testcase {
     /**
