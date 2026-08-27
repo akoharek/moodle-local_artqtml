@@ -34,6 +34,7 @@ rsync -a \
   --exclude 'dist/' \
   --exclude 'amd/src/' \
   --exclude 'CLAUDE.md' \
+  --exclude 'CHANGES.md' \
   --exclude 'REVIEW-FINDINGS.md' \
   --exclude 'skills-lock.json' \
   --exclude 'phpcs.xml' \
@@ -73,7 +74,7 @@ assert "artqtml/version.php" in names
 assert "artqtml/lang/en/local_artqtml.php" in names
 assert "artqtml/COPYING.txt" in names
 assert "artqtml/README.md" in names
-assert "artqtml/CHANGES.md" in names
+assert "artqtml/CHANGES.md" not in names
 assert "artqtml/REVIEW-FINDINGS.md" not in names
 # Allow directory entries artqtml/lang/ and artqtml/lang/en/; forbid other lang packs.
 bad_lang = [
@@ -89,6 +90,7 @@ forbidden_prefixes = (
     "artqtml/.git/",
     "artqtml/CLAUDE.md",
     "artqtml/BACKLOG.md",
+    "artqtml/CHANGES.md",
     "artqtml/REVIEW-FINDINGS.md",
     "artqtml/license.php",
 )
