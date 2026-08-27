@@ -176,7 +176,17 @@ class draft_role {
             return false;
         }
 
-        return (bool) role_unassign($roleid, $userid, $coursecontext->id);
+        $exists = $DB->record_exists('role_assignments', [
+            'roleid'    => $roleid,
+            'userid'    => $userid,
+            'contextid' => $coursecontext->id,
+        ]);
+        if (!$exists) {
+            return false;
+        }
+
+        role_unassign($roleid, $userid, $coursecontext->id);
+        return true;
     }
 
     /**
