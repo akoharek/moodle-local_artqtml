@@ -50,13 +50,13 @@ class hook_callbacks {
         if (!empty($CFG->upgraderunning)) {
             return;
         }
-        if (defined('CLI_SCRIPT') && CLI_SCRIPT) {
+        if (CLI_SCRIPT) {
             return;
         }
-        if (defined('WS_SERVER') && WS_SERVER) {
+        if (WS_SERVER) {
             return;
         }
-        if (defined('AJAX_SCRIPT') && AJAX_SCRIPT) {
+        if (AJAX_SCRIPT) {
             return;
         }
         if (!plugin_setup::user_can_configure()) {

@@ -259,9 +259,7 @@ $page = min($page, $lastpage);
 $questions = approve_page_data::questions($generationid, $sort, $dir, $page, $perpage);
 $creator = core_user::get_user($generation->userid);
 
-// C9: Preview opens the native Moodle question preview for a draft question, which requires
-// moodle/question:useall in the draft course context. Native editing is not offered on the
-// approve page; external edits are detected and lock the question row.
+// Preview and Edit open native Moodle question UI in the draft course (draft_role grants use/edit).
 $candraftpreviewquestions = false;
 $canmutate = generation_access_policy::can_mutate($generation, null, $context);
 if (draft_bank::is_configured()) {

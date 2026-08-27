@@ -25,11 +25,9 @@
  *
  * - moodle/course:view — preview and require_login($courseid) succeed through is_viewing().
  * - moodle/question:useall — qbank_previewquestion preview links on approve.php ask for 'use'.
+ * - moodle/question:editall — Edit links on approve.php open Moodle's native question editor.
  *
- * Deliberately absent: moodle/question:editall (and any edit* variant). External edits are
- * detected by classes/observer.php and lock the question row (externallyedited).
- *
- * Two capabilities, and deliberately no archetype.
+ * Three capabilities, and deliberately no archetype.
  *
  * @package    local_artqtml
  * @copyright  2026 AR Tudásmenedzsment Kft.
@@ -50,6 +48,7 @@ class draft_role {
     /** @var string[] The capabilities the role grants, and nothing else. */
     public const CAPABILITIES = [
         'moodle/course:view',
+        'moodle/question:editall',
         'moodle/question:useall',
     ];
 

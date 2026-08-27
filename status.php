@@ -166,6 +166,7 @@ $PAGE->requires->js_call_amd('local_artqtml/status', 'init');
 $questioncount = $DB->count_records('local_artqtml_questions', ['generationid' => $generationid]);
 $tokenwarningmessage = '';
 
+$settingsurl = new moodle_url('/local/artqtml/generate.php', ['id' => $generationid]);
 $approveurl = new moodle_url('/local/artqtml/approve.php', ['generationid' => $generationid]);
 $backurl = new moodle_url('/local/artqtml/index.php');
 $retryurl = new moodle_url('/local/artqtml/status.php', ['generationid' => $generationid, 'retry' => 1]);
@@ -183,7 +184,7 @@ echo html_writer::tag('p', format_string($generation->name));
 // overwrite just the message text without disturbing a dismiss-button/JS init.
 echo html_writer::div(
     html_writer::div($tokenwarningmessage, 'alert alert-warning mb-0', ['data-region' => 'tokenwarning-text']),
-    $tokenwarningmessage !== '' ? 'mb-3' : 'mb-3 d-none',
+    'mb-3 d-none',
     ['data-region' => 'tokenwarning']
 );
 
@@ -395,7 +396,7 @@ $technicalerror = has_capability('local/artqtml:configure', $context) ? s($gener
 
 $failedactions = html_writer::div(
     ($canmutate ? $retrylink : '') .
-        html_writer::link($backurl, get_string('backtolist', 'local_artqtml'), ['class' => 'btn btn-secondary']),
+        html_writer::link($settingsurl, get_string('backtosettings', 'local_artqtml'), ['class' => 'btn btn-secondary']),
     'artqtm-buttonrow'
 );
 

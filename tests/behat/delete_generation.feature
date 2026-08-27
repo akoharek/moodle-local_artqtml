@@ -22,7 +22,7 @@ Feature: Deleting an ArtQTML generation
 
   Scenario: Teacher deletes a generation from the list
     When I visit the ArtQTML list page
-    And I click on "Delete" "link" in the "Disposable" "table_row"
+    And I click on "Delete" "button" in the "Disposable" "table_row"
     And I click on "Yes" "button" in the "Confirmation" "dialogue"
     Then I should see "and all of its questions were deleted."
     And I should not see "DEL1-IH-0001"

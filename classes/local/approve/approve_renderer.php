@@ -270,6 +270,15 @@ class approve_renderer {
                         'target'      => '_blank',
                         'data-testid' => 'artqtm-approve-preview-link',
                     ]);
+                    if (!$islocked && $canmutate) {
+                        $editurl = new \moodle_url(
+                            '/question/bank/editquestion/question.php',
+                            approve_page_data::question_edit_url_params((int) $question->questionbankid, $pageurl)
+                        );
+                        $actions[] = \html_writer::link($editurl, get_string('actionedit', 'local_artqtml'), [
+                            'data-testid' => 'artqtm-approve-edit-link',
+                        ]);
+                    }
                 }
             }
 
@@ -281,7 +290,7 @@ class approve_renderer {
                 $actions[] = \html_writer::span(get_string('moved_badge', 'local_artqtml'), 'badge badge-info', [
                     'data-testid' => 'artqtm-approve-moved-badge',
                 ]);
-            } else if (!$islocked && !empty($question->approved)) {
+            } else if (!empty($question->approved)) {
                 // "a badge maga nem kattintható" - a plain span, with the revoke action as
                 // its own separate link beside it.
                 $actions[] = \html_writer::span(get_string('approvedlabel', 'local_artqtml'), 'badge badge-success', [
@@ -296,7 +305,7 @@ class approve_renderer {
                         'data-testid' => 'artqtm-approve-revoke-link',
                     ]);
                 }
-            } else if ($canmutate && !$islocked) {
+            } else if ($canmutate) {
                 // A gomb (button), and the field table types it as one,
                 // so it is a real submit button in the surrounding form rather than the state-changing
                 // GET link it used to be. The form already carries the sesskey and the generationid.

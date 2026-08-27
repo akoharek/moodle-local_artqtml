@@ -39,7 +39,7 @@ class setting_configtext_courseid extends \admin_setting_configtext {
      */
     public function __construct(string $name, string $visiblename, string $description) {
         // Default 0: fresh installs deliberately leave draft course unset until an admin picks one.
-        parent::__construct($name, $visiblename, $description, 0, PARAM_INT);
+        parent::__construct($name, $visiblename, $description, '0', PARAM_INT);
     }
 
     /**
@@ -59,10 +59,7 @@ class setting_configtext_courseid extends \admin_setting_configtext {
         $courseid = (int) $data;
         if ($courseid <= 0) {
             // Moodle applies plugin defaults during install/upgrade; unset is valid then.
-            if (
-                \during_initial_install() || !empty($CFG->upgraderunning)
-                || (defined('CLI_SCRIPT') && CLI_SCRIPT)
-            ) {
+            if (\during_initial_install() || !empty($CFG->upgraderunning) || CLI_SCRIPT) {
                 return true;
             }
             return get_string('errordraftcourserequired', 'local_artqtml');

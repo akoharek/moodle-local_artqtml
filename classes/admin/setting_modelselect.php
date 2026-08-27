@@ -153,6 +153,6 @@ class setting_modelselect extends \admin_setting_configselect {
             return get_string('errormodelrequired', 'local_artqtml');
         }
 
-        return parent::validate($data);
+        return true;
     }
 }
