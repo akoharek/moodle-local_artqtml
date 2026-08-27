@@ -221,7 +221,7 @@ if ($generation->status === generation_status::PARTIAL) {
     $shortfall = \local_artqtml\local\missing_types::shortfall($generation);
     $retrytypeslink = '';
     if ($shortfall !== [] && $canmutate) {
-        $described = \local_artqtml\local\missing_types::describe($shortfall);
+        $described = \local_artqtml\local\missing_types::describe($generation);
         $retrytypesbutton = new single_button(
             new moodle_url('/local/artqtml/retrytypes.php', ['generationid' => $generationid]),
             get_string('retrymissingtypes', 'local_artqtml'),

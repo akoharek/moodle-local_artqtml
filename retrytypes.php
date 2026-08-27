@@ -116,7 +116,7 @@ function local_artqtml_create_followup(stdClass $source, array $settings, array 
     $record->sourcetext = $source->sourcetext;
     $record->sourcetexthash = $source->sourcetexthash;
     $record->sourcefilehash = $source->sourcefilehash;
-    $record->settings = json_encode(missing_types::narrowed_settings($settings, $shortfall));
+    $record->settings = json_encode(missing_types::narrowed_settings($settings, $source));
     $record->status = generation_status::STARTED;
     $record->timecreated = time();
     $record->timemodified = $record->timecreated;
@@ -155,7 +155,7 @@ echo html_writer::tag('p', get_string('duplicatefounddesc', 'local_artqtml', (ob
     'similarity' => $match->similarity,
     'status'     => get_string('status_' . $match->status, 'local_artqtml'),
 ]));
-echo html_writer::tag('p', get_string('retrymissingtypesdesc', 'local_artqtml', missing_types::describe($shortfall)));
+echo html_writer::tag('p', get_string('retrymissingtypesdesc', 'local_artqtml', missing_types::describe($generation)));
 
 $continueurl = new moodle_url('/local/artqtml/retrytypes.php');
 echo html_writer::start_tag('form', ['method' => 'post', 'action' => $continueurl->out(false)]);
