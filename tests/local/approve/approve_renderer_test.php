@@ -29,9 +29,9 @@ use local_artqtml\local\draft_bank;
  */
 final class approve_renderer_test extends \advanced_testcase {
     /**
-     * A still-in-draft question keeps the plugin-aware Edit action.
+     * A still-in-draft question shows Preview only (no native Edit link).
      */
-    public function test_unmoved_question_shows_edit_not_open(): void {
+    public function test_unmoved_question_shows_preview_not_edit_or_open(): void {
         [$output, $creator, $pageurl] = $this->setup_page();
         $question = $this->seed_question(['movedout' => 0, 'questioncode' => 'OPEN-IH-0001']);
 
@@ -46,12 +46,11 @@ final class approve_renderer_test extends \advanced_testcase {
             (int) $question->generationid
         );
 
-        $this->assertStringContainsString('artqtml-approve-edit-link', $html);
-        $this->assertStringContainsString(get_string('actionedit', 'local_artqtml'), $html);
         $this->assertStringContainsString('artqtml-approve-preview-link', $html);
+        $this->assertStringNotContainsString('artqtml-approve-edit-link', $html);
+        $this->assertStringNotContainsString(get_string('actionedit', 'local_artqtml'), $html);
         $this->assertStringNotContainsString('artqtml-approve-open-link', $html);
-        $this->assertStringContainsString('/question/bank/editquestion/question.php', $html);
-        $this->assertStringContainsString('id=' . (int) $question->questionbankid, $html);
+        $this->assertStringNotContainsString('/question/bank/editquestion/question.php', $html);
     }
 
     /**
