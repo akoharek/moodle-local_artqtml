@@ -155,17 +155,18 @@ class ajax_rate_limiter {
         int $expectedwindowstart
     ): bool {
         if ($DB->get_dbfamily() === 'postgres') {
-            return $DB->count_records_sql(
-                "SELECT COUNT(1)
-                   FROM (
-                        UPDATE {local_artqtml_ajax_ratelimit}
-                           SET windowstart = ?, hitcount = 1
-                         WHERE id = ?
-                           AND windowstart = ?
-                        RETURNING id
-                        ) AS cas_rows",
+            $DB->execute(
+                "UPDATE {local_artqtml_ajax_ratelimit}
+                    SET windowstart = ?, hitcount = 1
+                  WHERE id = ?
+                    AND windowstart = ?",
                 [$now, $id, $expectedwindowstart]
-            ) === 1;
+            );
+            $updated = $DB->get_record('local_artqtml_ajax_ratelimit', ['id' => $id]);
+
+            return $updated
+                && (int) $updated->windowstart === $now
+                && (int) $updated->hitcount === 1;
         }
 
         $DB->execute(
@@ -195,18 +196,17 @@ class ajax_rate_limiter {
         int $limit
     ): bool {
         if ($DB->get_dbfamily() === 'postgres') {
-            return $DB->count_records_sql(
-                "SELECT COUNT(1)
-                   FROM (
-                        UPDATE {local_artqtml_ajax_ratelimit}
-                           SET hitcount = hitcount + 1
-                         WHERE id = ?
-                           AND hitcount = ?
-                           AND hitcount < ?
-                        RETURNING id
-                        ) AS cas_rows",
+            $DB->execute(
+                "UPDATE {local_artqtml_ajax_ratelimit}
+                    SET hitcount = hitcount + 1
+                  WHERE id = ?
+                    AND hitcount = ?
+                    AND hitcount < ?",
                 [$id, $expectedhitcount, $limit]
-            ) === 1;
+            );
+            $updated = $DB->get_record('local_artqtml_ajax_ratelimit', ['id' => $id]);
+
+            return $updated && (int) $updated->hitcount === $expectedhitcount + 1;
         }
 
         $DB->execute(
