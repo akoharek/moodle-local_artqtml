@@ -1,9 +1,9 @@
 # local_artqtml Marketplace code review — unified triage
 
 **Scope:** `local/artqtml` (Light / Marketplace)  
-**Updated:** 2026-08-27 (S-06 fixed — atomic DB ajax rate limiter; C-03 fixed — full privacy get_metadata; S-04 fixed — cap non-JSON provider error bodies at 500 chars via ai_request::error_message_from_body; F-10 fixed — missing-types retry per-level shortfall; C-N1…F-N1 nits fixed; F-09 wontfix — Open link gated on draft preview caps by design; F-06 wontfix — connection test sync model probe by design; F-05 fixed — retry grants draft role like start; F-04 fixed — difficulty_label canonicalised to easy/medium/hard; F-03 fixed — IH hints persist to question bank; F-02 false positive — bulk move Light scope; matrix updated; C-19 fixed; C-18 fixed; C-17 fixed; C-16 fixed; C-15 fixed; C-14 fixed; C-11/C-12/C-13 fixed; C-10 fixed; C-09 fixed in tracker)  
+**Updated:** 2026-08-27 (tracker sync: C-01/C-02/C-06/F-07 closed in code; C-04/C-05/C-07/C-08 fixed 2026-08-27; S-06, C-03, S-04 fixed; all P0/P1 audit items resolved or wontfix/FP; **0 open submit-critical findings**)
 **Passes merged:** Security (Sonnet `a2368d28`), Compliance (Sonnet `7072ded4`), Functional (Gemini `1db629c4`); prior tracker retained for stable IDs  
-**Status:** Triage only — no product code changed in this pass
+**Status:** Submit-critical audit items **closed in code** — awaiting CI green on `fix/s02-manageall-capability` (`b9c99e9`)
 
 Severity: **P0** Marketplace blocker · **P1** fix before submit · **P2** backlog · **Nit** optional
 
@@ -13,23 +13,23 @@ Severity: **P0** Marketplace blocker · **P1** fix before submit · **P2** backl
 
 | Severity | Count | Role |
 |----------|------:|------|
-| **P0** | **5** | Marketplace blockers |
-| **P1** | **9** | Fix before HQ / Marketplace submit |
-| **P2** | **0** | Backlog after submit-critical work |
-| **Nit** | **0** | Optional polish |
+| **P0** | **0 open** (5 fixed) | Marketplace blockers — all resolved |
+| **P1** | **0 open** (8 fixed, 1 false positive) | Fix before HQ / Marketplace submit — all resolved |
+| **P2** | **0 open** (fixed / wontfix / false positive) | Backlog after submit-critical work |
+| **Nit** | **0 open** (all fixed) | Optional polish |
 
-**Marketplace blockers (P0):** (1) ~~missing object-level ownership~~ **S-02 fixed**, (2) ~~permanent draft-course editall/useall~~ **S-01 fixed (2026082602)**, (3) missing `@copyright` / phpcs exclude vs moodle.org CI, (4) missing `MOODLE_INTERNAL` guards, (5) fresh install blocked until admin sets hidden draft course (`draftcourseid=0` / `is_configured()`).
+**Marketplace blockers (P0):** all resolved — (1) ~~missing object-level ownership~~ **S-02 fixed**, (2) ~~permanent draft-course editall/useall~~ **S-01 fixed (2026082602)**, (3) ~~missing `@copyright` / phpcs exclude~~ **C-02 fixed (`4a6e759`)**, (4) ~~missing `MOODLE_INTERNAL` guards~~ **C-01 fixed**, (5) ~~fresh install blocked~~ **F-07 fixed (`848f7aa`)** — post-install redirect + setup checklist (by design, not auto-create course).
 
-**Later (P1–Nit):** ~~privacy metadata~~ **C-03 fixed**, privacy deletion copy, Full-leak lang/comments, ~~FAILED-state UX loop~~ **F-08 fixed**, ~~raw LLM error log flooding~~ **S-04 fixed**, ~~non-atomic AJAX rate limit~~ **S-06 fixed**, ~~Move button crash~~ **F-01 false positive (misreported — not a fatal)**, ~~bulk move label mismatch~~ **F-02 false positive (bulk move in Light scope; matrix updated)**, AMD/CLI leftovers, schema/label nits.
+**Later (P1–Nit):** all resolved — ~~privacy metadata~~ **C-03 fixed**, ~~privacy deletion copy~~ **C-04 fixed**, ~~Full-leak lang~~ **C-05 fixed**, ~~reparent dead code~~ **C-07 fixed (option B)**, ~~ticket-ID scrub~~ **C-08 fixed**, ~~schema COMMENT~~ **C-06 fixed**, ~~FAILED UX~~ **F-08 fixed**, ~~S-04/S-06~~ **fixed**, ~~F-01/F-02~~ **false positive**, P2/Nit all closed.
 
-**Recommended fix order**
+**Recommended fix order** — all steps complete; next gate is CI + Marketplace ZIP/submit.
 
-1. **Ownership policy** — one auth helper: owner or manage capability on upload / source / status abort·retry / approve·delete·move (and narrow `retrytypes` IDOR).  
-2. ~~**Draft role** — stop permanent `moodle/question:editall`+`useall`; revoke when unused.~~ **Done (2026082602): preview-only role + external-edit lock**
-3. **Copyright + `MOODLE_INTERNAL`** — drop `CopyrightTagMissing` exclude; add guards (C-01, C-02).  
-4. **Fresh-install draft course** — allow first-run without preconfigured hidden course (F-07).  
-5. **UX / compliance P1** — ~~FAILED misleading back-to-settings~~ **F-08 fixed**, ~~Move-without-categories crash~~ **F-01 false positive (retracted)**, privacy metadata, dead Full lang strings, reparent upgrade, ticket-ID scrub.  
-6. **P2 / Nit** as capacity allows; re-audit touched security surfaces after ownership + draft-role fixes.
+1. ~~**Ownership policy**~~ **S-02/S-08 fixed**  
+2. ~~**Draft role**~~ **S-01 fixed (2026082602)**  
+3. ~~**Copyright + `MOODLE_INTERNAL`**~~ **C-01/C-02 fixed**  
+4. ~~**Fresh-install onboarding**~~ **F-07 fixed (`848f7aa`)**  
+5. ~~**UX / compliance P1**~~ **all fixed / FP / wontfix**  
+6. ~~**P2 / Nit**~~ **all closed**
 
 ---
 
@@ -39,9 +39,9 @@ Severity: **P0** Marketplace blocker · **P1** fix before submit · **P2** backl
 |----|----------|------|--------|----------|---------|---------|---------------------|
 | S-02 | P0 | Security | **fixed** | `upload.php`; `generation_source_service.php`; `status.php` (abort/retry); `approve.php`; approval / deletion / move services | Mutating another user’s generation needs only system `local/artqtml:use` — no ownership / manage check (same root cause across endpoints) | Security (elevated); prior S-02/S-03 | Shared object-level auth: require owner or elevated manage capability before any mutate |
 | S-01 | P0 | Security | **fixed** | `classes/local/draft_role.php`; `classes/observer.php`; approve UI/services | Draft role no longer grants native edit; external Moodle edit locks question (`externallyedited`); approve/move blocked; generation delete still allowed (owner/`:manageall`) | Security (elevated); prior S-01 | Documented 2026082602 — holding-area model replaces permanent editall grant |
-| C-02 | P0 | Compliance | open | most PHP; `phpcs.xml` | Missing `@copyright`; phpcs excludes `CopyrightTagMissing` but moodle.org CI will not | Compliance; prior C-02 | Add copyright tags; remove exclude so local CI matches HQ |
-| C-01 | P0 | Compliance | open | `lib.php`; `db/upgrade.php`; `db/install.php`; `db/uninstall.php` | Missing `defined('MOODLE_INTERNAL') \|\| die();` | Compliance; prior C-01 | Add guard after file docblock |
-| F-07 | P0 | Functional | open | config / `is_configured()`; generate entry | Fresh install blocked while `draftcourseid=0` until admin sets hidden draft course | Functional (new P0) | Bootstrap or auto-create draft course / allow first-run without admin pre-config |
+| C-02 | P0 | Compliance | **fixed** | most PHP; `phpcs.xml` | Missing `@copyright`; phpcs excludes `CopyrightTagMissing` but moodle.org CI will not | Compliance; prior C-02; fixed `4a6e759` | `@copyright` on all shipped PHP; no `CopyrightTagMissing` exclude in `phpcs.xml` |
+| C-01 | P0 | Compliance | **fixed** | `lib.php`; `db/upgrade.php`; `db/install.php`; `db/uninstall.php` | Missing `defined('MOODLE_INTERNAL') \|\| die();` | Compliance; prior C-01; fixed `4a6e759` | Guard on all shipped PHP; exceptions: `tools/*`, `phpstan-bootstrap.php`, one test |
+| F-07 | P0 | Functional | **fixed** | `plugin_setup.php`; `db/install.php`; settings banners | Fresh install blocked while `draftcourseid=0` until admin sets hidden draft course | Functional (new P0); fixed `848f7aa` | Post-install redirect + setup checklist — by design, not auto-create course |
 | S-04 | P1 | Security | **fixed** | `ai_request.php`; generate/validate tasks; `model_checker.php` | Raw provider error bodies logged / stored unbounded | Security (elevated from P2); prior S-04; fixed 2026-08-27 | `error_message_from_body()`: JSON `error.message` unchanged; non-JSON bodies capped at 500 chars |
 | S-06 | P1 | Security | **fixed** | `ajax_rate_limiter.php`; `db/install.xml`; `db/upgrade.php` | Non-atomic cache read-modify-write | Security (elevated from P2); prior S-06; fixed 2026-08-27 | DB table + optimistic UPDATE; removed MUC `ajax_ratelimit` cache def (C-19) |
 | C-03 | P1 | Compliance | **fixed** | `classes/privacy/provider.php`; lang EN/HU | Incomplete `get_metadata()` vs stored/exported personal fields | Compliance; prior C-03; fixed 2026-08-27 | All personal columns declared + matching lang strings |
@@ -49,7 +49,7 @@ Severity: **P0** Marketplace blocker · **P1** fix before submit · **P2** backl
 | C-05 | P1 | Compliance | **fixed** | `lang/en` (+ hu) | ~20 dead Full-leak strings (`aiinstruction*`, `diagnosticsmode*`, `settingdebug*`, …) | Compliance; prior C-05; fixed 2026-08-27 | Deleted 26 unused Full-leak keys (Light only); EN/HU parity restored |
 | C-07 | P1 | Compliance | **fixed** | `draft_category_reparent.php`; `db/upgrade.php` | Reparent helper claimed / present but not called from upgrade | Compliance; prior C-07; **product decision 2026-08-26 (option B)** | Removed dead reparent helper + tests — plugin never deployed; Full keeps upgrade step |
 | C-08 | P1 | Compliance | **fixed** | install.xml; get_status; process_pending; WS/comments | Spec/ticket IDs in shipped comments (`C-01`, `M-08`, …) | Compliance; prior C-08; fixed 2026-08-27 | Scrubbed remaining audit IDs from shipped PHP/tests/comments |
-| C-06 | P1 | Compliance | open | `db/install.xml` | Schema COMMENT still Bloom / free-text and/or Hungarian (Full leak) | Compliance; prior C-06 | English COMMENT describing easy/medium/hard only |
+| C-06 | P1 | Compliance | **fixed** | `db/install.xml` | Schema COMMENT still Bloom / free-text and/or Hungarian (Full leak) | Compliance; prior C-06; fixed C-N1 | English COMMENT: easy/medium/hard only |
 | F-01 | P1 | Functional | **false positive** (misreported) | `approve_renderer.php`; `approve.php` | Historical claim: Move without category → `required_param` fatal. **Verified:** soft `\core\notification::error(errornocategory)` + redirect (~158–161); empty `$categoryoptions` hides Move; no per-row Move. Provenance: GPT `bc2f036b` → Gemini `1db629c4` → triage. Optional Nit only: empty choosedots → intentional soft notification. `errornocategory` may be HU-only (not F-01). | Functional re-check 2026-08-27; prior F-01 | **Do not treat as crash.** No product fix for alleged fatal; skip as open P1 |
 | F-08 | P1 | Functional | **fixed** | `status.php`; lang | FAILED UI promised settings edit via “Back to settings” but `generate.php` rejected non-STARTED (bounce loop) | Functional (new); fixed 2026-08-26 (option C) | `generationfailed` copy retry-only; secondary button → list (`backtolist` / `index.php`) |
 | S-05 | P2 | Security | **fixed** | generation_list; approve_renderer; `lib.php`; delete/modelaction | State-changing GET + sesskey in URL | Security; prior S-05; fixed 2026-08-27 | POST forms + `data_submitted()` on mutate scripts |
@@ -106,9 +106,10 @@ Severity: **P0** Marketplace blocker · **P1** fix before submit · **P2** backl
 | **F-06** | Prior F-06; **wontfix 2026-08-27** — by design: connection test probes all listed models synchronously to filter dropdown to working models only; cost accepted (same spirit as S-07) |
 | **F-09** | Prior F-09; **wontfix 2026-08-27** — by design: Open/Preview/Edit gated on draft preview capability; normal flow has draft_role from start/retry |
 | **S-08**, **S-N1**, **C-N6** | New from Security / Compliance nits |
-| Unchanged open from prior tracker | C-01–C-08 as listed; F-N1 re-verified still open (**F-01 false positive / retracted**; **F-02 false positive / closed — matrix updated** 2026-08-27; **F-03 fixed** 2026-08-27; **F-04 fixed** 2026-08-27; **F-05 fixed** 2026-08-27; **F-06 wontfix** 2026-08-27; **F-09 wontfix** 2026-08-27; **F-08 fixed** 2026-08-26; **S-07 wontfix** 2026-08-27; **C-09 fixed** 2026-08-27; **C-10 fixed** 2026-08-27; **C-11 fixed** 2026-08-27; **C-12 fixed** 2026-08-27; **C-13 fixed** 2026-08-27; **C-14 fixed** 2026-08-27; **C-15 fixed** 2026-08-27; **C-16 fixed** 2026-08-27; **C-17 fixed** 2026-08-27; **C-18 fixed** 2026-08-27; **C-19 fixed** 2026-08-27) |
-
-Prior note: REVIEW-FINDINGS tracked **C-01, C-02, C-05, C-07, C-08** as still open — confirmed retained above (**C-10 fixed** 2026-08-27; **C-16 fixed** 2026-08-27; **C-17 fixed** 2026-08-27; **C-19 fixed** 2026-08-27).
+| **C-01**, **C-02** | Prior C-01/C-02; **fixed `4a6e759`** — MOODLE_INTERNAL + @copyright sweep |
+| **F-07** | Prior F-07; **fixed `848f7aa`** — post-install redirect + setup checklist (not auto-create course) |
+| **C-04**, **C-05**, **C-06**, **C-07**, **C-08** | Prior P1 compliance; **all fixed 2026-08-27** (`b9c99e9`, C-N1 for C-06) |
+| Unchanged open from prior tracker | **None** — all audit IDs closed (fixed / wontfix / false positive) as of 2026-08-27 |
 
 ---
 
@@ -121,4 +122,4 @@ Prior note: REVIEW-FINDINGS tracked **C-01, C-02, C-05, C-07, C-08** as still op
 | Functional | `1db629c4-e2c2-40b4-b717-837327920666` | Fresh install, FAILED loop, Move, UX P2/Nit |
 | Prior triage | This file (pre-merge) | Stable S-/C-/F- IDs |
 
-Do not treat this document as a fix commit — implement in product code separately; re-run targeted security review after S-01 / S-02.
+Do not treat this document as a fix commit — implement in product code separately; re-run targeted security review after S-01 / S-02. **2026-08-27:** all submit-critical items implemented; remaining gate is CI + Marketplace packaging/submit.
