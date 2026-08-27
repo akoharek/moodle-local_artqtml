@@ -152,11 +152,11 @@ class behat_local_artqtml extends behat_base {
             $node->click();
         } catch (\Facebook\WebDriver\Exception\UnexpectedAlertOpenException) {
             $this->execute([behat_general::class, 'accept_currently_displayed_alert_dialog'], []);
-            $this->wait_until_the_page_is_ready();
+            $this->execute('behat_general::wait_until_the_page_is_ready');
             return;
         }
 
         $this->execute([behat_general::class, 'accept_currently_displayed_alert_dialog'], []);
-        $this->wait_until_the_page_is_ready();
+        $this->execute('behat_general::wait_until_the_page_is_ready');
     }
 }
