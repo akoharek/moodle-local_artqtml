@@ -478,7 +478,8 @@ class generation_list {
                         new \moodle_url('/local/artqtml/delete.php', ['id' => $generation->id]),
                         get_string('actiondelete', 'local_artqtml'),
                         'post',
-                        \single_button::BUTTON_LINK
+                        \single_button::BUTTON_SECONDARY,
+                        ['class' => 'btn btn-link p-0 align-baseline']
                     );
                     $deletebutton->class = 'singlebutton d-inline';
                     $deletebutton->add_confirm_action(

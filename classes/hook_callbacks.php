@@ -44,7 +44,10 @@ class hook_callbacks {
     public static function after_config(after_config $hook): void {
         global $CFG;
 
-        if (\during_install()) {
+        if (\during_initial_install()) {
+            return;
+        }
+        if (!empty($CFG->upgraderunning)) {
             return;
         }
         if (defined('CLI_SCRIPT') && CLI_SCRIPT) {
