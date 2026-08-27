@@ -17,6 +17,38 @@ Felhasználók: `teacher1` (manageall / manager), `teacher2` (editingteacher, ma
 | **A — Külső edit** | Moodle natív bank/szerkesztő + lock + **questioncode** a listán | Minden approve/UI változás után |
 | **B — Unhappy path** | Move kategória/sor nélkül, moved/locked sorok, hiányzó param | Release előtt / edge-case javítás után |
 | **C — Jogosultság** | editingteacher manageall nélkül | S-02 / capability változás után |
+| **D — Residual 2026082705** | FAILED → lista; generate.php view gate | F-08 / S2-01 view után |
+
+---
+
+## D — Residual 2026082705 (F-08, S2-01 view)
+
+### TC-CLICK-D-001 — FAILED másodlagos CTA (F-08)
+
+**Előfeltétel:** Hiba (`failed`) állapotú generálás (seed vagy szimulált API hiba).
+
+**Lépések**
+
+1. `/local/artqtml/status.php?generationid=…` megnyitása Hiba állapotban.
+2. Másodlagos gomb felirat és cél ellenőrzése.
+
+**PASS**
+
+| # | Ellenőrzés | Elvárt |
+|---|------------|--------|
+| 1 | Másodlagos gomb felirat | **Vissza a listához** (`backtolist`) |
+| 2 | Kattintás célja | `/local/artqtml/index.php` — **nem** `generate.php` |
+
+### TC-CLICK-D-002 — generate.php view gate (S2-01)
+
+**Előfeltétel:** `teacher1` STARTED generálása; `teacher2` (`:use`, manageall nélkül).
+
+**Lépések**
+
+1. `teacher2`-vel közvetlen URL: `/local/artqtml/generate.php?id=<teacher1_started_id>`.
+2. Eredmény ellenőrzése.
+
+**PASS:** Átirányítás hibaüzenettel (`cannotmutateothers`); a beállítások űrlap **nem** jelenik meg.
 
 ---
 

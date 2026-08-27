@@ -104,6 +104,26 @@ final class generation_access_policy_test extends \advanced_testcase {
     }
 
     /**
+     * generate.php view/read is gated by can_mutate (S2-01 residual).
+     *
+     * Non-owners with :use alone may open status/approve for collaboration but must not open
+     * another user's STARTED draft on the settings page.
+     */
+    public function test_non_owner_cannot_open_settings_page(): void {
+        $owner = $this->getDataGenerator()->create_user();
+        $other = $this->getDataGenerator()->create_user();
+        $this->grant_capabilities($other, ['local/artqtml:use']);
+        $this->setUser($other);
+
+        $generation = (object) [
+            'userid' => (int) $owner->id,
+            'status' => generation_status::STARTED,
+        ];
+
+        $this->assertFalse(generation_access_policy::can_mutate($generation, null, $this->context));
+    }
+
+    /**
      * :configure alone never authorises mutation.
      */
     public function test_configure_only_cannot_mutate(): void {

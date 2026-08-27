@@ -1,8 +1,9 @@
 # local_artqtml Marketplace re-review — unified triage (pass 2)
 
 **Scope:** `local/artqtml` (Light / Marketplace)  
-**Plugin version:** `2026082704` / release `2026.08.27`  
+**Plugin version:** `2026082705` / release `2026.08.27`  
 **Fix commit (pass-2 product):** `263fb52`  
+**Residual fix commit:** (pending)  
 **Date:** 2026-08-27 (evening re-review)  
 **Prior tracker:** `REVIEW-FINDINGS.md` (20260826 + fix wave) · handoff `artqtml_codereview_20260826_01.md`  
 **This tracker:** `REVIEW-FINDINGS2.md` · handoff `artqtml_codereview_20260827_01.md`  
@@ -16,29 +17,29 @@ Comparison status values: **fixed** · **still-open** · **intentional-open** ·
 
 ## Cross-check (2026-08-27 night) — code vs this tracker
 
-Independent verification against plugin tree at `/Users/akoharek/projektek/moodle/local/artqtml` (`version.php` `2026082704`). No product PHP changed.
+Independent verification against plugin tree at `/Users/akoharek/projektek/moodle/local/artqtml` (`version.php` `2026082705`). Residual fixes applied in `2026082705`.
 
 ### Verdict
 
-- **Fixed claims that hold:** **41 / 43** (35 prior reconfirmed + 8 new, minus 2 overstated).
-- **Wrong / overstated:** **2** — **F-08** (partial: copy fixed, bounce button still present), **C2-03** (partial: broken mid-sentence comments remain).
-- **still-open / regress counts in exec summary:** accurate as **0** actionable; S-06 comparison row still says **regress** only as historical note absorbed by **S2-03** (now fixed) — stale wording, not an open bug.
+- **Fixed claims that hold:** **43 / 43** (all prior + residual items closed).
+- **Wrong / overstated:** **0** — F-08, C2-03, S2-01 view residual resolved in `2026082705`.
+- **still-open / regress counts in exec summary:** accurate as **0** actionable.
 - **intentional-open (3) + false-positive (2):** claims still accurate.
 
 ### Summary table
 
 | ID | Doc status | Verified status | Evidence | Note |
 |----|------------|-----------------|----------|------|
-| S2-01 | fixed | confirmed-fixed | `generate.php:153`, `:174` | Mutate on save/back + start gated. Page-load view of another’s STARTED draft still only `:use` (`:41–56`) — optional residual, not P0 mutate hole |
+| S2-01 | fixed | confirmed-fixed | `generate.php:45–53`, `:162`, `:183` | View + mutate gated by `can_mutate` |
 | S2-02 | fixed | confirmed-fixed | `draft_role.php:47–50`, `:83`; `upgrade.php` editall strip | CAPABILITIES = view+useall only; `editall` unassigned; `revoke_if_idle` present |
 | S2-03 / S-06 | fixed / regress→fixed | confirmed-fixed | `ajax_rate_limiter.php:117`, `:135`, `:166–172` | Affected-row CAS (`update_affected_one_row`); no hitcount re-read equality |
 | S2-04 | fixed | confirmed-fixed | `ai_request.php:454–472` | Non-envelope JSON capped like plain text |
 | C2-01 | fixed | confirmed-fixed | `privacy/provider.php:127–136`, `:346`, `:367`, `:389` | Metadata + export/delete for `local_artqtml_ajax_ratelimit` |
 | C2-02 | fixed | confirmed-fixed | `retrytypes.php:24`; `upload.php:132` | Neutral “Product decision” wording; no personal names in those comments |
-| C2-03 | fixed | **partial** | e.g. `status.php:362–363`; `approve_renderer.php:353`, `:595`; `generation_list.php:498` | Capitalization/orphan mid-sentence fragments still present in named files |
+| C2-03 | fixed | confirmed-fixed | `status.php`, `generation_list.php`, `approve_renderer.php` | Mid-sentence PHPCS comment fragments repaired |
 | C2-04 | fixed | confirmed-fixed | lang EN/HU grep | `backtosettingsshort` / `plugindesc` absent |
-| S-02 | fixed (partial) | confirmed-fixed | approve/status/upload/retrytypes/services + `generate.php` mutate | Ownership helper on mutate paths; generate gap closed via S2-01 (doc Notes still say “Gap”) |
-| S-01 | fixed | confirmed-fixed | `draft_role.php:47–50` | No permanent `editall`; Notes text still describes old residual — stale prose |
+| S-02 | fixed (partial) | confirmed-fixed | approve/status/upload/retrytypes/services + `generate.php` | Ownership helper on view + mutate paths |
+| S-01 | fixed | confirmed-fixed | `draft_role.php:47–50` | No permanent `editall` |
 | S-04 | fixed | confirmed-fixed | `ai_request.php:448+` | 500-char non-JSON cap; JSON envelope message uncapped by design |
 | S-05 | fixed | confirmed-fixed | `status.php:95–98`; `approve.php:105–108`; `retrytypes.php:54–56` | POST + `data_submitted()` on mutate |
 | S-07 | intentional-open | intentional | `text_extractor.php:39` (`67108864`) | 64 MiB cap unchanged — **wontfix** |
@@ -55,17 +56,17 @@ Independent verification against plugin tree at `/Users/akoharek/projektek/moodl
 | F-05 | fixed | confirmed-fixed | `status.php:135` | `draft_role::grant` on FAILED retry |
 | F-06 | intentional-open | intentional | `model_checker.php:145–168` | Connection test probes listed models sync — **wontfix** |
 | F-07 | fixed | confirmed-fixed | `plugin_setup.php` `POSTINSTALL_REDIRECT_KEY`; `db/install.php:35` | postinstall redirect flag |
-| F-08 | fixed | **partial** | `lang/*/generationfailed` OK; `status.php:387–389` + `:172` | Copy retry-only ✓; secondary still `backtosettings` → `generate.php` (FAILED ≠ STARTED bounce) — **not** `backtolist`/`index.php` as claimed |
+| F-08 | fixed | confirmed-fixed | `status.php:387–388` | FAILED secondary → `backtolist` / `index.php` |
 | F-09 | intentional-open | intentional | `approve.php:265–276` | Open/preview gated on draft `useall` + mutate — **wontfix** |
 | F-10 | fixed | confirmed-fixed | `missing_types.php:40–52`, `:108+` | Matrix shortfall + `narrowed_settings` |
 | F-N1 | fixed | confirmed-fixed | `lib.php:249–259` | Provider-aware missing-key strings |
 
 ### Misclassified / stale rows
 
-1. **F-08** — Doc **fixed**; code **partial** (button remediation incomplete).
-2. **C2-03** — Doc **fixed**; code **partial** (comment repair incomplete).
-3. **S-06** comparison = **regress** while exec summary **regress: 0** and **S2-03 fixed** — ID confusion only; treat S-06 as closed via S2-03.
-4. **S-02 / S-01 Notes** — still describe generate gap / permanent editall; contradict current **fixed** + S2-01/S2-02 code.
+1. ~~**F-08** — partial~~ — closed in `2026082705`.
+2. ~~**C2-03** — partial~~ — closed in `2026082705`.
+3. ~~**S2-01 view residual**~~ — closed in `2026082705` (`generate.php` ownership on page load).
+4. **S-06** comparison = **regress** while exec summary **regress: 0** and **S2-03 fixed** — ID confusion only; treat S-06 as closed via S2-03.
 5. **Recommended fix order** (top of file) — obsolete checklist; all listed items are claimed fixed in the new-findings table.
 
 ---

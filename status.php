@@ -169,7 +169,6 @@ $PAGE->requires->js_call_amd('local_artqtml/status', 'init');
 
 $questioncount = $DB->count_records('local_artqtml_questions', ['generationid' => $generationid]);
 
-$settingsurl = new moodle_url('/local/artqtml/generate.php', ['id' => $generationid]);
 $approveurl = new moodle_url('/local/artqtml/approve.php', ['generationid' => $generationid]);
 $backurl = new moodle_url('/local/artqtml/index.php');
 $retryurl = new moodle_url('/local/artqtml/status.php', ['generationid' => $generationid, 'retry' => 1]);
@@ -198,9 +197,9 @@ echo html_writer::div(
     ['data-region' => 'countdiscrepancy']
 );
 
-// A distinct green "completed successfully" notification (separate from just filling the.
-// progress bar and revealing Continue), shown up front if the generation is already completed on
-// page load, otherwise revealed live by amd/src/status.js the moment the poll returns 'completed'.
+// A distinct green "completed successfully" notification (separate from just filling the progress
+// bar and revealing Continue), shown up front if the generation is already completed on page load,
+// otherwise revealed live by amd/src/status.js the moment the poll returns 'completed'.
 // The question count sits in its own span (like question-count above) so the JS can refresh it to
 // the final value when completion happens mid-poll rather than on a fresh already-completed load.
 $successcountspan = html_writer::tag('span', $questioncount, ['data-region' => 'success-count']);
@@ -233,9 +232,9 @@ if ($generation->status === generation_status::PARTIAL) {
         $retrytypeslink = $OUTPUT->render($retrytypesbutton);
     }
 
-    // Countdiscrepancy only names the shortfall. The why is already in.
-    // local_artqtml_log (type_generation_failed / question_rejected / undershoot outcomes) -
-    // surface it here so the teacher is not left guessing why SR/RV came back empty.
+    // Countdiscrepancy only names the shortfall; the why is already in local_artqtml_log
+    // (type_generation_failed / question_rejected / undershoot outcomes) — surface it here so the
+    // teacher is not left guessing why SR/RV came back empty.
     $partialreasons = \local_artqtml\local\partial_reason::render($generationid);
 
     echo html_writer::div(
@@ -359,10 +358,10 @@ if (generation_status::is_in_progress($generation->status) && $canmutate) {
     echo $OUTPUT->render($abortbutton);
 }
 
-// Shown server-side for a partly successful run. The notice above tells the teacher the.
-// questions that did get made are usable - and until this line the page then gave them no way to
-// reach them, because Continue was only ever revealed by the JS on 'completed'. The other statuses
-// are unchanged: hidden here, unhidden by amd/src/status.js when the poll says completed.
+// Shown server-side for a partly successful run. The notice above tells the teacher the questions
+// that did get made are usable — and until this line the page then gave them no way to reach them,
+// because Continue was only ever revealed by the JS on 'completed'. The other statuses are
+// unchanged: hidden here, unhidden by amd/src/status.js when the poll says completed.
 echo html_writer::div(
     html_writer::link($approveurl, get_string('continuebutton', 'local_artqtml'), ['class' => 'btn btn-primary']),
     $generation->status === generation_status::PARTIAL ? '' : 'd-none',
@@ -386,7 +385,7 @@ $technicalerror = has_capability('local/artqtml:configure', $context) ? s($gener
 
 $failedactions = html_writer::div(
     ($canmutate ? $retrylink : '') .
-        html_writer::link($settingsurl, get_string('backtosettings', 'local_artqtml'), ['class' => 'btn btn-secondary']),
+        html_writer::link($backurl, get_string('backtolist', 'local_artqtml'), ['class' => 'btn btn-secondary']),
     'artqtml-buttonrow'
 );
 

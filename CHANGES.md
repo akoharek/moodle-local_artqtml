@@ -3,6 +3,14 @@
 Newest release first. Version numbers match `version.php` `$plugin->version`;
 the number in parentheses is `$plugin->release`.
 
+## 2026-08-27 — `2026082705` (2026.08.27)
+
+**Pass-2 residual fixes (REVIEW-FINDINGS2 F-08, C2-03, S2-01)**
+
+- **F-08:** FAILED status secondary button links to `index.php` (`backtolist`), not `generate.php`.
+- **S2-01:** `generate.php` view/read gated by `generation_access_policy::can_mutate()` (owner or `:manageall`).
+- **C2-03:** PHPCS comment repair completed in `status.php`, `generation_list.php`, `approve_renderer.php`.
+
 ## 2026-08-27 — `2026082704` (2026.08.27)
 
 **Pass-2 security/compliance fixes (REVIEW-FINDINGS2 S2-01…C2-04)**

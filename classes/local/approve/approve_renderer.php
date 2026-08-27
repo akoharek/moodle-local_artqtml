@@ -350,9 +350,9 @@ class approve_renderer {
                 }
             }
 
-            // The question name/text toggles an inline details row (below) open/closed,.
-            // instead of being plain unclickable text - js/approve... (inline script further down)
-            // wires the click handler, matching this file's existing plain-JS style.
+            // The question name/text toggles an inline details row (below) open/closed, instead of
+            // being plain unclickable text — js/approve... (inline script further down) wires the
+            // click handler, matching this file's existing plain-JS style.
             //
             // No icon before the question name, so the type icon that used to be
             // concatenated in front of this label now lives in the Type cell and nowhere else.
@@ -581,8 +581,8 @@ class approve_renderer {
             ]);
             $html .= \html_writer::end_div();
 
-            // Disabled until at least one row is selected; the selection script below is.
-            // what re-enables it, so the server-rendered state (nothing selected) is disabled.
+            // Disabled until at least one row is selected; the selection script below is what
+            // re-enables it, so the server-rendered state (nothing selected) is disabled.
             $html .= \html_writer::tag(
                 'button',
                 get_string('moveselected', 'local_artqtml'),
@@ -592,7 +592,7 @@ class approve_renderer {
             );
         }
 
-        // The confirmation must show how many questions are actually selected at click time (the.
+        // The confirmation must show how many questions are actually selected at click time (the
         // selection changes client-side without a page reload), so the message is rendered with a
         // sentinel placeholder here and substituted for the live checked-checkbox count in JS below.
         $html .= \html_writer::tag(

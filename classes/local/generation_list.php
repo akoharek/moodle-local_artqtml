@@ -125,9 +125,9 @@ class generation_list {
         $total = $DB->count_records_sql($countsql, $params);
 
         $orderby = self::SORTABLE[$sort] . ' ' . $dir . ', g.timecreated DESC';
-        // Movedoutcount drives the "this generation can no longer be deleted" state of the.
-        // row's Delete button. Counted in the same query as the other per-row aggregates rather than
-        // one extra query per rendered row.
+        // Movedoutcount drives the "this generation can no longer be deleted" state of the row's
+        // Delete button. Counted in the same query as the other per-row aggregates rather than one
+        // extra query per rendered row.
         $sql = "SELECT g.*$namefields, $statuscase AS statusorder, $creatorsort AS creatorname,
                        (SELECT COUNT(1) FROM {local_artqtml_questions} q WHERE q.generationid = g.id) AS questioncount,
                        (SELECT COUNT(1) FROM {local_artqtml_questions} q
@@ -144,7 +144,7 @@ class generation_list {
 
         // All current state (filters + sort/dir) merged onto the base URL, so that sort-header
         // links, the paging bar, and the filter form each only need to override the one param
-        // They're actually changing without dropping the other two (.
+        // they are actually changing without dropping the other two.
         $stateurl = self::section_url($baseurl, $prefix, [
             $prefix . '_status'   => $status !== '' ? $status : null,
             $prefix . '_datefrom' => $datefrom !== '' ? $datefrom : null,
@@ -304,8 +304,7 @@ class generation_list {
         foreach ($baseurl->params() as $name => $value) {
             $html .= \html_writer::empty_tag('input', ['type' => 'hidden', 'name' => $name, 'value' => $value]);
         }
-        // Carry the active sort forward (
-        // so that changing a filter resets to page 1 as required.
+        // Carry the active sort forward so that changing a filter does not reset it.
         $html .= \html_writer::empty_tag('input', ['type' => 'hidden', 'name' => $prefix . '_sort', 'value' => $sort]);
         $html .= \html_writer::empty_tag('input', ['type' => 'hidden', 'name' => $prefix . '_dir', 'value' => $dir]);
 
@@ -495,9 +494,9 @@ class generation_list {
                 ]);
             }
 
-            // The values of the columns that collapse below lg, repeated inside the.
-            // name cell so nothing becomes unreachable on a narrow screen. Hidden at >= lg by
-            // .d-lg-none, where the real columns are visible instead.
+            // The values of the columns that collapse below lg, repeated inside the name cell so
+            // nothing becomes unreachable on a narrow screen. Hidden at >= lg by .d-lg-none, where
+            // the real columns are visible instead.
             $collapsedparts = [
                 \html_writer::span(fullname($generation)),
                 \html_writer::span(userdate($generation->timecreated, get_string('datetimeformat', 'local_artqtml'))),
@@ -590,16 +589,16 @@ class generation_list {
      * @return \moodle_url
      */
     public static function open_url(\stdClass $generation): \moodle_url {
-        // No re-listing of the seven statuses - completed goes to the approval page, the.
-        // in-progress trio plus failed and partial go to the status page, and anything else
-        // ('started') falls through to the settings page it can be resumed from.
+        // No re-listing of the seven statuses: completed goes to the approval page, the in-progress
+        // trio plus failed and partial go to the status page, and anything else ('started') falls
+        // through to the settings page it can be resumed from.
         if ($generation->status === generation_status::COMPLETED) {
             return new \moodle_url('/local/artqtml/approve.php', ['generationid' => $generation->id]);
         }
-        // Partial belongs on the status page, not the approval page and certainly not the.
-        // settings page it was falling through to. Everything the teacher needs to decide about a
-        // partly successful run is there and nowhere else: what is missing, the button that asks
-        // for it again, and the Continue link to the questions that did get made.
+        // Partial belongs on the status page, not the approval page and certainly not the settings
+        // page it was falling through to. Everything the teacher needs to decide about a partly
+        // successful run is there and nowhere else: what is missing, the button that asks for it
+        // again, and the Continue link to the questions that did get made.
         if (
             generation_status::is_in_progress($generation->status)
             || $generation->status === generation_status::FAILED

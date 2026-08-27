@@ -28,6 +28,7 @@ require_once($CFG->dirroot . '/local/artqtml/lib.php');
 
 use local_artqtml\form\generate_form;
 use local_artqtml\local\generation_access_policy;
+use local_artqtml\local\generation_list;
 use local_artqtml\local\question_types;
 use local_artqtml\local\draft_bank;
 
@@ -41,6 +42,15 @@ require_capability('local/artqtml:use', $context);
 $generationid = required_param('id', PARAM_INT);
 
 $generation = $DB->get_record('local_artqtml_generations', ['id' => $generationid], '*', MUST_EXIST);
+
+if (!generation_access_policy::can_mutate($generation, null, $context)) {
+    redirect(
+        generation_list::open_url($generation),
+        get_string('cannotmutateothers', 'local_artqtml'),
+        null,
+        \core\output\notification::NOTIFY_ERROR
+    );
+}
 
 if ($generation->status !== \local_artqtml\local\generation_status::STARTED) {
     $message = $generation->status === \local_artqtml\local\generation_status::COMPLETED
