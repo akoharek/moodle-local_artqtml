@@ -98,7 +98,7 @@ Re-checked against current tree (`$plugin->version` **2026082705**):
 | **P0 open** | **0** |
 | **P1 open** | **0** |
 | **P2 open** | **0** |
-| **Nit open** | **1** (C2-03 residual: `status.php:183`, `:212`) |
+| **Nit open** | **0** |
 | **intentional-open** | **3** |
 
 **Live generation:** **PASS** — generation **#26** (`PHOTO1` / Photosynthesis Quiz), status `completed`, 2 questions; approved `PHOTO1-IH-0001`. User `teacher2`. Cron task `process_pending_generations` needed to finish validating→completed on this docker host.

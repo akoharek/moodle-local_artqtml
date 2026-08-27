@@ -10,6 +10,7 @@ the number in parentheses is `$plugin->release`.
 - **F-08:** FAILED status secondary button links to `index.php` (`backtolist`), not `generate.php`.
 - **S2-01:** `generate.php` view/read gated by `generation_access_policy::can_mutate()` (owner or `:manageall`).
 - **C2-03:** PHPCS comment repair completed in `status.php`, `generation_list.php`, `approve_renderer.php`.
+- **CI:** pgsql rate-limiter CAS via execute+re-read (no UPDATE RETURNING subquery); Behat aligned with S2-02 Preview-only approve rows.
 
 ## 2026-08-27 — `2026082704` (2026.08.27)
 
