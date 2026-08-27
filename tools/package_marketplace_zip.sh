@@ -36,6 +36,7 @@ rsync -a \
   --exclude 'CLAUDE.md' \
   --exclude 'CHANGES.md' \
   --exclude 'REVIEW-FINDINGS.md' \
+  --exclude 'REVIEW-FINDINGS2.md' \
   --exclude 'skills-lock.json' \
   --exclude 'phpcs.xml' \
   --exclude 'phpstan.neon' \
@@ -76,6 +77,7 @@ assert "artqtml/COPYING.txt" in names
 assert "artqtml/README.md" in names
 assert "artqtml/CHANGES.md" not in names
 assert "artqtml/REVIEW-FINDINGS.md" not in names
+assert "artqtml/REVIEW-FINDINGS2.md" not in names
 # Allow directory entries artqtml/lang/ and artqtml/lang/en/; forbid other lang packs.
 bad_lang = [
     n for n in names
