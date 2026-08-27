@@ -136,4 +136,25 @@ class behat_local_artqtml extends behat_base {
             return true;
         });
     }
+
+    /**
+     * Per-row delete uses a native confirm() guard; accept it in the same step.
+     *
+     * @When I delete the ArtQTML approve-row question :code
+     * @param string $code
+     */
+    public function i_delete_the_approve_row_question(string $code): void {
+        behat_base::require_javascript_in_session($this->getSession());
+
+        $node = $this->get_node_in_container('button', 'Delete', 'table_row', $code);
+
+        try {
+            $node->click();
+        } catch (\Facebook\WebDriver\Exception\UnexpectedAlertOpenException $e) {
+            // The onclick confirm opens before the step finishes; accept below.
+        }
+
+        $this->execute([behat_general::class, 'accept_currently_displayed_alert_dialog'], []);
+        $this->wait_until_the_page_is_ready();
+    }
 }

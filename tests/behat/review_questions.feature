@@ -55,8 +55,7 @@ Feature: Reviewing generated ArtQTML questions
 
   Scenario: Teacher deletes a draft question
     When I open the ArtQTML generation named "Review pack"
-    And I click on "Delete" "button" in the "REV1-IH-0002" "table_row"
-    And I accept the currently displayed dialog
+    And I delete the ArtQTML approve-row question "REV1-IH-0002"
     Then I should not see "REV1-IH-0002"
 
   Scenario: Teacher edits a draft question in Moodle's editor
