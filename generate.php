@@ -320,12 +320,12 @@ echo html_writer::start_div('mt-3');
 echo html_writer::tag('button', get_string('startgeneration', 'local_artqtml'), [
     'type'  => 'button',
     'id'    => 'artqtml-submitbutton',
-    'class' => 'btn btn-primary mr-2',
+    'class' => 'btn btn-primary me-2',
 ]);
 echo html_writer::tag('button', get_string('backtoupload', 'local_artqtml'), [
     'type'  => 'button',
     'id'    => 'artqtml-backbutton',
-    'class' => 'btn btn-outline-secondary mr-2',
+    'class' => 'btn btn-outline-secondary me-2',
 ]);
 echo html_writer::tag('button', get_string('abortbutton', 'local_artqtml'), [
     'type'  => 'button',

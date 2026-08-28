@@ -124,9 +124,9 @@ final class generation_status_test extends \advanced_testcase {
      */
     public function test_badge_class_covers_every_status(): void {
         foreach (generation_status::VALUES as $status) {
-            $this->assertStringStartsWith('badge-', generation_status::badge_class($status));
+            $this->assertStringStartsWith('text-bg-', generation_status::badge_class($status));
         }
-        $this->assertSame('badge-secondary', generation_status::badge_class('no-such-status'));
+        $this->assertSame('text-bg-secondary', generation_status::badge_class('no-such-status'));
     }
 
     /**

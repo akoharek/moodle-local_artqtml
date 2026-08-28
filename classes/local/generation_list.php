@@ -298,7 +298,7 @@ class generation_list {
         $html = \html_writer::start_tag('form', [
             'method' => 'get',
             'action' => $baseurl->out_omit_querystring(),
-            'class'  => 'form-inline artqtml-filterbar mb-2',
+            'class'  => 'd-flex flex-wrap align-items-center gap-2 artqtml-filterbar mb-2',
             'id'     => $formid,
         ]);
         foreach ($baseurl->params() as $name => $value) {
@@ -320,16 +320,16 @@ class generation_list {
             $prefix . '_status',
             $status,
             null,
-            ['class' => 'mr-2', 'aria-label' => get_string('filterstatus', 'local_artqtml')]
+            ['class' => 'me-2', 'aria-label' => get_string('filterstatus', 'local_artqtml')]
         );
 
         $html .= \html_writer::empty_tag('input', [
             'type' => 'date', 'name' => $prefix . '_datefrom', 'value' => $datefrom,
-            'class' => 'form-control mr-2', 'aria-label' => get_string('filterdatefrom', 'local_artqtml'),
+            'class' => 'form-control me-2', 'aria-label' => get_string('filterdatefrom', 'local_artqtml'),
         ]);
         $html .= \html_writer::empty_tag('input', [
             'type' => 'date', 'name' => $prefix . '_dateto', 'value' => $dateto,
-            'class' => 'form-control mr-2', 'aria-label' => get_string('filterdateto', 'local_artqtml'),
+            'class' => 'form-control me-2', 'aria-label' => get_string('filterdateto', 'local_artqtml'),
         ]);
 
         if (!$onlymine) {
@@ -349,7 +349,7 @@ class generation_list {
                 $prefix . '_creator',
                 (string) $creator,
                 null,
-                ['class' => 'mr-2', 'aria-label' => get_string('filtercreator', 'local_artqtml')]
+                ['class' => 'me-2', 'aria-label' => get_string('filtercreator', 'local_artqtml')]
             );
         }
 

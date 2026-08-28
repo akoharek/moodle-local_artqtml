@@ -128,15 +128,15 @@ class generation_status {
      */
     public static function badge_class(string $value): string {
         $map = [
-            self::STARTED    => 'badge-secondary',
-            self::GENERATING => 'badge-info',
-            self::VALIDATING => 'badge-info',
-            self::SAVING     => 'badge-info',
-            self::COMPLETED  => 'badge-success',
-            self::FAILED     => 'badge-danger',
+            self::STARTED    => 'text-bg-secondary',
+            self::GENERATING => 'text-bg-info',
+            self::VALIDATING => 'text-bg-info',
+            self::SAVING     => 'text-bg-info',
+            self::COMPLETED  => 'text-bg-success',
+            self::FAILED     => 'text-bg-danger',
         ];
 
-        return $map[$value] ?? 'badge-secondary';
+        return $map[$value] ?? 'text-bg-secondary';
     }
 
     /**

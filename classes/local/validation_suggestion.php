@@ -115,14 +115,14 @@ class validation_suggestion {
      */
     public static function badge_class(string $value): string {
         $map = [
-            self::ACCEPTED      => 'badge-success',
-            self::NEEDS_REVIEW  => 'badge-warning',
-            self::REJECTED      => 'badge-danger',
-            self::NOT_EVALUATED => 'badge-secondary',
-            self::EDITED        => 'badge-info',
-            self::LOCKED        => 'badge-dark',
+            self::ACCEPTED      => 'text-bg-success',
+            self::NEEDS_REVIEW  => 'text-bg-warning',
+            self::REJECTED      => 'text-bg-danger',
+            self::NOT_EVALUATED => 'text-bg-secondary',
+            self::EDITED        => 'text-bg-info',
+            self::LOCKED        => 'text-bg-dark',
         ];
 
-        return $map[$value] ?? 'badge-secondary';
+        return $map[$value] ?? 'text-bg-secondary';
     }
 }

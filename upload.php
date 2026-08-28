@@ -406,7 +406,7 @@ if ($mform->is_cancelled()) {
         echo html_writer::tag(
             'button',
             get_string('duplicatecontinue', 'local_artqtml'),
-            ['type' => 'submit', 'class' => 'btn btn-primary mr-2']
+            ['type' => 'submit', 'class' => 'btn btn-primary me-2']
         );
         echo html_writer::end_tag('form');
 

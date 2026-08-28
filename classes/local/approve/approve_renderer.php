@@ -50,13 +50,13 @@ class approve_renderer {
         foreach ($statuscounts as $statuskey => $statuscount) {
             $html .= \html_writer::span(
                 \local_artqtml\local\validation_suggestion::label($statuskey) . ': ' . $statuscount,
-                'badge ' . \local_artqtml\local\validation_suggestion::badge_class($statuskey) . ' mr-2',
+                'badge ' . \local_artqtml\local\validation_suggestion::badge_class($statuskey) . ' me-2',
                 ['data-testid' => 'artqtml-approve-summary-count']
             );
         }
         $html .= \html_writer::span(
             get_string('validationsummarytotal', 'local_artqtml') . ': ' . $statustotal,
-            'badge badge-light mr-2',
+            'badge text-bg-light me-2',
             ['data-testid' => 'artqtml-approve-summary-total']
         );
         $html .= \html_writer::end_div();
@@ -146,13 +146,13 @@ class approve_renderer {
             // The Type column shows both the native Moodle question-type icon and the type name
             // (icon + text). The icon may appear only in the Type column, not before the
             // question name. pix_icon() already emits class="icon"; passing 'icon' again in
-            // the class attribute produced class="icon icon mr-1" - harmless but duplicated, and it
+            // the class attribute produced class="icon icon me-1" - harmless but duplicated, and it
             // is what made the icon inherit the surrounding link's colour/underline when it sat
             // inside the question-name anchor. The icon is decorative here (the type name is right
             // next to it), so it carries an empty alt and is hidden from assistive technology
             // rather than repeating the label a screen reader already reads from the cell text.
             $typeicon = $output->pix_icon('icon', '', 'qtype_' . $qtype, [
-                'class'       => 'mr-1',
+                'class'       => 'me-1',
                 'aria-hidden' => 'true',
                 'data-testid' => 'artqtml-approve-typeicon',
             ]);
@@ -277,17 +277,17 @@ class approve_renderer {
             }
 
             if ($islocked) {
-                $actions[] = \html_writer::span(get_string('questionlockedbadge', 'local_artqtml'), 'badge badge-dark', [
+                $actions[] = \html_writer::span(get_string('questionlockedbadge', 'local_artqtml'), 'badge text-bg-dark', [
                     'data-testid' => 'artqtml-approve-locked-badge',
                 ]);
             } else if ($question->movedout) {
-                $actions[] = \html_writer::span(get_string('moved_badge', 'local_artqtml'), 'badge badge-info', [
+                $actions[] = \html_writer::span(get_string('moved_badge', 'local_artqtml'), 'badge text-bg-info', [
                     'data-testid' => 'artqtml-approve-moved-badge',
                 ]);
             } else if (!empty($question->approved)) {
                 // The badge itself is not clickable — a plain span, with the revoke action as
                 // its own separate link beside it.
-                $actions[] = \html_writer::span(get_string('approvedlabel', 'local_artqtml'), 'badge badge-success', [
+                $actions[] = \html_writer::span(get_string('approvedlabel', 'local_artqtml'), 'badge text-bg-success', [
                     'data-testid' => 'artqtml-approve-approved-badge',
                 ]);
                 if ($canmutate) {
@@ -561,12 +561,12 @@ class approve_renderer {
         if (empty($categoryoptions)) {
             $html .= $output->notification(get_string('nocategories', 'local_artqtml'), 'warning');
         } else {
-            $html .= \html_writer::start_div('form-inline artqtml-bulkcategory');
+            $html .= \html_writer::start_div('d-flex flex-wrap align-items-center gap-2 artqtml-bulkcategory');
             $html .= \html_writer::label(
                 get_string('selectcategory', 'local_artqtml'),
                 'artqtml-categoryvalue',
                 true,
-                ['class' => 'mr-2']
+                ['class' => 'me-2']
             );
             // Deliberately NOT required="required": the <select> lives in the same form as every
             // other control on this page, so an HTML5 required attribute blocked Approve all acceptable
@@ -575,7 +575,7 @@ class approve_renderer {
             // The move path validates the value server-side in approve.php (errornocategory).
             $html .= \html_writer::select($categoryoptions, 'categoryvalue', '', ['' => 'choosedots'], [
                 'id'          => 'artqtml-categoryvalue',
-                'class'       => 'mr-2',
+                'class'       => 'me-2',
                 'data-testid' => 'artqtml-approve-category-select',
             ]);
             $html .= \html_writer::end_div();
@@ -738,7 +738,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         $text . ($iscorrect
                             ? ' ' . \html_writer::span(
                                 get_string('detailscorrect', 'local_artqtml'),
-                                'badge badge-success'
+                                'badge text-bg-success'
                             )
                             : '')
                         . ($explanation !== ''

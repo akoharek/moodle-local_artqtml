@@ -165,7 +165,7 @@ echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', '
 echo html_writer::tag(
     'button',
     get_string('duplicatecontinue', 'local_artqtml'),
-    ['type' => 'submit', 'class' => 'btn btn-primary mr-2']
+    ['type' => 'submit', 'class' => 'btn btn-primary me-2']
 );
 echo html_writer::end_tag('form');
 

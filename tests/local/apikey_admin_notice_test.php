@@ -131,7 +131,7 @@ final class apikey_admin_notice_test extends \advanced_testcase {
             file_get_contents($root . '/status.php')
         );
         $this->assertStringNotContainsString(
-            'singlebutton d-inline mr-2',
+            'singlebutton d-inline me-2',
             file_get_contents($root . '/status.php')
         );
     }
