@@ -44,9 +44,9 @@ define(['core/ajax'], function(Ajax) {
     };
 
     /**
- * @param {Element} root
- * @return {{stages: Object, failed: Object, colorClasses: Array<string>, terminal: Array<string>}}
- */
+     * @param {Element} root
+     * @return {{stages: Object, failed: Object, colorClasses: Array<string>, terminal: Array<string>}}
+     */
     function progressConfig(root) {
         return JSON.parse(root.getAttribute('data-progress-config'));
     }
@@ -72,6 +72,7 @@ define(['core/ajax'], function(Ajax) {
      * @param {{status: string, questioncount: number, unvalidatedcount: number, error: string}} statusdata
      * @return {void}
      */
+    // eslint-disable-next-line complexity -- status bar branches mirror server stage model
     function updateUi(root, statusdata) {
         var bar = root.querySelector(SELECTORS.PROGRESS_BAR);
         var abortbutton = root.querySelector(SELECTORS.ABORT_BUTTON);

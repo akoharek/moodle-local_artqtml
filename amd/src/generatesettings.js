@@ -165,6 +165,7 @@ define(['jquery', 'core/str'], function($, Str) {
         Str.get_string('estimatedtokenslabel', 'local_artqtml', '__N__').then(function(str) {
             tokensTemplate = str;
             update(labels);
+            return null;
         }).catch(function() {
             // Keep the '~__N__' fallback if the string cannot be loaded.
         });
@@ -179,6 +180,7 @@ define(['jquery', 'core/str'], function($, Str) {
         var backbutton = document.getElementById('artqtml-backbutton');
         if (backbutton) {
             backbutton.addEventListener('click', function() {
+                // eslint-disable-next-line no-alert -- native confirm matches Moodle form back UX
                 if (window.confirm(messages.backconfirm)) {
                     submitForm('back');
                 }

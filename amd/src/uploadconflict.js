@@ -157,6 +157,7 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                     // tells them to paste their text into this field, so it must still hold it.
                     // textContent/alert rather than innerHTML - the message is localised plain
                     // text and must not be able to render markup.
+                    // eslint-disable-next-line no-alert -- plain-text server message for teacher
                     window.alert(result.message);
                     return null;
                 }
@@ -164,6 +165,7 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                 return null;
             }).catch(function() {
                 dropFile();
+                // eslint-disable-next-line no-alert -- plain-text fallback when extract AJAX fails
                 window.alert(messages.extractfailedmessage);
             });
         }
@@ -191,6 +193,7 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                     loadExtractedTextThenDropFile(draftitemid);
                     return;
                 }
+                // eslint-disable-next-line no-alert -- teacher chooses file vs existing textarea text
                 if (window.confirm(messages.filepromptmessage)) {
                     loadExtractedTextThenDropFile(draftitemid);
                 } else {
@@ -212,6 +215,7 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                 return;
             }
             warnedtext = true;
+            // eslint-disable-next-line no-alert -- teacher chooses text vs attached file
             if (window.confirm(messages.textpromptmessage)) {
                 dropFile();
                 lastknowngoodvalue = textarea.value;

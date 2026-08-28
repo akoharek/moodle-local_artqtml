@@ -33,6 +33,7 @@ define([], function() {
         }
 
         cancelbtn.addEventListener('click', function(e) {
+            // eslint-disable-next-line no-alert -- native confirm before discarding upload form
             if (!window.confirm(confirmmessage)) {
                 e.preventDefault();
                 e.stopPropagation();
