@@ -1,4 +1,4 @@
-@local_artqtml
+@local @local_artqtml
 Feature: ArtQTML admin settings
   In order to run the plugin
   As an administrator

@@ -66,7 +66,7 @@ final class draft_question_lock_test extends \advanced_testcase {
      * Insert one draft question row.
      *
      * @param int $generationid
-     * @param array<string,mixed> $overrides
+     * @param array $overrides
      * @return int question row id
      */
     private function make_question(int $generationid, array $overrides = []): int {

@@ -37,7 +37,7 @@ class approve_renderer {
     /**
      * The four-status validation summary row of badges.
      *
-     * @param array<string,int> $statuscounts from approve_page_data::status_counts()
+     * @param array $statuscounts from approve_page_data::status_counts()
      * @param int $statustotal
      * @return string
      */
@@ -511,10 +511,9 @@ class approve_renderer {
      * The bulk action buttons: approve-all-accepted, the target-category select + move button
      * (or a "no categories" notice), and the bulk-delete button.
      *
-     * @param \core_renderer $output the page output renderer (passed in rather than pulled from
-     *      the global $OUTPUT, as this is a plain helper, not a plugin_renderer_base)
+     * @param \core_renderer $output page output renderer
      * @param int $eligibleforapproval count for the approve-all button label/disabled state
-     * @param array<string,string> $categoryoptions move-target options ("categoryid,contextid" => label)
+     * @param array $categoryoptions move-target options ("categoryid,contextid" => label)
      * @param bool $canmutate whether bulk mutate controls may be shown
      * @return string
      */

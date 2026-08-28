@@ -1,4 +1,4 @@
-@local_artqtml @javascript
+@local @local_artqtml @javascript
 Feature: Reviewing generated ArtQTML questions
   In order to put AI questions into a real question bank
   As a teacher

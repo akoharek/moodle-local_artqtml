@@ -642,7 +642,7 @@ class generation_list {
      *
      * @param \moodle_url $baseurl
      * @param string $prefix
-     * @param array<string,mixed> $overrides null values remove the param
+     * @param array $overrides null values remove the param
      * @return \moodle_url
      */
     protected static function section_url(\moodle_url $baseurl, string $prefix, array $overrides): \moodle_url {

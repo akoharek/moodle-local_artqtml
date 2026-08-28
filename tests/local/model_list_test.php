@@ -175,6 +175,8 @@ final class model_list_test extends \advanced_testcase {
      * Request, and that is what pushed the sweep past PHP's execution limit.
      *
      * @dataProvider gemini_model_provider
+     * @param string $id model id from the provider
+     * @param bool $expected whether the model is classified as non-text
      */
     public function test_non_text_gemini_models_are_recognised(string $id, bool $expected): void {
         $this->assertSame($expected, model_list::is_non_text_gemini_model($id));

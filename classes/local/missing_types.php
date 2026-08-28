@@ -267,8 +267,8 @@ class missing_types {
      * Build a single-level matrix shortfall from type totals when only countdiscrepancy exists.
      *
      * @param array $settings
-     * @param array<string, int> $typeshortfall
-     * @return array<string, array<string, int>>
+     * @param array $typeshortfall per-type shortfall counts
+     * @return array matrix shortfall keyed by type then difficulty
      */
     protected static function legacy_matrix_shortfall(array $settings, array $typeshortfall): array {
         $matrix = $settings['matrix'] ?? [];
@@ -290,7 +290,7 @@ class missing_types {
     /**
      * Format per-type shortfall counts for user-facing messages.
      *
-     * @param array<string, int> $shortfall
+     * @param array $shortfall per-type shortfall counts
      * @return string
      */
     protected static function describe_type_totals(array $shortfall): string {

@@ -1,4 +1,4 @@
-@local_artqtml
+@local @local_artqtml
 Feature: Approve page row actions before and after move
   In order to review draft questions safely
   As a teacher

@@ -325,6 +325,7 @@ class validate_questions_task {
      * Cost of a prompt they can read - but cannot make the prompt name a value the schema does not
      * Accept, which is the drift that put the two out of step once before.
      *
+     * @param \stdClass $generation generation row supplying difficulty scale context
      * @return string
      */
     protected function build_system_instruction(\stdClass $generation): string {

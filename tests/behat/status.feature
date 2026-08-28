@@ -1,4 +1,4 @@
-@local_artqtml @javascript
+@local @local_artqtml @javascript
 Feature: ArtQTML generation status
   In order to know what a generation is doing
   As a teacher

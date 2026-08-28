@@ -127,7 +127,7 @@ final class approve_renderer_test extends \advanced_testcase {
     /**
      * Insert one generation plus one plugin question pointing at a real Moodle question.
      *
-     * @param array<string,mixed> $overrides
+     * @param array $overrides columns to override on the plugin question row
      * @param \stdClass|null $category optional destination/draft category
      * @return \stdClass the plugin question row
      */

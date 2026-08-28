@@ -99,7 +99,7 @@ if (!is_array($settings)) {
  *
  * @param stdClass $source the partly successful generation being followed up
  * @param array $settings its decoded settings
- * @param array<string, int> $shortfall
+ * @param array $shortfall per-type shortfall counts keyed by question type code
  * @return void does not return - redirects
  */
 function local_artqtml_create_followup(stdClass $source, array $settings, array $shortfall): void {

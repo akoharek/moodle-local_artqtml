@@ -209,7 +209,22 @@ jobs:
 
       - name: ESLint (grunt, zero lint warnings)
         if: ${{ !cancelled() }}
-        run: moodle-plugin-ci grunt --max-lint-warnings 0 ./plugin
+        working-directory: ${{ github.workspace }}/moodle
+        run: |
+          ARTQTM_PLUGIN_REL="${ARTQTM_PLUGIN_REL:-}"
+          if [ -z "$ARTQTM_PLUGIN_REL" ]; then
+            for cand in local/artqtml public/local/artqtml; do
+              if [ -d "$cand" ]; then
+                ARTQTM_PLUGIN_REL="$cand"
+                break
+              fi
+            done
+          fi
+          if [ -z "$ARTQTM_PLUGIN_REL" ]; then
+            echo "::error::Plugin directory not found for ESLint."
+            exit 1
+          fi
+          npx grunt eslint --root="$ARTQTM_PLUGIN_REL" --max-lint-warnings=0
 
       # BL-21: PHPStan pinned (must match tools/devtools/composer.json → phpstan/phpstan 2.2.5).
       - name: Install plugin PHPStan toolchain

@@ -33,7 +33,7 @@ class observer {
     /**
      * question saved.
      *
-     * @param \core\event\question_created|\core\event\question_updated $event
+     * @param \core\event\base $event question_created or question_updated
      * @return void
      */
     public static function question_saved(\core\event\base $event): void {

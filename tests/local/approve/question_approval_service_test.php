@@ -29,8 +29,8 @@ final class question_approval_service_test extends \advanced_testcase {
     /**
      * Insert one generation plus one question row in a given state.
      *
-     * @param array<string,mixed> $overrides columns to override on the question row
-     * @return array{0:int,1:int} [generationid, questionid]
+     * @param array $overrides columns to override on the question row
+     * @return array generation id and question id
      */
     protected function seed_question(array $overrides = []): array {
         global $DB, $USER;

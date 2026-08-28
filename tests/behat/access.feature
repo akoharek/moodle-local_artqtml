@@ -1,4 +1,4 @@
-@local_artqtml
+@local @local_artqtml
 Feature: ArtQTML access and blocking
   In order to keep draft AI content away from the wrong people
   As a teacher or student

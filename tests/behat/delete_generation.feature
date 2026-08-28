@@ -1,4 +1,4 @@
-@local_artqtml @javascript
+@local @local_artqtml @javascript
 Feature: Deleting an ArtQTML generation
   In order to discard unused drafts
   As a teacher

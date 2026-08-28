@@ -1,4 +1,4 @@
-@local_artqtml
+@local @local_artqtml
 Feature: Starting a new ArtQTML generation
   In order to generate questions from source text
   As a teacher

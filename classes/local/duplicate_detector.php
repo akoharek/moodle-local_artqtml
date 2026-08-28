@@ -165,8 +165,8 @@ class duplicate_detector {
     /**
      * Jaccard similarity between two shingle sets: |A n B| / |A u B|.
      *
-     * @param array<string,bool> $a
-     * @param array<string,bool> $b
+     * @param array $a shingle set
+     * @param array $b shingle set
      * @return float
      */
     protected static function jaccard(array $a, array $b): float {

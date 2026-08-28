@@ -29,7 +29,7 @@ final class partial_reason_test extends \advanced_testcase {
     /**
      * Create a generation with the given per-type requested counts.
      *
-     * @param array<string, int> $counts
+     * @param array $counts per-type requested counts
      * @return int generation id
      */
     protected function make_generation(array $counts): int {
