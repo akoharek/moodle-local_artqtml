@@ -135,7 +135,7 @@ class generate_form extends \moodleform {
 
         $mform->addElement('html', \html_writer::div(
             '',
-            'font-weight-bold border-top pt-2 mt-2',
+            'fw-bold border-top pt-2 mt-2',
             [
                 'id' => 'artqtml-step2total',
                 'role' => 'status',

@@ -204,7 +204,7 @@ class approve_renderer {
                 if ($displaycategory !== null) {
                     $statuscell .= \html_writer::div(
                         s(\local_artqtml\local\problem_category::label($displaycategory)),
-                        'small font-weight-bold mt-1 artqtml-problemcategory'
+                        'small fw-bold mt-1 artqtml-problemcategory'
                     );
                 }
                 if ($displayjustification !== '') {

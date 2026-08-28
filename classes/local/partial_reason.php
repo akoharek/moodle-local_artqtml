@@ -144,7 +144,7 @@ class partial_reason {
         }
 
         return \html_writer::tag('p', get_string('generationpartialreasonheading', 'local_artqtml'), [
-                'class' => 'mb-1 mt-2 font-weight-bold',
+                'class' => 'mb-1 mt-2 fw-bold',
             ]) . \html_writer::tag('ul', $items, ['class' => 'mb-2', 'data-region' => 'partial-reasons']);
     }
 

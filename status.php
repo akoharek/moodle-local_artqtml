@@ -239,7 +239,7 @@ if ($generation->status === generation_status::PARTIAL) {
 
     echo html_writer::div(
         html_writer::tag('p', get_string('generationpartialnotice', 'local_artqtml')) .
-            html_writer::tag('p', $countdiscrepancymessage, ['class' => 'mb-0 font-weight-bold']) .
+            html_writer::tag('p', $countdiscrepancymessage, ['class' => 'mb-0 fw-bold']) .
             $partialreasons .
             $retrytypeslink,
         'alert alert-warning mb-3',
@@ -394,7 +394,7 @@ echo html_writer::div(
         html_writer::tag(
             'p',
             get_string('error_apifailed', 'local_artqtml'),
-            ['class' => 'text-danger font-weight-bold', 'data-region' => 'error-generic']
+            ['class' => 'text-danger fw-bold', 'data-region' => 'error-generic']
         ) .
         html_writer::tag(
             'p',
