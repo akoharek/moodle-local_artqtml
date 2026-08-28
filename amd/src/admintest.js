@@ -59,7 +59,7 @@ define(['core/ajax'], function(Ajax) {
 
             callTestConnection(provider).then(function(data) {
                 status.textContent = data.message;
-                status.className = 'ml-2 ' + (data.success ? 'text-success' : 'text-danger');
+                status.className = 'ms-2 ' + (data.success ? 'text-success' : 'text-danger');
                 if (data.success) {
                     // The dropdown only exists once a test has succeeded, and it is built server-side
                     // from the cache that test populated.
@@ -68,7 +68,7 @@ define(['core/ajax'], function(Ajax) {
                 return null;
             }).catch(function() {
                 status.textContent = errorunknownlabel;
-                status.className = 'ml-2 text-danger';
+                status.className = 'ms-2 text-danger';
             });
         });
     }

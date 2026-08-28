@@ -345,14 +345,14 @@ echo html_writer::start_div('bg-white rounded p-4', [
 echo html_writer::tag('p', get_string('abortsaveconfirm', 'local_artqtml', format_string($generation->name)));
 if ($candeleteown) {
     echo html_writer::tag('button', get_string('abortdelete', 'local_artqtml'), [
-        'type' => 'button', 'id' => 'artqtml-abortmodal-delete', 'class' => 'btn btn-outline-danger btn-block mb-2',
+        'type' => 'button', 'id' => 'artqtml-abortmodal-delete', 'class' => 'btn btn-outline-danger d-block w-100 mb-2',
     ]);
 }
 echo html_writer::tag('button', get_string('abortsave', 'local_artqtml'), [
-    'type' => 'button', 'id' => 'artqtml-abortmodal-save', 'class' => 'btn btn-outline-secondary btn-block mb-2',
+    'type' => 'button', 'id' => 'artqtml-abortmodal-save', 'class' => 'btn btn-outline-secondary d-block w-100 mb-2',
 ]);
 echo html_writer::tag('button', get_string('abortcancel', 'local_artqtml'), [
-    'type' => 'button', 'id' => 'artqtml-abortmodal-cancel', 'class' => 'btn btn-secondary btn-block',
+    'type' => 'button', 'id' => 'artqtml-abortmodal-cancel', 'class' => 'btn btn-secondary d-block w-100',
 ]);
 echo html_writer::end_div();
 echo html_writer::end_div();

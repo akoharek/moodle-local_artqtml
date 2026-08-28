@@ -3,6 +3,17 @@
 Newest release first. Version numbers match `version.php` `$plugin->version`;
 the number in parentheses is `$plugin->release`.
 
+## 2026-08-28 — `2026082801` (2026.08.28)
+
+**Bootstrap 5 utility migration (Moodle 5.2 deprecated-style gate)**
+
+- Moodle 5.2 fails Behat on Bootstrap 4 utility classes through its deprecated-style check.
+  Remaining occurrences replaced: `ml-2` → `ms-2` (`lib.php`, `amd/src/admintest.js`) and
+  `btn-block` → `d-block w-100` (`generate.php` abort dialog).
+- `styles.css` back-fills `.fw-bold` and `.ms-2` for Moodle 4.5, whose Bootstrap 4 does not
+  define the 5.x names, so emphasis and spacing survive on the 4.5 LTS branch.
+- `amd/build` rebuilt from source so the CI freshness gate stays satisfied.
+
 ## 2026-08-27 — `2026082705` (2026.08.27)
 
 **Pass-2 residual fixes (REVIEW-FINDINGS2 F-08, C2-03, S2-01)**

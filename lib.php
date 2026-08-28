@@ -72,7 +72,7 @@ function local_artqtml_render_test_button(string $provider): string {
         'type' => 'button', 'id' => $buttonid, 'class' => 'btn btn-secondary',
         'data-testid' => 'artqtml-admin-connectiontest-' . $provider,
     ]);
-    $html .= html_writer::tag('span', '', ['id' => $statusid, 'class' => 'ml-2']);
+    $html .= html_writer::tag('span', '', ['id' => $statusid, 'class' => 'ms-2']);
 
     return $html;
 }
@@ -111,7 +111,7 @@ function local_artqtml_render_model_buttons(string $provider): string {
         'post',
         single_button::BUTTON_SECONDARY
     );
-    $checkbutton->class = 'singlebutton d-inline ml-2';
+    $checkbutton->class = 'singlebutton d-inline ms-2';
     $checkbutton->set_attribute('data-testid', 'artqtml-admin-runmodelcheck-' . $provider);
 
     $html = $OUTPUT->render($refreshbutton) . $OUTPUT->render($checkbutton);
@@ -125,7 +125,7 @@ function local_artqtml_render_model_buttons(string $provider): string {
                 'local_artqtml',
                 userdate((int) $cached['fetchedat'], get_string('datetimeformat', 'local_artqtml'))
             ),
-            'ml-2 text-muted small',
+            'ms-2 text-muted small',
             ['data-testid' => 'artqtml-admin-modellistage-' . $provider]
         );
     }

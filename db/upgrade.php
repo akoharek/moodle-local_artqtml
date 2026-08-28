@@ -122,5 +122,10 @@ function xmldb_local_artqtml_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026082705, 'local', 'artqtml');
     }
 
+    if ($oldversion < 2026082801) {
+        // Bootstrap 5 utility migration in markup and CSS only: no schema or data change.
+        upgrade_plugin_savepoint(true, 2026082801, 'local', 'artqtml');
+    }
+
     return true;
 }
