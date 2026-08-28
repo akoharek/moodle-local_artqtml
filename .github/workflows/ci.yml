@@ -26,7 +26,7 @@ permissions:
 # Validate::gitBranch(), and MoodleInstaller runs `git clone --depth 1 --branch <value>`,
 # which git resolves to a tag. A raw commit hash would NOT work.
 #
-# $plugin->requires stays 4.5.0 (2024100700). $plugin->supported = [405, 501, 502] (Moodle 4.5 / 5.1 / 5.2).
+# $plugin->requires stays 4.5.0 (2024100700). $plugin->supported = [405, 502] (Moodle 4.5–5.2).
 # CI matrix covers 4.5 / 5.1 / 5.2 (static-checks + phpunit jobs below).
 
 jobs:
@@ -39,6 +39,8 @@ jobs:
   static-checks:
     name: Static (${{ matrix.moodle-branch }} / ${{ matrix.database }})
     runs-on: ubuntu-latest
+    env:
+      MOODLE_DIR: ${{ github.workspace }}/moodle
     strategy:
       fail-fast: false
       matrix:
@@ -250,6 +252,8 @@ jobs:
     name: PHPUnit (${{ matrix.moodle-branch }} / ${{ matrix.database }})
     needs: static-checks
     runs-on: ubuntu-latest
+    env:
+      MOODLE_DIR: ${{ github.workspace }}/moodle
     strategy:
       fail-fast: false
       matrix:
@@ -342,6 +346,8 @@ jobs:
     needs: static-checks
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    env:
+      MOODLE_DIR: ${{ github.workspace }}/moodle
     strategy:
       fail-fast: false
       matrix:
