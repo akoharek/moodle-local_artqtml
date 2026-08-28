@@ -26,14 +26,15 @@ permissions:
 # Validate::gitBranch(), and MoodleInstaller runs `git clone --depth 1 --branch <value>`,
 # which git resolves to a tag. A raw commit hash would NOT work.
 #
-# $plugin->requires stays 4.5.1 (2024100700). Do not add $plugin->supported until CI +
-# business smoke prove each major (see general/moodle-multi-version-smoke.md).
+# $plugin->requires stays 4.5.0 (2024100700). $plugin->supported = [405, 501, 502] (Moodle 4.5 / 5.1 / 5.2).
+# CI matrix covers 4.5 / 5.1 / 5.2 (static-checks + phpunit jobs below).
 
 jobs:
 
   # ---------------------------------------------------------------------------
-  # Fast static analysis: php -l, PHPStan (level 5, Moodle-aware), PHPCS (Moodle
-  # standard). Runs first; the heavier phpunit job gates on it.
+  # Fast static analysis: validate/savepoints, phplint, phpmd (soft), phpcs, phpdoc,
+  # grunt (ESLint), PHPStan; plus AMD build diff gate and script guards. PHPUnit/Behat
+  # gate on this job.
   # ---------------------------------------------------------------------------
   static-checks:
     name: Static (${{ matrix.moodle-branch }} / ${{ matrix.database }})
@@ -112,16 +113,27 @@ jobs:
 
       - name: Initialise moodle-plugin-ci
         run: |
-          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^4
+          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci 4.5.11
           echo "$(cd ci/bin; pwd)" >> "$GITHUB_PATH"
           echo "$(cd ci/vendor/bin; pwd)" >> "$GITHUB_PATH"
           sudo locale-gen en_AU.UTF-8
+
+      - name: Add qtype_ordering dependency
+        run: moodle-plugin-ci add-plugin --clone https://github.com/gbateson/moodle-qtype_ordering
 
       - name: Install Moodle + plugin
         run: moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1
         env:
           DB: ${{ matrix.database }}
           MOODLE_BRANCH: ${{ matrix.moodle-branch }}
+
+      - name: Moodle plugin validate
+        if: ${{ !cancelled() }}
+        run: moodle-plugin-ci validate
+
+      - name: Check upgrade savepoints
+        if: ${{ !cancelled() }}
+        run: moodle-plugin-ci savepoints
 
       # BL-36: AMD source and build must stay in step. Node version comes from Moodle's
       # .nvmrc via moodle-plugin-ci — not a second pin in this file.
@@ -178,10 +190,27 @@ jobs:
         run: bash "${{ github.workspace }}/plugin/tools/script-guard.sh"
 
       - name: PHP Lint
+        if: ${{ !cancelled() }}
         run: moodle-plugin-ci phplint
 
+      - name: PHP Mess Detector (informational)
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        run: moodle-plugin-ci phpmd
+
       - name: PHP CodeSniffer (Moodle standard)
+        if: ${{ !cancelled() }}
         run: moodle-plugin-ci phpcs --standard "${{ github.workspace }}/plugin/phpcs.xml"
+
+      - name: PHPDoc (zero warnings)
+        if: ${{ !cancelled() }}
+        run: moodle-plugin-ci phpdoc --max-warnings 0
+
+      # No mustache step: this plugin has no templates/ directory.
+
+      - name: ESLint (grunt, zero lint warnings)
+        if: ${{ !cancelled() }}
+        run: moodle-plugin-ci grunt --max-lint-warnings 0
 
       # BL-21: PHPStan pinned (must match tools/devtools/composer.json → phpstan/phpstan 2.2.5).
       - name: Install plugin PHPStan toolchain
@@ -293,10 +322,13 @@ jobs:
 
       - name: Initialise moodle-plugin-ci
         run: |
-          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^4
+          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci 4.5.11
           echo "$(cd ci/bin; pwd)" >> "$GITHUB_PATH"
           echo "$(cd ci/vendor/bin; pwd)" >> "$GITHUB_PATH"
           sudo locale-gen en_AU.UTF-8
+
+      - name: Add qtype_ordering dependency
+        run: moodle-plugin-ci add-plugin --clone https://github.com/gbateson/moodle-qtype_ordering
 
       - name: Install Moodle + plugin
         run: moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1
@@ -305,7 +337,7 @@ jobs:
           MOODLE_BRANCH: ${{ matrix.moodle-branch }}
 
       - name: PHPUnit (local_artqtml_testsuite)
-        run: moodle-plugin-ci phpunit
+        run: moodle-plugin-ci phpunit --fail-on-warning
 
   # ---------------------------------------------------------------------------
   # Behat: browser acceptance tests. One cell per supported major (4.5 LTS + 5.2).
@@ -367,10 +399,13 @@ jobs:
 
       - name: Initialise moodle-plugin-ci
         run: |
-          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^4
+          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci 4.5.11
           echo "$(cd ci/bin; pwd)" >> "$GITHUB_PATH"
           echo "$(cd ci/vendor/bin; pwd)" >> "$GITHUB_PATH"
           sudo locale-gen en_AU.UTF-8
+
+      - name: Add qtype_ordering dependency
+        run: moodle-plugin-ci add-plugin --clone https://github.com/gbateson/moodle-qtype_ordering
 
       - name: Install Moodle + plugin
         run: moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1
@@ -379,4 +414,14 @@ jobs:
           MOODLE_BRANCH: ${{ matrix.moodle-branch }}
 
       - name: Behat (@local_artqtml)
-        run: moodle-plugin-ci behat --profile chrome --tags @local_artqtml
+        id: behat
+        run: moodle-plugin-ci behat --profile chrome --tags @local_artqtml --scss-deprecations
+
+      - name: Upload Behat Faildump
+        if: ${{ failure() && steps.behat.outcome == 'failure' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: Behat Faildump (${{ matrix.moodle-branch }})
+          path: ${{ github.workspace }}/moodledata/behat_dump
+          retention-days: 7
+          if-no-files-found: ignore

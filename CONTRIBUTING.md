@@ -19,3 +19,5 @@ Labels such as `bug`, `enhancement`, and `question` help triage; templates apply
 ## Pull requests
 
 PRs against `main` are welcome for clear bug fixes and documentation. Keep changes focused; match existing Moodle coding style in this plugin.
+
+Before pushing, run `bash tools/check.sh` locally (see `tools/TOOLCHAIN.md`).

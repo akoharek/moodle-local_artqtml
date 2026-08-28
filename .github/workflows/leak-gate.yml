@@ -1,0 +1,19 @@
+name: Light leak gate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  leak-gate:
+    name: grep-light-leaks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: grep-light-leaks
+        run: bash tools/grep-light-leaks.sh "${{ github.workspace }}"

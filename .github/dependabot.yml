@@ -44,12 +44,22 @@ updates:
     labels:
       - dependencies
 
+  # PHPStan, phpmd, phpcs, and related devtools (tools/devtools/composer.json).
+  - package-ecosystem: composer
+    directory: /tools/devtools
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "deps"
+    labels:
+      - dependencies
+
 # Amit a Dependabot NEM tud figyelni, és ezért kézzel követendő:
 #
 # - A PHPStan phar. Nem csomagkezelőn keresztül jön, hanem a GitHub kiadási oldaláról, curl-lel
 #   (ci.yml). A Dependabot ezt nem látja. A verzió a ci.yml PHPSTAN_VERSION értékében és a helyi
 #   eszközkészletben áll - a kettőnek egyeznie kell, lásd tools/TOOLCHAIN.md.
-# - A moodle-plugin-ci. A ci.yml `^4` megkötéssel telepíti, ami futásidőben oldódik fel, tehát
-#   magától mozoghat. Ez tudatosan maradt így: a phpcs szabálykönyve a Moodle sajátja, és ritkán
-#   változik, a `^4` viszont a Moodle 4.5-höz igazodó ágat tartja. Ha ez is elkezd meglepetést
-#   okozni, ugyanaz a lépés kell rá: pontos verzió + értesítés.
+# - A moodle-plugin-ci. A ci.yml 4.5.11-re rögzíti; Dependabot PR-t nyit, ha a composer
+#   ecosystem frissítést igényel (tools/devtools külön). Verzióemeléskor nézd a CHANGELOG-ot.

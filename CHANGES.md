@@ -170,6 +170,6 @@ ArtQTML generates Moodle quiz questions from teacher-provided source text.
 - **AI providers:** Claude and Gemini (bring your own API keys)
 - **Workflow:** generate → review / approve → move a single question into the question bank
 - **Admin:** API keys, models, draft course, and basic type feedback settings
-- **Compatibility:** Moodle 4.5–5.2 (`$plugin->supported = [405, 502]`), maturity STABLE
+- **Compatibility:** Moodle 4.5 / 5.1 / 5.2 (`$plugin->supported = [405, 501, 502]`), maturity STABLE
 - **Dependency:** `qtype_ordering` (required for SR)
 - **License:** GPL v3 or later

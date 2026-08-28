@@ -117,5 +117,10 @@ function xmldb_local_artqtml_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026082704, 'local', 'artqtml');
     }
 
+    if ($oldversion < 2026082705) {
+        // Pass-2 residuals (F-08, S2-01 view gate, C2-03): no schema change.
+        upgrade_plugin_savepoint(true, 2026082705, 'local', 'artqtml');
+    }
+
     return true;
 }

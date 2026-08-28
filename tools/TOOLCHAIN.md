@@ -11,6 +11,7 @@ futnak, a tanár sosem találkozik velük.
 
 | eszköz | mit csinál |
 |---|---|
+| **grep-light-leaks** (`tools/grep-light-leaks.sh`) | **Light leak kapu**: spec ticket ID-k és edition-split megjegyzések keresése a repóban (a szkriptben rögzített minták). CI: `.github/workflows/leak-gate.yml`; helyben: `bash tools/grep-light-leaks.sh .` |
 | **phpcs** (PHP CodeSniffer) | a **formai** ellenőr: behúzás, elnevezés, kötelező fejlécek, megjegyzések alakja. Hibát és figyelmeztetést különböztet meg; a kapu csak a hibákon bukik |
 | **moodle-cs** | nem program: maga a **Moodle szabálykönyve**, amit a phpcs olvas |
 | **phpstan** | a **logikai** ellenőr: nem létező függvény hívása, rossz típusú érték, kezeletlen eset. Ez az, amelyik valódi hibát talál |
@@ -27,15 +28,22 @@ függőségük, azokat a composer oldja fel.
 | csomag | helyi verzió | CI |
 |---|---|---|
 | `phpstan/phpstan` | **2.2.5** — rögzítve | `ci.yml` → `PHPSTAN_VERSION: 2.2.5` + `tools/devtools` composer install — **rögzítve** |
+| `moodlehq/moodle-plugin-ci` | — | `ci.yml` → **4.5.11** (minden job initialise lépés) |
+| `moodle-plugin-ci validate` / `savepoints` | — | `ci.yml` static-checks job, install után (Marketplace / upgrade ellenőrzés) |
+| `moodle-plugin-ci phpdoc` | — | `ci.yml` static-checks → `--max-warnings 0` |
+| `moodle-plugin-ci grunt` (ESLint) | — | `ci.yml` static-checks → `--max-lint-warnings 0` (AMD diff gate külön lépés) |
+| `qtype_ordering` (CI függőség) | — | `ci.yml` → `add-plugin --clone https://github.com/gbateson/moodle-qtype_ordering` (master; nincs Moodle-tag ág) minden jobban install előtt |
+| PHPUnit (`phpunit` job) | — | `ci.yml` → `moodle-plugin-ci phpunit --fail-on-warning` |
+| Behat (`behat` job) | — | `ci.yml` → `--profile chrome --tags @local_artqtml --scss-deprecations`; bukáskor `behat_dump` artifact (7 nap) |
 | `spaze/phpstan-disallowed-calls` | **4.14.0** — rögzítve | ugyanez a `tools/devtools` composer install hozza; a `phpstan.neon` include-olja |
 
 A `composer.json` `audit.block-insecure: false` szándékos: a rögzített `phpcs` 3.13.5 advisory
 egyébként megállítaná a `composer install`-t (a CI ugyanerre a configra támaszkodik;
 `--no-audit` nem használható, mert a moodle-plugin-ci PATH-on lévő Composer túl régi).
 Verzióemeléskor nézd meg az advisory-t.
-| `phpmd/phpmd` | **2.15.0** — rögzítve | nem fut a CI-ben, szándékosan |
-| `squizlabs/php_codesniffer` | **3.13.5** — rögzítve | a `moodle-plugin-ci ^4` hozza |
-| `moodlehq/moodle-cs` | **v3.7.0** — rögzítve | a `moodle-plugin-ci ^4` hozza |
+| `phpmd/phpmd` | **2.15.0** — rögzítve | `ci.yml` static-checks → `continue-on-error: true` (információs, nem kapu) |
+| `squizlabs/php_codesniffer` | **3.13.5** — rögzítve | a `moodle-plugin-ci 4.5.11` hozza |
+| `moodlehq/moodle-cs` | **v3.7.0** — rögzítve | a `moodle-plugin-ci 4.5.11` hozza |
 | `dealerdirect/phpcodesniffer-composer-installer` | v1.2.1 | függőség |
 | `phpcsstandards/phpcsutils` | 1.2.3 | függőség |
 | `phpcsstandards/phpcsextra` | 1.5.1 | függőség |
@@ -47,7 +55,7 @@ hívások tiltása. A Semgrep CE külön workflow-ban fut (`semgrep.yml`), nem a
 ## A phpmd külön eset: fut, de nem kapu
 
 **Egy pontosítás, mert korábban félrevezetően fogalmaztam.** Azt írtam, „telepítve volt, de soha
-semmi nem hívta". Ez a **kapukra** igaz — sem a CI, sem a `check.sh` nem futtatta —, de úgy hangzik,
+semmi nem hívta". Ez a **kapukra** igaz — a `check.sh` nem áll meg rajta —, de úgy hangzik,
 mintha sosem lett volna haszna. **Egy egész refaktorálást ez mért ki.**
 
 A `archivum/REFACTOR_RUN_LOG.md` szerint a három god-class szétbontásánál (2026-07-25) a phpmd adta
@@ -65,7 +73,8 @@ Az igazi kérdése — **nem nőnek-e vissza a szétbontott osztályok** — nem
 félévente. Arra a mérőműszer való, nem a kapu.
 
 **Ezért 2026-07-31-től:** a `check.sh` lefuttatja, kiírja, amit talált, és **nem állítja a kilépési
-kódot**. A CI-ben nem fut. A `tests/`, a `tools/` és a `node_modules/` ki van zárva belőle — egy
+kódot**. A CI-ben is fut (`moodle-plugin-ci phpmd`), de `continue-on-error: true` — információs,
+nem kapu. A `tests/`, a `tools/` és a `node_modules/` ki van zárva belőle — egy
 teszt hosszú törzse nem karbantartási adósság.
 
 **A `db/upgrade.php` is kizárva.** A Moodle előírt alakja egy hosszú lánc
