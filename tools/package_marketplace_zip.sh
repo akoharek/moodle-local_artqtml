@@ -33,6 +33,8 @@ rsync -a \
   --exclude 'tools/' \
   --exclude 'dist/' \
   --exclude 'moodle/' \
+  --exclude 'moodledata/' \
+  --exclude '.gitignore' \
   --exclude 'amd/src/' \
   --exclude 'CLAUDE.md' \
   --exclude 'CHANGES.md' \
@@ -88,6 +90,7 @@ bad_lang = [
 ]
 assert not bad_lang, bad_lang
 forbidden_prefixes = (
+    "artqtml/moodledata/",
     "artqtml/tests/",
     "artqtml/tools/",
     "artqtml/.git/",
