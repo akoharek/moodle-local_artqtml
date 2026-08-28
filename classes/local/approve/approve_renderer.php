@@ -38,7 +38,7 @@ class approve_renderer {
      * The four-status validation summary row of badges.
      *
      * @param array $statuscounts from approve_page_data::status_counts()
-     * @param int $statustotal
+     * @param int $statustotal total questions across all validation statuses
      * @return string
      */
     public static function validation_summary(array $statuscounts, int $statustotal): string {

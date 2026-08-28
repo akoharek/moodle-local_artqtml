@@ -640,8 +640,8 @@ class generation_list {
     /**
      * Build a URL for this section only, overriding/removing the given params.
      *
-     * @param \moodle_url $baseurl
-     * @param string $prefix
+     * @param \moodle_url $baseurl list page URL to copy params from
+     * @param string $prefix query-param prefix for this section
      * @param array $overrides null values remove the param
      * @return \moodle_url
      */

@@ -266,7 +266,7 @@ class missing_types {
     /**
      * Build a single-level matrix shortfall from type totals when only countdiscrepancy exists.
      *
-     * @param array $settings
+     * @param array $settings decoded generation settings including matrix
      * @param array $typeshortfall per-type shortfall counts
      * @return array matrix shortfall keyed by type then difficulty
      */
