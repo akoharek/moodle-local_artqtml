@@ -37,7 +37,9 @@ cd "$PLUGIN_DIR" || exit 2
 status=0
 
 # --------------------------------------------------------------------------- minden szkript indítható
-for script in $(find tools -name '*.sh' -type f | sort); do
+# Vendor test fixtures under tools/devtools are Composer packages — not our scripts.
+for script in $(find tools -name '*.sh' -type f \
+    ! -path 'tools/devtools/vendor/*' ! -path 'tools/*/vendor/*' | sort); do
     if [ ! -x "$script" ]; then
         notexec="${notexec:-}$script "
     fi
@@ -49,7 +51,7 @@ if [ -n "${notexec:-}" ]; then
     echo "    Javítás: chmod +x <fájl>, és a módváltozást commitolni kell - a jogosultság a gitben áll."
     status=1
 else
-    echo "  minden tools/**.sh futtatható ($(find tools -name '*.sh' -type f | wc -l | tr -d ' ') db)"
+    echo "  minden saját tools/**.sh futtatható ($(find tools -name '*.sh' -type f ! -path 'tools/devtools/vendor/*' ! -path 'tools/*/vendor/*' | wc -l | tr -d ' ') db)"
 fi
 
 exit "$status"

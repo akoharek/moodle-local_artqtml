@@ -12,6 +12,7 @@ futnak, a tanár sosem találkozik velük.
 | eszköz | mit csinál |
 |---|---|
 | **grep-light-leaks** (`tools/grep-light-leaks.sh`) | **Light leak kapu**: spec ticket ID-k és edition-split megjegyzések keresése a repóban (a szkriptben rögzített minták). CI: `.github/workflows/leak-gate.yml`; helyben: `bash tools/grep-light-leaks.sh .` |
+| **local_ci.sh** | **Helyi push-előtti kapu** (2026-09-04): `bash tools/local_ci.sh --fast` vagy `--push`. Magyar leírás: `tools/LOCAL_CI.md`. MPC static: `run_mpc_static.sh`; AMD: `run_amd_gate.sh`; Semgrep: `run_semgrep_docker.sh`. |
 | **phpcs** (PHP CodeSniffer) | a **formai** ellenőr: behúzás, elnevezés, kötelező fejlécek, megjegyzések alakja. Hibát és figyelmeztetést különböztet meg; a kapu csak a hibákon bukik |
 | **moodle-cs** | nem program: maga a **Moodle szabálykönyve**, amit a phpcs olvas |
 | **phpstan** | a **logikai** ellenőr: nem létező függvény hívása, rossz típusú érték, kezeletlen eset. Ez az, amelyik valódi hibát talál |

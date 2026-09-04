@@ -40,3 +40,5 @@
 
 # Local one-off audit helpers (not shipped, not for public review).
 .devtools/
+/tools/.local-ci-last.txt
+/tools/.mpc/

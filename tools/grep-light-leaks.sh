@@ -54,6 +54,12 @@ EXCLUDE_ARGS=(
   --exclude-dir=.devtools
   --exclude-dir=dist
   --exclude=grep-light-leaks.sh
+  --exclude=local_ci.sh
+  --exclude=LOCAL_CI.md
+  --exclude=run_mpc_static.sh
+  --exclude='.local-ci-last.txt'
+  --exclude='.gates-last.txt'
+  --exclude-dir=.mpc
   # Internal review artifacts, not shipped in Marketplace ZIP.
   --exclude='REVIEW-FINDINGS*.md'
 )
