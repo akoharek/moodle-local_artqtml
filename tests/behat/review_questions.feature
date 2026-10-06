@@ -61,6 +61,7 @@ Feature: Reviewing generated ArtQTML questions
   Scenario: Teacher can preview a draft question
     When I open the ArtQTML generation named "Review pack"
     Then "[data-testid='artqtml-approve-preview-link']" "css_element" should exist
+    And "[data-testid='artqtml-approve-edit-link']" "css_element" should exist
 
   Scenario: Teacher moves an approved question into a course question bank
     When I open the ArtQTML generation named "Review pack"

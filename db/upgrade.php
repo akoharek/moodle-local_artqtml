@@ -127,5 +127,37 @@ function xmldb_local_artqtml_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026082801, 'local', 'artqtml');
     }
 
+    if ($oldversion < 2026091401) {
+        // Dataroot backup for API keys: survives Docker MariaDB volume resets when moodledata
+        // persists (moodle-docker/local.yml). Seed the backup file from existing config rows.
+        \local_artqtml\local\encrypted_config::backup_stored_keys_to_dataroot();
+        \local_artqtml\local\api_key_backup::restore_missing();
+
+        upgrade_plugin_savepoint(true, 2026091401, 'local', 'artqtml');
+    }
+
+    if ($oldversion < 2026091501) {
+        // Extend moodledata backup with plain settings (models, draft course) for Docker dev.
+        \local_artqtml\local\api_key_backup::backup_all_from_config();
+        \local_artqtml\local\api_key_backup::restore_missing();
+
+        upgrade_plugin_savepoint(true, 2026091501, 'local', 'artqtml');
+    }
+
+    if ($oldversion < 2026091603) {
+        // Restore question:editall on the draft role so the generation owner can open Moodle's
+        // native question editor from approve.php.
+        \local_artqtml\local\draft_role::ensure_role();
+
+        upgrade_plugin_savepoint(true, 2026091603, 'local', 'artqtml');
+    }
+
+    if ($oldversion < 2026100500) {
+        // Moodle 5.3 verified on a separate localhost (MariaDB 11.4, PHP 8.3, public/ docroot).
+        // $plugin->supported is disk metadata; this savepoint exists so the version bump is a
+        // normal upgrade rather than a silent version.php-only change.
+        upgrade_plugin_savepoint(true, 2026100500, 'local', 'artqtml');
+    }
+
     return true;
 }

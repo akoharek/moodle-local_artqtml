@@ -339,7 +339,7 @@ echo html_writer::start_div('', [
     'style' => 'display:none; position:fixed; top:0; left:0; width:100%; height:100%;' .
         ' background:rgba(0,0,0,0.5); z-index:1050;',
 ]);
-echo html_writer::start_div('bg-white rounded p-4', [
+echo html_writer::start_div('bg-body rounded p-4', [
     'style' => 'max-width:28rem; margin:10vh auto; box-shadow:0 0.5rem 1rem rgba(0,0,0,0.3);',
 ]);
 echo html_writer::tag('p', get_string('abortsaveconfirm', 'local_artqtml', format_string($generation->name)));

@@ -85,9 +85,8 @@ class observer {
             // pointing at someone who approved a now-superseded version of the question.
             'approvedby'           => null,
             'edited'               => 1,
-            // External Moodle edit while still in draft: lock plugin mutate paths on this row.
-            'externallyedited'     => 1,
-            // Who, and (for the list page's "Modified by" column) when.
+            // Native question.php from approve.php is the intended edit path. Do not lock the
+            // row: the teacher must still be able to approve and move after saving.
             'lasteditedby'         => $event->userid,
             'lasteditedat'         => time(),
         ]);

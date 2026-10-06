@@ -73,6 +73,9 @@ class model_blocking {
      * @return array{reason: string, model: string, checktype: string, errorcode: string, since: int}|null
      */
     public static function state(string $provider): ?array {
+        // Docker dev may wipe MariaDB while moodledata (and apikeys.json) survives.
+        api_key_backup::restore_missing();
+
         $model = (string) get_config('local_artqtml', $provider === model_list::PROVIDER_CLAUDE ? 'claudemodel' : 'geminimodel');
         if ($model === '') {
             return [

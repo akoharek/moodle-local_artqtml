@@ -261,19 +261,19 @@ $page = min($page, $lastpage);
 $questions = approve_page_data::questions($generationid, $sort, $dir, $page, $perpage);
 $creator = core_user::get_user($generation->userid);
 
-// Preview opens native Moodle question UI in the draft course (draft_role grants use).
-$candraftpreviewquestions = false;
+// Preview and Edit open native Moodle question UI in the draft course.
 $canmutate = generation_access_policy::can_mutate($generation, null, $context);
+$candraftpreviewquestions = false;
 if ($canmutate && draft_bank::is_configured()) {
     draft_role::grant((int) $USER->id);
-}
-if (draft_bank::is_configured()) {
     $draftcontextid = draft_bank::get_draft_context_id();
     if ($draftcontextid !== null) {
-        $candraftpreviewquestions = has_capability('moodle/question:useall', \context::instance_by_id($draftcontextid));
+        $candraftpreviewquestions = has_capability(
+            'moodle/question:useall',
+            \context::instance_by_id($draftcontextid)
+        );
     }
 }
-$candraftpreviewquestions = $candraftpreviewquestions && $canmutate;
 
 echo html_writer::start_tag('form', ['method' => 'post', 'action' => $pageurl->out(false)]);
 echo html_writer::input_hidden_params($pageurl);

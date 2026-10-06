@@ -24,6 +24,8 @@
 
 namespace local_artqtml\admin;
 
+use local_artqtml\local\api_key_backup;
+
 /**
  * Validates that the draft course id is set and the course exists.
  */
@@ -69,5 +71,22 @@ class setting_configtext_courseid extends \admin_setting_configtext {
         }
 
         return true;
+    }
+
+    /**
+     * Mirror the draft course id into moodledata so a MariaDB reset can restore it.
+     *
+     * @param string $data
+     * @return string empty string on success, an error message otherwise
+     */
+    public function write_setting($data) {
+        $result = parent::write_setting($data);
+        if ($result === '') {
+            $stored = (string) get_config('local_artqtml', $this->name);
+            if ($stored !== '' && $stored !== '0') {
+                api_key_backup::backup_plain_setting($this->name, $stored);
+            }
+        }
+        return $result;
     }
 }

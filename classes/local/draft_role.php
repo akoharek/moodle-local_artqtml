@@ -15,19 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Narrow role for previewing draft questions in the hidden draft course.
+ * Narrow role so the generation owner can preview and edit draft questions from approve.php.
  *
- * The draft course is a holding area only: questions must not be edited through Moodle's native
- * question bank while they remain in the draft category. Review, approve and move happen on the
- * plugin approve page; preview uses Moodle's native preview UI and needs question:useall.
+ * Draft questions are not reached by browsing the draft course (no enrolment). The approve page
+ * opens Moodle's native question.php (with the plugin validation panel) and the native preview
+ * UI. Those entry points need course:view, question:editall and question:useall on the draft
+ * course context.
  *
- * What the role carries, read off Moodle's entry points:
- *
- * - moodle/course:view — preview and require_login($courseid) succeed through is_viewing().
- * - moodle/question:useall — qbank_previewquestion preview links on approve.php.
- *
- * Two capabilities, and deliberately no archetype. Assignments are granted while a user has draft
- * work in progress and revoked once they no longer need preview access in the shared draft course.
+ * Three capabilities, and deliberately no archetype. Assignments are granted while a user has
+ * draft work in progress and revoked once they no longer need that access.
  *
  * @package    local_artqtml
  * @copyright  2026 AR Tudásmenedzsment Kft.
@@ -37,7 +33,7 @@
 namespace local_artqtml\local;
 
 /**
- * Creates and hands out the draft preview role.
+ * Creates and hands out the draft editing/preview role.
  */
 class draft_role {
     /** @var string Role shortname. Stable: the upgrade step and every assignment look it up by this. */
@@ -46,6 +42,7 @@ class draft_role {
     /** @var string[] The capabilities the role grants, and nothing else. */
     public const CAPABILITIES = [
         'moodle/course:view',
+        'moodle/question:editall',
         'moodle/question:useall',
     ];
 
@@ -56,7 +53,6 @@ class draft_role {
      * net before an assignment, so it must be safe to call when the role is already there. It only
      * ever adds the capabilities it owns - an administrator who has deliberately added another one
      * keeps it, because silently reverting a site's own decision is worse than a broad role.
-     * editall is explicitly removed when it is no longer part of CAPABILITIES.
      *
      * @return int the role id
      */
@@ -80,13 +76,11 @@ class draft_role {
             assign_capability($capability, CAP_ALLOW, $roleid, $systemcontext->id, true);
         }
 
-        unassign_capability('moodle/question:editall', $roleid, $systemcontext->id);
-
         return $roleid;
     }
 
     /**
-     * Whether the user still needs preview access in the shared draft course.
+     * Whether the user still needs Preview/Edit access in the shared draft course.
      *
      * True while they own an in-flight generation with a draft bank, or while they still have at
      * least one unmoved draft question awaiting review on one of their generations.
@@ -128,7 +122,7 @@ class draft_role {
     }
 
     /**
-     * Give a user the role in the draft course so Preview links on approve.php work.
+     * Give a user the role in the draft course so Preview and Edit links on approve.php work.
      *
      * @param int $userid
      * @return bool true when the user holds the role afterwards, false when there was nothing to

@@ -60,11 +60,11 @@ final class draft_role_test extends \advanced_testcase {
     }
 
     /**
-     * The capability set is the whole point: two, and no more. The guard is against growth - a
-     * third capability added "just to make something work" is how a narrow role becomes a broad
+     * The capability set is the whole point: three, and no more. The guard is against growth - a
+     * fourth capability added "just to make something work" is how a narrow role becomes a broad
      * one, and it would pass every functional test.
      */
-    public function test_the_role_grants_exactly_two_capabilities(): void {
+    public function test_the_role_grants_exactly_three_capabilities(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -79,10 +79,9 @@ final class draft_role_test extends \advanced_testcase {
         );
 
         $this->assertSame(
-            ['moodle/course:view', 'moodle/question:useall'],
+            ['moodle/course:view', 'moodle/question:editall', 'moodle/question:useall'],
             array_keys($granted)
         );
-        $this->assertArrayNotHasKey('moodle/question:editall', $granted);
         // Named individually as well, because these are the ones an editingteacher enrolment would
         // have brought along - the breadth this role exists instead of.
         $this->assertArrayNotHasKey('moodle/course:update', $granted);
@@ -120,7 +119,7 @@ final class draft_role_test extends \advanced_testcase {
 
         $this->assertTrue(has_capability('moodle/course:view', $context, $user));
         $this->assertTrue(has_capability('moodle/question:useall', $context, $user));
-        $this->assertFalse(has_capability('moodle/question:editall', $context, $user));
+        $this->assertTrue(has_capability('moodle/question:editall', $context, $user));
 
         $this->assertFalse(has_capability('moodle/course:update', $context, $user));
         $this->assertFalse(is_enrolled($context, $user));

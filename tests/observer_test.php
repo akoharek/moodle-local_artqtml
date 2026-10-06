@@ -197,7 +197,7 @@ final class observer_test extends \advanced_testcase {
         $this->assertSame(0, (int) $row->approved, 'an edit revokes the approval');
         $this->assertNull($row->approvedby);
         $this->assertSame(1, (int) $row->edited);
-        $this->assertSame(1, (int) $row->externallyedited);
+        $this->assertSame(0, (int) $row->externallyedited);
         $this->assertNotEmpty($row->lasteditedat);
 
         $this->assertTrue(

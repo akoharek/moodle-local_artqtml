@@ -29,9 +29,9 @@ use local_artqtml\local\draft_bank;
  */
 final class approve_renderer_test extends \advanced_testcase {
     /**
-     * A still-in-draft question shows Preview only (no native Edit link).
+     * A still-in-draft question keeps native Edit (question.php) and Preview. No Open.
      */
-    public function test_unmoved_question_shows_preview_not_edit_or_open(): void {
+    public function test_unmoved_question_shows_edit_and_preview_not_open(): void {
         [$output, $creator, $pageurl] = $this->setup_page();
         $question = $this->seed_question(['movedout' => 0, 'questioncode' => 'OPEN-IH-0001']);
 
@@ -47,10 +47,34 @@ final class approve_renderer_test extends \advanced_testcase {
         );
 
         $this->assertStringContainsString('artqtml-approve-preview-link', $html);
-        $this->assertStringNotContainsString('artqtml-approve-edit-link', $html);
-        $this->assertStringNotContainsString(get_string('actionedit', 'local_artqtml'), $html);
+        $this->assertStringContainsString('artqtml-approve-edit-link', $html);
+        $this->assertStringContainsString(get_string('actionedit', 'local_artqtml'), $html);
         $this->assertStringNotContainsString('artqtml-approve-open-link', $html);
-        $this->assertStringNotContainsString('/question/bank/editquestion/question.php', $html);
+        $this->assertStringContainsString('/question/bank/editquestion/question.php', $html);
+        $this->assertStringContainsString('id=' . (int) $question->questionbankid, $html);
+    }
+
+    /**
+     * Without mutate rights the native Edit link is hidden.
+     */
+    public function test_unmoved_question_hides_edit_when_cannot_mutate(): void {
+        [$output, $creator, $pageurl] = $this->setup_page();
+        $question = $this->seed_question(['movedout' => 0, 'questioncode' => 'OPEN-IH-0003']);
+
+        $html = approve_renderer::questions_table(
+            $output,
+            [$question],
+            'name',
+            'ASC',
+            $pageurl,
+            true,
+            $creator,
+            (int) $question->generationid,
+            false
+        );
+
+        $this->assertStringContainsString('artqtml-approve-preview-link', $html);
+        $this->assertStringNotContainsString('artqtml-approve-edit-link', $html);
     }
 
     /**

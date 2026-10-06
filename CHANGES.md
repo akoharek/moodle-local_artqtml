@@ -3,6 +3,29 @@
 Newest release first. Version numbers match `version.php` `$plugin->version`;
 the number in parentheses is `$plugin->release`.
 
+## 2026-10-05 — `2026100500` (2026.10.05)
+
+**Moodle 5.3 support**
+
+- `$plugin->supported` 4.5–5.3 (`[405, 503]`). Verified on a separate localhost (PHP 8.3,
+  MariaDB 11.4, `public/` docroot): install, settings, list, upload, generate, status, approve.
+- CI: `v5.3.0` cell; MariaDB 11.4 (5.3 minimum).
+
+**Approve page: native Edit restored**
+
+- Unmoved draft rows show **Edit** (Moodle `/question/bank/editquestion/question.php` with the
+  plugin validation panel) beside **Preview**. Moved rows still show **Open** only.
+- Draft role is again `course:view` + `question:editall` + `question:useall`. Native edit from
+  approve.php is the intended product path.
+- After a native save the row is **Edited**, not Locked — approve and move remain available.
+  Editing another teacher's generation asks for confirmation; the owner's does not.
+
+**Dev: API key backup in moodledata**
+
+- Encrypted API keys (and model / draft-course settings) are mirrored under moodledata so a
+  Docker MariaDB reset can restore them. Optional `tools/seed_dev_api_keys.php` seeds from
+  `.env` (`ARTQTML_*` variables).
+
 ## 2026-08-28 — `2026082801` (2026.08.28)
 
 **Bootstrap 5 utility migration (Moodle 5.2 deprecated-style gate)**

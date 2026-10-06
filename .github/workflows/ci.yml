@@ -10,24 +10,26 @@ on:
 permissions:
   contents: read
 
-# Multi-major matrix (2026-08-12): Marketplace validation on 4.5 + 5.1 + 5.2.
+# Multi-major matrix: Marketplace validation on 4.5 + 5.1 + 5.2 + 5.3.
 #
-# BL-20: pin release tags, not MOODLE_*_STABLE. STABLE gains commits every week, and
+# Pin release tags, not MOODLE_*_STABLE. STABLE gains commits every week, and
 # moodle-plugin-ci re-clones it on every run, so CI could turn red without a single commit
 # from us. Tags used here (verify when bumping):
 #   - v4.5.12  — 4.5 LTS pin already in use
 #   - v5.1.6   — latest 5.1.x tag at decision time (prefer over MOODLE_501_STABLE)
 #   - v5.2.2   — latest 5.2.x tag at decision time (prefer over MOODLE_502_STABLE)
+#   - v5.3.0   — 5.3.0 LTS (2026-10-05); requires PHP 8.3+ and MariaDB 11.4
 #
-# PHP: 8.3 on every cell (supported on 4.5, 5.1, and 5.2; 5.2 minimum is 8.3).
-# DB: MariaDB 10.11 on all majors; one Postgres cell on 5.2 with PG16 (5.2 minimum).
+# PHP: 8.3 on every cell (supported on 4.5–5.3; 5.2+ minimum is 8.3).
+# DB: MariaDB 11.4 on all majors (5.3 minimum; fine for 4.5/5.1/5.2); one Postgres cell
+# on 5.2 with PG16 (5.2 minimum). 5.3's Postgres minimum is 17 — not in this matrix yet.
 #
 # A tag is valid where it is used. moodle-plugin-ci passes this value through
 # Validate::gitBranch(), and MoodleInstaller runs `git clone --depth 1 --branch <value>`,
 # which git resolves to a tag. A raw commit hash would NOT work.
 #
-# $plugin->requires stays 4.5.0 (2024100700). $plugin->supported = [405, 502] (Moodle 4.5–5.2).
-# CI matrix covers 4.5 / 5.1 / 5.2 (static-checks + phpunit jobs below).
+# $plugin->requires stays 4.5.0 (2024100700). $plugin->supported = [405, 503] (Moodle 4.5–5.3).
+# CI matrix covers 4.5 / 5.1 / 5.2 / 5.3 (static-checks + phpunit jobs below).
 
 jobs:
 
@@ -54,6 +56,9 @@ jobs:
           - moodle-branch: v5.2.2
             php: '8.3'
             database: mariadb
+          - moodle-branch: v5.3.0
+            php: '8.3'
+            database: mariadb
           - moodle-branch: v5.2.2
             php: '8.3'
             database: pgsql
@@ -72,7 +77,7 @@ jobs:
           --health-cmd="pg_isready -U postgres"
           --health-interval=10s --health-timeout=5s --health-retries=5
       mariadb:
-        image: mariadb:10.11
+        image: mariadb:11.4
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: "true"
           MYSQL_CHARACTER_SET_SERVER: "utf8mb4"
@@ -282,6 +287,9 @@ jobs:
           - moodle-branch: v5.2.2
             php: '8.3'
             database: mariadb
+          - moodle-branch: v5.3.0
+            php: '8.3'
+            database: mariadb
           - moodle-branch: v5.2.2
             php: '8.3'
             database: pgsql
@@ -298,7 +306,7 @@ jobs:
           --health-cmd="pg_isready -U postgres"
           --health-interval=10s --health-timeout=5s --health-retries=5
       mariadb:
-        image: mariadb:10.11
+        image: mariadb:11.4
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: "true"
           MYSQL_CHARACTER_SET_SERVER: "utf8mb4"
@@ -353,7 +361,7 @@ jobs:
         run: moodle-plugin-ci phpunit --fail-on-warning ./plugin
 
   # ---------------------------------------------------------------------------
-  # Behat: browser acceptance tests. One cell per supported major (4.5 LTS + 5.2).
+  # Behat: browser acceptance tests. One cell per LTS edge (4.5 LTS + 5.3 LTS).
   # Selenium is required for @javascript (approve confirm, status.js, question editor).
   # ---------------------------------------------------------------------------
   behat:
@@ -370,13 +378,13 @@ jobs:
           - moodle-branch: v4.5.12
             php: '8.3'
             database: mariadb
-          - moodle-branch: v5.2.2
+          - moodle-branch: v5.3.0
             php: '8.3'
             database: mariadb
 
     services:
       mariadb:
-        image: mariadb:10.11
+        image: mariadb:11.4
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: "true"
           MYSQL_CHARACTER_SET_SERVER: "utf8mb4"

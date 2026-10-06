@@ -42,3 +42,6 @@
 .devtools/
 /tools/.local-ci-last.txt
 /tools/.mpc/
+
+# Local dev API keys for tools/seed_dev_api_keys.php — never commit.
+/.env

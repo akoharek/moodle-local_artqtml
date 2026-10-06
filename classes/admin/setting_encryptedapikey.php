@@ -81,7 +81,13 @@ class setting_encryptedapikey extends \admin_setting_configpasswordunmask {
         }
 
         encrypted_config::clear_failure($this->name);
-        return ($this->config_write($this->name, $encrypted) ? '' : get_string('errorsetting', 'admin'));
+        if (!$this->config_write($this->name, $encrypted)) {
+            return get_string('errorsetting', 'admin');
+        }
+
+        \local_artqtml\local\api_key_backup::backup_setting($this->name, $encrypted);
+
+        return '';
     }
 
     /**

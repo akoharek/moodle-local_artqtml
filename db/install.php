@@ -34,5 +34,8 @@ function xmldb_local_artqtml_install(): bool {
 
     \local_artqtml\local\plugin_setup::flag_post_install_redirect();
 
+    // Restore API keys / models / draft course from moodledata after a Docker MariaDB reset.
+    \local_artqtml\local\api_key_backup::restore_missing();
+
     return true;
 }

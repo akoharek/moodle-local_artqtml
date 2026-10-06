@@ -65,7 +65,13 @@ class encrypted_config {
     public static function get(string $name): string {
         $stored = get_config(self::component(), $name);
         if ($stored === false || $stored === '') {
-            return '';
+            // Docker dev often wipes MariaDB while moodledata (and its encryption secret) survives.
+            // Restore ciphertext from the dataroot backup before treating the key as missing.
+            api_key_backup::restore_missing();
+            $stored = get_config(self::component(), $name);
+            if ($stored === false || $stored === '') {
+                return '';
+            }
         }
 
         $stored = (string) $stored;
@@ -180,7 +186,9 @@ class encrypted_config {
      */
     protected static function encrypt_in_place(string $name, string $plaintext): void {
         try {
-            set_config($name, \core\encryption::encrypt($plaintext), self::component());
+            $encrypted = \core\encryption::encrypt($plaintext);
+            set_config($name, $encrypted, self::component());
+            api_key_backup::backup_setting($name, $encrypted);
         } catch (\Throwable $e) {
             debugging(
                 self::component() . ': could not re-encrypt leftover plaintext ' . $name .
@@ -188,6 +196,15 @@ class encrypted_config {
                 DEBUG_NORMAL
             );
         }
+    }
+
+    /**
+     * Write the current config_plugins ciphertext for each API key to moodledata.
+     *
+     * @return void
+     */
+    public static function backup_stored_keys_to_dataroot(): void {
+        api_key_backup::backup_all_from_config();
     }
 
     /**

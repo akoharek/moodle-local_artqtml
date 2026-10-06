@@ -26,6 +26,7 @@
 
 namespace local_artqtml\admin;
 
+use local_artqtml\local\api_key_backup;
 use local_artqtml\local\model_list;
 
 /**
@@ -152,5 +153,22 @@ class setting_modelselect extends \admin_setting_configselect {
         }
 
         return true;
+    }
+
+    /**
+     * Mirror the chosen model into moodledata so a MariaDB reset can restore it.
+     *
+     * @param mixed $data
+     * @return string empty string on success, an error message otherwise
+     */
+    public function write_setting($data) {
+        $result = parent::write_setting($data);
+        if ($result === '') {
+            $stored = (string) get_config('local_artqtml', $this->name);
+            if ($stored !== '') {
+                api_key_backup::backup_plain_setting($this->name, $stored);
+            }
+        }
+        return $result;
     }
 }

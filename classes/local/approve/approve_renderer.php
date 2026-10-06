@@ -273,6 +273,29 @@ class approve_renderer {
                         'target'      => '_blank',
                         'data-testid' => 'artqtml-approve-preview-link',
                     ]);
+                    if (!$islocked && $canmutate) {
+                        $editurl = new \moodle_url(
+                            '/question/bank/editquestion/question.php',
+                            approve_page_data::question_edit_url_params((int) $question->questionbankid, $pageurl)
+                        );
+                        $editattrs = ['data-testid' => 'artqtml-approve-edit-link'];
+                        if ((int) $creator->id === (int) $USER->id) {
+                            $actions[] = \html_writer::link(
+                                $editurl,
+                                get_string('actionedit', 'local_artqtml'),
+                                $editattrs
+                            );
+                        } else {
+                            $actions[] = $output->action_link(
+                                $editurl,
+                                get_string('actionedit', 'local_artqtml'),
+                                new \confirm_action(
+                                    get_string('confirmeditothersquestion', 'local_artqtml', fullname($creator))
+                                ),
+                                $editattrs
+                            );
+                        }
+                    }
                 }
             }
 
