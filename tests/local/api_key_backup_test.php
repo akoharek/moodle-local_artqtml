@@ -20,6 +20,7 @@ namespace local_artqtml\local;
  * Unit tests for moodledata API key backup/restore.
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\api_key_backup

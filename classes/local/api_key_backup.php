@@ -23,6 +23,7 @@
  * ids, draft course) are stored in the same file under "settings".
  *
  * @package    local_artqtml
+ * @copyright  2026 AR Tudásmenedzsment Kft.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -171,7 +172,7 @@ class api_key_backup {
      *
      * Always returns normalised keys/settings maps so callers need no shape guards.
      *
-     * @return array{version?: int, backedat?: int, keys: array<string, string>, settings: array<string, string>}
+     * @return array Always includes keys and settings string maps (may be empty).
      */
     protected static function read_file(): array {
         $empty = ['keys' => [], 'settings' => []];
