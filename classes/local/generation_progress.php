@@ -134,7 +134,46 @@ class generation_progress {
      * @param string|null $pendingdatajson the generation's raw pendingdata column
      * @return int
      */
-    public static function failed_percent(?string $pendingdatajson): int {
+    public static function questions_so_far(?string $pendingdatajson, int $savedcount): int {
+        if ($savedcount > 0) {
+            return $savedcount;
+        }
+
+        $pendingdata = json_decode((string) $pendingdatajson, true);
+        if (!is_array($pendingdata)) {
+            return 0;
+        }
+
+        if (isset($pendingdata['questions']) && is_array($pendingdata['questions'])) {
+            return count($pendingdata['questions']);
+        }
+
+        $outcomes = $pendingdata['generating']['outcomes'] ?? null;
+        if (!is_array($outcomes)) {
+            return 0;
+        }
+
+        $total = 0;
+        foreach ($outcomes as $outcome) {
+            if (is_array($outcome)) {
+                $total += (int) ($outcome['count'] ?? 0);
+            }
+        }
+
+        return $total;
+    }
+
+    /**
+     * How far a failed generation actually got, as a bar percentage.
+     *
+     * M-15: nothing is written to local_artqtm_questions until the saving stage commits, so the
+     * question count says nothing about progress. The shape of pendingdata does: both keys means
+     * it reached saving, 'questions' alone means it failed validating, neither means it never got
+     * past generating.
+     *
+     * @param string|null $pendingdatajson the generation's raw pendingdata column
+     * @return int
+     */    public static function failed_percent(?string $pendingdatajson): int {
         $pendingdata = json_decode((string) $pendingdatajson, true);
 
         if (is_array($pendingdata) && array_key_exists('evaluations', $pendingdata)) {

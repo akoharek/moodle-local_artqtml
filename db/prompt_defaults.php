@@ -30,8 +30,7 @@ defined('MOODLE_INTERNAL') || die();
 return [
 
     'generatorprompttemplate' =>
-        "You are generating quiz questions for a Moodle course, based on the source text "
-        . "provided as the user message.\n"
+        "You are generating quiz questions based on the source text provided as the user message.\n"
         . "\n"
         . "Generate the questions in the language of the source text.\n"
         . "\n"
@@ -160,7 +159,7 @@ return [
 
     'validationpromptsuggestion' =>
         'For the suggestion field, use exactly one of these values: {{SUGGESTION_VALUES}}. Use '
-        . '"accepted" when the question can be used as generated, "needs_review" when it needs a '
+        . '"acceptable" when the question can be used as generated, "needs_review" when it needs a '
         . "teacher's correction, and \"rejected\" when it should be discarded. The field is required "
         . 'and must never be an empty string.',
 

@@ -40,14 +40,16 @@ if (!data_submitted()) {
 require_sesskey();
 
 $provider = required_param('provider', PARAM_ALPHA);
-$action = required_param('action', PARAM_ALPHA);
+// modelaction (not action): admin settings posts action=save-settings on the same request when
+// these buttons use formaction inside that form; POST would win over a query-string action=.
+$action = required_param('modelaction', PARAM_ALPHA);
 
 // Same reason as delete.php: an act-and-redirect script still needs $PAGE set up, because
 // Redirect() renders a full page (theme, favicon, notification) and reads $PAGE->url, and the
 // Invalid-provider exception below renders through $PAGE as well. require_login() with no course
 // Argument sets neither for a system-level script. Placed before the validation deliberately, so
 // The error page is covered too.
-$PAGE->set_url('/local/artqtml/modelaction.php', ['provider' => $provider, 'action' => $action]);
+$PAGE->set_url('/local/artqtml/modelaction.php', ['provider' => $provider, 'modelaction' => $action]);
 $PAGE->set_context($context);
 
 if (!in_array($provider, model_list::PROVIDERS, true)) {

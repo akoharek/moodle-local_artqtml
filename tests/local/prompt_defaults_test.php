@@ -220,6 +220,26 @@ final class prompt_defaults_test extends \advanced_testcase {
     }
 
     /**
+     * Generation may not start while the generator system prompt is empty.
+     */
+    public function test_is_generator_configured_requires_non_empty_template(): void {
+        $this->resetAfterTest();
+
+        set_config('generatorprompttemplate', '', 'local_artqtml');
+        $this->assertFalse(prompt_seed::is_generator_configured());
+
+        set_config('generatorprompttemplate', '   ', 'local_artqtml');
+        $this->assertFalse(prompt_seed::is_generator_configured());
+
+        set_config('generatorprompttemplate', 'You are a quiz writer. {{QUESTION_COUNTS}}', 'local_artqtml');
+        $this->assertTrue(prompt_seed::is_generator_configured());
+        $this->assertSame(
+            'You are a quiz writer. {{QUESTION_COUNTS}}',
+            prompt_seed::generator_template()
+        );
+    }
+
+    /**
      * Running it twice changes nothing the second time.
      */
     public function test_seeding_is_repeatable(): void {

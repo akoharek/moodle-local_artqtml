@@ -62,7 +62,11 @@ class get_status extends external_api {
 
         $generation = $DB->get_record('local_artqtml_generations', ['id' => $params['id']], '*', MUST_EXIST);
 
-        $questioncount = $DB->count_records('local_artqtml_questions', ['generationid' => $generation->id]);
+        $savedcount = $DB->count_records('local_artqtml_questions', ['generationid' => $generation->id]);
+        $questioncount = \local_artqtml\local\generation_progress::questions_so_far(
+            $generation->pendingdata,
+            $savedcount
+        );
         $unvalidatedcount = $DB->count_records('local_artqtml_questions', [
             'generationid'         => $generation->id,
             'validationsuggestion' => 'not_evaluated',

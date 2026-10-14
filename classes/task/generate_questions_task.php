@@ -33,6 +33,7 @@ namespace local_artqtml\task;
 use local_artqtml\local\ai_request;
 use local_artqtml\local\generation_recover;
 use local_artqtml\local\model_list;
+use local_artqtml\local\prompt_seed;
 use local_artqtml\local\question\ai_text_cleaner;
 use local_artqtml\local\question_types;
 use local_artqtml\local\question_schema;
@@ -93,6 +94,19 @@ class generate_questions_task {
                 generation_recover::to_started(
                     $generation,
                     get_string('errorgenerationunexpected', 'local_artqtml')
+                );
+                return;
+            }
+
+            // Empty generator system prompt still builds a valid API call (schema + source only).
+            // generate.php / Retry refuse the same case; this catches rows queued before clear.
+            if (!prompt_seed::is_generator_configured()) {
+                $this->log_event($generationid, 'generator_prompt_empty', [
+                    'stage' => 'generate',
+                ], $userid);
+                generation_recover::to_started(
+                    $generation,
+                    get_string('errorgeneratorpromptempty', 'local_artqtml')
                 );
                 return;
             }

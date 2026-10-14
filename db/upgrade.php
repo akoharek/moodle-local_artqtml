@@ -159,5 +159,53 @@ function xmldb_local_artqtml_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026100500, 'local', 'artqtml');
     }
 
+    if ($oldversion < 2026101405) {
+        // maxsourcetokens is an explicit ceiling; it no longer means "80% of generatorcontextwindow".
+        // Materialise the previous effective value so existing sites keep the same limit.
+        $explicit = (int) (get_config('local_artqtml', 'maxsourcetokens') ?: 0);
+        if ($explicit <= 0) {
+            $contextwindow = (int) (get_config('local_artqtml', 'generatorcontextwindow') ?: 0);
+            if ($contextwindow <= 0) {
+                $contextwindow = 8192;
+            }
+            $materialised = max(1, (int) floor($contextwindow * 80 / 100));
+            set_config('maxsourcetokens', $materialised, 'local_artqtml');
+        }
+
+        upgrade_plugin_savepoint(true, 2026101405, 'local', 'artqtml');
+    }
+
+    if ($oldversion < 2026101406) {
+        // Empty prompt holes silently produce generations with no count/policy instructions.
+        // Fill from db/prompt_defaults.php; never overwrite edits.
+        \local_artqtml\local\prompt_seed::apply();
+
+        upgrade_plugin_savepoint(true, 2026101406, 'local', 'artqtml');
+    }
+
+    if ($oldversion < 2026101407) {
+        // Gemini suggestion enum: accepted → acceptable.
+        $DB->set_field(
+            'local_artqtml_questions',
+            'validationsuggestion',
+            'acceptable',
+            ['validationsuggestion' => 'accepted']
+        );
+
+        $suggestiontpl = (string) (get_config('local_artqtml', 'validationpromptsuggestion') ?: '');
+        if ($suggestiontpl !== '' && str_contains($suggestiontpl, '"accepted" when')) {
+            set_config(
+                'validationpromptsuggestion',
+                str_replace('"accepted" when', '"acceptable" when', $suggestiontpl),
+                'local_artqtml'
+            );
+        }
+
+        upgrade_plugin_savepoint(true, 2026101407, 'local', 'artqtml');
+    }
+
+    // Every upgrade path: re-seed any prompt setting that is empty. Safe and idempotent.
+    \local_artqtml\local\prompt_seed::apply();
+
     return true;
 }

@@ -38,11 +38,14 @@ class question_schema {
      * @param string $typecode IH/FE/SR
      * @return array
      */
-    protected static function common_properties(string $typecode): array {
+    protected static function common_properties(string $typecode, array $settings = []): array {
         return [
             'type'             => ['const' => $typecode],
             'questiontext'     => ['type' => 'string'],
-            'difficulty_label' => ['type' => 'string', 'enum' => difficulty_label::VALUES],
+            'difficulty_label' => [
+                'type' => 'string',
+                'enum' => difficulty_label::values_for_settings($settings),
+            ],
             'source_reference' => ['type' => 'string'],
         ];
     }
@@ -97,7 +100,7 @@ class question_schema {
      * @return array
      */
     protected static function ih_schema(array $settings): array {
-        $properties = self::common_properties('IH') + [
+        $properties = self::common_properties('IH', $settings) + [
             'correctanswer' => ['type' => 'boolean'],
         ];
         $required = ['type', 'questiontext', 'difficulty_label', 'source_reference', 'correctanswer'];
@@ -136,7 +139,7 @@ class question_schema {
             $optionrequired[] = 'explanation';
         }
 
-        $properties = self::common_properties('FE') + [
+        $properties = self::common_properties('FE', $settings) + [
             'options' => [
                 'type'     => 'array',
                 'items' => [
@@ -253,7 +256,7 @@ class question_schema {
      * @return array
      */
     protected static function sr_schema(array $settings): array {
-        $properties = self::common_properties('SR') + [
+        $properties = self::common_properties('SR', $settings) + [
             'items' => [
                 'type'     => 'array',
                 'items' => [

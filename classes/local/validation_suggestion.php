@@ -34,7 +34,7 @@ namespace local_artqtml\local;
  */
 class validation_suggestion {
     /** @var string the question is acceptable as generated ("Accepted"). */
-    public const ACCEPTED = 'accepted';
+    public const ACCEPTED = 'acceptable';
 
     /** @var string the question needs a teacher's edit before use ("Needs review"). */
     public const NEEDS_REVIEW = 'needs_review';
@@ -94,6 +94,10 @@ class validation_suggestion {
      * @return string|null a member of {@see self::VALUES}, or $default
      */
     public static function normalise(?string $value, ?string $default = null): ?string {
+        // Legacy Gemini/DB value before 2026101407; map so an old row or cached response still resolves.
+        if ((string) $value === 'accepted') {
+            $value = self::ACCEPTED;
+        }
         return in_array((string) $value, self::VALUES, true) ? (string) $value : $default;
     }
 
@@ -104,6 +108,10 @@ class validation_suggestion {
      * @return string
      */
     public static function label(string $value): string {
+        // Legacy DB / Behat fixtures may still store "accepted" after the rename to acceptable.
+        if ($value === 'accepted') {
+            $value = self::ACCEPTED;
+        }
         return get_string('validationstatus_' . $value, 'local_artqtml');
     }
 
@@ -114,6 +122,9 @@ class validation_suggestion {
      * @return string
      */
     public static function badge_class(string $value): string {
+        if ($value === 'accepted') {
+            $value = self::ACCEPTED;
+        }
         $map = [
             self::ACCEPTED      => 'text-bg-success',
             self::NEEDS_REVIEW  => 'text-bg-warning',

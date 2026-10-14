@@ -69,7 +69,7 @@ final class missing_types_test extends \advanced_testcase {
                 'questioncode' => $code,
                 'questiontext' => 'Question',
                 'difficultylabel' => $level,
-                'validationsuggestion' => 'accepted',
+                'validationsuggestion' => 'acceptable',
                 'timecreated' => $now,
             ]);
         }

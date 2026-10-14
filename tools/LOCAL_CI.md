@@ -11,7 +11,7 @@ A plugin mappájában (`artqtml` vagy `artqtm`):
 # Gyors kör fejlesztés közben (~2–5 perc; Docker kell)
 bash tools/local_ci.sh --fast
 
-# Napi push / Release előtt (~10–25 perc, Docker kell)
+# Napi push / Release előtt (~15–40 perc, Docker + selenium kell)
 bash tools/local_ci.sh --push
 ```
 
@@ -30,6 +30,7 @@ bash tools/local_ci.sh --push
 | Régi JavaScript betöltés tiltása | igen | igen |
 | AMD / ESLint | — | igen |
 | Biztonsági minta-kereső (Semgrep) | — | igen |
+| Böngészős forgatókönyvek (Behat, `@local_…`) | — | igen |
 
 Az MPC lépések ugyanazok, mint a GitHub **static** jobban (`moodle-plugin-ci`). Első futáskor a script letölti az MPC-t a `tools/.mpc/` alá (gitignore, nem megy a repóba).
 
@@ -44,4 +45,5 @@ Az MPC lépések ugyanazok, mint a GitHub **static** jobban (`moodle-plugin-ci`)
 - MPC első futás → `tools/.mpc` telepítés (~1 perc); ha elakad, töröld a `tools/.mpc` mappát és futtasd újra.
 - AMD piros → a script a helyi `node:22` Docker image-et használ (Moodle grunt).
 - Semgrep első futás → letölti a `semgrep/semgrep` image-et.
+- Behat → kell a `selenium` szolgáltatás a moodle-docker stackben; első / verzióváltás után `admin/tool/behat/cli/init.php` fut (lassú). Külön: `bash tools/run_behat_docker.sh`.
 - phpcs/phpstan „PHP 8.4 kell” → a Moodle Docker 8.3-as; a `tools/devtools` composer `platform.php` legyen `8.3.32`, majd újratelepítés.

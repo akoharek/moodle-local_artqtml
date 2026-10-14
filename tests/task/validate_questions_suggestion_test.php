@@ -34,7 +34,7 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
      */
     public function test_enum_is_exactly_three_values(): void {
         $this->assertSame(
-            ['accepted', 'needs_review', 'rejected'],
+            ['acceptable', 'needs_review', 'rejected'],
             validation_suggestion::VALUES
         );
         $this->assertCount(3, validation_suggestion::VALUES);
@@ -172,13 +172,13 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
             $this->assertNotSame($value, $label, "validationstatus_$value must not render as its raw key");
         }
 
-        $this->assertSame('Accepted', validation_suggestion::label(validation_suggestion::ACCEPTED));
+        $this->assertSame('Acceptable', validation_suggestion::label(validation_suggestion::ACCEPTED));
 
         $hu = [];
         require(__DIR__ . '/../../lang/hu/local_artqtml.php');
         $hu = $string;
 
-        $this->assertSame('Elfogadható', $hu['validationstatus_accepted']);
+        $this->assertSame('Elfogadható', $hu['validationstatus_acceptable']);
         $this->assertSame('Módosítandó', $hu['validationstatus_needs_review']);
         $this->assertSame('Törlendő', $hu['validationstatus_rejected']);
         $this->assertSame('Nem értékelt', $hu['validationstatus_not_evaluated']);
@@ -191,6 +191,8 @@ final class validate_questions_suggestion_test extends \advanced_testcase {
         foreach (validation_suggestion::VALUES as $value) {
             $this->assertSame($value, validation_suggestion::normalise($value));
         }
+        // Legacy machine key from before the accepted → acceptable rename.
+        $this->assertSame(validation_suggestion::ACCEPTED, validation_suggestion::normalise('accepted'));
         $this->assertNull(validation_suggestion::normalise('not_evaluated'));
         $this->assertNull(validation_suggestion::normalise(''));
         $this->assertNull(validation_suggestion::normalise(null));

@@ -211,10 +211,12 @@ class save_questions_task {
 
             $evaluation = $evaluations[$pseudoid] ?? null;
 
-            $normaliseddifficulty = difficulty_label::normalise(
-                isset($question['difficulty_label']) ? (string) $question['difficulty_label'] : null,
-                difficulty_label::MEDIUM
-            );
+            // Store what the model returned (case/alias cleanup only). Do not invent a level.
+            $rawdifficulty = isset($question['difficulty_label']) ? (string) $question['difficulty_label'] : '';
+            $normaliseddifficulty = difficulty_label::normalise($rawdifficulty !== '' ? $rawdifficulty : null, null);
+            if ($normaliseddifficulty === null && $rawdifficulty !== '') {
+                $normaliseddifficulty = trim($rawdifficulty);
+            }
             $question['difficulty_label'] = $normaliseddifficulty;
 
             $record = new \stdClass();

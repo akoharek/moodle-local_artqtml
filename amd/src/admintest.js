@@ -55,7 +55,12 @@ define(['core/ajax'], function(Ajax) {
         }
 
         button.addEventListener('click', function() {
+            if (button.disabled) {
+                return;
+            }
+            button.disabled = true;
             status.textContent = testinglabel;
+            status.className = 'ms-2 text-muted';
 
             callTestConnection(provider).then(function(data) {
                 status.textContent = data.message;
@@ -64,11 +69,14 @@ define(['core/ajax'], function(Ajax) {
                     // The dropdown only exists once a test has succeeded, and it is built server-side
                     // from the cache that test populated.
                     window.location.reload();
+                    return null;
                 }
+                button.disabled = false;
                 return null;
             }).catch(function() {
                 status.textContent = errorunknownlabel;
                 status.className = 'ms-2 text-danger';
+                button.disabled = false;
             });
         });
     }

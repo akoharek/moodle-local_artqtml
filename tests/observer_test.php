@@ -103,7 +103,7 @@ final class observer_test extends \advanced_testcase {
             'problemcategory'      => 'ok',
             'justification'        => 'A validátor ítélete az EREDETI szövegről.',
             'confidence'           => 92,
-            'validationdata'       => json_encode(['verdict' => 'accepted']),
+            'validationdata'       => json_encode(['verdict' => 'acceptable']),
             'questionbankid'       => $questionbankid,
             'movedout'             => 0,
             'approved'             => 1,

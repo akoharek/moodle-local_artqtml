@@ -82,4 +82,26 @@ class prompt_seed {
 
         return require($CFG->dirroot . '/local/artqtml/db/prompt_defaults.php');
     }
+
+    /**
+     * The live generator system prompt from config_plugins (may be empty).
+     *
+     * @return string
+     */
+    public static function generator_template(): string {
+        return trim((string) (get_config('local_artqtml', 'generatorprompttemplate') ?: ''));
+    }
+
+    /**
+     * Whether a generation may start: the system prompt must be non-empty.
+     *
+     * An empty template still builds a valid API envelope (schema + source text), so the model
+     * runs without the count/difficulty/policy instructions. Refusing here is cheaper than
+     * discovering it in the result.
+     *
+     * @return bool
+     */
+    public static function is_generator_configured(): bool {
+        return self::generator_template() !== '';
+    }
 }

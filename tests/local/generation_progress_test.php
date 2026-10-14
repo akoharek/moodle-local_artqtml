@@ -112,6 +112,32 @@ final class generation_progress_test extends \advanced_testcase {
     /**
      * A failed generation's percentage comes from pendingdata's shape, not a question count.
      */
+    public function test_questions_so_far_prefers_pending_then_saved(): void {
+        $this->assertSame(0, generation_progress::questions_so_far(null, 0));
+        $this->assertSame(7, generation_progress::questions_so_far(null, 7));
+
+        $generating = json_encode([
+            'generating' => [
+                'done' => 2,
+                'total' => 4,
+                'current' => 'FE',
+                'outcomes' => [
+                    'IH' => ['result' => 'ok', 'count' => 20],
+                    'FE' => ['result' => 'ok', 'count' => 15],
+                ],
+            ],
+        ]);
+        $this->assertSame(35, generation_progress::questions_so_far($generating, 0));
+        // Saved rows win once the saving stage has committed.
+        $this->assertSame(12, generation_progress::questions_so_far($generating, 12));
+
+        $held = json_encode(['questions' => [['x' => 1], ['x' => 2], ['x' => 3]]]);
+        $this->assertSame(3, generation_progress::questions_so_far($held, 0));
+    }
+
+    /**
+     * M-15: a failed generation's percentage comes from pendingdata's shape, not a question count.
+     */
     public function test_failed_percent_reads_pendingdata_shape(): void {
         $this->assertSame(25, generation_progress::failed_percent(null));
         $this->assertSame(25, generation_progress::failed_percent(''));

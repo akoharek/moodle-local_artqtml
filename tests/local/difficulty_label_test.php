@@ -17,10 +17,9 @@
 namespace local_artqtml\local;
 
 /**
- * Unit tests for scale difficulty_label normalisation and display.
+ * Unit tests for scale / Bloom difficulty_label normalisation and display.
  *
  * @package    local_artqtml
- * @copyright  2026 AR Tudásmenedzsment Kft.
  * @category   test
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_artqtml\local\difficulty_label
@@ -30,9 +29,35 @@ final class difficulty_label_test extends \advanced_testcase {
      * Canonical keys pass through unchanged.
      */
     public function test_normalise_accepts_canonical_values(): void {
-        foreach (difficulty_label::VALUES as $value) {
+        foreach (array_merge(difficulty_label::VALUES, difficulty_label::BLOOM_VALUES) as $value) {
             $this->assertSame($value, difficulty_label::normalise($value));
         }
+    }
+
+    /**
+     * Bloom mode always exposes the full Bloom vocabulary (not narrowed to requested counts).
+     */
+    public function test_values_for_settings_bloom_is_full_set(): void {
+        $settings = [
+            'difficulty' => [
+                'mode' => 'bloom',
+                'bloom' => ['remember' => 0, 'understand' => 0, 'apply' => 5],
+            ],
+        ];
+        $this->assertSame(difficulty_label::BLOOM_VALUES, difficulty_label::values_for_settings($settings));
+    }
+
+    /**
+     * Scale mode keeps easy/medium/hard.
+     */
+    public function test_values_for_settings_scale(): void {
+        $settings = [
+            'difficulty' => [
+                'mode' => 'scale',
+                'scale' => ['easy' => 1, 'medium' => 0, 'hard' => 2],
+            ],
+        ];
+        $this->assertSame(difficulty_label::VALUES, difficulty_label::values_for_settings($settings));
     }
 
     /**
@@ -45,6 +70,8 @@ final class difficulty_label_test extends \advanced_testcase {
         $this->assertSame(difficulty_label::EASY, difficulty_label::normalise('Könnyű'));
         $this->assertSame(difficulty_label::MEDIUM, difficulty_label::normalise('közepes'));
         $this->assertSame(difficulty_label::HARD, difficulty_label::normalise('NEHÉZ'));
+        $this->assertSame(difficulty_label::APPLY, difficulty_label::normalise('Apply'));
+        $this->assertSame(difficulty_label::REMEMBER, difficulty_label::normalise('emlékezés'));
     }
 
     /**
@@ -58,7 +85,7 @@ final class difficulty_label_test extends \advanced_testcase {
     }
 
     /**
-     * label() renders localised scale strings, not raw machine keys.
+     * label() renders localised scale or Bloom strings, not raw machine keys.
      */
     public function test_label_uses_lang_strings(): void {
         $this->resetAfterTest();
@@ -66,5 +93,8 @@ final class difficulty_label_test extends \advanced_testcase {
         $this->assertSame('Easy', difficulty_label::label('easy'));
         $this->assertSame('Medium', difficulty_label::label('MEDIUM'));
         $this->assertSame('Hard', difficulty_label::label('nehéz'));
+        $this->assertSame('Apply', difficulty_label::label('apply'));
+        $this->assertSame('Remember', difficulty_label::label('remember'));
+        $this->assertSame('Understand', difficulty_label::label('understand'));
     }
 }

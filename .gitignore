@@ -24,6 +24,7 @@
 # Local gate / cron run output and PHPUnit init stamp.
 /tools/.gates-last.txt
 /tools/.phpunit-initialised-at
+/tools/.behat-initialised-at
 /tools/.cron-last.txt
 
 # Composer vendor for the local/CI PHPStan toolchain (tools/devtools).

@@ -25,9 +25,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_artqtml';
-$plugin->version   = 2026100500;
+$plugin->version   = 2026101408;
 $plugin->requires  = 2024100700; // Moodle 4.5.0.
-$plugin->release   = '2026.10.05';
+$plugin->release   = '2026.10.14';
 $plugin->maturity  = MATURITY_STABLE;
 $plugin->supported = [405, 503]; // Moodle 4.5 through 5.3 (inclusive branch range).
 // SR (ordering) questions are created via qtype_ordering - without declaring the

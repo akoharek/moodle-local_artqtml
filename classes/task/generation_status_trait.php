@@ -89,6 +89,13 @@ trait generation_status_trait {
         $record->timecreated = time();
 
         $DB->insert_record('local_artqtml_log', $record);
+
+        // Mirror to cron / scheduled_task CLI so a watchable run sees progress without the DB.
+        $detail = $data === [] ? '' : (' ' . json_encode($data, JSON_UNESCAPED_UNICODE));
+        if (\core_text::strlen($detail) > 240) {
+            $detail = \core_text::substr($detail, 0, 237) . '...';
+        }
+        mtrace('local_artqtml #' . $generationid . ' ' . $event . $detail);
     }
 
     /**

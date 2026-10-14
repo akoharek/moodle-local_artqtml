@@ -15,13 +15,39 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * How much source text this plugin will accept.
+ * The one place that decides how much source text this plugin will accept.
  *
- * Uses characters/4 as a predictable resource guard (same estimate as the UI counter).
- * Does not claim provider tokenization, does not truncate, and is not a site-wide quota.
+ * WHY THIS CLASS EXISTS. Until 2026-08-04 the size of a source text was a display detail: the
+ * upload page ran a live character/word/token counter in JavaScript and coloured it red past the
+ * context window, and that was the whole of it. Nothing on the server ever compared a number to a
+ * limit - not the form, not the upload handler, not the task that makes the API call. A pasted
+ * document of any size was saved, hashed, and sent to the provider, and a crafted POST skipped even
+ * the colouring.
+ *
+ * WHAT THE NUMBER IS, AND WHAT IT IS NOT. The estimate is characters divided by four - the same
+ * approximation the counter has always shown the user, kept deliberately identical so the two
+ * cannot disagree about the same text. It is NOT the provider's tokenizer: real tokenization is
+ * model-specific, and Hungarian text in particular will not divide neatly by four. This is a
+ * resource guard with a predictable number behind it, not a billing figure.
+ *
+ * Three things it is explicitly not:
+ *
+ *  - It is not a context-fit calculation. A request that passes this can still be too large for a
+ *    model once the system prompt, the schema and the answer are added; that is a separate concern
+ *    from how much source text the plugin will store and send.
+ *  - It is not connected to the monthly token budget ({@see token_budget}). That limits spending
+ *    over a billing cycle; this limits one request's input.
+ *  - It does not truncate. Silently shortening a teacher's material would produce questions about
+ *    a document they did not upload, and nothing on screen would say so.
+ *  - It is not derived from generatorcontextwindow. That setting is the generator call's
+ *    max_tokens (response size). Coupling the two meant changing the answer budget silently
+ *    changed how much source text could be uploaded.
+ *
+ * Everything about the limit lives here - the /4 estimate, the configured maximum and the
+ * comparison - because the alternative is the same arithmetic in the form, the upload handler,
+ * the AJAX endpoint and the task, drifting apart one edit at a time.
  *
  * @package    local_artqtml
- * @copyright  2026 AR Tudásmenedzsment Kft.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -31,31 +57,25 @@ namespace local_artqtml\local;
  * Estimates source-text size and answers whether it is over the configured limit.
  */
 class source_text_limit {
-    /**
-     * Percentage of the generator's context window used as the automatic limit.
-     *
-     * The remaining fifth is not slack: the request also carries the system prompt, the response
-     * Schema and the provider envelope, and the model's own answer has to fit in the same window.
-     *
-     * @var int
-     */
-    public const AUTO_CONTEXT_PERCENT = 80;
-
     /** @var int characters per estimated token - the approximation js/textcounter.js has always shown. */
     public const CHARS_PER_TOKEN = 4;
 
-    /** @var int context window assumed when the setting is missing or not positive. */
-    public const DEFAULT_CONTEXT_WINDOW = 8192;
+    /**
+     * Default when the setting is missing or not positive.
+     *
+     * Chosen as an explicit ceiling independent of the generator response budget
+     * ({@see generatorcontextwindow}). Sites that still had maxsourcetokens=0 (old "80% of context
+     * window" mode) are migrated to their previous effective value on upgrade.
+     *
+     * @var int
+     */
+    public const DEFAULT_MAX_SOURCE_TOKENS = 32000;
 
     /**
      * The effective source-text limit in estimated tokens.
      *
-     * An administrator may set `maxsourcetokens` explicitly. Zero - the default - means "work it
-     * Out from the generator's context window", so a site that raises its context window does not
-     * Also have to remember to raise a second number that nothing links to the first.
-     *
-     * A negative or unreadable stored value falls back to the automatic mode rather than being
-     * Used, because the alternative to a nonsensical limit is a working one, not no limit at all.
+     * Reads `maxsourcetokens` only. Missing, zero or negative values fall back to
+     * {@see self::DEFAULT_MAX_SOURCE_TOKENS} so a broken config never means "accept everything".
      *
      * @return int always at least 1
      */
@@ -65,20 +85,15 @@ class source_text_limit {
             return $explicit;
         }
 
-        $contextwindow = (int) (get_config('local_artqtml', 'generatorcontextwindow') ?: 0);
-        if ($contextwindow <= 0) {
-            $contextwindow = self::DEFAULT_CONTEXT_WINDOW;
-        }
-
-        return max(1, (int) floor($contextwindow * self::AUTO_CONTEXT_PERCENT / 100));
+        return self::DEFAULT_MAX_SOURCE_TOKENS;
     }
 
     /**
      * Estimated token count for a piece of text.
      *
      * Counts Unicode characters via \core_text, not bytes: a Hungarian source text would otherwise
-     * Be over-counted by every accented letter, and the number the user sees would not match the
-     * Number the server compares.
+     * be over-counted by every accented letter, and the number the user sees would not match the
+     * number the server compares.
      *
      * @param string $text
      * @return int 0 for an empty string
@@ -95,6 +110,13 @@ class source_text_limit {
     /**
      * The limit expressed in characters.
      *
+     * NOT USED IN A DECISION ANYWHERE, and that is on purpose rather than an oversight - the
+     * docblock used to claim it fed the messages and the browser counter, and neither is true.
+     * Both work in tokens, because the token limit is the one the provider actually enforces and
+     * the character figure is an estimate derived from it ({@see self::CHARS_PER_TOKEN}). This
+     * exists so that a character figure, where one is wanted, comes from the same arithmetic as
+     * everything else rather than from a second copy of it.
+     *
      * @return int
      */
     public static function character_limit(): int {
@@ -105,8 +127,8 @@ class source_text_limit {
      * Whether this text is over the limit.
      *
      * Text estimated at exactly the limit is accepted - the limit is a maximum, not a boundary to
-     * Stay under, and an off-by-one here would reject a document the counter had just shown as
-     * Being at the maximum.
+     * stay under, and an off-by-one here would reject a document the counter had just shown as
+     * being at the maximum.
      *
      * @param string $text
      * @return bool
@@ -119,7 +141,7 @@ class source_text_limit {
      * Everything a message about this text needs, in one call.
      *
      * The error the user sees names all four numbers, because "too long" without them leaves them
-     * Guessing how much to cut.
+     * guessing how much to cut.
      *
      * @param string $text
      * @return array{characters: int, estimatedtokens: int, tokenlimit: int, characterlimit: int, exceeded: bool}
@@ -141,11 +163,11 @@ class source_text_limit {
      * The localised "too long" message for a piece of text, with its numbers filled in.
      *
      * Provided here so the four call sites that refuse an oversized text - the form, the upload
-     * Handler, the AJAX endpoint and the task - cannot each assemble a slightly different sentence
-     * From the same facts.
+     * handler, the AJAX endpoint and the task - cannot each assemble a slightly different sentence
+     * from the same facts.
      *
      * The message names sizes only. It never quotes the text itself: an error is displayed, logged
-     * And sometimes mailed, and source material is exactly what should not travel that way.
+     * and sometimes mailed, and source material is exactly what should not travel that way.
      *
      * @param string $text
      * @return string

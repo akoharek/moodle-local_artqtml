@@ -70,7 +70,7 @@ final class validate_questions_problemcategory_test extends \advanced_testcase {
             $this->assertStringNotContainsString('[[', $label, "missing lang string for '$key'");
         }
         $this->assertNotSame(
-            get_string('validationstatus_accepted', 'local_artqtml'),
+            get_string('validationstatus_acceptable', 'local_artqtml'),
             problem_category::label('ok'),
             'the "ok" category label must be distinguishable from the "Accepted" suggestion label'
         );

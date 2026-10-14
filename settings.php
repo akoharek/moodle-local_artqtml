@@ -73,13 +73,13 @@ if ($hassiteconfig || has_capability('local/artqtml:configure', context_system::
         50,
         1
     ));
-    // 0 means 80% of the generator's context window (see source_text_limit).
+    // Explicit source-text ceiling - not derived from generatorcontextwindow (response max_tokens).
     $general->add(new \local_artqtml\admin\setting_configtext_min(
         'local_artqtml/maxsourcetokens',
         get_string('settingmaxsourcetokens', 'local_artqtml'),
         get_string('settingmaxsourcetokens_desc', 'local_artqtml'),
-        0,
-        0
+        \local_artqtml\local\source_text_limit::DEFAULT_MAX_SOURCE_TOKENS,
+        1
     ));
     $general->add(new \local_artqtml\admin\setting_configtext_min(
         'local_artqtml/apitimeout',

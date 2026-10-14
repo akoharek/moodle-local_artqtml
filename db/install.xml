@@ -45,7 +45,7 @@
         <FIELD NAME="difficultylabel" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Difficulty label for this question during generation (easy, medium, or hard). Empty if not set."/>
         <FIELD NAME="sourcereference" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Short reference into the source text this question was derived from"/>
         <FIELD NAME="questiondata" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON encoded type-specific fields from the AI response"/>
-        <FIELD NAME="validationsuggestion" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="not_evaluated" SEQUENCE="false" COMMENT="accepted, needs_review, rejected or not_evaluated"/>
+        <FIELD NAME="validationsuggestion" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="not_evaluated" SEQUENCE="false" COMMENT="acceptable, needs_review, rejected or not_evaluated"/>
         <FIELD NAME="problemcategory" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Validator problem category: one of ok/factual_error/ambiguous_wording/other; 'ok' for accepted, NULL until evaluated"/>
         <FIELD NAME="justification" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Validator's short justification text"/>
         <FIELD NAME="confidence" TYPE="int" LENGTH="3" NOTNULL="false" SEQUENCE="false" COMMENT="Validator confidence percentage 0-100"/>

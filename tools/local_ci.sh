@@ -7,7 +7,7 @@
 #
 # Használat (a plugin gyökeréből):
 #   bash tools/local_ci.sh --fast    # gyors: stílus + logika + mpc static + termék-higiénia
-#   bash tools/local_ci.sh --push    # napi push előtt: fast + PHPUnit + AMD + Semgrep
+#   bash tools/local_ci.sh --push    # napi push előtt: fast + PHPUnit + AMD + Semgrep + Behat
 #   bash tools/local_ci.sh           # ugyanaz, mint --push
 #
 # Kilépés: 0 = mehet tovább; 1 = van mit javítani; 2 = környezet hiányzik.
@@ -150,7 +150,7 @@ else
     ok_step
 fi
 
-# --------------------------------------------------------------------------- 6–7. csak --push: AMD + Semgrep
+# --------------------------------------------------------------------------- 6–8. csak --push: AMD + Semgrep + Behat
 if [ "$mode" = "push" ]; then
     step "AMD + ESLint (Node 22 Docker, ha a host nem 22-es)"
     if bash "$PLUGIN_DIR/tools/run_amd_gate.sh" >> "$LOG" 2>&1; then
@@ -166,6 +166,19 @@ if [ "$mode" = "push" ]; then
     else
         fail_step "run_semgrep_docker.sh — SAST találat vagy Docker hiány"
         tail -20 "$LOG" | sed 's/^/    /'
+    fi
+
+    step "Behat (@local_${PLUGIN_SHORT}) — tools/run_behat_docker.sh"
+    if bash "$PLUGIN_DIR/tools/run_behat_docker.sh" >> "$LOG" 2>&1; then
+        ok_step
+    else
+        behat_ec=$?
+        if [ "$behat_ec" -eq 2 ]; then
+            fail_step "run_behat_docker.sh — környezet (Docker / selenium); lásd tools/.local-ci-last.txt"
+        else
+            fail_step "run_behat_docker.sh — Behat forgatókönyv bukás; lásd tools/.local-ci-last.txt"
+        fi
+        rg -n 'Failed steps|Scenario:|Exception:|Invalid get_string' "$LOG" | tail -25 | sed 's/^/    /' || true
     fi
 fi
 

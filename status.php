@@ -108,6 +108,13 @@ if (optional_param('retry', 0, PARAM_BOOL)) {
         \core\notification::error(local_artqtml_apikey_start_error());
         redirect(new moodle_url('/local/artqtml/status.php', ['generationid' => $generationid]));
     }
+    if (
+        $generation->status === generation_status::FAILED
+        && !\local_artqtml\local\prompt_seed::is_generator_configured()
+    ) {
+        \core\notification::error(get_string('errorgeneratorpromptempty', 'local_artqtml'));
+        redirect(new moodle_url('/admin/settings.php', ['section' => 'local_artqtml_generator']));
+    }
     // Retry puts a generation back into 'generating', so it is a start
     // like any other and it asks the same question - does this user already have one running? It
     // , which meant this button walked straight past the limit.
@@ -167,7 +174,11 @@ $PAGE->set_title(get_string('statusheading', 'local_artqtml'));
 $PAGE->set_heading(get_string('statusheading', 'local_artqtml'));
 $PAGE->requires->js_call_amd('local_artqtml/status', 'init');
 
-$questioncount = $DB->count_records('local_artqtml_questions', ['generationid' => $generationid]);
+$savedcount = $DB->count_records('local_artqtml_questions', ['generationid' => $generationid]);
+$questioncount = \local_artqtml\local\generation_progress::questions_so_far(
+    $generation->pendingdata,
+    $savedcount
+);
 
 $approveurl = new moodle_url('/local/artqtml/approve.php', ['generationid' => $generationid]);
 $backurl = new moodle_url('/local/artqtml/index.php');

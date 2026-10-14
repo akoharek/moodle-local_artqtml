@@ -195,6 +195,10 @@ if ($mform->is_cancelled()) {
         \core\notification::error(local_artqtml_apikey_start_error());
         redirect(new moodle_url('/local/artqtml/generate.php', ['id' => $generationid]));
     }
+    if (!\local_artqtml\local\prompt_seed::is_generator_configured()) {
+        \core\notification::error(get_string('errorgeneratorpromptempty', 'local_artqtml'));
+        redirect(new moodle_url('/admin/settings.php', ['section' => 'local_artqtml_generator']));
+    }
 
     if (\local_artqtml\local\source_text_limit::is_exceeded((string) $generation->sourcetext)) {
         \core\notification::error(
