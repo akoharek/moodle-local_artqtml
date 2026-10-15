@@ -15,7 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Password field for the Claude/Gemini API keys, encrypted at rest via \core\encryption.
+ * Plain text field for Claude/Gemini API keys, encrypted at rest via \core\encryption.
+ *
+ * Shown as a normal text input (not password-unmask): the Moodle passwordunmask widget hid the
+ * real input behind an edit link, so pasting a new key and saving often left the previous value.
  *
  * @package    local_artqtml
  * @copyright  2026 AR Tudásmenedzsment Kft.
@@ -27,20 +30,27 @@ namespace local_artqtml\admin;
 use local_artqtml\local\encrypted_config;
 
 /**
- * Transparently encrypts on write and decrypts on read, so the admin form/unmask toggle still
- * shows the real plaintext key, while `config_plugins` only ever holds ciphertext.
+ * Encrypts on write and decrypts on read. The admin form shows plaintext; config_plugins holds
+ * ciphertext only.
  *
- * Leftover plaintext (no Moodle encryption prefix) is re-encrypted in place on read so an
- * upgrade that introduced encryption does not drop the key. Ciphertext that fails integrity
- * cannot be recovered: the field shows empty (never the raw ciphertext) and a one-time admin
- * notice asks for the key to be re-entered from the provider dashboard.
- *
- * An empty submitted value does not overwrite config: password fields POST empty when the
- * administrator does not retype the key, including after a decrypt-failure display.
+ * Leftover plaintext is re-encrypted in place on read. Unreadable ciphertext shows empty and a
+ * one-time hint asks the administrator to paste the key again.
  */
-class setting_encryptedapikey extends \admin_setting_configpasswordunmask {
+class setting_encryptedapikey extends \admin_setting_configtext {
     /** @var bool whether a decrypt failure hint was already prepended to the description */
     private bool $decryptfailhintshown = false;
+
+    /**
+     * Constructor.
+     *
+     * @param string $name unique ascii name
+     * @param string $visiblename localised name
+     * @param string $description localised long description
+     * @param mixed $defaultsetting
+     */
+    public function __construct($name, $visiblename, $description, $defaultsetting) {
+        parent::__construct($name, $visiblename, $description, $defaultsetting, PARAM_RAW, 80);
+    }
 
     /**
      * Return the decrypted setting value for display.
@@ -61,7 +71,7 @@ class setting_encryptedapikey extends \admin_setting_configpasswordunmask {
     }
 
     /**
-     * Encrypt and store the submitted value. Empty input leaves the stored value unchanged.
+     * Encrypt and store the submitted value.
      *
      * @param string $data
      * @return string empty string on success, an error message otherwise
@@ -70,7 +80,7 @@ class setting_encryptedapikey extends \admin_setting_configpasswordunmask {
         $data = trim((string) $data);
         if ($data === '') {
             // Leave the stored ciphertext (or leftover plaintext) unchanged. An empty POST is
-            // how password fields submit when the administrator does not retype the key.
+            // how the field submits when the administrator does not retype the key.
             return '';
         }
 
@@ -88,26 +98,6 @@ class setting_encryptedapikey extends \admin_setting_configpasswordunmask {
         \local_artqtml\local\api_key_backup::backup_setting($this->name, $encrypted);
 
         return '';
-    }
-
-    /**
-     * Require a key on first save; empty resubmit is allowed when a value is already stored.
-     *
-     * @param string $data
-     * @return true|string
-     */
-    public function validate($data) {
-        $data = trim((string) $data);
-        if ($data !== '') {
-            return true;
-        }
-
-        $stored = $this->config_read($this->name);
-        if ($stored === null || $stored === '') {
-            return get_string('errorapikeyrequired', 'local_artqtml');
-        }
-
-        return true;
     }
 
     /**

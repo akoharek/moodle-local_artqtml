@@ -3,6 +3,14 @@
 Newest release first. Version numbers match `version.php` `$plugin->version`;
 the number in parentheses is `$plugin->release`.
 
+## 2026-10-15 — `2026101500` (2026.10.15)
+
+**Admin: API key fields are normal text inputs**
+
+- Generator and validator API keys no longer use Moodle’s password-unmask widget (edit link /
+  masked field), which often blocked pasting and saving on a fresh install. Same plain text
+  field as Full; values stay encrypted in the database.
+
 ## 2026-10-05 — `2026100500` (2026.10.05)
 
 **Moodle 5.3 support**

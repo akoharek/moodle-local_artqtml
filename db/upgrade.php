@@ -205,6 +205,11 @@ function xmldb_local_artqtml_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026101407, 'local', 'artqtml');
     }
 
+    if ($oldversion < 2026101500) {
+        // API key admin fields: plain text input instead of password-unmask (paste/save UX).
+        upgrade_plugin_savepoint(true, 2026101500, 'local', 'artqtml');
+    }
+
     // Every upgrade path: re-seed any prompt setting that is empty. Safe and idempotent.
     \local_artqtml\local\prompt_seed::apply();
 
