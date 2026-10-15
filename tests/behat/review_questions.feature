@@ -24,7 +24,7 @@ Feature: Reviewing generated ArtQTML questions
       | teacher1 | Review pack  | REV1      | completed |
     And the following "local_artqtml > questions" exist:
       | generation  | questioncode  | questiontext                          | validationsuggestion |
-      | Review pack | REV1-IH-0001  | Water is required for photosynthesis. | accepted             |
+      | Review pack | REV1-IH-0001  | Water is required for photosynthesis. | acceptable             |
       | Review pack | REV1-IH-0002  | Plants do not contain chlorophyll.    | needs_review         |
     And I log in as "teacher1"
 
@@ -33,7 +33,7 @@ Feature: Reviewing generated ArtQTML questions
     And I click on "Open" "link" in the "Review pack" "table_row"
     Then I should see "Review and approve questions"
     And I should see "REV1-IH-0001"
-    And I should see "Accepted"
+    And I should see "Acceptable"
     When I click on "REV1-IH-0001" "link" in the "REV1-IH-0001" "table_row"
     Then I should see "Correct answer:"
     And I should see "True"
@@ -47,9 +47,9 @@ Feature: Reviewing generated ArtQTML questions
     And I click on "Revoke" "button" in the "REV1-IH-0001" "table_row"
     Then I should see "Approve"
 
-  Scenario: Teacher approves all accepted questions
+  Scenario: Teacher approves all acceptable questions
     When I open the ArtQTML generation named "Review pack"
-    And I press "Approve all accepted (1)"
+    And I press "Approve all acceptable (1)"
     Then I should see "1 question(s) approved."
     And I should see "Approved"
 

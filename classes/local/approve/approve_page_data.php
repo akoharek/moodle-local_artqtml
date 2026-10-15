@@ -79,8 +79,13 @@ class approve_page_data {
             ['generationid' => $generationid]
         );
         foreach ($statusrows as $statusrow) {
-            if (isset($statuscounts[$statusrow->validationsuggestion])) {
-                $statuscounts[$statusrow->validationsuggestion] = (int) $statusrow->total;
+            $key = (string) $statusrow->validationsuggestion;
+            // Legacy Gemini/DB value before the accepted → acceptable rename.
+            if ($key === 'accepted') {
+                $key = \local_artqtml\local\validation_suggestion::ACCEPTED;
+            }
+            if (isset($statuscounts[$key])) {
+                $statuscounts[$key] += (int) $statusrow->total;
             }
         }
 

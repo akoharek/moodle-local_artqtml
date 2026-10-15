@@ -46,7 +46,7 @@ Feature: ArtQTML generation status
       | teacher1 | Partial pack   | PART1     | partial | {"knowledgesource":"sourceonly","matrix_FE_easy":2} | [{"type":"FE","requested":2,"received":0}]                    | Unique partial source about mitochondria. |
     And the following "local_artqtml > questions" exist:
       | generation   | questioncode  | questiontext                         | validationsuggestion |
-      | Partial pack | PART1-IH-0001 | Mitochondria produce ATP.            | accepted             |
+      | Partial pack | PART1-IH-0001 | Mitochondria produce ATP.            | acceptable             |
     When I visit the ArtQTML list page
     And I click on "Open" "link" in the "Partial pack" "table_row"
     Then I should see "This generation finished, but produced fewer questions"

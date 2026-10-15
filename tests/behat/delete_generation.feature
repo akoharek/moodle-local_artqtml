@@ -17,7 +17,7 @@ Feature: Deleting an ArtQTML generation
       | teacher1 | Disposable  | DEL1      | completed |
     And the following "local_artqtml > questions" exist:
       | generation | questioncode | questiontext               | validationsuggestion |
-      | Disposable | DEL1-IH-0001 | Draft question to discard. | accepted             |
+      | Disposable | DEL1-IH-0001 | Draft question to discard. | acceptable             |
     And I log in as "teacher1"
 
   Scenario: Teacher deletes a generation from the list

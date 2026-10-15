@@ -160,7 +160,10 @@ class local_artqtml_generator extends component_generator_base {
         $typecode = (string) ($record['typecode'] ?? 'IH');
         $questiontext = (string) ($record['questiontext'] ?? 'Chlorophyll is used in photosynthesis.');
         $questioncode = (string) ($record['questioncode'] ?? $generation->shortname . '-' . $typecode . '-0001');
-        $suggestion = (string) ($record['validationsuggestion'] ?? validation_suggestion::ACCEPTED);
+        $suggestion = validation_suggestion::normalise(
+            (string) ($record['validationsuggestion'] ?? validation_suggestion::ACCEPTED),
+            validation_suggestion::ACCEPTED
+        );
         $createbank = !array_key_exists('createbank', $record) || !empty($record['createbank']);
 
         $questiondata = $record['questiondata'] ?? ['questiontext' => $questiontext, 'correctanswer' => true];

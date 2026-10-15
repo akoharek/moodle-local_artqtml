@@ -26,7 +26,7 @@ Feature: Approve page row actions before and after move
   Scenario: Unmoved draft row shows Preview and Edit, not Open
     Given the following "local_artqtml > questions" exist:
       | generation  | questioncode  | questiontext                       | validationsuggestion | movedout |
-      | Action pack | ACT1-IH-0001  | Plants need sunlight to grow.      | accepted             | 0        |
+      | Action pack | ACT1-IH-0001  | Plants need sunlight to grow.      | acceptable             | 0        |
     When I open the ArtQTML generation named "Action pack"
     Then I should see "ACT1-IH-0001"
     And "Preview" "link" should exist in the "ACT1-IH-0001" "table_row"
@@ -36,7 +36,7 @@ Feature: Approve page row actions before and after move
   Scenario: Moved row shows Open, not Edit or Preview
     Given the following "local_artqtml > questions" exist:
       | generation  | questioncode  | questiontext                       | validationsuggestion | movedout | movecourse |
-      | Action pack | ACT1-IH-0002  | Chlorophyll captures light energy. | accepted             | 1        | BIOBANK    |
+      | Action pack | ACT1-IH-0002  | Chlorophyll captures light energy. | acceptable             | 1        | BIOBANK    |
     When I open the ArtQTML generation named "Action pack"
     Then I should see "ACT1-IH-0002"
     And "Open" "link" should exist in the "ACT1-IH-0002" "table_row"
