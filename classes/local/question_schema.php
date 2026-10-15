@@ -36,6 +36,7 @@ class question_schema {
      * Only when actually enabled for that type in this generation's settings.
      *
      * @param string $typecode IH/FE/SR
+     * @param array $settings generation settings (difficulty mode + per-level counts)
      * @return array
      */
     protected static function common_properties(string $typecode, array $settings = []): array {

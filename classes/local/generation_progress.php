@@ -129,9 +129,13 @@ class generation_progress {
     }
 
     /**
-     * How far a failed generation actually got, as a bar percentage.
+     * How many questions the run has produced so far, for the status page counter.
      *
-     * @param string|null $pendingdatajson the generation's raw pendingdata column
+     * Prefer, in order: rows already saved; questions held in pendingdata after the generating
+     * stage; the sum of per-type outcome counts while still generating.
+     *
+     * @param string|null $pendingdatajson
+     * @param int $savedcount rows already in local_artqtml_questions for this generation
      * @return int
      */
     public static function questions_so_far(?string $pendingdatajson, int $savedcount): int {
