@@ -173,7 +173,8 @@ class generation_progress {
      *
      * @param string|null $pendingdatajson the generation's raw pendingdata column
      * @return int
-     */    public static function failed_percent(?string $pendingdatajson): int {
+     */
+    public static function failed_percent(?string $pendingdatajson): int {
         $pendingdata = json_decode((string) $pendingdatajson, true);
 
         if (is_array($pendingdata) && array_key_exists('evaluations', $pendingdata)) {

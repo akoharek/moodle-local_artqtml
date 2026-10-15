@@ -1,8 +1,13 @@
 <?xml version="1.0"?>
 <ruleset name="local_artqtml">
-    <description>Moodle coding standard for local_artqtml.</description>
+    <description>
+        Coding standard for local_artqtml: the Moodle standard. Align with Full (artqtm):
+        per-file @copyright was removed in favour of COPYRIGHT.txt; that sniff stays off.
+    </description>
 
-    <rule ref="moodle"/>
+    <rule ref="moodle">
+        <exclude name="moodle.Commenting.FileExpectedTags.CopyrightTagMissing"/>
+    </rule>
 
     <arg name="extensions" value="php"/>
     <!-- Warnings fail the build (no ignore_warnings_on_exit). -->

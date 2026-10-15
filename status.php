@@ -213,7 +213,7 @@ echo html_writer::div(
 // otherwise revealed live by amd/src/status.js the moment the poll returns 'completed'.
 // The question count sits in its own span (like question-count above) so the JS can refresh it to
 // the final value when completion happens mid-poll rather than on a fresh already-completed load.
-$successcountspan = html_writer::tag('span', $questioncount, ['data-region' => 'success-count']);
+$successcountspan = html_writer::tag('span', (string) $questioncount, ['data-region' => 'success-count']);
 echo html_writer::div(
     '✓ ' . get_string('generationcompletedsuccess', 'local_artqtml', $successcountspan),
     'alert alert-success' . ($generation->status === generation_status::COMPLETED ? ' mb-3' : ' mb-3 d-none'),
@@ -353,7 +353,7 @@ echo html_writer::tag(
 echo html_writer::tag(
     'p',
     get_string('questioncountlabel', 'local_artqtml') . ' ' .
-        html_writer::tag('span', $questioncount, ['data-region' => 'question-count'])
+        html_writer::tag('span', (string) $questioncount, ['data-region' => 'question-count'])
 );
 
 if (generation_status::is_in_progress($generation->status) && $canmutate) {

@@ -40,7 +40,7 @@ if (!data_submitted()) {
 require_sesskey();
 
 $provider = required_param('provider', PARAM_ALPHA);
-// modelaction (not action): admin settings posts action=save-settings on the same request when
+// Use modelaction (not action): admin settings posts action=save-settings on the same request when
 // these buttons use formaction inside that form; POST would win over a query-string action=.
 $action = required_param('modelaction', PARAM_ALPHA);
 

@@ -160,8 +160,9 @@ function xmldb_local_artqtml_upgrade($oldversion) {
     }
 
     if ($oldversion < 2026101405) {
-        // maxsourcetokens is an explicit ceiling; it no longer means "80% of generatorcontextwindow".
-        // Materialise the previous effective value so existing sites keep the same limit.
+        // The maxsourcetokens setting is an explicit ceiling; it no longer means
+        // "80% of generatorcontextwindow". Materialise the previous effective value so existing
+        // sites keep the same limit.
         $explicit = (int) (get_config('local_artqtml', 'maxsourcetokens') ?: 0);
         if ($explicit <= 0) {
             $contextwindow = (int) (get_config('local_artqtml', 'generatorcontextwindow') ?: 0);
