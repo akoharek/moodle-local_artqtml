@@ -5,7 +5,7 @@
     "license": "GPL-3.0-or-later",
     "require": {
         "phpstan/phpstan": "2.2.5",
-        "spaze/phpstan-disallowed-calls": "4.14.0",
+        "spaze/phpstan-disallowed-calls": "4.15.0",
         "squizlabs/php_codesniffer": "3.13.5",
         "moodlehq/moodle-cs": "v3.7.0",
         "phpmd/phpmd": "2.15.0"
